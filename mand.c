@@ -324,7 +324,7 @@ int main(int argc, char **argv) {
 
   // A drawing area for the results
   GtkWidget *da = gtk_drawing_area_new();
-  gtk_widget_set_size_request(da, 256, 256);
+  gtk_widget_set_size_request(da, 384, 384);
   g_signal_connect(da, "expose-event", G_CALLBACK(exposed), NULL);
   gtk_widget_add_events(da,
 			GDK_BUTTON_PRESS_MASK
