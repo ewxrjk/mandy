@@ -80,16 +80,15 @@ static void init_colors(void) {
   colors[MAXITER].r = colors[MAXITER].g = colors[MAXITER].b = 0;
 }
 
-static gboolean exposed(GtkWidget *widget,
-			GdkEventExpose __attribute__((unused)) *event,
-			gpointer __attribute__((unused)) data) {
+static void redraw(GtkWidget *widget,
+		   gboolean force) {
   static GdkPixbuf *pixbuf = NULL;
   static int lastw = -1, lasth = -1;
 
   gint w, h;
   gdk_drawable_get_size(widget->window, &w, &h);
 
-  if(w != lastw || h != lasth) {
+  if(w != lastw || h != lasth || force) {
     // The drawable size has changed, redraw it
     lastw = w;
     lasth = h;
@@ -109,15 +108,48 @@ static gboolean exposed(GtkWidget *widget,
       }
   }
 
-  // Redraw the exposed region
-  // TODO we could redraw *only* that region
+  // Redraw the drawing area
   gdk_draw_pixbuf(widget->window,
 		  widget->style->fg_gc[gtk_widget_get_state (widget)],
 		  pixbuf,
 		  0, 0, 0, 0, w, h,
 		  GDK_RGB_DITHER_NONE, 0, 0);
+}
 
+static gboolean exposed(GtkWidget *widget,
+			GdkEventExpose __attribute__((unused)) *event,
+			gpointer __attribute__((unused)) data) {
+  redraw(widget, FALSE);
   return TRUE;
+}
+
+static gboolean button_pressed(GtkWidget *widget,
+			       GdkEventButton *event,
+			       gpointer __attribute__((unused)) data) {
+  if(event->type == GDK_BUTTON_PRESS
+     && event->button == 1
+     && event->state == 0) {
+    gint w, h;
+    gdk_drawable_get_size(widget->window, &w, &h);
+    double xleft, ybottom, xsize, ysize;
+    if(w > h) {
+      xleft = x - size * w / h;
+      ybottom = y - size;
+      xsize = size * 2 * w / h;
+      ysize = size * 2;
+    } else {
+      xleft = x - size;
+      ybottom = y - size * h / w;
+      xsize = size * 2;
+      ysize = size * 2 * h / w;
+    }
+    x = xleft + event->x * xsize / w;
+    y = ybottom + (h - 1 - event->y) * ysize / h;
+    size = size / 1.414;
+    redraw(widget, TRUE);
+    return TRUE;
+  }
+  return FALSE;
 }
 
 static gboolean deleted(GtkWidget __attribute__((unused)) *widget,
@@ -143,6 +175,8 @@ int main(int argc, char **argv) {
   GtkWidget *da = gtk_drawing_area_new();
   gtk_widget_set_size_request(da, 256, 256);
   g_signal_connect(da, "expose-event", G_CALLBACK(exposed), NULL);
+  gtk_widget_add_events(da, GDK_BUTTON_PRESS_MASK);
+  g_signal_connect(da, "button-press-event", G_CALLBACK(button_pressed), NULL);
 
   // A label to say what we're doing
   GtkWidget *label = gtk_label_new("spong");
