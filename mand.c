@@ -168,7 +168,7 @@ static int *recompute(int w, int h) {
 // Color lookup table
 static struct {
   unsigned char r, g, b;
-} colors[MAXITER];
+} colors[MAXITER + 1];
 
 static void init_colors(void) {
   // The complement is colorful
@@ -212,7 +212,7 @@ static void redraw(GtkWidget *widget,
 
   // Redraw the drawing area
   gdk_draw_pixbuf(widget->window,
-		  widget->style->fg_gc[gtk_widget_get_state (widget)],
+		  widget->style->fg_gc[widget->state],
 		  pixbuf,
 		  0, 0, 0, 0, w, h,
 		  GDK_RGB_DITHER_NONE, 0, 0);
