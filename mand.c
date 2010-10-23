@@ -227,7 +227,41 @@ static gboolean exposed(GtkWidget *widget,
 
 
 static gboolean dragging;
-static double dragx, dragy;
+static double dragfromx, dragfromy, dragtox, dragtoy;
+
+static gboolean pointer_moved(GtkWidget __attribute__((unused)) *widget,
+			      GdkEventMotion *event,
+			      gpointer __attribute__((unused)) user_data) {
+  if(!dragging)
+    return FALSE;
+  dragtox = event->x;
+  dragtoy = event->y;
+  return TRUE;
+}
+
+static gboolean pointer_movement_timeout(gpointer data) {
+  GtkWidget *widget = data;
+  if(dragging) {
+    double deltax = dragtox - dragfromx;
+    double deltay = dragtoy - dragfromy;
+    if(!(deltax == 0 && deltay == 0)) {
+      dragfromx = dragtox;
+      dragfromy = dragtoy;
+      gint w, h;
+      gdk_drawable_get_size(widget->window, &w, &h);
+      if(w > h) {
+	x -= deltax * size * 2 / h;
+	y += deltay * size * 2 / h;
+      } else {
+	x -= deltax * size * 2 / w;
+	y += deltay * size * 2 / w;
+      }
+      report();
+      redraw(widget, TRUE);
+    }
+  }
+  return TRUE;
+}
 
 static gboolean button_pressed(GtkWidget *widget,
 			       GdkEventButton *event,
@@ -262,41 +296,19 @@ static gboolean button_pressed(GtkWidget *widget,
      && event->button == 1
      && event->state == 0) {
     dragging = TRUE;
-    dragx = event->x;
-    dragy = event->y;
+    dragtox = dragfromx = event->x;
+    dragtoy = dragfromy = event->y;
     return TRUE;
   }
   if(event->type == GDK_BUTTON_RELEASE
      && event->button == 1) {
+    dragtox = event->x;
+    dragtoy = event->y;
+    pointer_movement_timeout(widget);
     dragging = FALSE;
     return TRUE;
   }
   return FALSE;
-}
-
-static gboolean pointer_moved(GtkWidget *widget,
-			      GdkEventMotion *event,
-			      gpointer __attribute__((unused)) user_data) {
-  if(!dragging)
-    return FALSE;
-  double deltax = event->x - dragx;
-  double deltay = event->y - dragy;
-  if(!(deltax == 0 && deltay == 0)) {
-    dragx = event->x;
-    dragy = event->y;
-    gint w, h;
-    gdk_drawable_get_size(widget->window, &w, &h);
-    if(w > h) {
-      x -= deltax * size * 2 / h;
-      y += deltay * size * 2 / h;
-    } else {
-      x -= deltax * size * 2 / w;
-      y += deltay * size * 2 / w;
-    }
-    report();
-    redraw(widget, TRUE);
-  }
-  return TRUE;
 }
 
 static gboolean deleted(GtkWidget __attribute__((unused)) *widget,
@@ -333,6 +345,9 @@ int main(int argc, char **argv) {
   g_signal_connect(da, "button-press-event", G_CALLBACK(button_pressed), NULL);
   g_signal_connect(da, "button-release-event", G_CALLBACK(button_pressed), NULL);
   g_signal_connect(da, "motion-notify-event", G_CALLBACK(pointer_moved), NULL);
+
+  // Handle drags with a timeout
+  g_timeout_add(100, pointer_movement_timeout, da);
 
   // A label to say what we're doing
   GtkWidget *label = gtk_label_new("spong");
