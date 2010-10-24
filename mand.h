@@ -1,6 +1,8 @@
 #ifndef MAND_H
 #define MAND_H
 
+#define _GNU_SOURCE 1
+
 #define MAXITER 255
 
 struct color {
