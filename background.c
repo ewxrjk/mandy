@@ -128,9 +128,18 @@ static void *controller(void __attribute__((unused)) *data) {
 	fatal(rc, "pthread_cond_wait");
       continue;
     }
-    if(!(goaliters = malloc(goalw * goalh * sizeof(int))))
+    double workx = goalx, worky = goaly, workxsize = goalxsize;
+    int workw = goalw, workh = goalh;
+    if(!(goaliters = malloc(workw * workh * sizeof(int))))
       fatal(errno, "malloc");
-    mand(goalx, goaly, goalxsize, goalw, goalh, goaliters);
+    mand(workx, worky, workxsize, workw, workh, goaliters);
+    if(workx != goalx || worky != goaly || workxsize != goalxsize
+       || workw != goalw || workh != goalh) {
+      // The goal changed while we were thinking
+      free(goaliters);
+      goaliters = NULL;
+      continue;
+    }
     goalmet = 1;
     // We don't signal anything with the completion, the main thread
     // is expected to poll.
