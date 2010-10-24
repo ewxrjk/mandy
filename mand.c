@@ -7,26 +7,95 @@
 #include <gtk/gtk.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
-static GtkLabel *report_label;
+static void recompute(void);
 
 // The results of the most recent computation
 static int *latest_iters;
 static GdkPixbuf *latest_pixbuf;
+
 // Set if a computation is ongoing
 static gboolean recomputing;
+
 // Where and how to draw the results
 static GdkDrawable *drawable;
 static GdkGC *gc;
 static GtkWidget *toplevel;
-// Cursors
+
+// Cursor
 static GdkCursor *busy_cursor;
+
+// Reporting entry
+static GtkWidget *xentry, *yentry, *rentry;
+
+static void text_activated(GtkEntry *entry, gpointer user_data) {
+  double *value = (double *)user_data;
+  const char *text = gtk_entry_get_text(entry);
+  char *end;
+  errno = 0;
+  double n = strtod(text, &end);
+  // Reject invalid values with a beep.
+  if(errno
+     || (value == &size && n <= 0.0)
+     || *end) {
+    gdk_beep();
+    return;
+  }
+  *value = n;
+  recompute();
+}
+
+/* Create the control panel */
+static GtkWidget *controlpanel(void) {
+  GtkWidget *table = gtk_table_new(3, 4, FALSE);
+  GtkWidget *xcaption, *ycaption, *rcaption;
+
+  gtk_table_attach((GtkTable *)table,
+                   (xcaption = gtk_label_new("X centre")),
+                   0, 1, 0, 1,
+                   GTK_FILL, 0, 1, 1);
+  gtk_misc_set_alignment((GtkMisc *)xcaption, 1.0, 0.0);
+  gtk_table_attach((GtkTable *)table,
+                   (xentry = gtk_entry_new()),
+                   1, 2, 0, 1,
+                   GTK_FILL, 0, 1, 1);
+  g_signal_connect(xentry, "activate", G_CALLBACK(text_activated), &xcenter);
+
+  gtk_table_attach((GtkTable *)table,
+                   (ycaption = gtk_label_new("Y centre")),
+                   0, 1, 1, 2,
+                   GTK_FILL, 0, 1, 1);
+  gtk_misc_set_alignment((GtkMisc *)ycaption, 1.0, 0.0);
+  gtk_table_attach((GtkTable *)table,
+                   (yentry = gtk_entry_new()),
+                   1, 2, 1, 2,
+                   GTK_FILL, 0, 1, 1);
+  g_signal_connect(yentry, "activate", G_CALLBACK(text_activated), &ycenter);
+
+  gtk_table_attach((GtkTable *)table,
+                   (rcaption = gtk_label_new("Radius")),
+                   0, 1, 2, 3,
+                   GTK_FILL, 0, 1, 1);
+  gtk_misc_set_alignment((GtkMisc *)rcaption, 1.0, 0.0);
+  gtk_table_attach((GtkTable *)table,
+                   (rentry = gtk_entry_new()),
+                   1, 2, 2, 3,
+                   GTK_FILL, 0, 1, 1);
+  g_signal_connect(rentry, "activate", G_CALLBACK(text_activated), &size);
+
+  GtkWidget *frame = gtk_frame_new(NULL);
+  gtk_container_add((GtkContainer *)frame, table);
+  return frame;
+}
 
 /* Report current position, size, etc */
 static void report(void) {
   char buffer[128];
-  snprintf(buffer, sizeof buffer,
-	   "%g x %g radius %g", xcenter, ycenter, size);
-  gtk_label_set_text(report_label, buffer);
+  snprintf(buffer, sizeof buffer, "%g", xcenter);
+  gtk_entry_set_text((GtkEntry *)xentry, buffer);
+  snprintf(buffer, sizeof buffer, "%g", ycenter);
+  gtk_entry_set_text((GtkEntry *)yentry, buffer);
+  snprintf(buffer, sizeof buffer, "%g", size);
+  gtk_entry_set_text((GtkEntry *)rentry, buffer);
 }
 
 /* Attempt to recompute and redraw when we either know something has
@@ -218,15 +287,10 @@ int main(int argc, char **argv) {
   // Timeout to pick up the results of delayed recomputation
   g_timeout_add(10, timeout, NULL);
 
-  // A label to say what we're doing
-  GtkWidget *label = gtk_label_new("spong");
-  report_label = (GtkLabel *)label;
-  report();
-
   // Pack it together vertically
   GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
-  gtk_box_pack_start((GtkBox *)vbox, da, TRUE, TRUE, 0);
-  gtk_box_pack_end((GtkBox *)vbox, label, FALSE, FALSE, 1);
+  gtk_box_pack_start((GtkBox *)vbox, controlpanel(), FALSE, FALSE, 1);
+  gtk_box_pack_end((GtkBox *)vbox, da, TRUE, TRUE, 0);
   gtk_container_add((GtkContainer *)toplevel, vbox);
   gtk_widget_show_all(toplevel);
 
@@ -237,6 +301,7 @@ int main(int argc, char **argv) {
 
   // Start an initial computation.
   recompute();
+  report();
 
   // Run the main loop
   GMainLoop *mainloop = g_main_loop_new(0, 0);
