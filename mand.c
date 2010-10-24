@@ -8,9 +8,6 @@
 #include <gtk/gtk.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
-// x, y are the centre
-// size is the distance from the centre to the nearest edge
-static double x = 0.0, y = 0.0, size = 2.0;
 static GtkLabel *report_label;
 
 static void report(void) {
@@ -22,10 +19,7 @@ static void report(void) {
 
 static int *recompute(int w, int h) {
   int *iters = malloc(w * h * sizeof(int));
-  if(w > h)
-    mand(x - size * w / h, y - size, size * 2 * w / h, w, h, iters);
-  else
-    mand(x - size, y - size * h / w, size * 2, w, h, iters);
+  mand(x - xsize(w, h), y - ysize(w, h), xsize(w, h) * 2, w, h, iters);
   return iters;
 }
 

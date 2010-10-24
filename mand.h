@@ -13,8 +13,11 @@ void destroy_threads(void);
 void mand(double x, double y, double xsize, int xpixels, int ypixels,
 	  int *results);
 void init_colors(void);
+double xsize(int w, int h);
+double ysize(int w, int h);
 
 extern struct color colors[];
+extern double x, y, size;
 
 #endif /* MAND_H */
 
