@@ -1,0 +1,74 @@
+	 mand - display the Mandelbrot set and its complement
+	 ====================================================
+
+		  *** THIS IS A WORK IN PROGRESS ***
+
+This is a simple GTK+ program that lets you zoom in on the Mandelbrot
+set.
+
+Installation
+============
+
+  make
+  sudo make install
+
+Use
+===
+
+Display:
+
+  When you start 'mand' the display is divided into two halves.  The
+  bottom half has the pretty pictures and the top half tells you where
+  you are.
+
+  'X centre' and 'Y centre' define the location of the centre of the
+  window in the complex plane.  (X means the real part and Y the
+  imaginary part.)  You start at (0,0).
+
+  'Radius' defines gives the radius of the largest circle visible.
+
+  'Iterations' defines the maximum number of iterations for each
+  point.  Lower values are faster, higher values give more detail.
+
+  All of the above fields can be edited directly.  Press ENTER to set
+  the new values.  You will get a beep if you entered something
+  invalid.
+
+Mouse:
+
+  You can use the first (left) mouse button to drag the image around.
+
+  You can use the second (middle) mouse button to zoom in on the point
+  you click.  If you want to zoom back out, edit the 'Radius' box
+  above.
+
+Hacking
+=======
+
+This program requires GCC and C99 support.
+
+All the GTK+-specific code is kept in mand.c.  The idea is to support
+the possibility of other UIs.
+
+The calculations are done in background threads in background.c.  A
+worker thread is created for each CPU core that is online when the
+program starts.  If cores are offlined or onlined while it runs then
+the number of threads will no longer match the number of cores.
+
+Copyright
+=========
+
+Copyright © 2010 Richard Kettlewell.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
