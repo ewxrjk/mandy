@@ -7,7 +7,7 @@
 static int ncores;
 static struct threadinfo {
   pthread_t id;
-  double x, y, size;
+  double x, y, xsize;
   int xpixels, ypixels;
   int *results;
 } *threads;
@@ -49,8 +49,8 @@ static void *worker(void *arg) {
       fatal(rc, "pthread_mutex_unlock");
     for(int py = 0; py < me->ypixels; ++py)
       for(int px = 0; px < me->xpixels; ++px)
-	*results++ = calc(me->x + px * me->size / me->xpixels,
-			  me->y + py * me->size / me->xpixels);
+	*results++ = calc(me->x + px * me->xsize / me->xpixels,
+			  me->y + py * me->xsize / me->xpixels);
     if((rc = pthread_mutex_lock(&lock)))
       fatal(rc, "pthread_mutex_lock");
     me->results = 0;
@@ -87,8 +87,9 @@ void destroy_threads(void) {
   }
 }
 
-// Compute values for [x,x+size) x [y, y+size) in xpixels * ypixels
-void mand(double x, double y, double size, int xpixels, int ypixels,
+// Compute values for [x,x+xsize) x [y, y+xsize*ypixels/xpixels)
+// in xpixels * ypixels
+void mand(double x, double y, double xsize, int xpixels, int ypixels,
 	  int *results) {
   int rc;
   if((rc = pthread_mutex_lock(&lock)))
@@ -98,8 +99,8 @@ void mand(double x, double y, double size, int xpixels, int ypixels,
   int extra = ypixels % ncores != 0;
   for(int n = 0; n < ncores; ++n) {
     threads[n].x = x;
-    threads[n].y = y + n * ychunk * size / xpixels;
-    threads[n].size = size;
+    threads[n].y = y + n * ychunk * xsize / xpixels;
+    threads[n].xsize = xsize;
     threads[n].xpixels = xpixels;
     threads[n].ypixels = ychunk + (n == ncores - 1 && extra);
     threads[n].results = results + xpixels * n * ychunk;
