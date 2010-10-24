@@ -32,9 +32,15 @@ void init_colors(int new_maxiter) {
   colors = malloc((maxiter + 1) * sizeof *colors);
   // The complement is colorful
   for(int n = 0; n < maxiter; ++n) {
+#if 0
     colors[n].r = (cos(2 * M_PI * (double)n / maxiter) + 1.0) * 127;
     colors[n].g = 255 - (cos(4 * M_PI * (double)n / maxiter) + 1.0) * 127;
     colors[n].b = 255 - (cos(8 * M_PI * (double)n / maxiter) + 1.0) * 127;
+#else
+    colors[n].r = (cos(2 * M_PI * n / 256) + 1.0) * 127;
+    colors[n].g = (cos(2 * M_PI * n / 1024) + 1.0) * 127;
+    colors[n].b = (cos(2 * M_PI * n / 512) + 1.0) * 127;
+#endif
   }
   // The set itself is black
   colors[maxiter].r = colors[maxiter].g = colors[maxiter].b = 0;
