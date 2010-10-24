@@ -11,7 +11,8 @@ static struct threadinfo {
   int xpixels, ypixels;
   int *results;
 } *threads;
-static pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+static pthread_cond_t work_available = PTHREAD_COND_INITIALIZER;
+static pthread_cond_t work_done = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 static int quit_threads;
 
@@ -40,7 +41,7 @@ static void *worker(void *arg) {
     fatal(rc, "pthread_mutex_lock");
   while(!quit_threads) {
     if(!me->results) {
-      if((rc = pthread_cond_wait(&cond, &lock)))
+      if((rc = pthread_cond_wait(&work_available, &lock)))
 	fatal(rc, "pthread_cond_wait");
       continue;
     }
@@ -54,7 +55,7 @@ static void *worker(void *arg) {
     if((rc = pthread_mutex_lock(&lock)))
       fatal(rc, "pthread_mutex_lock");
     me->results = 0;
-    if((rc = pthread_cond_broadcast(&cond)))
+    if((rc = pthread_cond_broadcast(&work_done)))
       fatal(rc, "pthread_cond_broadcast");
   }
   if((rc = pthread_mutex_unlock(&lock)))
@@ -77,7 +78,7 @@ void destroy_threads(void) {
   if((rc = pthread_mutex_lock(&lock)))
     fatal(rc, "pthread_mutex_lock");
   quit_threads = 1;
-  if((rc = pthread_cond_broadcast(&cond)))
+  if((rc = pthread_cond_broadcast(&work_available)))
     fatal(rc, "pthread_cond_broadcast");
   if((rc = pthread_mutex_unlock(&lock)))
     fatal(rc, "pthread_mutex_unlock");
@@ -106,7 +107,7 @@ void mand(double x, double y, double xsize, int xpixels, int ypixels,
     threads[n].results = results + xpixels * n * ychunk;
   }
   // Set them going
-  if((rc = pthread_cond_broadcast(&cond)))
+  if((rc = pthread_cond_broadcast(&work_available)))
     fatal(rc, "pthread_cond_broadcast");
   // Wait for them to finish
   for(;;) {
@@ -116,7 +117,7 @@ void mand(double x, double y, double xsize, int xpixels, int ypixels,
 	++finished;
     if(finished >= ncores)
       break;
-    if((rc = pthread_cond_wait(&cond, &lock)))
+    if((rc = pthread_cond_wait(&work_done, &lock)))
       fatal(rc, "pthread_cond_wait");
   }
   if((rc = pthread_mutex_unlock(&lock)))
