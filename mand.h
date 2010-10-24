@@ -19,6 +19,8 @@ double xleft(int w, int h);
 double ybottom(int w, int h);
 double xposition(int w, int h, int x);
 double yposition(int w, int h, int y);
+void drag(int w, int h, int deltax, int deltay);
+void zoom(int w, int h, int x, int y);
 
 extern struct color colors[];
 extern double xcenter, ycenter, size;

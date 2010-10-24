@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <errno.h>
-#include <math.h>
 #include <glib.h>
 #include <gtk/gtk.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
@@ -95,13 +94,7 @@ static gboolean pointer_movement_timeout(gpointer data) {
       dragfromy = dragtoy;
       gint w, h;
       gdk_drawable_get_size(widget->window, &w, &h);
-      if(w > h) {
-	xcenter -= deltax * size * 2 / h;
-	ycenter += deltay * size * 2 / h;
-      } else {
-	xcenter -= deltax * size * 2 / w;
-	ycenter += deltay * size * 2 / w;
-      }
+      drag(w, h, deltax, deltay);
       report();
       redraw(widget, TRUE);
     }
@@ -118,9 +111,7 @@ static gboolean button_pressed(GtkWidget *widget,
      && event->state == 0) {
     gint w, h;
     gdk_drawable_get_size(widget->window, &w, &h);
-    xcenter = xposition(w, h, event->x);
-    ycenter = yposition(w, h, event->y);
-    size = size * sqrt(0.5);
+    zoom(w, h, event->x, event->y);
     report();
     redraw(widget, TRUE);
     return TRUE;
