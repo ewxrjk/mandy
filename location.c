@@ -17,10 +17,10 @@
  * proceeding from left to right and increasing imaginary (Y) values
  * proceeding from bottom to top.
  *
- * The objects x and y give the centre of the window in plane units
+ * The objects x and y give the center of the window in plane units
  * and the object size gives the radius of the largest displayable
  * circle, i.e. the distance parallel to the real or imaginary axis
- * from the centre to the nearest window edge.  The reason for this is
+ * from the center to the nearest window edge.  The reason for this is
  * to produce sensible behavior as the window is resized.
  *
  * THE ITERS[] ARRAY
@@ -33,9 +33,9 @@
  * units.
  */
 
-// Location of the centre of the window
-double xcentre = 0.0;
-double ycentre = 0.0;
+// Location of the center of the window
+double xcenter = 0.0;
+double ycenter = 0.0;
 
 // Distance to the nearest edge
 double size = 2.0;
@@ -54,6 +54,22 @@ double ysize(int w, int h) {
     return size;
   else
     return size * h / w;
+}
+
+// Get the left (least real) boundary of the window in plane units
+double xleft(int w, int h) {
+  if(w > h)
+    return xcenter - size * w / h;
+  else
+    return xcenter - size;
+}
+
+// Get the lower (least imaginary) boundary of the window in plane units
+double ybottom(int w, int h) {
+  if(w > h)
+    return ycenter - size;
+  else
+    return ycenter - size * h / w;
 }
 
 /*

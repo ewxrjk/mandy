@@ -13,14 +13,14 @@ static GtkLabel *report_label;
 static void report(void) {
   char buffer[128];
   snprintf(buffer, sizeof buffer,
-	   "%g x %g radius %g", xcentre, ycentre, size);
+	   "%g x %g radius %g", xcenter, ycenter, size);
   gtk_label_set_text(report_label, buffer);
 }
 
 static int *recompute(int w, int h) {
   int *iters = malloc(w * h * sizeof(int));
-  mand(xcentre - xsize(w, h),
-       ycentre - ysize(w, h),
+  mand(xcenter - xsize(w, h),
+       ycenter - ysize(w, h),
        xsize(w, h) * 2,
        w, h,
        iters);
@@ -96,11 +96,11 @@ static gboolean pointer_movement_timeout(gpointer data) {
       gint w, h;
       gdk_drawable_get_size(widget->window, &w, &h);
       if(w > h) {
-	xcentre -= deltax * size * 2 / h;
-	ycentre += deltay * size * 2 / h;
+	xcenter -= deltax * size * 2 / h;
+	ycenter += deltay * size * 2 / h;
       } else {
-	xcentre -= deltax * size * 2 / w;
-	ycentre += deltay * size * 2 / w;
+	xcenter -= deltax * size * 2 / w;
+	ycenter += deltay * size * 2 / w;
       }
       report();
       redraw(widget, TRUE);
@@ -118,16 +118,8 @@ static gboolean button_pressed(GtkWidget *widget,
      && event->state == 0) {
     gint w, h;
     gdk_drawable_get_size(widget->window, &w, &h);
-    double xleft, ybottom;
-    if(w > h) {
-      xleft = xcentre - size * w / h;
-      ybottom = ycentre - size;
-    } else {
-      xleft = xcentre - size;
-      ybottom = ycentre - size * h / w;
-    }
-    xcentre = xleft + event->x * xsize(w, h) * 2 / w;
-    ycentre = ybottom + (h - 1 - event->y) * ysize(w, h) * 2 / h;
+    xcenter = xleft(w, h) + event->x * xsize(w, h) * 2 / w;
+    ycenter = ybottom(w, h) + (h - 1 - event->y) * ysize(w, h) * 2 / h;
     size = size / 1.414;
     report();
     redraw(widget, TRUE);

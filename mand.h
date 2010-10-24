@@ -15,9 +15,11 @@ void mand(double x, double y, double xsize, int xpixels, int ypixels,
 void init_colors(void);
 double xsize(int w, int h);
 double ysize(int w, int h);
+double xleft(int w, int h);
+double ybottom(int w, int h);
 
 extern struct color colors[];
-extern double xcentre, ycentre, size;
+extern double xcenter, ycenter, size;
 
 #endif /* MAND_H */
 
