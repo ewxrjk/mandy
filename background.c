@@ -16,6 +16,7 @@
 #include "mand.h"
 #include <pthread.h>
 #include <unistd.h>
+#include <sys/time.h>
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -25,6 +26,8 @@ static int goalw, goalh;
 static int goalmax;
 static int goalmet = 1;
 static int *goaliters;
+
+static double pps;
 
 static pthread_t controller_id;
 static int ncores;
@@ -106,6 +109,8 @@ static void *worker(void *arg) {
 static void mand(double x, double y, double xsize, int xpixels, int ypixels,
 		 int max, int *results) {
   int rc;
+  struct timeval tv0, tv1;
+  
   // Fill in the per-thread requests
   int ychunk = ypixels / ncores;
   int extra = ypixels % ncores != 0;
@@ -118,6 +123,7 @@ static void mand(double x, double y, double xsize, int xpixels, int ypixels,
     threads[n].max = max;
     threads[n].results = results + xpixels * n * ychunk;
   }
+  gettimeofday(&tv0, NULL);
   // Set them going
   if((rc = pthread_cond_broadcast(&work_available)))
     fatal(rc, "pthread_cond_broadcast");
@@ -132,6 +138,8 @@ static void mand(double x, double y, double xsize, int xpixels, int ypixels,
     if((rc = pthread_cond_wait(&work_done, &lock)))
       fatal(rc, "pthread_cond_wait");
   }
+  gettimeofday(&tv1, NULL);
+  pps = xpixels * ypixels / ((tv1.tv_sec - tv0.tv_sec) + (tv1.tv_usec - tv0.tv_usec) / 1000000.0);
 }
 
 /* Controller thread.  When goalmet is set to 0, allocates a new iters[]
@@ -241,6 +249,17 @@ int *compute(double x, double y, double xsize, int w, int h, int max) {
   if((rc = pthread_mutex_unlock(&lock)))
     fatal(rc, "pthread_mutex_unlock");
   return result;
+}
+
+double pixelrate(void) {
+  int rc;
+  
+  if((rc = pthread_mutex_lock(&lock)))
+    fatal(rc, "pthread_mutex_lock");
+  double r = pps;
+  if((rc = pthread_mutex_unlock(&lock)))
+    fatal(rc, "pthread_mutex_unlock");
+  return r;
 }
 
 /*

@@ -35,6 +35,7 @@ double xposition(int w, int h, int x);
 double yposition(int w, int h, int y);
 void drag(int w, int h, int deltax, int deltay);
 void zoom(int w, int h, int x, int y, double scale);
+double pixelrate(void);
 
 extern struct color *colors;
 extern int maxiter;

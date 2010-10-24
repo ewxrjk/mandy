@@ -34,6 +34,9 @@ Display:
   the new values.  You will get a beep if you entered something
   invalid.
 
+  'Pixel/s' shows how many pixels per second the program computed on
+  the last run.
+
 Mouse:
 
   You can use the left mouse button to drag the image around.
