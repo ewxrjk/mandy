@@ -264,7 +264,7 @@ int main(int argc, char **argv) {
 
   // Bits of infrastructure
   init_threads();
-  init_colors();
+  init_colors(255);
 
   // The top level window
   toplevel = gtk_window_new(GTK_WINDOW_TOPLEVEL);

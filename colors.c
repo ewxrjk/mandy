@@ -1,18 +1,28 @@
 #include "mand.h"
 #include <math.h>
+#include <stdlib.h>
 
 // Color lookup table
-struct color colors[MAXITER + 1];
+struct color *colors;
 
-void init_colors(void) {
+// Maximum iteration count
+int maxiter;
+
+void init_colors(int new_maxiter) {
+  if(maxiter == new_maxiter)
+    return;
+  maxiter = new_maxiter;
+  if(colors)
+    free(colors);
+  colors = malloc((maxiter + 1) * sizeof *colors);
   // The complement is colorful
-  for(int n = 0; n < MAXITER; ++n) {
-    colors[n].r = (cos(2 * M_PI * (double)n / MAXITER) + 1.0) * 127;
-    colors[n].g = 255 - (cos(4 * M_PI * (double)n / MAXITER) + 1.0) * 127;
-    colors[n].b = 255 - (cos(8 * M_PI * (double)n / MAXITER) + 1.0) * 127;
+  for(int n = 0; n < maxiter; ++n) {
+    colors[n].r = (cos(2 * M_PI * (double)n / maxiter) + 1.0) * 127;
+    colors[n].g = 255 - (cos(4 * M_PI * (double)n / maxiter) + 1.0) * 127;
+    colors[n].b = 255 - (cos(8 * M_PI * (double)n / maxiter) + 1.0) * 127;
   }
   // The set itself is black
-  colors[MAXITER].r = colors[MAXITER].g = colors[MAXITER].b = 0;
+  colors[maxiter].r = colors[maxiter].g = colors[maxiter].b = 0;
 }
 
 /*

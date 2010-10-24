@@ -3,8 +3,6 @@
 
 #define _GNU_SOURCE 1
 
-#define MAXITER 255
-
 struct color {
   unsigned char r, g, b;
 };
@@ -13,7 +11,7 @@ void fatal(int errno_value, const char *fmt, ...);
 void init_threads(void);
 void destroy_threads(void);
 int *compute(double x, double y, double xsize, int w, int h);
-void init_colors(void);
+void init_colors(int new_maxiter);
 double xsize(int w, int h);
 double ysize(int w, int h);
 double xleft(int w, int h);
@@ -23,7 +21,8 @@ double yposition(int w, int h, int y);
 void drag(int w, int h, int deltax, int deltay);
 void zoom(int w, int h, int x, int y);
 
-extern struct color colors[];
+extern struct color *colors;
+extern int maxiter;
 extern double xcenter, ycenter, size;
 
 #endif /* MAND_H */

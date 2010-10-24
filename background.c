@@ -42,7 +42,7 @@ static int calc(double cx, double cy) {
   // then z^2 + c = zx^2 - zy^2 + cx + i(2zxzy+cy)
   int iterations = 0;
   double zx = 0, zy = 0;
-  while(iterations < MAXITER && (zx * zx + zy * zy < 4.0)) {
+  while(iterations < maxiter && (zx * zx + zy * zy < 4.0)) {
     double nzx = zx * zx - zy * zy + cx;
     double nzy = 2 * zx * zy  + cy;
     zx = nzx;
