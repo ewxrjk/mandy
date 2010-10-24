@@ -61,12 +61,10 @@ static int calc(double cx, double cy, int max) {
   //
   // then z^2 + c = zx^2 - zy^2 + cx + i(2zxzy+cy)
   int iterations = 0;
-  double zx = 0, zy = 0;
-  while(iterations < max && (zx * zx + zy * zy < 4.0)) {
-    double nzx = zx * zx - zy * zy + cx;
-    double nzy = 2 * zx * zy  + cy;
-    zx = nzx;
-    zy = nzy;
+  double zx = 0, zy = 0, zx2, zy2;
+  while(((zx2 = zx * zx) + (zy2 = zy * zy) < 4.0) && iterations < max) {
+    zy = 2 * zx * zy  + cy;
+    zx = zx2 - zy2 + cx;
     ++iterations;
   }
   return iterations;

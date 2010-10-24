@@ -29,6 +29,9 @@ SOURCE:=$(subst .o,.c,${OBJECT}) mand.h
 mand: $(OBJECT)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJECT) $(LIBS)
 
+%.s: %.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -S $<
+
 $(OBJECT): mand.h
 
 installdirs:
