@@ -14,9 +14,62 @@ void drag(int w, int h, int deltax, int deltay) {
 
 // Perform a zoom
 void zoom(int w, int h, int x, int y) {
+#if 1
+  /* The idea is that when you click on a point, it should zoom
+   * *around that point*.  Formally we require that:
+   *
+   * xposition_0(w, h, x) = xposition_1(w, h, x)
+   * xposition_0(w, h, y) = xposition_1(w, h, y)
+   *
+   * Where [xy]position_0 use [xy]center_0 and size_0 (the before values)
+   * and [xy]position_1 use [xy]centre_1 and size_1 (the after values).
+   *
+   * We know size_1 = k*size_0 (for some scale factor k) and what we
+   * are after is [xy]centre_1.
+   *
+   * Expanding on the X axis for the w>h case:
+   *
+   * xposition_0(w,h,x) = xleft_0(w,h)+x*xsize_0(w,h)/w
+   *                    = xcenter_0 - size_0*w/h + x*(size_0*w*2/h)/w
+   *                    = xcenter_0 + size_0*(x*2 - w)/h
+   * xposition_1(w,h,x) = xcenter_1 + size_1*(x*2 - w)/h
+   *
+   * Equating these:
+   *
+   * xcenter_0 + size_0*(x*2 - w)/h = xcenter_1 + size_1*(x*2 - w)/h
+   * xcenter_1 = xcenter_0 + size_0*(x*2 - w)/h - size_1*(x*2 - w)/h
+   *           = xcenter_0 + (size_0-size_1) * (x*2 - w)/h
+   *           = xcenter_0 + size_0*(1-k) * (x*2 - w)/h
+   *
+   * For the h>w case:
+   *
+   * xposition_0(w,h,x) = xleft_0(w,h)+x*xsize_0(w,h)/w
+   *                    = xcenter_0 - size_0 + x*size_0*2/w
+   *                    = xcenter_0 + size_0*(x*2/w - 1)
+   * xposition_1(w,h,x) = xcenter_1 + size_1*(x*2/w - 1)
+   *
+   * Equating:
+   *
+   * xcenter_0 + size_0*(x*2/w - 1) = xcenter_1 + size_1*(x*2/w - 1)
+   * xcenter_1 = xcenter_0 + (size_0-size_1)*(x*2/w - 1)
+   *           = xcenter_0 + size_0*(1-k)*(x*2/w - 1)
+   */
+  const double k = M_SQRT1_2;	/* == 1/sqrt(2) */
+  if(w > h) {
+    xcenter += size * (1-k) * (x * 2 - w) / h;
+    ycenter += size * (1-k) * ((h - 1 - y) * 2.0 / h - 1);
+  } else {
+    xcenter += size * (1-k) * (x * 2.0 / w - 1);
+    ycenter += size * (1-k) * ((h - 1 - y) * 2 - h) / w;
+  }
+  size = size * k;
+#else
+  // This is actually zoom + recenter.  It's a bit annoying in
+  // practice.
   xcenter = xposition(w, h, x);
   ycenter = yposition(w, h, y);
   size = size * sqrt(0.5);
+#endif
 }
 
 /*
