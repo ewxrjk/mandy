@@ -12,8 +12,7 @@ struct color {
 void fatal(int errno_value, const char *fmt, ...);
 void init_threads(void);
 void destroy_threads(void);
-void mand(double x, double y, double xsize, int xpixels, int ypixels,
-	  int *results);
+int *compute(double x, double y, double xsize, int w, int h);
 void init_colors(void);
 double xsize(int w, int h);
 double ysize(int w, int h);
