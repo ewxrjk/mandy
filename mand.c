@@ -17,6 +17,9 @@ static gboolean recomputing;
 // Where and how to draw the results
 static GdkDrawable *drawable;
 static GdkGC *gc;
+static GtkWidget *toplevel;
+// Cursors
+static GdkCursor *busy_cursor, *idle_cursor;
 
 /* Report current position, size, etc */
 static void report(void) {
@@ -42,6 +45,8 @@ static void recompute(void) {
   // If it's not ready yet just return.  We'll get a timeout callback
   // soon enough.
   if(!latest_iters) {
+    if(!recomputing)
+      gdk_window_set_cursor(toplevel->window, busy_cursor);
     recomputing = TRUE;
     return;
   }
@@ -133,6 +138,7 @@ static gboolean timeout(gpointer __attribute__((unused)) data) {
     // one.
     recompute();
     if(!recomputing) {
+      gdk_window_set_cursor(toplevel->window, idle_cursor);
       // We must have got an answer
       redraw();
     }
@@ -192,7 +198,7 @@ int main(int argc, char **argv) {
   init_colors();
 
   // The top level window
-  GtkWidget *toplevel = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+  toplevel = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title((GtkWindow *)toplevel, "mand");
   g_signal_connect(G_OBJECT(toplevel), "delete-event",
                    G_CALLBACK(deleted), NULL);
@@ -227,6 +233,8 @@ int main(int argc, char **argv) {
   // We only know these after the first _show_all call
   drawable = da->window;
   gc = da->style->fg_gc[da->state];
+  idle_cursor = gdk_window_get_cursor(toplevel->window);
+  busy_cursor = gdk_cursor_new(GDK_WATCH);
 
   // Start an initial computation.
   recompute();
