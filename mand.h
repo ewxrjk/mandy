@@ -17,7 +17,7 @@ double xsize(int w, int h);
 double ysize(int w, int h);
 
 extern struct color colors[];
-extern double x, y, size;
+extern double xcentre, ycentre, size;
 
 #endif /* MAND_H */
 
