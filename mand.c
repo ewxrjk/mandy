@@ -29,22 +29,6 @@ static int *recompute(int w, int h) {
   return iters;
 }
 
-// Color lookup table
-static struct {
-  unsigned char r, g, b;
-} colors[MAXITER + 1];
-
-static void init_colors(void) {
-  // The complement is colorful
-  for(int n = 0; n < MAXITER; ++n) {
-    colors[n].r = (cos(2 * M_PI * (double)n / MAXITER) + 1.0) * 127;
-    colors[n].g = 255 - (cos(4 * M_PI * (double)n / MAXITER) + 1.0) * 127;
-    colors[n].g = 255 - (cos(8 * M_PI * (double)n / MAXITER) + 1.0) * 127;
-  }
-  // The set itself is black
-  colors[MAXITER].r = colors[MAXITER].g = colors[MAXITER].b = 0;
-}
-
 static void redraw(GtkWidget *widget,
 		   gboolean force) {
   static GdkPixbuf *pixbuf = NULL;
