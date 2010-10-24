@@ -19,7 +19,7 @@ static GdkDrawable *drawable;
 static GdkGC *gc;
 static GtkWidget *toplevel;
 // Cursors
-static GdkCursor *busy_cursor, *idle_cursor;
+static GdkCursor *busy_cursor;
 
 /* Report current position, size, etc */
 static void report(void) {
@@ -138,7 +138,7 @@ static gboolean timeout(gpointer __attribute__((unused)) data) {
     // one.
     recompute();
     if(!recomputing) {
-      gdk_window_set_cursor(toplevel->window, idle_cursor);
+      gdk_window_set_cursor(toplevel->window, NULL);
       // We must have got an answer
       redraw();
     }
@@ -233,7 +233,6 @@ int main(int argc, char **argv) {
   // We only know these after the first _show_all call
   drawable = da->window;
   gc = da->style->fg_gc[da->state];
-  idle_cursor = gdk_window_get_cursor(toplevel->window);
   busy_cursor = gdk_cursor_new(GDK_WATCH);
 
   // Start an initial computation.
