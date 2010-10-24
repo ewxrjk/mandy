@@ -1,3 +1,4 @@
+#include "mand.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
@@ -38,20 +39,6 @@ static int calc(double cx, double cy) {
     ++iterations;
   }
   return iterations;
-}
-
-static void fatal(int errno_value, const char *fmt, ...) {
-  va_list ap;
-
-  fprintf(stderr,"FATAL: ");
-  va_start(ap, fmt);
-  vfprintf(stderr, fmt, ap);
-  va_end(ap);
-  if(errno_value)
-    fprintf(stderr, ": %s\n", strerror(errno));
-  else
-    fputc('\n', stderr);
-  exit(1);
 }
 
 static void *worker(void *arg) {
@@ -365,3 +352,12 @@ int main(int argc, char **argv) {
   GMainLoop *mainloop = g_main_loop_new(0, 0);
   g_main_loop_run(mainloop);
 }
+
+/*
+Local Variables:
+c-basic-offset:2
+comment-column:40
+fill-column:79
+indent-tabs-mode:nil
+End:
+*/
