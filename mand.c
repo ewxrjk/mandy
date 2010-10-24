@@ -19,9 +19,9 @@ static void report(void) {
 
 static int *recompute(int w, int h) {
   int *iters = malloc(w * h * sizeof(int));
-  mand(xcenter - xsize(w, h),
-       ycenter - ysize(w, h),
-       xsize(w, h) * 2,
+  mand(xcenter - xsize(w, h) / 2,
+       ycenter - ysize(w, h) / 2,
+       xsize(w, h),
        w, h,
        iters);
   return iters;
@@ -118,9 +118,9 @@ static gboolean button_pressed(GtkWidget *widget,
      && event->state == 0) {
     gint w, h;
     gdk_drawable_get_size(widget->window, &w, &h);
-    xcenter = xleft(w, h) + event->x * xsize(w, h) * 2 / w;
-    ycenter = ybottom(w, h) + (h - 1 - event->y) * ysize(w, h) * 2 / h;
-    size = size / 1.414;
+    xcenter = xposition(w, h, event->x);
+    ycenter = yposition(w, h, event->y);
+    size = size * sqrt(0.5);
     report();
     redraw(widget, TRUE);
     return TRUE;

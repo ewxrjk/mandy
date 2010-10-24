@@ -17,6 +17,8 @@ double xsize(int w, int h);
 double ysize(int w, int h);
 double xleft(int w, int h);
 double ybottom(int w, int h);
+double xposition(int w, int h, int x);
+double yposition(int w, int h, int y);
 
 extern struct color colors[];
 extern double xcenter, ycenter, size;

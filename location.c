@@ -43,17 +43,17 @@ double size = 2.0;
 // Get the width of the window in plane units
 double xsize(int w, int h) {
   if(w > h)
-    return size * w / h;
+    return size * w * 2 / h;
   else
-    return size;
+    return size * 2;
 }
 
 // Get the height of the window in plane units
 double ysize(int w, int h) {
   if(w > h)
-    return size;
+    return size * 2;
   else
-    return size * h / w;
+    return size * h * 2 / w;
 }
 
 // Get the left (least real) boundary of the window in plane units
@@ -70,6 +70,16 @@ double ybottom(int w, int h) {
     return ycenter - size;
   else
     return ycenter - size * h / w;
+}
+
+// Get the plane X position of a window coordinate
+double xposition(int w, int h, int x) {
+  return xleft(w, h) + x * xsize(w, h) / w;
+}
+
+// Get the plane Y position of a window coordinate
+double yposition(int w, int h, int y) {
+  return ybottom(w, h) + (h - 1 - y) * ysize(w, h) / h;
 }
 
 /*
