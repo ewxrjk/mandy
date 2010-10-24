@@ -14,7 +14,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "mand.h"
-#include <math.h>
 
 // Perform a drag (in pixel units)
 void drag(int w, int h, int deltax, int deltay) {
@@ -27,8 +26,9 @@ void drag(int w, int h, int deltax, int deltay) {
   }
 }
 
-// Perform a zoom
-void zoom(int w, int h, int x, int y) {
+/* Perform a zoom.  scale is the ratio of 'size', less than 1 to zoom
+ * in and more than 1 to zoom out. */
+void zoom(int w, int h, int x, int y, double scale) {
 #if 1
   /* The idea is that when you click on a point, it should zoom
    * *around that point*.  Formally we require that:
@@ -69,15 +69,14 @@ void zoom(int w, int h, int x, int y) {
    * xcenter_1 = xcenter_0 + (size_0-size_1)*(x*2/w - 1)
    *           = xcenter_0 + size_0*(1-k)*(x*2/w - 1)
    */
-  const double k = M_SQRT1_2;	/* == 1/sqrt(2) */
   if(w > h) {
-    xcenter += size * (1-k) * (x * 2 - w) / h;
-    ycenter += size * (1-k) * ((h - 1 - y) * 2.0 / h - 1);
+    xcenter += size * (1-scale) * (x * 2 - w) / h;
+    ycenter += size * (1-scale) * ((h - 1 - y) * 2.0 / h - 1);
   } else {
-    xcenter += size * (1-k) * (x * 2.0 / w - 1);
-    ycenter += size * (1-k) * ((h - 1 - y) * 2 - h) / w;
+    xcenter += size * (1-scale) * (x * 2.0 / w - 1);
+    ycenter += size * (1-scale) * ((h - 1 - y) * 2 - h) / w;
   }
-  size = size * k;
+  size = size * scale;
 #else
   // This is actually zoom + recenter.  It's a bit annoying in
   // practice.

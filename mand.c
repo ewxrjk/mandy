@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <errno.h>
+#include <math.h>
 #include <glib.h>
 #include <gtk/gtk.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
@@ -276,7 +277,18 @@ static gboolean button_pressed(GtkWidget *widget,
      && event->state == 0) {
     gint w, h;
     gdk_drawable_get_size(widget->window, &w, &h);
-    zoom(w, h, event->x, event->y);
+    zoom(w, h, event->x, event->y, M_SQRT1_2);
+    report();
+    recompute();
+    return TRUE;
+  }
+  // Double-click right button zooms out
+  if(event->type == GDK_2BUTTON_PRESS
+     && event->button == 3
+     && event->state == 0) {
+    gint w, h;
+    gdk_drawable_get_size(widget->window, &w, &h);
+    zoom(w, h, event->x, event->y, M_SQRT2);
     report();
     recompute();
     return TRUE;

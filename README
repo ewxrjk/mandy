@@ -36,11 +36,10 @@ Display:
 
 Mouse:
 
-  You can use the first (left) mouse button to drag the image around.
+  You can use the left mouse button to drag the image around.
 
-  You can double-click the first (left) mouse button to zoom in on the
-  point you click.  If you want to zoom back out, edit the 'Radius'
-  box above.
+  You can double-click the left mouse button to zoom in on the point
+  you click, and double-click the right mouse button to zoom back out.
 
 Hacking
 =======
