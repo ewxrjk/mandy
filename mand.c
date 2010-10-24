@@ -210,7 +210,7 @@ int main(int argc, char **argv) {
   g_signal_connect(da, "motion-notify-event", G_CALLBACK(pointer_moved), NULL);
 
   // Timeout to pick up the results of delayed recomputation
-  g_timeout_add(100, timeout, NULL);
+  g_timeout_add(10, timeout, NULL);
 
   // A label to say what we're doing
   GtkWidget *label = gtk_label_new("spong");
