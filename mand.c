@@ -24,10 +24,10 @@ static GtkWidget *toplevel;
 // Cursor
 static GdkCursor *busy_cursor;
 
-// Reporting entry
-static GtkWidget *xentry, *yentry, *rentry;
+// Text entry boxes for parameters
+static GtkWidget *xentry, *yentry, *rentry, *ientry;
 
-static void text_activated(GtkEntry *entry, gpointer user_data) {
+static void location_text_activated(GtkEntry *entry, gpointer user_data) {
   double *value = (double *)user_data;
   const char *text = gtk_entry_get_text(entry);
   char *end;
@@ -44,10 +44,28 @@ static void text_activated(GtkEntry *entry, gpointer user_data) {
   recompute();
 }
 
+static void maxiter_text_activated(GtkEntry *entry,
+                                   gpointer __attribute__((unused)) user_data) {
+  const char *text = gtk_entry_get_text(entry);
+  char *end;
+  errno = 0;
+  long n = strtol(text, &end, 10);
+  // Reject invalid values with a beep.
+  if(errno
+     || n <= 0
+     || n > INT_MAX
+     || *end) {
+    gdk_beep();
+    return;
+  }
+  init_colors((int)n);
+  recompute();
+}
+
 /* Create the control panel */
 static GtkWidget *controlpanel(void) {
   GtkWidget *table = gtk_table_new(3, 4, FALSE);
-  GtkWidget *xcaption, *ycaption, *rcaption;
+  GtkWidget *xcaption, *ycaption, *rcaption, *icaption;
 
   gtk_table_attach((GtkTable *)table,
                    (xcaption = gtk_label_new("X centre")),
@@ -58,7 +76,8 @@ static GtkWidget *controlpanel(void) {
                    (xentry = gtk_entry_new()),
                    1, 2, 0, 1,
                    GTK_FILL, 0, 1, 1);
-  g_signal_connect(xentry, "activate", G_CALLBACK(text_activated), &xcenter);
+  g_signal_connect(xentry, "activate", G_CALLBACK(location_text_activated),
+                   &xcenter);
 
   gtk_table_attach((GtkTable *)table,
                    (ycaption = gtk_label_new("Y centre")),
@@ -69,7 +88,8 @@ static GtkWidget *controlpanel(void) {
                    (yentry = gtk_entry_new()),
                    1, 2, 1, 2,
                    GTK_FILL, 0, 1, 1);
-  g_signal_connect(yentry, "activate", G_CALLBACK(text_activated), &ycenter);
+  g_signal_connect(yentry, "activate", G_CALLBACK(location_text_activated),
+                   &ycenter);
 
   gtk_table_attach((GtkTable *)table,
                    (rcaption = gtk_label_new("Radius")),
@@ -80,8 +100,21 @@ static GtkWidget *controlpanel(void) {
                    (rentry = gtk_entry_new()),
                    1, 2, 2, 3,
                    GTK_FILL, 0, 1, 1);
-  g_signal_connect(rentry, "activate", G_CALLBACK(text_activated), &size);
+  g_signal_connect(rentry, "activate", G_CALLBACK(location_text_activated),
+                   &size);
 
+  gtk_table_attach((GtkTable *)table,
+                   (icaption = gtk_label_new("Iterations")),
+                   2, 3, 0, 1,
+                   GTK_FILL, 0, 1, 1);
+  gtk_misc_set_alignment((GtkMisc *)icaption, 1.0, 0.0);
+  gtk_table_attach((GtkTable *)table,
+                   (ientry = gtk_entry_new()),
+                   3, 4, 0, 1,
+                   GTK_FILL, 0, 1, 1);
+  g_signal_connect(ientry, "activate", G_CALLBACK(maxiter_text_activated),
+                   NULL);
+  
   GtkWidget *frame = gtk_frame_new(NULL);
   gtk_container_add((GtkContainer *)frame, table);
   return frame;
@@ -96,6 +129,8 @@ static void report(void) {
   gtk_entry_set_text((GtkEntry *)yentry, buffer);
   snprintf(buffer, sizeof buffer, "%g", size);
   gtk_entry_set_text((GtkEntry *)rentry, buffer);
+  snprintf(buffer, sizeof buffer, "%d", maxiter);
+  gtk_entry_set_text((GtkEntry *)ientry, buffer);
 }
 
 /* Attempt to recompute and redraw when we either know something has
@@ -110,7 +145,8 @@ static void recompute(void) {
   latest_iters = compute(xcenter - xsize(w, h) / 2,
 			 ycenter - ysize(w, h) / 2,
 			 xsize(w, h),
-			 w, h);
+			 w, h,
+                         maxiter);
   // If it's not ready yet just return.  We'll get a timeout callback
   // soon enough.
   if(!latest_iters) {

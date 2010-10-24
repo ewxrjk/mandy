@@ -7,6 +7,7 @@
 
 static double goalx, goaly, goalxsize;
 static int goalw, goalh;
+static int goalmax;
 static int goalmet = 1;
 static int *goaliters;
 
@@ -16,6 +17,7 @@ static struct threadinfo {
   pthread_t id;
   double x, y, xsize;
   int xpixels, ypixels;
+  int max;
   int *results;
 } *threads;
 
@@ -35,14 +37,14 @@ static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 static int quit_threads;
 
 /* Compute the iteration count for one point */
-static int calc(double cx, double cy) {
+static int calc(double cx, double cy, int max) {
   // let c = cx + icy
   // let z = zx + izy
   //
   // then z^2 + c = zx^2 - zy^2 + cx + i(2zxzy+cy)
   int iterations = 0;
   double zx = 0, zy = 0;
-  while(iterations < maxiter && (zx * zx + zy * zy < 4.0)) {
+  while(iterations < max && (zx * zx + zy * zy < 4.0)) {
     double nzx = zx * zx - zy * zy + cx;
     double nzy = 2 * zx * zy  + cy;
     zx = nzx;
@@ -71,7 +73,8 @@ static void *worker(void *arg) {
     for(int py = 0; py < me->ypixels; ++py)
       for(int px = 0; px < me->xpixels; ++px)
 	*results++ = calc(me->x + px * me->xsize / me->xpixels,
-			  me->y + py * me->xsize / me->xpixels);
+			  me->y + py * me->xsize / me->xpixels,
+			  me->max);
     if((rc = pthread_mutex_lock(&lock)))
       fatal(rc, "pthread_mutex_lock");
     me->results = 0;
@@ -86,7 +89,7 @@ static void *worker(void *arg) {
 /* Compute values for [x,x+xsize) x [y, y+xsize*ypixels/xpixels) in
  * xpixels * ypixels.  lock must be held. */
 static void mand(double x, double y, double xsize, int xpixels, int ypixels,
-	  int *results) {
+		 int max, int *results) {
   int rc;
   // Fill in the per-thread requests
   int ychunk = ypixels / ncores;
@@ -97,6 +100,7 @@ static void mand(double x, double y, double xsize, int xpixels, int ypixels,
     threads[n].xsize = xsize;
     threads[n].xpixels = xpixels;
     threads[n].ypixels = ychunk + (n == ncores - 1 && extra);
+    threads[n].max = max;
     threads[n].results = results + xpixels * n * ychunk;
   }
   // Set them going
@@ -129,12 +133,12 @@ static void *controller(void __attribute__((unused)) *data) {
       continue;
     }
     double workx = goalx, worky = goaly, workxsize = goalxsize;
-    int workw = goalw, workh = goalh;
+    int workw = goalw, workh = goalh, workmax = goalmax;
     if(!(goaliters = malloc(workw * workh * sizeof(int))))
       fatal(errno, "malloc");
-    mand(workx, worky, workxsize, workw, workh, goaliters);
+    mand(workx, worky, workxsize, workw, workh, workmax, goaliters);
     if(workx != goalx || worky != goaly || workxsize != goalxsize
-       || workw != goalw || workh != goalh) {
+       || workw != goalw || workh != goalh || workmax != goalmax) {
       // The goal changed while we were thinking
       free(goaliters);
       goaliters = NULL;
@@ -186,7 +190,7 @@ void destroy_threads(void) {
 /* Request a computation.  A non-NULL return means that the data is
  * available.  A NULL return means it is not, but will be later; you
  * must call again. */
-int *compute(double x, double y, double xsize, int w, int h) {
+int *compute(double x, double y, double xsize, int w, int h, int max) {
   int *result = NULL, rc;
 
   if((rc = pthread_mutex_lock(&lock)))
@@ -195,7 +199,8 @@ int *compute(double x, double y, double xsize, int w, int h) {
      && goaly == y
      && goalxsize == xsize
      && goalw == w
-     && goalh == h) {
+     && goalh == h
+     && goalmax == max) {
     // Goal has not changed, but it might still be under construction
     if(goalmet) {
       result = goaliters;
@@ -213,6 +218,7 @@ int *compute(double x, double y, double xsize, int w, int h) {
     goalxsize = xsize;
     goalw = w;
     goalh = h;
+    goalmax = max;
     goalmet = 0;
     if((rc = pthread_cond_signal(&goal_changed)))
       fatal(rc, "pthread_cond_signal");

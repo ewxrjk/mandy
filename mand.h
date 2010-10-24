@@ -10,7 +10,7 @@ struct color {
 void fatal(int errno_value, const char *fmt, ...);
 void init_threads(void);
 void destroy_threads(void);
-int *compute(double x, double y, double xsize, int w, int h);
+int *compute(double x, double y, double xsize, int w, int h, int max);
 void init_colors(int new_maxiter);
 double xsize(int w, int h);
 double ysize(int w, int h);
