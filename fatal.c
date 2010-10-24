@@ -4,6 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* Report an error, perhaps including an errno value, and terminate the
+ * program.
+ *
+ * The format strings and additional arguments follow the same rules as printf.
+ */
 void fatal(int errno_value, const char *fmt, ...) {
   va_list ap;
 

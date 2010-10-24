@@ -9,6 +9,7 @@
 
 static GtkLabel *report_label;
 
+/* Report current position, size, etc */
 static void report(void) {
   char buffer[128];
   snprintf(buffer, sizeof buffer,
@@ -16,6 +17,8 @@ static void report(void) {
   gtk_label_set_text(report_label, buffer);
 }
 
+/* Recompute the iteration counts, which are returned in newly
+ * allocated, caller-owned array. */
 static int *recompute(int w, int h) {
   int *iters = malloc(w * h * sizeof(int));
   mand(xcenter - xsize(w, h) / 2,
@@ -26,6 +29,8 @@ static int *recompute(int w, int h) {
   return iters;
 }
 
+/* Redraw onto widget either if the widget size has changed, or if
+ * force is TRUE (indicating that the location changed) */
 static void redraw(GtkWidget *widget,
 		   gboolean force) {
   static GdkPixbuf *pixbuf = NULL;
@@ -63,6 +68,7 @@ static void redraw(GtkWidget *widget,
 		  GDK_RGB_DITHER_NONE, 0, 0);
 }
 
+/* expose-event callback */
 static gboolean exposed(GtkWidget *widget,
 			GdkEventExpose __attribute__((unused)) *event,
 			gpointer __attribute__((unused)) data) {
@@ -70,10 +76,11 @@ static gboolean exposed(GtkWidget *widget,
   return TRUE;
 }
 
-
+/* Drag state */
 static gboolean dragging;
 static double dragfromx, dragfromy, dragtox, dragtoy;
 
+/* motion-notify-event callback */
 static gboolean pointer_moved(GtkWidget __attribute__((unused)) *widget,
 			      GdkEventMotion *event,
 			      gpointer __attribute__((unused)) user_data) {
@@ -84,6 +91,9 @@ static gboolean pointer_moved(GtkWidget __attribute__((unused)) *widget,
   return TRUE;
 }
 
+/* Timeout to actually implement dragging.  The idea is to avoid
+ * piling up recomputes.  It's better than doing it from pointer_moved
+ * but still not good. */
 static gboolean pointer_movement_timeout(gpointer data) {
   GtkWidget *widget = data;
   if(dragging) {
@@ -102,6 +112,7 @@ static gboolean pointer_movement_timeout(gpointer data) {
   return TRUE;
 }
 
+/* button-{press,release}-event callback */
 static gboolean button_pressed(GtkWidget *widget,
 			       GdkEventButton *event,
 			       gpointer __attribute__((unused)) data) {
@@ -136,6 +147,7 @@ static gboolean button_pressed(GtkWidget *widget,
   return FALSE;
 }
 
+/* delete-event callback */
 static gboolean deleted(GtkWidget __attribute__((unused)) *widget,
 			GdkEvent __attribute__((unused)) *event,
 			gpointer __attribute__((unused)) data) {
