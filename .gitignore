@@ -1,3 +1,4 @@
 *.o
 *~
 mand
+mand-*.tar.gz

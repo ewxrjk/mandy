@@ -16,12 +16,15 @@ prefix=/usr/local
 exec_prefix=${prefix}
 bindir=${exec_prefix}/bin
 
+VERSION=0.0.WIP
+
 INSTALL=install
 CC=gcc -Wall -W -Werror -std=c99
 CFLAGS=-O2 -g
 CPPFLAGS:=$(shell pkg-config --cflags gtk+-2.0)
 LIBS:=$(shell pkg-config --libs gtk+-2.0)
 OBJECT=mand.o fatal.o background.o colors.o location.o movement.o
+SOURCE:=$(subst .o,.c,${OBJECT}) mand.h
 
 mand: $(OBJECT)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJECT) $(LIBS)
@@ -33,6 +36,21 @@ installdirs:
 
 install: installdirs
 	$(INSTALL) -m 755 mand ${DESTDIR}${bindir}/mand
+
+dist:
+	rm -rf mand-${VERSION}
+	mkdir mand-${VERSION}
+	cp Makefile README COPYING mand-${VERSION}/.
+	cp ${SOURCE} mand-${VERSION}/.
+	tar cf mand-${VERSION}.tar mand-${VERSION}
+	gzip -9f mand-${VERSION}.tar
+	rm -rf mand-${VERSION}
+
+distcheck: dist
+	gzip -cd mand-${VERSION}.tar.gz | tar xf -
+	cd mand-${VERSION} && $(MAKE)
+	cd mand-${VERSION} && $(MAKE) install DESTDIR=distcheck-tmp
+	rm -rf mand-${VERSION}
 
 clean:
 	rm -f mand
