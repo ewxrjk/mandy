@@ -118,20 +118,16 @@ static gboolean button_pressed(GtkWidget *widget,
      && event->state == 0) {
     gint w, h;
     gdk_drawable_get_size(widget->window, &w, &h);
-    double xleft, ybottom, xsize, ysize;
+    double xleft, ybottom;
     if(w > h) {
       xleft = xcentre - size * w / h;
       ybottom = ycentre - size;
-      xsize = size * 2 * w / h;
-      ysize = size * 2;
     } else {
       xleft = xcentre - size;
       ybottom = ycentre - size * h / w;
-      xsize = size * 2;
-      ysize = size * 2 * h / w;
     }
-    xcentre = xleft + event->x * xsize / w;
-    ycentre = ybottom + (h - 1 - event->y) * ysize / h;
+    xcentre = xleft + event->x * xsize(w, h) * 2 / w;
+    ycentre = ybottom + (h - 1 - event->y) * ysize(w, h) * 2 / h;
     size = size / 1.414;
     report();
     redraw(widget, TRUE);
