@@ -270,9 +270,9 @@ static gboolean timeout(gpointer __attribute__((unused)) data) {
 static gboolean button_pressed(GtkWidget *widget,
 			       GdkEventButton *event,
 			       gpointer __attribute__((unused)) data) {
-  // Middle button zooms
-  if(event->type == GDK_BUTTON_PRESS
-     && event->button == 2
+  // Double-click left button zooms in
+  if(event->type == GDK_2BUTTON_PRESS
+     && event->button == 1
      && event->state == 0) {
     gint w, h;
     gdk_drawable_get_size(widget->window, &w, &h);
@@ -281,7 +281,7 @@ static gboolean button_pressed(GtkWidget *widget,
     recompute();
     return TRUE;
   }
-  // Left button drags
+  // Hold left button drags
   if(event->type == GDK_BUTTON_PRESS
      && event->button == 1
      && event->state == 0) {
