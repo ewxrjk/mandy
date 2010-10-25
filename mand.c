@@ -22,6 +22,7 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
+#include <gdk/gdkkeysyms.h>
 
 static void recompute(void);
 
@@ -337,6 +338,29 @@ static gboolean deleted(GtkWidget __attribute__((unused)) *widget,
   exit(0);
 }
 
+/* key-release-event callback */
+static gboolean keypress(GtkWidget __attribute__((unused)) *widget,
+                         GdkEventKey *event,
+                         gpointer __attribute__((unused)) data) {
+  if(event->state == GDK_CONTROL_MASK) {
+    switch(event->keyval) {
+    case 'w': case 'W':
+      deleted(NULL, NULL, NULL);
+    case GDK_equal: case GDK_minus: case GDK_KP_Add: case GDK_KP_Subtract: {
+      gint w, h;
+      gdk_drawable_get_size(widget->window, &w, &h);
+      zoom(w, h, w / 2, h / 2,
+           (event->keyval == GDK_equal || event->keyval == GDK_KP_Add)
+            ? M_SQRT1_2 : M_SQRT2);
+      report();
+      recompute();
+      return TRUE;
+    }
+    }
+  }
+  return FALSE;
+}
+
 int main(int argc, char **argv) {
   if(!setlocale(LC_CTYPE, ""))
     fatal(errno, "error calling setlocale");
@@ -350,8 +374,12 @@ int main(int argc, char **argv) {
   // The top level window
   toplevel = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title((GtkWindow *)toplevel, "mand");
+  gtk_widget_add_events(toplevel,
+			GDK_KEY_RELEASE_MASK);
   g_signal_connect(G_OBJECT(toplevel), "delete-event",
                    G_CALLBACK(deleted), NULL);
+  g_signal_connect(G_OBJECT(toplevel), "key-release-event",
+                   G_CALLBACK(keypress), NULL);
 
   // A drawing area for the results
   GtkWidget *da = gtk_drawing_area_new();

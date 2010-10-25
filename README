@@ -44,6 +44,11 @@ Mouse:
   You can double-click the left mouse button to zoom in on the point
   you click, and double-click the right mouse button to zoom back out.
 
+Keyboard:
+
+  The + and - keys together with CTRL can also be use to zoom in on,
+  and out from, the centre of the image.
+
 Hacking
 =======
 
