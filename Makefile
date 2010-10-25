@@ -26,7 +26,7 @@ LIBS:=$(shell pkg-config --libs gtk+-2.0)
 OBJECT=mand.o fatal.o background.o colors.o location.o movement.o
 SOURCE:=$(subst .o,.c,${OBJECT}) mand.h
 
-mand: $(OBJECT)
+mandy: $(OBJECT)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJECT) $(LIBS)
 
 %.s: %.c
@@ -38,22 +38,22 @@ installdirs:
 	mkdir -p ${DESTDIR}${bindir}
 
 install: installdirs
-	$(INSTALL) -m 755 mand ${DESTDIR}${bindir}/mand
+	$(INSTALL) -m 755 mandy ${DESTDIR}${bindir}/mandy
 
 dist:
-	rm -rf mand-${VERSION}
-	mkdir mand-${VERSION}
-	cp Makefile README COPYING mand-${VERSION}/.
-	cp ${SOURCE} mand-${VERSION}/.
-	tar cf mand-${VERSION}.tar mand-${VERSION}
-	gzip -9f mand-${VERSION}.tar
-	rm -rf mand-${VERSION}
+	rm -rf mandy-${VERSION}
+	mkdir mandy-${VERSION}
+	cp Makefile README COPYING mandy-${VERSION}/.
+	cp ${SOURCE} mandy-${VERSION}/.
+	tar cf mandy-${VERSION}.tar mandy-${VERSION}
+	gzip -9f mandy-${VERSION}.tar
+	rm -rf mandy-${VERSION}
 
 distcheck: dist
-	gzip -cd mand-${VERSION}.tar.gz | tar xf -
-	cd mand-${VERSION} && $(MAKE)
-	cd mand-${VERSION} && $(MAKE) install DESTDIR=distcheck-tmp
-	rm -rf mand-${VERSION}
+	gzip -cd mandy-${VERSION}.tar.gz | tar xf -
+	cd mandy-${VERSION} && $(MAKE)
+	cd mandy-${VERSION} && $(MAKE) install DESTDIR=distcheck-tmp
+	rm -rf mandy-${VERSION}
 
 clean:
 	rm -f mand

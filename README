@@ -1,5 +1,5 @@
-	 mand - display the Mandelbrot set and its complement
-	 ====================================================
+	mandy - display the Mandelbrot set and its complement
+	=====================================================
 
 		  *** THIS IS A WORK IN PROGRESS ***
 
@@ -17,7 +17,7 @@ Use
 
 Display:
 
-  When you start 'mand' the display is divided into two halves.  The
+  When you start 'mandy' the display is divided into two halves.  The
   bottom half has the pretty pictures and the top half tells you where
   you are.
 
