@@ -67,7 +67,7 @@ static int calc(double cx, double cy, int max) {
     zx = zx2 - zy2 + cx;
     ++iterations;
   }
-  return iterations;
+  return iterations == max || zy > 0 ? max : 0;
 }
 
 /* Do a rectangular portion of the computation */
