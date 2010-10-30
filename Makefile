@@ -19,20 +19,20 @@ bindir=${exec_prefix}/bin
 VERSION=0.0.WIP
 
 INSTALL=install
-CC=gcc -Wall -W -Werror -std=c99
-CFLAGS=-O2 -g
+CXX=g++ -Wall -W -Werror
+CXXFLAGS=-O2 -g
 CPPFLAGS:=$(shell pkg-config --cflags gtk+-2.0)
 LIBS:=$(shell pkg-config --libs gtk+-2.0)
-OBJECT=mand.o fatal.o background.o colors.o location.o movement.o
-SOURCE:=$(subst .o,.c,${OBJECT}) mand.h
+OBJECT=mandy.o fatal.o background.o colors.o location.o movement.o
+SOURCE:=$(subst .o,.cc,${OBJECT}) mandy.h
 
 mandy: $(OBJECT)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJECT) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(OBJECT) $(LIBS)
 
-%.s: %.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -S $<
+%.s: %.cc
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -S $<
 
-$(OBJECT): mand.h
+$(OBJECT): mandy.h
 
 installdirs:
 	mkdir -p ${DESTDIR}${bindir}
@@ -56,5 +56,5 @@ distcheck: dist
 	rm -rf mandy-${VERSION}
 
 clean:
-	rm -f mand
+	rm -f mandy
 	rm -f *.o

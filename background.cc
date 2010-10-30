@@ -13,13 +13,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "mand.h"
+#include "mandy.h"
 #include <pthread.h>
 #include <unistd.h>
 #include <sys/time.h>
-#include <string.h>
-#include <stdlib.h>
-#include <errno.h>
+#include <cstring>
+#include <cstdlib>
+#include <cerrno>
 
 static double goalx, goaly, goalxsize;
 static int goalw, goalh;
@@ -72,7 +72,7 @@ static int calc(double cx, double cy, int max) {
 
 /* Do a rectangular portion of the computation */
 static void *worker(void *arg) {
-  struct threadinfo *me = arg;
+  struct threadinfo *me = (struct threadinfo *)arg;
   int rc;
 
   if((rc = pthread_mutex_lock(&lock)))
@@ -155,13 +155,12 @@ static void *controller(void __attribute__((unused)) *data) {
     }
     double workx = goalx, worky = goaly, workxsize = goalxsize;
     int workw = goalw, workh = goalh, workmax = goalmax;
-    if(!(goaliters = malloc(workw * workh * sizeof(int))))
-      fatal(errno, "malloc");
+    goaliters = new int[workw * workh];
     mand(workx, worky, workxsize, workw, workh, workmax, goaliters);
     if(workx != goalx || worky != goaly || workxsize != goalxsize
        || workw != goalw || workh != goalh || workmax != goalmax) {
       // The goal changed while we were thinking
-      free(goaliters);
+      delete[] goaliters;
       goaliters = NULL;
       continue;
     }
@@ -177,8 +176,7 @@ static void *controller(void __attribute__((unused)) *data) {
 /* Initialize all threads */
 void init_threads(void) {
   ncores = sysconf(_SC_NPROCESSORS_ONLN);
-  if(!(threads = malloc(ncores * sizeof *threads)))
-    fatal(errno, "malloc");
+  threads = new threadinfo[ncores];
   memset(threads, 0, ncores * sizeof *threads);
   int rc;
   for(int n = 0; n < ncores; ++n)

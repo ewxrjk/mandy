@@ -13,11 +13,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "mand.h"
-#include <stdarg.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include "mandy.h"
+#include <cstdarg>
+#include <cstring>
+#include <cstdio>
+#include <cstdlib>
 
 /* Report an error, perhaps including an errno value, and terminate the
  * program.

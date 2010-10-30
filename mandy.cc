@@ -13,12 +13,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "mand.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <locale.h>
-#include <errno.h>
-#include <math.h>
+#include "mandy.h"
+#include <cstdio>
+#include <cstdlib>
+#include <clocale>
+#include <cerrno>
+#include <cmath>
 #include <glib.h>
 #include <gtk/gtk.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
@@ -89,60 +89,60 @@ static GtkWidget *controlpanel(void) {
   gtk_table_attach((GtkTable *)table,
                    (xcaption = gtk_label_new("X centre")),
                    0, 1, 0, 1,
-                   GTK_FILL, 0, 1, 1);
+                   GTK_FILL, (GtkAttachOptions)0, 1, 1);
   gtk_misc_set_alignment((GtkMisc *)xcaption, 1.0, 0.0);
   gtk_table_attach((GtkTable *)table,
                    (xentry = gtk_entry_new()),
                    1, 2, 0, 1,
-                   GTK_FILL, 0, 1, 1);
+                   GTK_FILL, (GtkAttachOptions)0, 1, 1);
   g_signal_connect(xentry, "activate", G_CALLBACK(location_text_activated),
                    &xcenter);
 
   gtk_table_attach((GtkTable *)table,
                    (ycaption = gtk_label_new("Y centre")),
                    0, 1, 1, 2,
-                   GTK_FILL, 0, 1, 1);
+                   GTK_FILL, (GtkAttachOptions)0, 1, 1);
   gtk_misc_set_alignment((GtkMisc *)ycaption, 1.0, 0.0);
   gtk_table_attach((GtkTable *)table,
                    (yentry = gtk_entry_new()),
                    1, 2, 1, 2,
-                   GTK_FILL, 0, 1, 1);
+                   GTK_FILL, (GtkAttachOptions)0, 1, 1);
   g_signal_connect(yentry, "activate", G_CALLBACK(location_text_activated),
                    &ycenter);
 
   gtk_table_attach((GtkTable *)table,
                    (rcaption = gtk_label_new("Radius")),
                    0, 1, 2, 3,
-                   GTK_FILL, 0, 1, 1);
+                   GTK_FILL, (GtkAttachOptions)0, 1, 1);
   gtk_misc_set_alignment((GtkMisc *)rcaption, 1.0, 0.0);
   gtk_table_attach((GtkTable *)table,
                    (rentry = gtk_entry_new()),
                    1, 2, 2, 3,
-                   GTK_FILL, 0, 1, 1);
+                   GTK_FILL, (GtkAttachOptions)0, 1, 1);
   g_signal_connect(rentry, "activate", G_CALLBACK(location_text_activated),
                    &size);
 
   gtk_table_attach((GtkTable *)table,
                    (icaption = gtk_label_new("Iterations")),
                    2, 3, 0, 1,
-                   GTK_FILL, 0, 1, 1);
+                   GTK_FILL, (GtkAttachOptions)0, 1, 1);
   gtk_misc_set_alignment((GtkMisc *)icaption, 1.0, 0.0);
   gtk_table_attach((GtkTable *)table,
                    (ientry = gtk_entry_new()),
                    3, 4, 0, 1,
-                   GTK_FILL, 0, 1, 1);
+                   GTK_FILL, (GtkAttachOptions)0, 1, 1);
   g_signal_connect(ientry, "activate", G_CALLBACK(maxiter_text_activated),
                    NULL);
 
   gtk_table_attach((GtkTable *)table,
                    (pixel_rate_caption = gtk_label_new("Pixels/s")),
                    2, 3, 1, 2,
-                   GTK_FILL, 0, 1, 1);
+                   GTK_FILL, (GtkAttachOptions)0, 1, 1);
   gtk_misc_set_alignment((GtkMisc *)pixel_rate_caption, 1.0, 0.0);
   gtk_table_attach((GtkTable *)table,
                    (pixel_rate_entry = gtk_entry_new()),
                    3, 4, 1, 2,
-                   GTK_FILL, 0, 1, 1);
+                   GTK_FILL, (GtkAttachOptions)0, 1, 1);
   g_object_set(pixel_rate_entry,
                "editable", FALSE,
                (char *)NULL);

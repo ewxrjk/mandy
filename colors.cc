@@ -13,9 +13,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "mand.h"
-#include <math.h>
-#include <stdlib.h>
+#include "mandy.h"
+#include <cmath>
+#include <cstdlib>
 
 // Color lookup table
 struct color *colors;
@@ -28,8 +28,8 @@ void init_colors(int new_maxiter) {
     return;
   maxiter = new_maxiter;
   if(colors)
-    free(colors);
-  colors = malloc((maxiter + 1) * sizeof *colors);
+    delete[] colors;
+  colors = new color[maxiter + 1];
   // The complement is colorful
   for(int n = 0; n < maxiter; ++n) {
 #if 0
