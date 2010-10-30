@@ -26,14 +26,25 @@ class MandelbrotJob: public Job {
   double radius;                        // complex-plane radius
   int maxiters;
 public:
+  ~MandelbrotJob();
+
+  // Construct a job which fills in a rectangle
   MandelbrotJob(int x, int y,           // pixel location to draw at
                 int w, int h,           // pixel size to draw
                 double cx, double cy,   // centre of image
                 double r,               // radius of biggest circle in image
                 int maxiters,           // max iteration count
                 IterBuffer *dest);
-  ~MandelbrotJob();
+
+  // Do the computation (called in background thread)
   void work();
+
+  // Create a new IterBuffer and start to asynchronously populate it.  It will
+  // be returned with one ref owned by the caller (and many by the background
+  // jobs).  Uncomputed locations are set to -1.
+  IterBuffer *recompute(double cx, double cy, double r, 
+                        int maxiters, int w, int h,
+                        void (*completion_callback)(Job *));
 };
 
 #endif /* MANDELBROTJOB_H */

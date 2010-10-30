@@ -70,6 +70,27 @@ void MandelbrotJob::work() {
   }
 }
 
+IterBuffer *MandelbrotJob::recompute(double cx, double cy, double r, 
+				     int maxiters, int w, int h,
+				     void (*completion_callback)(Job *)) {
+  IterBuffer *dest = new IterBuffer(w, h);
+  // Set everything to 'unknown'
+  memset(dest->data, 0xFF, dest->w * dest->h * sizeof(int));
+  // Chunks need to be large enough that the overhead of jobs doesn't
+  // add up to much but small enough that stale jobs don't hog the CPU
+  // much.
+  const int chunk = 64;
+  for(int px = 0; px < dest->w; px += chunk) {
+    const int pw = std::min(chunk, dest->w - px);
+    for(int py = 0; py < dest->h; py += chunk) {
+      const int ph = std::min(chunk, dest->h - py);
+      (new MandelbrotJob(px, py, pw, ph, cx, cy, r, maxiters, dest))
+	->submit(completion_callback);
+    }
+  }
+  return dest;
+}
+
 MandelbrotJob::~MandelbrotJob() {
   dest->release();
 }

@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "mandy.h"
+#include "Job.h"
 #include <cstdio>
 #include <cstdlib>
 #include <clocale>
@@ -335,6 +336,7 @@ static gboolean deleted(GtkWidget __attribute__((unused)) *widget,
 			GdkEvent __attribute__((unused)) *event,
 			gpointer __attribute__((unused)) data) {
   destroy_threads();
+  Job::destroy();
   exit(0);
 }
 
@@ -370,6 +372,7 @@ int main(int argc, char **argv) {
   // Bits of infrastructure
   init_threads();
   init_colors(255);
+  Job::init();
 
   // The top level window
   toplevel = gtk_window_new(GTK_WINDOW_TOPLEVEL);
