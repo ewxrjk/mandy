@@ -48,7 +48,7 @@ void MandelbrotJob::work() {
     // Starting point for this row's results
     int *res = dest->data + py * dest->w + x;
     // Complex-plane location of this row
-    const double cy = ybottom + py * xsize / dest->w;
+    const double cy = ybottom + (dest->h - 1 - py) * xsize / dest->w;
     // Iterate over columns
     for(int px = x; px < lx; ++px) {
       // Complex-plane location of this column

@@ -38,14 +38,14 @@
  * from the center to the nearest window edge.  The reason for this is
  * to produce sensible behavior as the window is resized.
  *
- * THE ITERS[] ARRAY
- * =================
+ * THE ITERBUFFER->DATA[] ARRAY
+ * ============================
  *
- * This is addressed in pixel units BUT is reversed vertically.
- * Values within one row proceed from left to right as addresses
- * increase but the lowest-addressed row belongs at the bottom of the
- * screen and corresponds to the lower imaginary (Y) value in plane
- * units.
+ * This is addressed in pixel units.  Values within one row proceed from left
+ * to right as addresses increase and the lowest-addressed row belongs at the
+ * bottom of the screen and corresponds to the largest imaginary (Y) value in
+ * plane units.  This means that you have to invert Y coordinates when
+ * converting between pixel and plane units.
  */
 
 // Location of the center of the window

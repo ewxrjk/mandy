@@ -64,15 +64,15 @@ static void gtkCompleted(Job *generic_job) {
   if(j->dest != latest_dest)
     return;
   const int w = latest_dest->w;
-  const int h = latest_dest->h;
   guchar *const pixels = gdk_pixbuf_get_pixels(latest_pixbuf);
   const int rowstride = gdk_pixbuf_get_rowstride(latest_pixbuf);
   const int lx = j->x + j->w;
   const int ly = j->y + j->h;
   for(int y = j->y; y < ly; ++y) {
-    guchar *pixelrow = pixels + ((h - 1) - y) * rowstride + j->x * 3;
+    int *datarow = &latest_dest->data[y * w + j->x];
+    guchar *pixelrow = pixels + y * rowstride + j->x * 3;
     for(int x = j->x; x < lx; ++x) {
-      const int count = latest_dest->data[y * w + x];
+      const int count = *datarow++;
       *pixelrow++ = colors[count].r;
       *pixelrow++ = colors[count].g;
       *pixelrow++ = colors[count].b;
