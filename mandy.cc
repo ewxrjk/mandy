@@ -29,8 +29,8 @@
 static gboolean gtkuiToplevelDeleted(GtkWidget *, GdkEvent *, gpointer);
 
 // The results of the most recent computation
-static IterBuffer *latest_dest;
-static GdkPixbuf *latest_pixbuf;
+static IterBuffer *gtkuiLatestDest;
+static GdkPixbuf *gtkuiLatestPixbuf;
 
 // Where and how to draw the results
 static GdkDrawable *gtkuiDrawable;
@@ -43,7 +43,7 @@ static GtkWidget *gtkuiToplevel;
 static void gtkuiRedraw(int x, int y, int w, int h) {
   gdk_draw_pixbuf(gtkuiDrawable,
 		  gtkuiGC,
-		  latest_pixbuf,
+		  gtkuiLatestPixbuf,
 		  x, y, x, y, w, h,
 		  GDK_RGB_DITHER_NONE, 0, 0);
 }
@@ -52,15 +52,15 @@ static void gtkuiRedraw(int x, int y, int w, int h) {
 static void gtkuiCompleted(Job *generic_job) {
   MandelbrotJob *j = dynamic_cast<MandelbrotJob *>(generic_job);
   // Ignore stale jobs
-  if(j->dest != latest_dest)
+  if(j->dest != gtkuiLatestDest)
     return;
-  const int w = latest_dest->w;
-  guchar *const pixels = gdk_pixbuf_get_pixels(latest_pixbuf);
-  const int rowstride = gdk_pixbuf_get_rowstride(latest_pixbuf);
+  const int w = gtkuiLatestDest->w;
+  guchar *const pixels = gdk_pixbuf_get_pixels(gtkuiLatestPixbuf);
+  const int rowstride = gdk_pixbuf_get_rowstride(gtkuiLatestPixbuf);
   const int lx = j->x + j->w;
   const int ly = j->y + j->h;
   for(int y = j->y; y < ly; ++y) {
-    int *datarow = &latest_dest->data[y * w + j->x];
+    int *datarow = &gtkuiLatestDest->data[y * w + j->x];
     guchar *pixelrow = pixels + y * rowstride + j->x * 3;
     for(int x = j->x; x < lx; ++x) {
       const int count = *datarow++;
@@ -74,17 +74,17 @@ static void gtkuiCompleted(Job *generic_job) {
 
 // Called to set a new location, scale or maxiter
 static void gtkuiNewLocation() {
-  if(latest_dest) {
-    latest_dest->release();
-    latest_dest = NULL;
+  if(gtkuiLatestDest) {
+    gtkuiLatestDest->release();
+    gtkuiLatestDest = NULL;
   }
   gint w, h;
   gdk_drawable_get_size(gtkuiDrawable, &w, &h);
-  if(!latest_pixbuf)
-    latest_pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, w, h);
+  if(!gtkuiLatestPixbuf)
+    gtkuiLatestPixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, w, h);
   // TODO if there's a pixbuf available then ideally we would move or scale it
   // to provide continuity.
-  latest_dest = MandelbrotJob::recompute(xcenter, ycenter, size,
+  gtkuiLatestDest = MandelbrotJob::recompute(xcenter, ycenter, size,
 					 maxiter, w, h,
 					 gtkuiCompleted);
 }
@@ -95,9 +95,9 @@ static void gtkuiNewSize() {
   // TODO actually what we really wanted was to create the new pixbuf
   // from whatever is lying around in the old one, to provide some
   // continuity.
-  if(latest_pixbuf) {
-    gdk_pixbuf_unref(latest_pixbuf);
-    latest_pixbuf = NULL;
+  if(gtkuiLatestPixbuf) {
+    gdk_pixbuf_unref(gtkuiLatestPixbuf);
+    gtkuiLatestPixbuf = NULL;
   }
   gtkuiNewLocation();
 }
@@ -297,17 +297,17 @@ static GtkWidget *gtkuiControlPanel(void) {
 // Pointer motion -------------------------------------------------------------
 
 /* Drag state */
-static gboolean dragging;
-static double dragfromx, dragfromy;
-static double dragtox, dragtoy;
+static gboolean gtkuiDragging;
+static double gtkuiDragFromX, gtkuiDragFromY;
+static double gtkuiDragToX, gtkuiDragToY;
 
-/* Drag from dragfrom[xy] to a new pointer location */
+/* Drag from gtkuiDragFrom[xy] to a new pointer location */
 static void gtkuiDragComplete() {
-  const int deltax = dragtox - dragfromx;
-  const int deltay = dragtoy - dragfromy;
+  const int deltax = gtkuiDragToX - gtkuiDragFromX;
+  const int deltay = gtkuiDragToY - gtkuiDragFromY;
   if(!(deltax == 0 && deltay == 0)) {
-    dragfromx = dragtox;
-    dragfromy = dragtoy;
+    gtkuiDragFromX = gtkuiDragToX;
+    gtkuiDragFromY = gtkuiDragToY;
     gint w, h;
     gdk_drawable_get_size(gtkuiDrawable, &w, &h);
     drag(w, h, deltax, deltay);
@@ -328,10 +328,10 @@ static gboolean gtkuiDragIdle(gpointer) {
 static gboolean gtkuiPointerMoved(GtkWidget __attribute__((unused)) *widget,
 			      GdkEventMotion *event,
 			      gpointer __attribute__((unused)) user_data) {
-  if(!dragging)
+  if(!gtkuiDragging)
     return FALSE;
-  dragtox = event->x;
-  dragtoy = event->y;
+  gtkuiDragToX = event->x;
+  gtkuiDragToY = event->y;
   if(gtkuiDragIdleHandle == 0)
     gtkuiDragIdleHandle = g_idle_add(gtkuiDragIdle, NULL);
   return TRUE;
@@ -365,17 +365,17 @@ static gboolean gtkuiButtonPressed(GtkWidget *, GdkEventButton *event, gpointer)
   if(event->type == GDK_BUTTON_PRESS
      && event->button == 1
      && event->state == 0) {
-    dragging = TRUE;
-    dragfromx = event->x;
-    dragfromy = event->y;
+    gtkuiDragging = TRUE;
+    gtkuiDragFromX = event->x;
+    gtkuiDragFromY = event->y;
     return TRUE;
   }
   if(event->type == GDK_BUTTON_RELEASE
      && event->button == 1) {
-    dragtox = event->x;
-    dragtoy = event->y;
+    gtkuiDragToX = event->x;
+    gtkuiDragToY = event->y;
     gtkuiDragComplete();
-    dragging = FALSE;
+    gtkuiDragging = FALSE;
     return TRUE;
   }
   return FALSE;
@@ -422,8 +422,8 @@ static gboolean gtkuiPeriodicPoll(gpointer __attribute__((unused)) data) {
 static gboolean gtkuiExposed(GtkWidget *, GdkEventExpose *, gpointer) {
   gint w, h;
   gdk_drawable_get_size(gtkuiDrawable, &w, &h);
-  if(w != gdk_pixbuf_get_width(latest_pixbuf)
-     || h != gdk_pixbuf_get_height(latest_pixbuf)) {
+  if(w != gdk_pixbuf_get_width(gtkuiLatestPixbuf)
+     || h != gdk_pixbuf_get_height(gtkuiLatestPixbuf)) {
     // The pixbuf is the wrong size (i.e. the window has been
     // resized).  Attempt a recompute.
     gtkuiNewSize();
