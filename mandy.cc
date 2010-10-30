@@ -246,8 +246,8 @@ static double dragfromx, dragfromy;
 
 /* Drag from dragfrom[xy] to a new pointer location */
 static void dragto(double dragtox, double dragtoy) {
-  double deltax = dragtox - dragfromx;
-  double deltay = dragtoy - dragfromy;
+  const int deltax = dragtox - dragfromx;
+  const int deltay = dragtoy - dragfromy;
   if(!(deltax == 0 && deltay == 0)) {
     dragfromx = dragtox;
     dragfromy = dragtoy;
@@ -255,7 +255,61 @@ static void dragto(double dragtox, double dragtoy) {
     gdk_drawable_get_size(drawable, &w, &h);
     drag(w, h, deltax, deltay);
     report();
-    // TODO move the contents of the pixbuf to provide instant feedback
+    // Move the contents of the pixbuf to provide instant feedback
+    if(latest_pixbuf) {
+      // imagine we're dragging 10 pixels right.  then deltax=10.
+      // so the pixel at (0,0) needs to end up at (10,0).
+      //
+      // imagine we're dragging 10 pixels left.  then deltax=-10.
+      // so the pixel at (10,0) needs to end up at (0,0).
+      guchar *const pixels = gdk_pixbuf_get_pixels(latest_pixbuf);
+      const int rowstride = gdk_pixbuf_get_rowstride(latest_pixbuf);
+      const int sy = abs(deltay), ly = h - abs(deltay);
+      const int sx = abs(deltax), lx = w - abs(deltax);
+      if(deltay > 0) {
+        for(int y = ly - 1; y >= sy; --y) {
+          guchar *destpixel = pixels + (y + deltay) * rowstride + 3 * deltax;
+          guchar *srcpixel = pixels + y * rowstride;
+          for(int x = sx; x < lx; ++x) {
+            *destpixel++ = *srcpixel++;
+            *destpixel++ = *srcpixel++;
+            *destpixel++ = *srcpixel++;
+          }
+        }
+      } else {
+        for(int y = sy; y < ly; ++y) {
+          if(deltax > 0) {
+            guchar *destpixel = pixels + (y + deltay) * rowstride
+              + 3 * (deltax  + lx);
+            guchar *srcpixel = pixels + y * rowstride + 3 * lx;
+            for(int x = sx; x < lx; ++x) {
+              *--destpixel = *--srcpixel;
+              *--destpixel = *--srcpixel;
+              *--destpixel = *--srcpixel;
+            }
+          } else {
+            guchar *destpixel = pixels + (y + deltay) * rowstride + 3 * deltax;
+            guchar *srcpixel = pixels + y * rowstride;
+            for(int x = sx; x < lx; ++x) {
+              *destpixel++ = *srcpixel++;
+              *destpixel++ = *srcpixel++;
+              *destpixel++ = *srcpixel++;
+            }
+          }
+        }
+      }
+      /*
+      // For large images only redraw around the drag point
+      const int rbox = 128;
+      int rx = dragtox - rbox / 2, ry = dragtoy - rbox / 2;
+      int rw = rbox, rh = rbox;
+      if(rx < 0) { rw += rx; rx = 0; }
+      if(ry < 0) { rh += ry; ry = 0; }
+      if(rx + rw > w) { rw = w - rx; };
+      if(ry + rh > h) { rh = h - ry; }
+      gtkRedraw(rx, ry, rw, rh);
+      */
+    }
     gtkNewLocation();
   }
 }
