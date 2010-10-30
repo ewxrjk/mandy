@@ -39,7 +39,7 @@ void MandelbrotJob::work() {
 				    ? radius
 				    : radius * h / w);
   const double xsize = (dest->w > dest->h
-			? radius * 2 / h
+			? radius * 2 * w / h
 			: radius * 2);
   // Compute the pixel limits
   const int lx = x + w, ly = y + h;
