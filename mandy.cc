@@ -41,7 +41,6 @@ static GdkCursor *busy_cursor;
 
 // Text entry boxes for parameters
 static GtkWidget *xentry, *yentry, *rentry, *ientry;
-static GtkWidget *pixel_rate_entry;
 
 // Drawing --------------------------------------------------------------------
 
@@ -155,7 +154,6 @@ static void maxiter_text_activated(GtkEntry *entry,
 static GtkWidget *controlpanel(void) {
   GtkWidget *table = gtk_table_new(3, 4, FALSE);
   GtkWidget *xcaption, *ycaption, *rcaption, *icaption;
-  GtkWidget *pixel_rate_caption;
 
   gtk_table_attach((GtkTable *)table,
                    (xcaption = gtk_label_new("X centre")),
@@ -205,19 +203,6 @@ static GtkWidget *controlpanel(void) {
   g_signal_connect(ientry, "activate", G_CALLBACK(maxiter_text_activated),
                    NULL);
 
-  gtk_table_attach((GtkTable *)table,
-                   (pixel_rate_caption = gtk_label_new("Pixels/s")),
-                   2, 3, 1, 2,
-                   GTK_FILL, (GtkAttachOptions)0, 1, 1);
-  gtk_misc_set_alignment((GtkMisc *)pixel_rate_caption, 1.0, 0.0);
-  gtk_table_attach((GtkTable *)table,
-                   (pixel_rate_entry = gtk_entry_new()),
-                   3, 4, 1, 2,
-                   GTK_FILL, (GtkAttachOptions)0, 1, 1);
-  g_object_set(pixel_rate_entry,
-               "editable", FALSE,
-               (char *)NULL);
-  
   GtkWidget *frame = gtk_frame_new(NULL);
   gtk_container_add((GtkContainer *)frame, table);
   return frame;
@@ -234,8 +219,6 @@ static void report(void) {
   gtk_entry_set_text((GtkEntry *)rentry, buffer);
   snprintf(buffer, sizeof buffer, "%d", maxiter);
   gtk_entry_set_text((GtkEntry *)ientry, buffer);
-  snprintf(buffer, sizeof buffer, "%g", pixelrate());
-  gtk_entry_set_text((GtkEntry *)pixel_rate_entry, buffer);
 }
 
 /* expose-event callback */
@@ -344,7 +327,6 @@ static gboolean button_pressed(GtkWidget *widget,
 static gboolean deleted(GtkWidget __attribute__((unused)) *widget,
 			GdkEvent __attribute__((unused)) *event,
 			gpointer __attribute__((unused)) data) {
-  destroy_threads();
   Job::destroy();
   exit(0);
 }
@@ -379,7 +361,6 @@ int main(int argc, char **argv) {
     fatal(0, "gtk_init_check failed");
 
   // Bits of infrastructure
-  init_threads();
   init_colors(255);
   Job::init();
 
