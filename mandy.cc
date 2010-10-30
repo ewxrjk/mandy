@@ -394,9 +394,10 @@ static gboolean gtkuiKeypress(GtkWidget *,
     case GDK_equal: case GDK_minus: case GDK_KP_Add: case GDK_KP_Subtract: {
       gint w, h;
       gdk_drawable_get_size(gtkuiDrawable, &w, &h);
-      zoom(w, h, w / 2, h / 2,
-           (event->keyval == GDK_equal || event->keyval == GDK_KP_Add)
-            ? M_SQRT1_2 : M_SQRT2);
+      if(event->keyval == GDK_equal || event->keyval == GDK_KP_Add)
+        size *= M_SQRT1_2;
+      else
+        size *= M_SQRT2;
       GtkuiControl::changed();
       gtkuiNewLocation();
       return TRUE;
