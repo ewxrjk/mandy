@@ -33,13 +33,13 @@ MandelbrotJob::MandelbrotJob(int x_, int y_,
 void MandelbrotJob::work() {
   // Compute the full size of the rectangle
   const double xleft = xcentre - (dest->w > dest->h
-				  ? radius * w / h
+				  ? radius * dest->w / dest->h
 				  : radius);
   const double ybottom = ycentre - (dest->w > dest->h
 				    ? radius
-				    : radius * h / w);
+				    : radius * dest->h / dest->w);
   const double xsize = (dest->w > dest->h
-			? radius * 2 * w / h
+			? radius * 2 * dest->w / dest->h
 			: radius * 2);
   // Compute the pixel limits
   const int lx = x + w, ly = y + h;
