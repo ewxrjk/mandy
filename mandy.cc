@@ -152,7 +152,9 @@ private:
     // TODO there is an optimization here: if maxiter has gone up then
     // we can skip computation of points with a known non-maximum
     // iteration count.
-    gtkuiNewLocation(-1, -1);
+    gint w, h;
+    gdk_drawable_get_size(gtkuiDrawable, &w, &h);
+    gtkuiNewLocation(w/2, h/2);
   }
 
   void render() {
