@@ -91,6 +91,8 @@ static void gtkNewLocation() {
   gdk_drawable_get_size(drawable, &w, &h);
   if(!latest_pixbuf)
     latest_pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, w, h);
+  // TODO if there's a pixbuf available then ideally we would move or scale it
+  // to provide continuity.
   latest_dest = MandelbrotJob::recompute(xcenter, ycenter, size,
 					 maxiter, w, h,
 					 gtkCompleted);
@@ -101,7 +103,7 @@ static void gtkNewSize() {
   // If there's a pixbuf it'll be the wrong size, so delete it.
   // TODO actually what we really wanted was to create the new pixbuf
   // from whatever is lying around in the old one, to provide some
-  // continuitty.
+  // continuity.
   if(latest_pixbuf) {
     gdk_pixbuf_unref(latest_pixbuf);
     latest_pixbuf = NULL;
