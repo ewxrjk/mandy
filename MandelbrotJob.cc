@@ -15,6 +15,7 @@
  */
 #include "mandy.h"
 #include "MandelbrotJob.h"
+#include <cstring>
 
 MandelbrotJob::MandelbrotJob(int x_, int y_,
 			     int w_, int h_,

@@ -21,6 +21,7 @@
 #include <cerrno>
 #include <cmath>
 #include <cassert>
+#include <cstring>
 #include <glib.h>
 #include <gtk/gtk.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>

@@ -15,6 +15,7 @@
  */
 #include "mandy.h"
 #include "Job.h"
+#include <unistd.h>
 
 void Job::submit(void (*completion_callback_)(Job *)) {
   int rc;
