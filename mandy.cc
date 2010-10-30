@@ -70,17 +70,14 @@ static void gtkCompleted(Job *generic_job) {
   const int lx = j->x + j->w;
   const int ly = j->y + j->h;
   for(int y = j->y; y < ly; ++y) {
+    guchar *pixelrow = pixels + ((h - 1) - y) * rowstride + j->x * 3;
     for(int x = j->x; x < lx; ++x) {
-      const int count = latest_dest->data[((h - 1) - y) * w + x];
-      if(count >= 0) {
-        // TODO why would it not be?
-        pixels[y * rowstride + x * 3 + 0] = colors[count].r;
-        pixels[y * rowstride + x * 3 + 1] = colors[count].g;
-        pixels[y * rowstride + x * 3 + 2] = colors[count].b;
-      }
+      const int count = latest_dest->data[y * w + x];
+      *pixelrow++ = colors[count].r;
+      *pixelrow++ = colors[count].g;
+      *pixelrow++ = colors[count].b;
     }
   }
-  // TODO only redraw the bit we filled in
   gtkRedraw(j->x, j->y, j->w, j->h);
 }
 
