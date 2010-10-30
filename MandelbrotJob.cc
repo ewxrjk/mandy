@@ -52,7 +52,7 @@ void MandelbrotJob::work() {
     // Iterate over columns
     for(int px = x; px < lx; ++px) {
       // Complex-plane location of this column
-      const double cx = xleft + px * xsize / dest->h;
+      const double cx = xleft + px * xsize / dest->w;
       // let c = cx + icy
       // let z = zx + izy
       //
