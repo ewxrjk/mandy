@@ -100,6 +100,9 @@ static void gtkuiNewSize() {
   // from whatever is lying around in the old one, to provide some
   // continuity.
   if(gtkuiLatestPixbuf) {
+    gtkuiRedraw(0, 0,
+                gdk_pixbuf_get_width(gtkuiLatestPixbuf),
+                gdk_pixbuf_get_height(gtkuiLatestPixbuf));
     gdk_pixbuf_unref(gtkuiLatestPixbuf);
     gtkuiLatestPixbuf = NULL;
   }
