@@ -67,6 +67,7 @@ void Job::poll() {
     completed.pop_front();
     releaseLock();
     j->completion_callback(j);
+    delete j;
     acquireLock();
   }
   releaseLock();

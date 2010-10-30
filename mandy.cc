@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "mandy.h"
-#include "Job.h"
+#include "MandelbrotJob.h"
 #include <cstdio>
 #include <cstdlib>
 #include <clocale>
@@ -29,6 +29,7 @@ static void recompute(void);
 
 // The results of the most recent computation
 static int *latest_iters;
+static IterBuffer *latest_dest;
 static GdkPixbuf *latest_pixbuf;
 
 // Set if a computation is ongoing
@@ -269,6 +270,28 @@ static gboolean pointer_moved(GtkWidget __attribute__((unused)) *widget,
     return FALSE;
   dragto(event->x, event->y);
   return TRUE;
+}
+
+/* Job completion callback */
+static void completed(Job *generic_job) {
+  MandelbrotJob *j = dynamic_cast<MandelbrotJob *>(generic_job);
+  // Ignore stale jobs
+  if(j->dest != latest_dest)
+    return;
+  const int w = latest_dest->w;
+  const int h = latest_dest->h;
+  guchar *const pixels = gdk_pixbuf_get_pixels(latest_pixbuf);
+  const int rowstride = gdk_pixbuf_get_rowstride(latest_pixbuf);
+  for(int y = j->y; y < j->y + j->h; ++y) {
+    for(int x = j->x; x < j->x + j->h; ++x) {
+      const int count = latest_dest->data[((h - 1) - y) * w + x];
+      if(count >= 0) {
+	pixels[y * rowstride + x * 3 + 0] = colors[count].r;
+	pixels[y * rowstride + x * 3 + 1] = colors[count].g;
+	pixels[y * rowstride + x * 3 + 2] = colors[count].b;
+      }
+    }
+  }
 }
 
 /* Timeout to handle delayed recompitation */

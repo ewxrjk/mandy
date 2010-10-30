@@ -58,7 +58,8 @@ public:
   //
   // completion_callback() will be called from inside poll().  No locks will be
   // held while it's being called, making it safe to invoke Job::submit(),
-  // Job::cancel() and even Job::poll().
+  // Job::cancel() and even Job::poll().  After the completion callback returns
+  // the job will be deleted.
   void submit(void (*completion_callback)(Job *));
 
   static void cancel();                 // cancel outstanding jobs

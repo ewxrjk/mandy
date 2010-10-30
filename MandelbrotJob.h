@@ -19,13 +19,14 @@
 #include "Job.h"
 
 class MandelbrotJob: public Job {
+public:
   IterBuffer *dest;                     // buffer to store results in
   int x, y;                             // pixel location in buffer
   int w, h;                             // pixel size in buffer
   double xcentre, ycentre;              // complex-plane image location
   double radius;                        // complex-plane radius
   int maxiters;
-public:
+
   ~MandelbrotJob();
 
   // Construct a job which fills in a rectangle
