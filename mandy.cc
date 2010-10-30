@@ -83,8 +83,10 @@ static void gtkCompleted(Job *generic_job) {
 
 // Called to set a new location, scale or maxiter
 static void gtkNewLocation() {
-  if(latest_dest)
+  if(latest_dest) {
     latest_dest->release();
+    latest_dest = NULL;
+  }
   gint w, h;
   gdk_drawable_get_size(drawable, &w, &h);
   if(!latest_pixbuf)
