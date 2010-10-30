@@ -13,8 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 bin_PROGRAMS=mandy
-mandy_SOURCES=Gtkui.cc IterBuffer.cc Job.cc MandelbrotJob.cc colors.cc	\
-fatal.cc location.cc mandy.cc movement.cc Gtkui.h IterBuffer.h Job.h	\
-MandelbrotJob.h mandy.h GtkuiDrawing.cc GtkuiControls.cc
+mandy_SOURCES=Gtkui.cc GtkuiControls.cc GtkuiDrawing.cc			\
+GtkuiKeyboard.cc GtkuiPointer.cc IterBuffer.cc Job.cc MandelbrotJob.cc	\
+colors.cc fatal.cc location.cc mandy.cc movement.cc Gtkui.h		\
+IterBuffer.h Job.h MandelbrotJob.h mandy.h
 AM_CXXFLAGS=$(GLIB_CFLAGS) $(GTK_CFLAGS)
 AM_LDFLAGS=$(GTK_LIBS)

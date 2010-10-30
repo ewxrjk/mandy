@@ -15,26 +15,39 @@
  */
 #include "mandy.h"
 #include "Gtkui.h"
-#include "Job.h"
-#include <clocale>
-#include <cerrno>
+#include <cmath>
 
-int main(int argc, char **argv) {
-  if(!setlocale(LC_CTYPE, ""))
-    fatal(errno, "error calling setlocale");
-  if(!gtk_init_check(&argc, &argv))
-    fatal(0, "gtk_init_check failed");
+namespace Gtkui {
 
-  // Bits of infrastructure
-  init_colors();
-  Job::init();
+  /* key-release-event callback */
+  gboolean Keypress(GtkWidget *,
+		    GdkEventKey *event,
+		    gpointer) {
+    if(event->state == GDK_CONTROL_MASK) {
+      switch(event->keyval) {
+      case 'w': case 'W':
+	ToplevelDeleted(NULL, NULL, NULL);
+      case GDK_equal: case GDK_minus: case GDK_KP_Add: case GDK_KP_Subtract: {
+	gint w, h;
+	gdk_drawable_get_size(Gtkui::Drawable, &w, &h);
+	if(event->keyval == GDK_equal || event->keyval == GDK_KP_Add)
+	  size *= M_SQRT1_2;
+	else
+	  size *= M_SQRT2;
+	Gtkui::Changed();
+	Gtkui::NewLocation(w/2, h/2);
+	return TRUE;
+      }
+      }
+    }
+    return FALSE;
+  }
 
-  Gtkui::Setup();
-  Gtkui::Run();
 }
 
 /*
 Local Variables:
+mode:c++
 c-basic-offset:2
 comment-column:40
 fill-column:79

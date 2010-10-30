@@ -45,6 +45,23 @@ namespace Gtkui {
   // Control panel
   GtkWidget *ControlPanel();
   void Changed();
+
+  // Pointer handling
+  gboolean PointerMoved(GtkWidget *, GdkEventMotion *, gpointer);
+  gboolean ButtonPressed(GtkWidget *, GdkEventButton *, gpointer);
+
+  // Keyboard handling
+  gboolean Keypress(GtkWidget *, GdkEventKey *, gpointer);
+
+  // Miscellaneous callbacks
+  gboolean PeriodicPoll(gpointer);
+  gboolean Exposed(GtkWidget *, GdkEventExpose *, gpointer);
+  gboolean ToplevelDeleted(GtkWidget *, GdkEvent *, gpointer);
+
+  // Setup
+  void Setup();
+  void Run();
+  
 };
 
 #endif /* GTKUI_H */
