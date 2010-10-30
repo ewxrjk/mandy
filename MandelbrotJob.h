@@ -45,7 +45,8 @@ public:
   // jobs).  Uncomputed locations are set to -1.
   static IterBuffer *recompute(double cx, double cy, double r, 
                                int maxiters, int w, int h,
-                               void (*completion_callback)(Job *));
+                               void (*completion_callback)(Job *),
+                               int xpos, int ypos);
 };
 
 #endif /* MANDELBROTJOB_H */

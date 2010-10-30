@@ -33,6 +33,7 @@ static IterBuffer *gtkuiLatestDest;
 static GdkPixbuf *gtkuiLatestPixbuf;
 
 // Where and how to draw the results
+static GtkWidget *gtkuiDrawingArea;
 static GdkDrawable *gtkuiDrawable;
 static GdkGC *gtkuiGC;
 static GtkWidget *gtkuiToplevel;
@@ -73,7 +74,7 @@ static void gtkuiCompleted(Job *generic_job) {
 }
 
 // Called to set a new location, scale or maxiter
-static void gtkuiNewLocation() {
+static void gtkuiNewLocation(int xpos, int ypos) {
   if(gtkuiLatestDest) {
     gtkuiLatestDest->release();
     gtkuiLatestDest = NULL;
@@ -84,9 +85,12 @@ static void gtkuiNewLocation() {
     gtkuiLatestPixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, w, h);
   // TODO if there's a pixbuf available then ideally we would move or scale it
   // to provide continuity.
+  if(xpos == -1 || ypos == -1)
+    gtk_widget_get_pointer(gtkuiDrawingArea, &xpos, &ypos);
   gtkuiLatestDest = MandelbrotJob::recompute(xcenter, ycenter, size,
-					 maxiter, w, h,
-					 gtkuiCompleted);
+                                             maxiter, w, h,
+                                             gtkuiCompleted,
+                                             xpos, ypos);
 }
 
 // Called when a resize is detected
@@ -99,7 +103,9 @@ static void gtkuiNewSize() {
     gdk_pixbuf_unref(gtkuiLatestPixbuf);
     gtkuiLatestPixbuf = NULL;
   }
-  gtkuiNewLocation();
+  gint w, h;
+  gdk_drawable_get_size(gtkuiDrawable, &w, &h);
+  gtkuiNewLocation(w/2, h/2);
 }
 
 // Control panel --------------------------------------------------------------
@@ -144,7 +150,7 @@ private:
     // TODO there is an optimization here: if maxiter has gone up then
     // we can skip computation of points with a known non-maximum
     // iteration count.
-    gtkuiNewLocation();
+    gtkuiNewLocation(-1, -1);
   }
 
   void render() {
@@ -312,7 +318,7 @@ static void gtkuiDragComplete() {
     gdk_drawable_get_size(gtkuiDrawable, &w, &h);
     drag(w, h, deltax, deltay);
     GtkuiControl::changed();
-    gtkuiNewLocation();
+    gtkuiNewLocation(gtkuiDragToX, gtkuiDragToY);
   }
 }
 
@@ -347,7 +353,7 @@ static gboolean gtkuiButtonPressed(GtkWidget *, GdkEventButton *event, gpointer)
     gdk_drawable_get_size(gtkuiDrawable, &w, &h);
     zoom(w, h, event->x, event->y, M_SQRT1_2);
     GtkuiControl::changed();
-    gtkuiNewLocation();
+    gtkuiNewLocation(-1, -1);
     return TRUE;
   }
   // Double-click right button zooms out
@@ -358,7 +364,7 @@ static gboolean gtkuiButtonPressed(GtkWidget *, GdkEventButton *event, gpointer)
     gdk_drawable_get_size(gtkuiDrawable, &w, &h);
     zoom(w, h, event->x, event->y, M_SQRT2);
     GtkuiControl::changed();
-    gtkuiNewLocation();
+    gtkuiNewLocation(-1, -1);
     return TRUE;
   }
   // Hold left button drags
@@ -399,7 +405,7 @@ static gboolean gtkuiKeypress(GtkWidget *,
       else
         size *= M_SQRT2;
       GtkuiControl::changed();
-      gtkuiNewLocation();
+      gtkuiNewLocation(w/2, h/2);
       return TRUE;
     }
     }
@@ -462,16 +468,16 @@ int main(int argc, char **argv) {
                    G_CALLBACK(gtkuiKeypress), NULL);
 
   // A drawing area for the results
-  GtkWidget *da = gtk_drawing_area_new();
-  gtk_widget_set_size_request(da, 384, 384);
-  g_signal_connect(da, "expose-event", G_CALLBACK(gtkuiExposed), NULL);
-  gtk_widget_add_events(da,
+  gtkuiDrawingArea = gtk_drawing_area_new();
+  gtk_widget_set_size_request(gtkuiDrawingArea, 384, 384);
+  g_signal_connect(gtkuiDrawingArea, "expose-event", G_CALLBACK(gtkuiExposed), NULL);
+  gtk_widget_add_events(gtkuiDrawingArea,
 			GDK_BUTTON_PRESS_MASK
 			|GDK_BUTTON_RELEASE_MASK
 			|GDK_POINTER_MOTION_MASK);
-  g_signal_connect(da, "button-press-event", G_CALLBACK(gtkuiButtonPressed), NULL);
-  g_signal_connect(da, "button-release-event", G_CALLBACK(gtkuiButtonPressed), NULL);
-  g_signal_connect(da, "motion-notify-event", G_CALLBACK(gtkuiPointerMoved), NULL);
+  g_signal_connect(gtkuiDrawingArea, "button-press-event", G_CALLBACK(gtkuiButtonPressed), NULL);
+  g_signal_connect(gtkuiDrawingArea, "button-release-event", G_CALLBACK(gtkuiButtonPressed), NULL);
+  g_signal_connect(gtkuiDrawingArea, "motion-notify-event", G_CALLBACK(gtkuiPointerMoved), NULL);
 
   // Timeout to pick up the results of delayed recomputation
   g_timeout_add(10, gtkuiPeriodicPoll, NULL);
@@ -479,13 +485,13 @@ int main(int argc, char **argv) {
   // Pack it together vertically
   GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
   gtk_box_pack_start((GtkBox *)vbox, gtkuiControlPanel(), FALSE, FALSE, 1);
-  gtk_box_pack_end((GtkBox *)vbox, da, TRUE, TRUE, 0);
+  gtk_box_pack_end((GtkBox *)vbox, gtkuiDrawingArea, TRUE, TRUE, 0);
   gtk_container_add((GtkContainer *)gtkuiToplevel, vbox);
   gtk_widget_show_all(gtkuiToplevel);
 
   // We only know these after the first _show_all call
-  gtkuiDrawable = da->window;
-  gtkuiGC = da->style->fg_gc[da->state];
+  gtkuiDrawable = gtkuiDrawingArea->window;
+  gtkuiGC = gtkuiDrawingArea->style->fg_gc[gtkuiDrawingArea->state];
 
   // Start an initial computation.
   gtkuiNewSize();

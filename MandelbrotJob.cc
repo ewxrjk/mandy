@@ -15,6 +15,7 @@
  */
 #include "mandy.h"
 #include "MandelbrotJob.h"
+#include <algorithm>
 
 MandelbrotJob::MandelbrotJob(int x_, int y_,
 			     int w_, int h_,
@@ -70,9 +71,22 @@ void MandelbrotJob::work() {
   }
 }
 
+struct comparator {
+  int cx, cy;
+  comparator(int cx_, int cy_): cx(cx_), cy(cy_) {}
+  int operator()(MandelbrotJob *a, MandelbrotJob *b) {
+    int adx = a->x - cx, ady = a->y - cy;
+    int ar2 = adx * adx + ady * ady;
+    int bdx = b->x - cx, bdy = b->y - cy;
+    int br2 = bdx * bdx + bdy * bdy;
+    return ar2 < br2;
+  }
+};
+
 IterBuffer *MandelbrotJob::recompute(double cx, double cy, double r, 
 				     int maxiters, int w, int h,
-				     void (*completion_callback)(Job *)) {
+				     void (*completion_callback)(Job *),
+				     int xpos, int ypos) {
   // Discard stale work
   Job::cancel();
   IterBuffer *dest = new IterBuffer(w, h);
@@ -81,15 +95,19 @@ IterBuffer *MandelbrotJob::recompute(double cx, double cy, double r,
   // Chunks need to be large enough that the overhead of jobs doesn't
   // add up to much but small enough that stale jobs don't hog the CPU
   // much.
-  const int chunk = 64;
+  const int chunk = 32;
+  std::vector<MandelbrotJob *> jobs;
   for(int px = 0; px < dest->w; px += chunk) {
     const int pw = std::min(chunk, dest->w - px);
     for(int py = 0; py < dest->h; py += chunk) {
       const int ph = std::min(chunk, dest->h - py);
-      (new MandelbrotJob(px, py, pw, ph, cx, cy, r, maxiters, dest))
-	->submit(completion_callback);
+      jobs.push_back(new MandelbrotJob(px, py, pw, ph, cx, cy, r, maxiters, dest));
     }
   }
+  comparator c(xpos, ypos);
+  std::sort(jobs.begin(), jobs.end(), c);
+  for(size_t n = 0; n < jobs.size(); ++n)
+    jobs[n]->submit(completion_callback);
   return dest;
 }
 
