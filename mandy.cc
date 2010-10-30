@@ -99,8 +99,10 @@ static void gtkNewSize() {
   // TODO actually what we really wanted was to create the new pixbuf
   // from whatever is lying around in the old one, to provide some
   // continuitty.
-  if(latest_pixbuf)
+  if(latest_pixbuf) {
     gdk_pixbuf_unref(latest_pixbuf);
+    latest_pixbuf = NULL;
+  }
   gtkNewLocation();
 }
 
