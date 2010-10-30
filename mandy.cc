@@ -20,20 +20,15 @@
 #include <clocale>
 #include <cerrno>
 #include <cmath>
+#include <cassert>
 #include <glib.h>
 #include <gtk/gtk.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include <gdk/gdkkeysyms.h>
 
-static void recompute(void);
-
 // The results of the most recent computation
-static int *latest_iters;
 static IterBuffer *latest_dest;
 static GdkPixbuf *latest_pixbuf;
-
-// Set if a computation is ongoing
-static gboolean recomputing;
 
 // Where and how to draw the results
 static GdkDrawable *drawable;
@@ -41,6 +36,7 @@ static GdkGC *gc;
 static GtkWidget *toplevel;
 
 // Cursor
+// TODO this has been lost...
 static GdkCursor *busy_cursor;
 
 // Text entry boxes for parameters
@@ -51,6 +47,9 @@ static GtkWidget *pixel_rate_entry;
 
 // Called to just redraw whatever we've got
 static void gtkRedraw() {
+  assert(latest_pixbuf);
+  assert(drawable);
+  assert(gc);
   gdk_draw_pixbuf(drawable,
 		  gc,
 		  latest_pixbuf,
@@ -232,77 +231,21 @@ static void report(void) {
   gtk_entry_set_text((GtkEntry *)pixel_rate_entry, buffer);
 }
 
-/* Attempt to recompute and redraw when we either know something has
- * changed or when we have no data anyway */
-static void recompute(void) {
-  // Discard old data
-  free(latest_iters);
-  // Find the current window size
-  gint w, h;
-  gdk_drawable_get_size(drawable, &w, &h);
-  // Attempt to get data
-  latest_iters = compute(xcenter - xsize(w, h) / 2,
-			 ycenter - ysize(w, h) / 2,
-			 xsize(w, h),
-			 w, h,
-                         maxiter);
-  // If it's not ready yet just return.  We'll get a timeout callback
-  // soon enough.
-  if(!latest_iters) {
-    if(!recomputing)
-      gdk_window_set_cursor(toplevel->window, busy_cursor);
-    recomputing = TRUE;
-    return;
-  }
-  // Discard any existing pixels
-  if(latest_pixbuf)
-    gdk_pixbuf_unref(latest_pixbuf);
-  // Create a new pixbuf
-  latest_pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, w, h);
-  // Fill it in.
-  guchar *const pixels = gdk_pixbuf_get_pixels(latest_pixbuf);
-  const int rowstride = gdk_pixbuf_get_rowstride(latest_pixbuf);
-  for(int y = 0; y < h; ++y)
-    for(int x = 0; x < w; ++x) {
-      const int count = latest_iters[((h - 1) - y) * w + x];
-      pixels[y * rowstride + x * 3 + 0] = colors[count].r;
-      pixels[y * rowstride + x * 3 + 1] = colors[count].g;
-      pixels[y * rowstride + x * 3 + 2] = colors[count].b;
-    }
-  // Draw it.
-  recomputing = FALSE;
-}
-
-/* Redraw with whatever's in the latest pixbuf (even if wrong) */
-static void redraw(void) {
-  if(latest_pixbuf)
-    gdk_draw_pixbuf(drawable,
-		    gc,
-		    latest_pixbuf,
-		    0, 0, 0, 0, -1, -1,
-		    GDK_RGB_DITHER_NONE, 0, 0);
-}
-
 /* expose-event callback */
 static gboolean exposed(GtkWidget __attribute__((unused)) *widget,
 			GdkEventExpose __attribute__((unused)) *event,
 			gpointer __attribute__((unused)) data) {
-  if(latest_pixbuf) {
-    // We already have some pixels.
-    gint w, h;
-    gdk_drawable_get_size(drawable, &w, &h);
-    if(w != gdk_pixbuf_get_width(latest_pixbuf)
-       || h != gdk_pixbuf_get_height(latest_pixbuf)) {
-      // The pixbuf is the wrong size (i.e. the window has been
-      // resized).  Attempt a recompute.
-      recompute();
-    }
+  gint w, h;
+  gdk_drawable_get_size(drawable, &w, &h);
+  if(w != gdk_pixbuf_get_width(latest_pixbuf)
+     || h != gdk_pixbuf_get_height(latest_pixbuf)) {
+    // The pixbuf is the wrong size (i.e. the window has been
+    // resized).  Attempt a recompute.
+    gtkNewSize();
   } else {
-    // No cached pixbuf.  Attempt a recompute.
-    recompute();
+    // Just draw what we've got
+    gtkRedraw();
   }
-  // Draw whatever we've got.
-  redraw();
   return TRUE;
 }
 
@@ -321,7 +264,8 @@ static void dragto(double dragtox, double dragtoy) {
     gdk_drawable_get_size(drawable, &w, &h);
     drag(w, h, deltax, deltay);
     report();
-    recompute();
+    // TODO move the contents of the pixbuf to provide instant feedback
+    gtkNewLocation();
   }
 }
 
@@ -335,41 +279,12 @@ static gboolean pointer_moved(GtkWidget __attribute__((unused)) *widget,
   return TRUE;
 }
 
-/* Job completion callback */
-static void completed(Job *generic_job) {
-  MandelbrotJob *j = dynamic_cast<MandelbrotJob *>(generic_job);
-  // Ignore stale jobs
-  if(j->dest != latest_dest)
-    return;
-  const int w = latest_dest->w;
-  const int h = latest_dest->h;
-  guchar *const pixels = gdk_pixbuf_get_pixels(latest_pixbuf);
-  const int rowstride = gdk_pixbuf_get_rowstride(latest_pixbuf);
-  for(int y = j->y; y < j->y + j->h; ++y) {
-    for(int x = j->x; x < j->x + j->h; ++x) {
-      const int count = latest_dest->data[((h - 1) - y) * w + x];
-      if(count >= 0) {
-	pixels[y * rowstride + x * 3 + 0] = colors[count].r;
-	pixels[y * rowstride + x * 3 + 1] = colors[count].g;
-	pixels[y * rowstride + x * 3 + 2] = colors[count].b;
-      }
-    }
-  }
-}
-
 /* Timeout to handle delayed recompitation */
 static gboolean timeout(gpointer __attribute__((unused)) data) {
-  if(recomputing) {
-    // The last recompute() call didn't get an answer.  Make another
-    // one.
-    recompute();
-    if(!recomputing) {
-      gdk_window_set_cursor(toplevel->window, NULL);
-      // We must have got an answer
-      redraw();
-      report();                         /* pixelrate will have changed */
-    }
-  }
+  // See if anything's happened lately.
+  // TODO we should arrange that the timeout is suppressed if nothing
+  // is going on.
+  Job::poll();
   return TRUE;
 }
 
@@ -385,7 +300,7 @@ static gboolean button_pressed(GtkWidget *widget,
     gdk_drawable_get_size(widget->window, &w, &h);
     zoom(w, h, event->x, event->y, M_SQRT1_2);
     report();
-    recompute();
+    gtkNewLocation();
     return TRUE;
   }
   // Double-click right button zooms out
@@ -396,7 +311,7 @@ static gboolean button_pressed(GtkWidget *widget,
     gdk_drawable_get_size(widget->window, &w, &h);
     zoom(w, h, event->x, event->y, M_SQRT2);
     report();
-    recompute();
+    gtkNewLocation();
     return TRUE;
   }
   // Hold left button drags
@@ -441,7 +356,7 @@ static gboolean keypress(GtkWidget __attribute__((unused)) *widget,
            (event->keyval == GDK_equal || event->keyval == GDK_KP_Add)
             ? M_SQRT1_2 : M_SQRT2);
       report();
-      recompute();
+      gtkNewLocation();
       return TRUE;
     }
     }
@@ -498,7 +413,7 @@ int main(int argc, char **argv) {
   busy_cursor = gdk_cursor_new(GDK_WATCH);
 
   // Start an initial computation.
-  recompute();
+  gtkNewSize();
   report();
 
   // Run the main loop
