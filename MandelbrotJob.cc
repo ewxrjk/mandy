@@ -44,13 +44,13 @@ void MandelbrotJob::work() {
   // Compute the pixel limits
   const int lx = x + w, ly = y + h;
   // Iterate over rows
-  for(int py = y; py < ly; ++y) {
+  for(int py = y; py < ly; ++py) {
     // Starting point for this row's results
     int *res = dest->data + y * dest->w + x;
     // Complex-plane location of this row
     const double cy = ybottom + py * xsize / dest->w;
     // Iterate over columns
-    for(int px = x; px < lx; ++x) {
+    for(int px = x; px < lx; ++px) {
       // Complex-plane location of this column
       const double cx = xleft + px * xsize / dest->h;
       // let c = cx + icy
