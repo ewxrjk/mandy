@@ -26,6 +26,8 @@
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include <gdk/gdkkeysyms.h>
 
+static gboolean gtkuiToplevelDeleted(GtkWidget *, GdkEvent *, gpointer);
+
 // The results of the most recent computation
 static IterBuffer *latest_dest;
 static GdkPixbuf *latest_pixbuf;
@@ -34,9 +36,6 @@ static GdkPixbuf *latest_pixbuf;
 static GdkDrawable *gtkuiDrawable;
 static GdkGC *gtkuiGC;
 static GtkWidget *gtkuiToplevel;
-
-// Text entry boxes for parameters
-static GtkWidget *xentry, *yentry, *rentry, *ientry;
 
 // Drawing --------------------------------------------------------------------
 
@@ -105,131 +104,197 @@ static void gtkuiNewSize() {
 
 // Control panel --------------------------------------------------------------
 
-static void location_text_activated(GtkEntry *entry, gpointer user_data) {
-  double *value = (double *)user_data;
-  const char *text = gtk_entry_get_text(entry);
-  char *end;
-  errno = 0;
-  double n = strtod(text, &end);
-  // Reject invalid values with a beep.
-  if(errno
-     || (value == &size && n <= 0.0)
-     || *end) {
-    gdk_beep();
-    return;
-  }
-  *value = n;
-  gtkuiNewLocation();
-}
+class GtkuiControl {
+public:
+  GtkWidget *label;
+  GtkWidget *entry;
 
-static void maxiter_text_activated(GtkEntry *entry,
-                                   gpointer __attribute__((unused)) user_data) {
-  const char *text = gtk_entry_get_text(entry);
-  char *end;
-  errno = 0;
-  long n = strtol(text, &end, 10);
-  // Reject invalid values with a beep.
-  if(errno
-     || n <= 0
-     || n > INT_MAX
-     || *end) {
-    gdk_beep();
-    return;
+  GtkuiControl(const char *caption) {
+    label = gtk_label_new(caption);
+    gtk_misc_set_alignment((GtkMisc *)label, 1.0, 0.0);
+    entry = gtk_entry_new();
+    g_signal_connect(entry, "activate",
+                    G_CALLBACK(GtkuiControl::honorAll), NULL);
+    controls.push_back(this);
   }
-  init_colors((int)n);
-  // TODO there is an optimization here: if maxiter has gone up then
-  // we can skip computation of points with a known non-maximum
-  // iteration count.
-  gtkuiNewLocation();
-}
+
+  static void changed() {
+    for(size_t n = 0; n < controls.size(); ++n) {
+      controls[n]->render();
+    }
+  }
+
+private:
+  static std::vector<GtkuiControl *> controls;
+
+  static void honorAll() {
+    // Check everything is valid
+    for(size_t n = 0; n < controls.size(); ++n) {
+      if(!controls[n]->validate()) {
+        gdk_beep();
+        gtk_widget_grab_focus(controls[n]->entry);
+        return;
+      }
+    }
+    // Set the new values
+    for(size_t n = 0; n < controls.size(); ++n)
+      controls[n]->honor();
+    // Redraw accordingly
+    init_colors();
+    // TODO there is an optimization here: if maxiter has gone up then
+    // we can skip computation of points with a known non-maximum
+    // iteration count.
+    gtkuiNewLocation();
+  }
+
+  void render() {
+    char buffer[128];
+    renderText(buffer, sizeof buffer);
+    gtk_entry_set_text((GtkEntry *)entry, buffer);
+  }
+
+  bool validate() {
+    const char *text = gtk_entry_get_text((GtkEntry *)entry);
+    return validateText(text);
+  }
+
+  void honor() {
+    const char *text = gtk_entry_get_text((GtkEntry *)entry);
+    char buffer[128];
+    renderText(buffer, sizeof buffer);
+    if(strcmp(buffer, text))
+      honorText(text);
+  }
+
+protected:
+  virtual void renderText(char buffer[], size_t bufsize) = 0;
+  virtual bool validateText(const char *text) = 0;
+  virtual void honorText(const char *text) = 0;
+};
+
+std::vector<GtkuiControl *> GtkuiControl::controls;
+
+class GtkuiIntegerControl: public GtkuiControl {
+public:
+  int *value;
+  int min, max;
+
+  GtkuiIntegerControl(const char *caption, int *value_, int min_, int max_):
+    GtkuiControl(caption),
+    value(value_),
+    min(min_), max(max_) {
+  }
+
+  void renderText(char buffer[], size_t bufsize) {
+    snprintf(buffer, bufsize, "%d", *value);
+  }
+
+  bool validateText(const char *text) {
+    char *end;
+    errno = 0;
+    long n = strtol(text, &end, 10);
+    if(errno
+       || n < min
+       || n > max
+       || *end)
+      return false;
+    return true;
+  }
+
+  void honorText(const char *text) {
+    *value = strtol(text, NULL, 10);
+  }
+};
+
+class GtkuiDoubleControl: public GtkuiControl {
+public:
+  double *value;
+  double min, max;
+  GtkuiDoubleControl(const char *caption, double *value_, double min_, double max_):
+    GtkuiControl(caption),
+    value(value_),
+    min(min_), max(max_) {
+  }
+
+  void renderText(char buffer[], size_t bufsize) {
+    snprintf(buffer, bufsize, "%g", *value);
+  }
+
+  bool validateText(const char *text) {
+    char *end;
+    errno = 0;
+    double n = strtod(text, &end);
+    if(errno
+       || n < min
+       || n > max
+       || *end)
+      return false;
+    return true;
+  }
+
+  void honorText(const char *text) {
+    *value = strtod(text, NULL);
+  }
+};
 
 /* Create the control panel */
 static GtkWidget *gtkuiControlPanel(void) {
   GtkWidget *table = gtk_table_new(3, 4, FALSE);
-  GtkWidget *xcaption, *ycaption, *rcaption, *icaption;
 
+  GtkuiControl *xControl = new GtkuiDoubleControl("X centre",
+                                                  &xcenter,
+                                                  -HUGE_VAL, HUGE_VAL);
   gtk_table_attach((GtkTable *)table,
-                   (xcaption = gtk_label_new("X centre")),
+                   xControl->label,
                    0, 1, 0, 1,
                    GTK_FILL, (GtkAttachOptions)0, 1, 1);
-  gtk_misc_set_alignment((GtkMisc *)xcaption, 1.0, 0.0);
   gtk_table_attach((GtkTable *)table,
-                   (xentry = gtk_entry_new()),
+                   xControl->entry,
                    1, 2, 0, 1,
                    GTK_FILL, (GtkAttachOptions)0, 1, 1);
-  g_signal_connect(xentry, "activate", G_CALLBACK(location_text_activated),
-                   &xcenter);
 
+  GtkuiControl *yControl = new GtkuiDoubleControl("Y centre",
+                                                  &ycenter,
+                                                  -HUGE_VAL, HUGE_VAL);
   gtk_table_attach((GtkTable *)table,
-                   (ycaption = gtk_label_new("Y centre")),
+                   yControl->label,
                    0, 1, 1, 2,
                    GTK_FILL, (GtkAttachOptions)0, 1, 1);
-  gtk_misc_set_alignment((GtkMisc *)ycaption, 1.0, 0.0);
   gtk_table_attach((GtkTable *)table,
-                   (yentry = gtk_entry_new()),
+                   yControl->entry,
                    1, 2, 1, 2,
                    GTK_FILL, (GtkAttachOptions)0, 1, 1);
-  g_signal_connect(yentry, "activate", G_CALLBACK(location_text_activated),
-                   &ycenter);
 
+  GtkuiControl *radiusControl = new GtkuiDoubleControl("Radius",
+                                                       &size,
+                                                       0.0, HUGE_VAL);
   gtk_table_attach((GtkTable *)table,
-                   (rcaption = gtk_label_new("Radius")),
+                   radiusControl->label,
                    0, 1, 2, 3,
                    GTK_FILL, (GtkAttachOptions)0, 1, 1);
-  gtk_misc_set_alignment((GtkMisc *)rcaption, 1.0, 0.0);
   gtk_table_attach((GtkTable *)table,
-                   (rentry = gtk_entry_new()),
+                   radiusControl->entry,
                    1, 2, 2, 3,
                    GTK_FILL, (GtkAttachOptions)0, 1, 1);
-  g_signal_connect(rentry, "activate", G_CALLBACK(location_text_activated),
-                   &size);
 
+  GtkuiControl *maxiterControl = new GtkuiIntegerControl("Iterations",
+                                                         &maxiter,
+                                                         1, INT_MAX);
   gtk_table_attach((GtkTable *)table,
-                   (icaption = gtk_label_new("Iterations")),
+                   maxiterControl->label,
                    2, 3, 0, 1,
                    GTK_FILL, (GtkAttachOptions)0, 1, 1);
-  gtk_misc_set_alignment((GtkMisc *)icaption, 1.0, 0.0);
   gtk_table_attach((GtkTable *)table,
-                   (ientry = gtk_entry_new()),
+                   maxiterControl->entry,
                    3, 4, 0, 1,
                    GTK_FILL, (GtkAttachOptions)0, 1, 1);
-  g_signal_connect(ientry, "activate", G_CALLBACK(maxiter_text_activated),
-                   NULL);
 
   GtkWidget *frame = gtk_frame_new(NULL);
   gtk_container_add((GtkContainer *)frame, table);
   return frame;
 }
 
-/* Report current position, size, etc */
-static void gtkuiReport(void) {
-  char buffer[128];
-  snprintf(buffer, sizeof buffer, "%g", xcenter);
-  gtk_entry_set_text((GtkEntry *)xentry, buffer);
-  snprintf(buffer, sizeof buffer, "%g", ycenter);
-  gtk_entry_set_text((GtkEntry *)yentry, buffer);
-  snprintf(buffer, sizeof buffer, "%g", size);
-  gtk_entry_set_text((GtkEntry *)rentry, buffer);
-  snprintf(buffer, sizeof buffer, "%d", maxiter);
-  gtk_entry_set_text((GtkEntry *)ientry, buffer);
-}
-
-/* expose-event callback */
-static gboolean gtkuiExposed(GtkWidget *, GdkEventExpose *, gpointer) {
-  gint w, h;
-  gdk_drawable_get_size(gtkuiDrawable, &w, &h);
-  if(w != gdk_pixbuf_get_width(latest_pixbuf)
-     || h != gdk_pixbuf_get_height(latest_pixbuf)) {
-    // The pixbuf is the wrong size (i.e. the window has been
-    // resized).  Attempt a recompute.
-    gtkuiNewSize();
-  } else {
-    // Just draw what we've got
-    // TODO only redraw the bit that was exposed
-    gtkuiRedraw(0, 0, w, h);
-  }
-  return TRUE;
-}
+// Pointer motion -------------------------------------------------------------
 
 /* Drag state */
 static gboolean dragging;
@@ -246,7 +311,7 @@ static void gtkuiDragComplete() {
     gint w, h;
     gdk_drawable_get_size(gtkuiDrawable, &w, &h);
     drag(w, h, deltax, deltay);
-    gtkuiReport();
+    GtkuiControl::changed();
     gtkuiNewLocation();
   }
 }
@@ -272,15 +337,6 @@ static gboolean gtkuiPointerMoved(GtkWidget __attribute__((unused)) *widget,
   return TRUE;
 }
 
-/* Timeout to handle delayed recompitation */
-static gboolean gtkuiPeriodicPoll(gpointer __attribute__((unused)) data) {
-  // See if anything's happened lately.
-  // TODO we should arrange that the timeout is suppressed if nothing
-  // is going on.
-  Job::poll();
-  return TRUE;
-}
-
 /* button-{press,release}-event callback */
 static gboolean gtkuiButtonPressed(GtkWidget *, GdkEventButton *event, gpointer) {
   // Double-click left button zooms in
@@ -290,7 +346,7 @@ static gboolean gtkuiButtonPressed(GtkWidget *, GdkEventButton *event, gpointer)
     gint w, h;
     gdk_drawable_get_size(gtkuiDrawable, &w, &h);
     zoom(w, h, event->x, event->y, M_SQRT1_2);
-    gtkuiReport();
+    GtkuiControl::changed();
     gtkuiNewLocation();
     return TRUE;
   }
@@ -301,7 +357,7 @@ static gboolean gtkuiButtonPressed(GtkWidget *, GdkEventButton *event, gpointer)
     gint w, h;
     gdk_drawable_get_size(gtkuiDrawable, &w, &h);
     zoom(w, h, event->x, event->y, M_SQRT2);
-    gtkuiReport();
+    GtkuiControl::changed();
     gtkuiNewLocation();
     return TRUE;
   }
@@ -325,11 +381,7 @@ static gboolean gtkuiButtonPressed(GtkWidget *, GdkEventButton *event, gpointer)
   return FALSE;
 }
 
-/* delete-event callback */
-static gboolean gtkuiToplevelDeleted(GtkWidget *, GdkEvent *, gpointer) {
-  Job::destroy();
-  exit(0);
-}
+// Keyboard -------------------------------------------------------------------
 
 /* key-release-event callback */
 static gboolean gtkuiKeypress(GtkWidget *,
@@ -345,13 +397,47 @@ static gboolean gtkuiKeypress(GtkWidget *,
       zoom(w, h, w / 2, h / 2,
            (event->keyval == GDK_equal || event->keyval == GDK_KP_Add)
             ? M_SQRT1_2 : M_SQRT2);
-      gtkuiReport();
+      GtkuiControl::changed();
       gtkuiNewLocation();
       return TRUE;
     }
     }
   }
   return FALSE;
+}
+
+// Miscelleneous callbacks ----------------------------------------------------
+
+/* Timeout to handle delayed recompitation */
+static gboolean gtkuiPeriodicPoll(gpointer __attribute__((unused)) data) {
+  // See if anything's happened lately.
+  // TODO we should arrange that the timeout is suppressed if nothing
+  // is going on.
+  Job::poll();
+  return TRUE;
+}
+
+/* expose-event callback */
+static gboolean gtkuiExposed(GtkWidget *, GdkEventExpose *, gpointer) {
+  gint w, h;
+  gdk_drawable_get_size(gtkuiDrawable, &w, &h);
+  if(w != gdk_pixbuf_get_width(latest_pixbuf)
+     || h != gdk_pixbuf_get_height(latest_pixbuf)) {
+    // The pixbuf is the wrong size (i.e. the window has been
+    // resized).  Attempt a recompute.
+    gtkuiNewSize();
+  } else {
+    // Just draw what we've got
+    // TODO only redraw the bit that was exposed
+    gtkuiRedraw(0, 0, w, h);
+  }
+  return TRUE;
+}
+
+/* delete-event callback */
+static gboolean gtkuiToplevelDeleted(GtkWidget *, GdkEvent *, gpointer) {
+  Job::destroy();
+  exit(0);
 }
 
 int main(int argc, char **argv) {
@@ -361,7 +447,7 @@ int main(int argc, char **argv) {
     fatal(0, "gtk_init_check failed");
 
   // Bits of infrastructure
-  init_colors(255);
+  init_colors();
   Job::init();
 
   // The top level window
@@ -402,7 +488,7 @@ int main(int argc, char **argv) {
 
   // Start an initial computation.
   gtkuiNewSize();
-  gtkuiReport();
+  GtkuiControl::changed();
 
   // Run the main loop
   GMainLoop *mainloop = g_main_loop_new(0, 0);

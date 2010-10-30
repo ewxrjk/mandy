@@ -21,12 +21,9 @@
 struct color *colors;
 
 // Maximum iteration count
-int maxiter;
+int maxiter = 255;
 
-void init_colors(int new_maxiter) {
-  if(maxiter == new_maxiter)
-    return;
-  maxiter = new_maxiter;
+void init_colors() {
   if(colors)
     delete[] colors;
   colors = new color[maxiter + 1];
