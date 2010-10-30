@@ -47,6 +47,66 @@ static GdkCursor *busy_cursor;
 static GtkWidget *xentry, *yentry, *rentry, *ientry;
 static GtkWidget *pixel_rate_entry;
 
+// Drawing --------------------------------------------------------------------
+
+// Called to just redraw whatever we've got
+static void gtkRedraw() {
+  gdk_draw_pixbuf(drawable,
+		  gc,
+		  latest_pixbuf,
+		  0, 0, 0, 0, -1, -1,
+		  GDK_RGB_DITHER_NONE, 0, 0);
+}
+
+// Job completion callback
+static void gtkCompleted(Job *generic_job) {
+  MandelbrotJob *j = dynamic_cast<MandelbrotJob *>(generic_job);
+  // Ignore stale jobs
+  if(j->dest != latest_dest)
+    return;
+  const int w = latest_dest->w;
+  const int h = latest_dest->h;
+  guchar *const pixels = gdk_pixbuf_get_pixels(latest_pixbuf);
+  const int rowstride = gdk_pixbuf_get_rowstride(latest_pixbuf);
+  for(int y = j->y; y < j->y + j->h; ++y) {
+    for(int x = j->x; x < j->x + j->h; ++x) {
+      const int count = latest_dest->data[((h - 1) - y) * w + x];
+      if(count >= 0) {
+	pixels[y * rowstride + x * 3 + 0] = colors[count].r;
+	pixels[y * rowstride + x * 3 + 1] = colors[count].g;
+	pixels[y * rowstride + x * 3 + 2] = colors[count].b;
+      }
+    }
+  }
+  gtkRedraw();
+}
+
+// Called to set a new location, scale or maxiter
+static void gtkNewLocation() {
+  if(latest_dest)
+    latest_dest->release();
+  gint w, h;
+  gdk_drawable_get_size(drawable, &w, &h);
+  if(!latest_pixbuf)
+    latest_pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, w, h);
+  latest_dest = MandelbrotJob::recompute(xcenter, ycenter, size,
+					 maxiter, w, h,
+					 gtkCompleted);
+}
+
+// Called when a resize is detected
+static void gtkNewSize() {
+  // If there's a pixbuf it'll be the wrong size, so delete it.
+  // TODO actually what we really wanted was to create the new pixbuf
+  // from whatever is lying around in the old one, to provide some
+  // continuitty.
+  if(latest_pixbuf)
+    gdk_pixbuf_unref(latest_pixbuf);
+  gtkNewLocation();
+}
+
+// Control panel --------------------------------------------------------------
+
 static void location_text_activated(GtkEntry *entry, gpointer user_data) {
   double *value = (double *)user_data;
   const char *text = gtk_entry_get_text(entry);
@@ -61,7 +121,7 @@ static void location_text_activated(GtkEntry *entry, gpointer user_data) {
     return;
   }
   *value = n;
-  recompute();
+  gtkNewLocation();
 }
 
 static void maxiter_text_activated(GtkEntry *entry,
@@ -79,7 +139,10 @@ static void maxiter_text_activated(GtkEntry *entry,
     return;
   }
   init_colors((int)n);
-  recompute();
+  // TODO there is an optimization here: if maxiter has gone up then
+  // we can skip computation of points with a known non-maximum
+  // iteration count.
+  gtkNewLocation();
 }
 
 /* Create the control panel */
