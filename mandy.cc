@@ -23,203 +23,8 @@
 #include <cmath>
 #include <cassert>
 #include <cstring>
-#include <vector>
 
 static gboolean gtkuiToplevelDeleted(GtkWidget *, GdkEvent *, gpointer);
-
-// Control panel --------------------------------------------------------------
-
-class GtkuiControl {
-public:
-  GtkWidget *label;
-  GtkWidget *entry;
-
-  GtkuiControl(const char *caption) {
-    label = gtk_label_new(caption);
-    gtk_misc_set_alignment((GtkMisc *)label, 1.0, 0.0);
-    entry = gtk_entry_new();
-    g_signal_connect(entry, "activate",
-                    G_CALLBACK(GtkuiControl::honorAll), NULL);
-    controls.push_back(this);
-  }
-
-  static void changed() {
-    for(size_t n = 0; n < controls.size(); ++n) {
-      controls[n]->render();
-    }
-  }
-
-private:
-  static std::vector<GtkuiControl *> controls;
-
-  static void honorAll() {
-    // Check everything is valid
-    for(size_t n = 0; n < controls.size(); ++n) {
-      if(!controls[n]->validate()) {
-        gdk_beep();
-        gtk_widget_grab_focus(controls[n]->entry);
-        return;
-      }
-    }
-    // Set the new values
-    for(size_t n = 0; n < controls.size(); ++n)
-      controls[n]->honor();
-    // Redraw accordingly
-    init_colors();
-    // TODO there is an optimization here: if maxiter has gone up then
-    // we can skip computation of points with a known non-maximum
-    // iteration count.
-    gint w, h;
-    gdk_drawable_get_size(Gtkui::Drawable, &w, &h);
-    Gtkui::NewLocation(w/2, h/2);
-  }
-
-  void render() {
-    char buffer[128];
-    renderText(buffer, sizeof buffer);
-    gtk_entry_set_text((GtkEntry *)entry, buffer);
-  }
-
-  bool validate() {
-    const char *text = gtk_entry_get_text((GtkEntry *)entry);
-    return validateText(text);
-  }
-
-  void honor() {
-    const char *text = gtk_entry_get_text((GtkEntry *)entry);
-    char buffer[128];
-    renderText(buffer, sizeof buffer);
-    if(strcmp(buffer, text))
-      honorText(text);
-  }
-
-protected:
-  virtual void renderText(char buffer[], size_t bufsize) = 0;
-  virtual bool validateText(const char *text) = 0;
-  virtual void honorText(const char *text) = 0;
-};
-
-std::vector<GtkuiControl *> GtkuiControl::controls;
-
-class GtkuiIntegerControl: public GtkuiControl {
-public:
-  int *value;
-  int min, max;
-
-  GtkuiIntegerControl(const char *caption, int *value_, int min_, int max_):
-    GtkuiControl(caption),
-    value(value_),
-    min(min_), max(max_) {
-  }
-
-  void renderText(char buffer[], size_t bufsize) {
-    snprintf(buffer, bufsize, "%d", *value);
-  }
-
-  bool validateText(const char *text) {
-    char *end;
-    errno = 0;
-    long n = strtol(text, &end, 10);
-    if(errno
-       || n < min
-       || n > max
-       || *end)
-      return false;
-    return true;
-  }
-
-  void honorText(const char *text) {
-    *value = strtol(text, NULL, 10);
-  }
-};
-
-class GtkuiDoubleControl: public GtkuiControl {
-public:
-  double *value;
-  double min, max;
-  GtkuiDoubleControl(const char *caption, double *value_, double min_, double max_):
-    GtkuiControl(caption),
-    value(value_),
-    min(min_), max(max_) {
-  }
-
-  void renderText(char buffer[], size_t bufsize) {
-    snprintf(buffer, bufsize, "%g", *value);
-  }
-
-  bool validateText(const char *text) {
-    char *end;
-    errno = 0;
-    double n = strtod(text, &end);
-    if(errno
-       || n < min
-       || n > max
-       || *end)
-      return false;
-    return true;
-  }
-
-  void honorText(const char *text) {
-    *value = strtod(text, NULL);
-  }
-};
-
-/* Create the control panel */
-static GtkWidget *gtkuiControlPanel(void) {
-  GtkWidget *table = gtk_table_new(3, 4, FALSE);
-
-  GtkuiControl *xControl = new GtkuiDoubleControl("X centre",
-                                                  &xcenter,
-                                                  -HUGE_VAL, HUGE_VAL);
-  gtk_table_attach((GtkTable *)table,
-                   xControl->label,
-                   0, 1, 0, 1,
-                   GTK_FILL, (GtkAttachOptions)0, 1, 1);
-  gtk_table_attach((GtkTable *)table,
-                   xControl->entry,
-                   1, 2, 0, 1,
-                   GTK_FILL, (GtkAttachOptions)0, 1, 1);
-
-  GtkuiControl *yControl = new GtkuiDoubleControl("Y centre",
-                                                  &ycenter,
-                                                  -HUGE_VAL, HUGE_VAL);
-  gtk_table_attach((GtkTable *)table,
-                   yControl->label,
-                   0, 1, 1, 2,
-                   GTK_FILL, (GtkAttachOptions)0, 1, 1);
-  gtk_table_attach((GtkTable *)table,
-                   yControl->entry,
-                   1, 2, 1, 2,
-                   GTK_FILL, (GtkAttachOptions)0, 1, 1);
-
-  GtkuiControl *radiusControl = new GtkuiDoubleControl("Radius",
-                                                       &size,
-                                                       0.0, HUGE_VAL);
-  gtk_table_attach((GtkTable *)table,
-                   radiusControl->label,
-                   0, 1, 2, 3,
-                   GTK_FILL, (GtkAttachOptions)0, 1, 1);
-  gtk_table_attach((GtkTable *)table,
-                   radiusControl->entry,
-                   1, 2, 2, 3,
-                   GTK_FILL, (GtkAttachOptions)0, 1, 1);
-
-  GtkuiControl *maxiterControl = new GtkuiIntegerControl("Iterations",
-                                                         &maxiter,
-                                                         1, INT_MAX);
-  gtk_table_attach((GtkTable *)table,
-                   maxiterControl->label,
-                   2, 3, 0, 1,
-                   GTK_FILL, (GtkAttachOptions)0, 1, 1);
-  gtk_table_attach((GtkTable *)table,
-                   maxiterControl->entry,
-                   3, 4, 0, 1,
-                   GTK_FILL, (GtkAttachOptions)0, 1, 1);
-
-  GtkWidget *frame = gtk_frame_new(NULL);
-  gtk_container_add((GtkContainer *)frame, table);
-  return frame;
-}
 
 // Pointer motion -------------------------------------------------------------
 
@@ -238,7 +43,7 @@ static void gtkuiDragComplete() {
     gint w, h;
     gdk_drawable_get_size(Gtkui::Drawable, &w, &h);
     drag(w, h, deltax, deltay);
-    GtkuiControl::changed();
+    Gtkui::Changed();
     Gtkui::NewLocation(gtkuiDragToX, gtkuiDragToY);
   }
 }
@@ -273,7 +78,7 @@ static gboolean gtkuiButtonPressed(GtkWidget *, GdkEventButton *event, gpointer)
     gint w, h;
     gdk_drawable_get_size(Gtkui::Drawable, &w, &h);
     zoom(w, h, event->x, event->y, M_SQRT1_2);
-    GtkuiControl::changed();
+    Gtkui::Changed();
     Gtkui::NewLocation(-1, -1);
     return TRUE;
   }
@@ -284,7 +89,7 @@ static gboolean gtkuiButtonPressed(GtkWidget *, GdkEventButton *event, gpointer)
     gint w, h;
     gdk_drawable_get_size(Gtkui::Drawable, &w, &h);
     zoom(w, h, event->x, event->y, M_SQRT2);
-    GtkuiControl::changed();
+    Gtkui::Changed();
     Gtkui::NewLocation(-1, -1);
     return TRUE;
   }
@@ -325,7 +130,7 @@ static gboolean gtkuiKeypress(GtkWidget *,
         size *= M_SQRT1_2;
       else
         size *= M_SQRT2;
-      GtkuiControl::changed();
+      Gtkui::Changed();
       Gtkui::NewLocation(w/2, h/2);
       return TRUE;
     }
@@ -405,7 +210,7 @@ int main(int argc, char **argv) {
 
   // Pack it together vertically
   GtkWidget *vbox = gtk_vbox_new(FALSE, 0);
-  gtk_box_pack_start((GtkBox *)vbox, gtkuiControlPanel(), FALSE, FALSE, 1);
+  gtk_box_pack_start((GtkBox *)vbox, Gtkui::ControlPanel(), FALSE, FALSE, 1);
   gtk_box_pack_end((GtkBox *)vbox, Gtkui::DrawingArea, TRUE, TRUE, 0);
   gtk_container_add((GtkContainer *)Gtkui::Toplevel, vbox);
   gtk_widget_show_all(Gtkui::Toplevel);
@@ -416,7 +221,7 @@ int main(int argc, char **argv) {
 
   // Start an initial computation.
   Gtkui::NewSize();
-  GtkuiControl::changed();
+  Gtkui::Changed();
 
   // Run the main loop
   GMainLoop *mainloop = g_main_loop_new(0, 0);

@@ -15,6 +15,6 @@
 bin_PROGRAMS=mandy
 mandy_SOURCES=Gtkui.cc IterBuffer.cc Job.cc MandelbrotJob.cc colors.cc	\
 fatal.cc location.cc mandy.cc movement.cc Gtkui.h IterBuffer.h Job.h	\
-MandelbrotJob.h mandy.h GtkuiDrawing.cc
+MandelbrotJob.h mandy.h GtkuiDrawing.cc GtkuiControls.cc
 AM_CXXFLAGS=$(GLIB_CFLAGS) $(GTK_CFLAGS)
 AM_LDFLAGS=$(GTK_LIBS)

@@ -36,10 +36,15 @@ namespace Gtkui {
   extern GdkGC *GC;
   extern GtkWidget *Toplevel;
 
+  // Drawing functions
   void Redraw(int x, int y, int w, int h);
   void Completed(Job *generic_job);
   void NewLocation(int xpos, int ypos);
   void NewSize();
+
+  // Control panel
+  GtkWidget *ControlPanel();
+  void Changed();
 };
 
 #endif /* GTKUI_H */
