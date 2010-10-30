@@ -67,16 +67,17 @@ static void gtkCompleted(Job *generic_job) {
   const int h = latest_dest->h;
   guchar *const pixels = gdk_pixbuf_get_pixels(latest_pixbuf);
   const int rowstride = gdk_pixbuf_get_rowstride(latest_pixbuf);
-  for(int y = j->y; y < j->y + j->h; ++y) {
-    for(int x = j->x; x < j->x + j->h; ++x) {
+  const int lx = j->x + j->w;
+  const int ly = j->y + j->h;
+  for(int y = j->y; y < ly; ++y) {
+    for(int x = j->x; x < lx; ++x) {
       const int count = latest_dest->data[((h - 1) - y) * w + x];
-      if(count >= 0) {
-	pixels[y * rowstride + x * 3 + 0] = colors[count].r;
-	pixels[y * rowstride + x * 3 + 1] = colors[count].g;
-	pixels[y * rowstride + x * 3 + 2] = colors[count].b;
-      }
+      pixels[y * rowstride + x * 3 + 0] = colors[count].r;
+      pixels[y * rowstride + x * 3 + 1] = colors[count].g;
+      pixels[y * rowstride + x * 3 + 2] = colors[count].b;
     }
   }
+  // TODO only redraw the bit we filled in
   gtkRedraw();
 }
 
@@ -246,6 +247,7 @@ static gboolean exposed(GtkWidget __attribute__((unused)) *widget,
     gtkNewSize();
   } else {
     // Just draw what we've got
+    // TODO only redraw the bit that was exposed
     gtkRedraw();
   }
   return TRUE;
