@@ -13,8 +13,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef MAND_H
-#define MAND_H
+#ifndef MANDY_H
+#define MANDY_H
 
 #include <config.h>
 
@@ -41,10 +41,11 @@ extern struct color *colors;
 extern int maxiter;
 extern double xcenter, ycenter, size;
 
-#endif /* MAND_H */
+#endif /* MANDY_H */
 
 /*
 Local Variables:
+mode:c++
 c-basic-offset:2
 comment-column:40
 fill-column:79
