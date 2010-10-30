@@ -97,10 +97,8 @@ static void gtkuiNewLocation(int xpos, int ypos) {
 // Called when a resize is detected
 static void gtkuiNewSize() {
   // If there's a pixbuf it'll be the wrong size, so delete it.
-  // TODO actually what we really wanted was to create the new pixbuf
-  // from whatever is lying around in the old one, to provide some
-  // continuity.
   if(gtkuiLatestPixbuf) {
+    // TODO ideally we would rescale the pixbuf
     gtkuiRedraw(0, 0,
                 gdk_pixbuf_get_width(gtkuiLatestPixbuf),
                 gdk_pixbuf_get_height(gtkuiLatestPixbuf));
