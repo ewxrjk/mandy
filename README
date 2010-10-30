@@ -9,6 +9,8 @@ set.
 Installation
 ============
 
+  ./autogen.sh          # only if building from git
+  ./configure
   make
   sudo make install
 
@@ -52,12 +54,12 @@ Keyboard:
 Hacking
 =======
 
-This program requires GCC and C99 support.
+This program requires G++.
 
-All the GTK+-specific code is kept in mand.c.  The idea is to support
-the possibility of other UIs.
+All the GTK+-specific code is kept in mandy.cc.  The idea is to
+support the possibility of other UIs.
 
-The calculations are done in background threads in background.c.  A
+The calculations are done in background threads in background.cc.  A
 worker thread is created for each CPU core that is online when the
 program starts.  If cores are offlined or onlined while it runs then
 the number of threads will no longer match the number of cores.

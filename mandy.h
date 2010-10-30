@@ -16,7 +16,7 @@
 #ifndef MAND_H
 #define MAND_H
 
-#define _GNU_SOURCE 1
+#include <config.h>
 
 struct color {
   unsigned char r, g, b;
