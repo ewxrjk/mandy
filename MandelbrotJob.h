@@ -42,9 +42,9 @@ public:
   // Create a new IterBuffer and start to asynchronously populate it.  It will
   // be returned with one ref owned by the caller (and many by the background
   // jobs).  Uncomputed locations are set to -1.
-  IterBuffer *recompute(double cx, double cy, double r, 
-                        int maxiters, int w, int h,
-                        void (*completion_callback)(Job *));
+  static IterBuffer *recompute(double cx, double cy, double r, 
+                               int maxiters, int w, int h,
+                               void (*completion_callback)(Job *));
 };
 
 #endif /* MANDELBROTJOB_H */
