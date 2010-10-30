@@ -14,8 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "mandy.h"
-#include "MandelbrotJob.h"
 #include "Gtkui.h"
+#include "Job.h"
 #include <cstdio>
 #include <cstdlib>
 #include <clocale>
@@ -23,79 +23,9 @@
 #include <cmath>
 #include <cassert>
 #include <cstring>
+#include <vector>
 
 static gboolean gtkuiToplevelDeleted(GtkWidget *, GdkEvent *, gpointer);
-
-// Drawing --------------------------------------------------------------------
-
-// Called to just redraw whatever we've got
-static void gtkuiRedraw(int x, int y, int w, int h) {
-  gdk_draw_pixbuf(Gtkui::Drawable,
-		  Gtkui::GC,
-		  Gtkui::LatestPixbuf,
-		  x, y, x, y, w, h,
-		  GDK_RGB_DITHER_NONE, 0, 0);
-}
-
-// Job completion callback
-static void gtkuiCompleted(Job *generic_job) {
-  MandelbrotJob *j = dynamic_cast<MandelbrotJob *>(generic_job);
-  // Ignore stale jobs
-  if(j->dest != Gtkui::LatestDest)
-    return;
-  const int w = Gtkui::LatestDest->w;
-  guchar *const pixels = gdk_pixbuf_get_pixels(Gtkui::LatestPixbuf);
-  const int rowstride = gdk_pixbuf_get_rowstride(Gtkui::LatestPixbuf);
-  const int lx = j->x + j->w;
-  const int ly = j->y + j->h;
-  for(int y = j->y; y < ly; ++y) {
-    int *datarow = &Gtkui::LatestDest->data[y * w + j->x];
-    guchar *pixelrow = pixels + y * rowstride + j->x * 3;
-    for(int x = j->x; x < lx; ++x) {
-      const int count = *datarow++;
-      *pixelrow++ = colors[count].r;
-      *pixelrow++ = colors[count].g;
-      *pixelrow++ = colors[count].b;
-    }
-  }
-  gtkuiRedraw(j->x, j->y, j->w, j->h);
-}
-
-// Called to set a new location, scale or maxiter
-static void gtkuiNewLocation(int xpos, int ypos) {
-  if(Gtkui::LatestDest) {
-    Gtkui::LatestDest->release();
-    Gtkui::LatestDest = NULL;
-  }
-  gint w, h;
-  gdk_drawable_get_size(Gtkui::Drawable, &w, &h);
-  if(!Gtkui::LatestPixbuf)
-    Gtkui::LatestPixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, w, h);
-  // TODO if there's a pixbuf available then ideally we would move or scale it
-  // to provide continuity.
-  if(xpos == -1 || ypos == -1)
-    gtk_widget_get_pointer(Gtkui::DrawingArea, &xpos, &ypos);
-  Gtkui::LatestDest = MandelbrotJob::recompute(xcenter, ycenter, size,
-                                             maxiter, w, h,
-                                             gtkuiCompleted,
-                                             xpos, ypos);
-}
-
-// Called when a resize is detected
-static void gtkuiNewSize() {
-  // If there's a pixbuf it'll be the wrong size, so delete it.
-  if(Gtkui::LatestPixbuf) {
-    // TODO ideally we would rescale the pixbuf
-    gtkuiRedraw(0, 0,
-                gdk_pixbuf_get_width(Gtkui::LatestPixbuf),
-                gdk_pixbuf_get_height(Gtkui::LatestPixbuf));
-    gdk_pixbuf_unref(Gtkui::LatestPixbuf);
-    Gtkui::LatestPixbuf = NULL;
-  }
-  gint w, h;
-  gdk_drawable_get_size(Gtkui::Drawable, &w, &h);
-  gtkuiNewLocation(w/2, h/2);
-}
 
 // Control panel --------------------------------------------------------------
 
@@ -141,7 +71,7 @@ private:
     // iteration count.
     gint w, h;
     gdk_drawable_get_size(Gtkui::Drawable, &w, &h);
-    gtkuiNewLocation(w/2, h/2);
+    Gtkui::NewLocation(w/2, h/2);
   }
 
   void render() {
@@ -309,7 +239,7 @@ static void gtkuiDragComplete() {
     gdk_drawable_get_size(Gtkui::Drawable, &w, &h);
     drag(w, h, deltax, deltay);
     GtkuiControl::changed();
-    gtkuiNewLocation(gtkuiDragToX, gtkuiDragToY);
+    Gtkui::NewLocation(gtkuiDragToX, gtkuiDragToY);
   }
 }
 
@@ -344,7 +274,7 @@ static gboolean gtkuiButtonPressed(GtkWidget *, GdkEventButton *event, gpointer)
     gdk_drawable_get_size(Gtkui::Drawable, &w, &h);
     zoom(w, h, event->x, event->y, M_SQRT1_2);
     GtkuiControl::changed();
-    gtkuiNewLocation(-1, -1);
+    Gtkui::NewLocation(-1, -1);
     return TRUE;
   }
   // Double-click right button zooms out
@@ -355,7 +285,7 @@ static gboolean gtkuiButtonPressed(GtkWidget *, GdkEventButton *event, gpointer)
     gdk_drawable_get_size(Gtkui::Drawable, &w, &h);
     zoom(w, h, event->x, event->y, M_SQRT2);
     GtkuiControl::changed();
-    gtkuiNewLocation(-1, -1);
+    Gtkui::NewLocation(-1, -1);
     return TRUE;
   }
   // Hold left button drags
@@ -396,7 +326,7 @@ static gboolean gtkuiKeypress(GtkWidget *,
       else
         size *= M_SQRT2;
       GtkuiControl::changed();
-      gtkuiNewLocation(w/2, h/2);
+      Gtkui::NewLocation(w/2, h/2);
       return TRUE;
     }
     }
@@ -423,11 +353,11 @@ static gboolean gtkuiExposed(GtkWidget *, GdkEventExpose *, gpointer) {
      || h != gdk_pixbuf_get_height(Gtkui::LatestPixbuf)) {
     // The pixbuf is the wrong size (i.e. the window has been
     // resized).  Attempt a recompute.
-    gtkuiNewSize();
+    Gtkui::NewSize();
   } else {
     // Just draw what we've got
     // TODO only redraw the bit that was exposed
-    gtkuiRedraw(0, 0, w, h);
+    Gtkui::Redraw(0, 0, w, h);
   }
   return TRUE;
 }
@@ -485,7 +415,7 @@ int main(int argc, char **argv) {
   Gtkui::GC = Gtkui::DrawingArea->style->fg_gc[Gtkui::DrawingArea->state];
 
   // Start an initial computation.
-  gtkuiNewSize();
+  Gtkui::NewSize();
   GtkuiControl::changed();
 
   // Run the main loop

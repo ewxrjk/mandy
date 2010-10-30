@@ -22,18 +22,24 @@
 #include <gdk/gdkkeysyms.h>
 
 class IterBuffer;
+class Job;
 
 namespace Gtkui {
+
   // The results of the most recent computation
   extern IterBuffer *LatestDest;
   extern GdkPixbuf *LatestPixbuf;
-  
+
   // Where and how to draw the results
   extern GtkWidget *DrawingArea;
   extern GdkDrawable *Drawable;
   extern GdkGC *GC;
   extern GtkWidget *Toplevel;
 
+  void Redraw(int x, int y, int w, int h);
+  void Completed(Job *generic_job);
+  void NewLocation(int xpos, int ypos);
+  void NewSize();
 };
 
 #endif /* GTKUI_H */
