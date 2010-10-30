@@ -331,9 +331,9 @@ static gboolean gtkuiDragIdle(gpointer) {
 }
 
 /* motion-notify-event callback */
-static gboolean gtkuiPointerMoved(GtkWidget __attribute__((unused)) *widget,
-			      GdkEventMotion *event,
-			      gpointer __attribute__((unused)) user_data) {
+static gboolean gtkuiPointerMoved(GtkWidget *,
+                                  GdkEventMotion *event,
+                                  gpointer) {
   if(!gtkuiDragging)
     return FALSE;
   gtkuiDragToX = event->x;
@@ -416,7 +416,7 @@ static gboolean gtkuiKeypress(GtkWidget *,
 // Miscelleneous callbacks ----------------------------------------------------
 
 /* Timeout to handle delayed recompitation */
-static gboolean gtkuiPeriodicPoll(gpointer __attribute__((unused)) data) {
+static gboolean gtkuiPeriodicPoll(gpointer) {
   // See if anything's happened lately.
   // TODO we should arrange that the timeout is suppressed if nothing
   // is going on.
