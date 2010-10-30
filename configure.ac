@@ -22,9 +22,8 @@ AM_PATH_GTK_2_0
 AC_LANG([C++])
 AC_PROG_CXX
 AC_PROG_RANLIB
-#GTK_CFLAGS="`echo \"$GTK_CFLAGS\"|sed 's/-I/-isystem /g'`"
-#GLIB_CFLAGS="`echo \"$GLIB_CFLAGS\"|sed 's/-I/-isystem /g'`"
 AC_SET_MAKE
+PKG_CHECK_MODULES([gtkmm], [gtkmm-2.4])
 AC_DEFINE([_GNU_SOURCE], [1], [use GNU extensions])
 if test "x$GCC" = xyes; then
   CXX="$CXX -Wall -W -Werror -Wpointer-arith -Wwrite-strings"
