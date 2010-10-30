@@ -243,9 +243,10 @@ static gboolean exposed(GtkWidget __attribute__((unused)) *widget,
 /* Drag state */
 static gboolean dragging;
 static double dragfromx, dragfromy;
+static double dragtox, dragtoy;
 
 /* Drag from dragfrom[xy] to a new pointer location */
-static void dragto(double dragtox, double dragtoy) {
+static void dragto() {
   const int deltax = dragtox - dragfromx;
   const int deltay = dragtoy - dragfromy;
   if(!(deltax == 0 && deltay == 0)) {
@@ -255,64 +256,16 @@ static void dragto(double dragtox, double dragtoy) {
     gdk_drawable_get_size(drawable, &w, &h);
     drag(w, h, deltax, deltay);
     report();
-    // Move the contents of the pixbuf to provide instant feedback
-    if(latest_pixbuf) {
-      // imagine we're dragging 10 pixels right.  then deltax=10.
-      // so the pixel at (0,0) needs to end up at (10,0).
-      //
-      // imagine we're dragging 10 pixels left.  then deltax=-10.
-      // so the pixel at (10,0) needs to end up at (0,0).
-      guchar *const pixels = gdk_pixbuf_get_pixels(latest_pixbuf);
-      const int rowstride = gdk_pixbuf_get_rowstride(latest_pixbuf);
-      const int sy = abs(deltay), ly = h - abs(deltay);
-      const int sx = abs(deltax), lx = w - abs(deltax);
-      if(deltay > 0) {
-        for(int y = ly - 1; y >= sy; --y) {
-          guchar *destpixel = pixels + (y + deltay) * rowstride + 3 * deltax;
-          guchar *srcpixel = pixels + y * rowstride;
-          for(int x = sx; x < lx; ++x) {
-            *destpixel++ = *srcpixel++;
-            *destpixel++ = *srcpixel++;
-            *destpixel++ = *srcpixel++;
-          }
-        }
-      } else {
-        for(int y = sy; y < ly; ++y) {
-          if(deltax > 0) {
-            guchar *destpixel = pixels + (y + deltay) * rowstride
-              + 3 * (deltax  + lx);
-            guchar *srcpixel = pixels + y * rowstride + 3 * lx;
-            for(int x = sx; x < lx; ++x) {
-              *--destpixel = *--srcpixel;
-              *--destpixel = *--srcpixel;
-              *--destpixel = *--srcpixel;
-            }
-          } else {
-            guchar *destpixel = pixels + (y + deltay) * rowstride + 3 * deltax;
-            guchar *srcpixel = pixels + y * rowstride;
-            for(int x = sx; x < lx; ++x) {
-              *destpixel++ = *srcpixel++;
-              *destpixel++ = *srcpixel++;
-              *destpixel++ = *srcpixel++;
-            }
-          }
-        }
-      }
-      /*
-      // For large images only redraw around the drag point
-      const int rbox = 128;
-      int rx = dragtox - rbox / 2, ry = dragtoy - rbox / 2;
-      int rw = rbox, rh = rbox;
-      if(rx < 0) { rw += rx; rx = 0; }
-      if(ry < 0) { rh += ry; ry = 0; }
-      if(rx + rw > w) { rw = w - rx; };
-      if(ry + rh > h) { rh = h - ry; }
-      gtkRedraw(rx, ry, rw, rh);
-      */
-      gtkRedraw(0, 0, w, h);
-    }
     gtkNewLocation();
   }
+}
+
+static guint drag_idle_handle;
+
+static gboolean drag_idle(gpointer) {
+  dragto();
+  drag_idle_handle = 0;
+  return FALSE;
 }
 
 /* motion-notify-event callback */
@@ -321,7 +274,10 @@ static gboolean pointer_moved(GtkWidget __attribute__((unused)) *widget,
 			      gpointer __attribute__((unused)) user_data) {
   if(!dragging)
     return FALSE;
-  dragto(event->x, event->y);
+  dragtox = event->x;
+  dragtoy = event->y;
+  if(drag_idle_handle == 0)
+    drag_idle_handle = g_idle_add(drag_idle, NULL);
   return TRUE;
 }
 
@@ -371,7 +327,9 @@ static gboolean button_pressed(GtkWidget *widget,
   }
   if(event->type == GDK_BUTTON_RELEASE
      && event->button == 1) {
-    dragto(event->x, event->y);
+    dragtox = event->x;
+    dragtoy = event->y;
+    dragto();
     dragging = FALSE;
     return TRUE;
   }
