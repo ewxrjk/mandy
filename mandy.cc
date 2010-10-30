@@ -309,6 +309,7 @@ static void dragto(double dragtox, double dragtoy) {
       if(ry + rh > h) { rh = h - ry; }
       gtkRedraw(rx, ry, rw, rh);
       */
+      gtkRedraw(0, 0, w, h);
     }
     gtkNewLocation();
   }
