@@ -73,6 +73,8 @@ void MandelbrotJob::work() {
 IterBuffer *MandelbrotJob::recompute(double cx, double cy, double r, 
 				     int maxiters, int w, int h,
 				     void (*completion_callback)(Job *)) {
+  // Discard stale work
+  Job::cancel();
   IterBuffer *dest = new IterBuffer(w, h);
   // Set everything to 'unknown'
   memset(dest->data, 0xFF, dest->w * dest->h * sizeof(int));

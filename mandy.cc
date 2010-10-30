@@ -46,14 +46,14 @@ static GtkWidget *pixel_rate_entry;
 // Drawing --------------------------------------------------------------------
 
 // Called to just redraw whatever we've got
-static void gtkRedraw() {
+static void gtkRedraw(int x, int y, int w, int h) {
   assert(latest_pixbuf);
   assert(drawable);
   assert(gc);
   gdk_draw_pixbuf(drawable,
 		  gc,
 		  latest_pixbuf,
-		  0, 0, 0, 0, -1, -1,
+		  x, y, x, y, w, h,
 		  GDK_RGB_DITHER_NONE, 0, 0);
 }
 
@@ -72,13 +72,16 @@ static void gtkCompleted(Job *generic_job) {
   for(int y = j->y; y < ly; ++y) {
     for(int x = j->x; x < lx; ++x) {
       const int count = latest_dest->data[((h - 1) - y) * w + x];
-      pixels[y * rowstride + x * 3 + 0] = colors[count].r;
-      pixels[y * rowstride + x * 3 + 1] = colors[count].g;
-      pixels[y * rowstride + x * 3 + 2] = colors[count].b;
+      if(count >= 0) {
+        // TODO why would it not be?
+        pixels[y * rowstride + x * 3 + 0] = colors[count].r;
+        pixels[y * rowstride + x * 3 + 1] = colors[count].g;
+        pixels[y * rowstride + x * 3 + 2] = colors[count].b;
+      }
     }
   }
   // TODO only redraw the bit we filled in
-  gtkRedraw();
+  gtkRedraw(j->x, j->y, j->w, j->h);
 }
 
 // Called to set a new location, scale or maxiter
@@ -252,7 +255,7 @@ static gboolean exposed(GtkWidget __attribute__((unused)) *widget,
   } else {
     // Just draw what we've got
     // TODO only redraw the bit that was exposed
-    gtkRedraw();
+    gtkRedraw(0, 0, w, h);
   }
   return TRUE;
 }
