@@ -15,5 +15,5 @@
 bin_PROGRAMS=mandy
 mandy_SOURCES=background.cc colors.cc fatal.cc location.cc mandy.cc	\
 movement.cc mandy.h
-mandy_CXXFLAGS=$(GLIB_CFLAGS) $(GTK_CFLAGS)
-mandy_LDFLAGS=$(GTK_LIBS)
+AM_CXXFLAGS=$(GLIB_CFLAGS) $(GTK_CFLAGS)
+AM_LDFLAGS=$(GTK_LIBS)
