@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 bin_PROGRAMS=mandy
 mandy_SOURCES=background.cc colors.cc fatal.cc location.cc mandy.cc	\
-movement.cc mandy.h IterBuffer.cc IterBuffer.h
+movement.cc mandy.h IterBuffer.cc IterBuffer.h Job.cc Job.h		\
+MandelbrotJob.cc MandelbrotJob.h
 AM_CXXFLAGS=$(GLIB_CFLAGS) $(GTK_CFLAGS)
 AM_LDFLAGS=$(GTK_LIBS)
