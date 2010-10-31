@@ -18,28 +18,7 @@
 
 #include <config.h>
 
-struct color {
-  unsigned char r, g, b;
-};
-
 void fatal(int errno_value, const char *fmt, ...);
-void init_threads(void);
-void destroy_threads(void);
-int *compute(double x, double y, double xsize, int w, int h, int max);
-void init_colors();
-double xsize(int w, int h);
-double ysize(int w, int h);
-double xleft(int w, int h);
-double ybottom(int w, int h);
-double xposition(int w, int h, int x);
-double yposition(int w, int h, int y);
-void drag(int w, int h, int deltax, int deltay);
-void zoom(int w, int h, int x, int y, double scale);
-double pixelrate(void);
-
-extern struct color *colors;
-extern int maxiter;
-extern double xcenter, ycenter, size;
 
 #endif /* MANDY_H */
 

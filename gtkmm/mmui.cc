@@ -24,7 +24,6 @@ static bool periodic() {
 int main(int argc, char **argv) {
   Gtk::Main kit(argc, argv);
 
-  init_colors();
   Job::init();
   Glib::signal_timeout().connect
     (sigc::ptr_fun(periodic), 10);
