@@ -51,7 +51,7 @@ void MandelbrotJob::work() {
 struct comparator {
   int cx, cy;
   comparator(int cx_, int cy_): cx(cx_), cy(cy_) {}
-  int operator()(MandelbrotJob *a, MandelbrotJob *b) {
+  int operator()(FractalJob *a, FractalJob *b) {
     int adx = a->params.x - cx, ady = a->params.y - cy;
     int ar2 = adx * adx + ady * ady;
     int bdx = b->params.x - cx, bdy = b->params.y - cy;
@@ -65,6 +65,7 @@ IterBuffer *MandelbrotJob::recompute(double cx, double cy, double r,
 				     void (*completion_callback)(Job *, void *),
 				     void *completion_data,
 				     int xpos, int ypos) {
+  const MandelbrotJobFactory factory;
   // Discard stale work
   Job::cancel();
   IterBuffer *dest = new IterBuffer(w, h);
@@ -74,12 +75,12 @@ IterBuffer *MandelbrotJob::recompute(double cx, double cy, double r,
   // add up to much but small enough that stale jobs don't hog the CPU
   // much.
   const int chunk = 32;
-  std::vector<MandelbrotJob *> jobs;
+  std::vector<FractalJob *> jobs;
   for(int px = 0; px < dest->w; px += chunk) {
     const int pw = std::min(chunk, dest->w - px);
     for(int py = 0; py < dest->h; py += chunk) {
       const int ph = std::min(chunk, dest->h - py);
-      MandelbrotJob *j = new MandelbrotJob();
+      FractalJob *j = factory.create();
       j->params.set(dest, cx, cy, r, maxiters, px, py, pw, ph);
       jobs.push_back(j);
     }
@@ -91,5 +92,6 @@ IterBuffer *MandelbrotJob::recompute(double cx, double cy, double r,
   return dest;
 }
 
-MandelbrotJob::~MandelbrotJob() {
+FractalJob *MandelbrotJobFactory::create() const {
+  return new MandelbrotJob();
 }

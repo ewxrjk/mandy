@@ -57,11 +57,13 @@ public:
   int w, h;                             // pixel dimensions
 };
 
-class MandelbrotJob: public Job {
+class FractalJob: public Job {
 public:
   FractalJobParameters params;          // job parameters
+};
 
-  ~MandelbrotJob();
+class MandelbrotJob: public FractalJob {
+public:
 
   // Do the computation (called in background thread)
   void work();
@@ -74,6 +76,16 @@ public:
                                void (*completion_callback)(Job *, void *),
                                void *completion_data,
                                int xpos, int ypos);
+};
+
+class FractalJobFactory {
+public:
+  virtual FractalJob *create() const = 0;
+};
+
+class MandelbrotJobFactory: public FractalJobFactory {
+public:
+  FractalJob *create() const;
 };
 
 #endif /* MANDELBROTJOB_H */
