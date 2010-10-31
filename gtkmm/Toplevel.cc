@@ -19,12 +19,11 @@
 namespace mmui {
 
   Toplevel::Toplevel(): vbox(false, 0),
-                        draw(this),
-                        x(0), y(0), radius(2), maxiter(255) {
+                        view(this) {
     set_title("mandy");
     add_events(Gdk::KEY_RELEASE_MASK);
     // TODO control panel
-    vbox.pack_end(draw, true, true, 0);
+    vbox.pack_end(view, true, true, 0);
     add(vbox);
   }
 
@@ -41,18 +40,18 @@ namespace mmui {
 	exit(0);
       case GDK_equal: case GDK_minus: case GDK_KP_Add: case GDK_KP_Subtract: {
 	int w, h;
-        draw.get_window()->get_size(w, h);
+        view.get_window()->get_size(w, h);
 	if(event->keyval == GDK_equal || event->keyval == GDK_KP_Add)
 	  size *= M_SQRT1_2;
 	else
 	  size *= M_SQRT2;
 	//Gtkui::Changed();
 	//Gtkui::NewLocation(w/2, h/2);
-	return TRUE;
+	return true;
       }
       }
     }
-    return FALSE;
+    return false;
 
   }
 

@@ -16,9 +16,10 @@
 #include "mmui.h"
 
 namespace mmui {
-  DrawingArea::DrawingArea(Toplevel *tl): toplevel(*tl),
-                                          dest(NULL),
-                                          Dragging(false) {
+  View::View(Toplevel *tl): toplevel(*tl),
+                            x(0), y(0), radius(2), maxiter(255),
+                            dest(NULL),
+                            Dragging(false) {
     set_size_request(384, 384);
     add_events(Gdk::BUTTON_PRESS_MASK
 	       |Gdk::BUTTON_RELEASE_MASK
@@ -27,7 +28,7 @@ namespace mmui {
 
   // Mouse movement -----------------------------------------------------------
 
-  bool DrawingArea::on_button_press_event(GdkEventButton *event) {
+  bool View::on_button_press_event(GdkEventButton *event) {
     // Double-click left button zooms in
     if(event->type == GDK_2BUTTON_PRESS
        && event->button == 1
@@ -62,7 +63,7 @@ namespace mmui {
     return false;
   }
 
-  bool DrawingArea::on_button_release_event(GdkEventButton *event) {
+  bool View::on_button_release_event(GdkEventButton *event) {
     if(event->type == GDK_BUTTON_RELEASE
        && event->button == 1) {
       DragToX = event->x;
@@ -74,24 +75,24 @@ namespace mmui {
     return false;
   }
 
-  bool DrawingArea::on_motion_notify_event(GdkEventMotion *event) {
+  bool View::on_motion_notify_event(GdkEventMotion *event) {
     if(!Dragging)
       return false;
     DragToX = event->x;
     DragToY = event->y;
     if(!DragIdleConnection.connected())
       DragIdleConnection = Glib::signal_idle().connect
-        (sigc::mem_fun(*this, &DrawingArea::DragIdle));
+        (sigc::mem_fun(*this, &View::DragIdle));
     return true;
   }
 
-  bool DrawingArea::DragIdle() {
+  bool View::DragIdle() {
     DragComplete();
     DragIdleConnection.disconnect();
     return false;
   }
 
-  void DrawingArea::DragComplete() {
+  void View::DragComplete() {
     const int deltax = DragToX - DragFromX;
     const int deltay = DragToY - DragFromY;
     if(!(deltax == 0 && deltay == 0)) {
@@ -107,7 +108,7 @@ namespace mmui {
 
   // Redrawing ----------------------------------------------------------------
 
-  bool DrawingArea::on_expose_event(GdkEventExpose *) {
+  bool View::on_expose_event(GdkEventExpose *) {
     int w, h;
     get_window()->get_size(w, h);
     /*
@@ -125,7 +126,7 @@ namespace mmui {
     return true;
   }
 
-  void DrawingArea::Redraw(int x, int y, int w, int h) {
+  void View::Redraw(int x, int y, int w, int h) {
     get_window()->draw_pixbuf(get_style()->get_fg_gc(Gtk::STATE_NORMAL),
                               pixbuf, x, y, x, y, w, h,
                               Gdk::RGB_DITHER_NONE, 0, 0);

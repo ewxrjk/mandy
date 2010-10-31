@@ -19,6 +19,7 @@
 
 #include "mandy.h"
 #include "IterBuffer.h"
+#include "Job.h"
 
 #include <gtkmm.h>
 
@@ -26,9 +27,9 @@ namespace mmui {
 
   class Toplevel;
 
-  class DrawingArea: public Gtk::DrawingArea {
+  class View: public Gtk::DrawingArea {
   public:
-    DrawingArea(Toplevel *toplevel);
+    View(Toplevel *toplevel);
     bool on_button_press_event(GdkEventButton *);
     bool on_button_release_event(GdkEventButton *);
     bool on_motion_notify_event(GdkEventMotion *);
@@ -37,11 +38,16 @@ namespace mmui {
     // Reference back to top-level window
     Toplevel &toplevel;
 
+    // Parameters
+    double x, y, radius;
+    int maxiter;
+
     // Iteration count and pixel data
     IterBuffer *dest;
     Glib::RefPtr<Gdk::Pixbuf> pixbuf;
 
     void Redraw(int x, int y, int w, int h);
+    static void Completed(Job *generic_job, void *completion_data);
 
     // Dragging support
     bool Dragging;
@@ -61,11 +67,7 @@ namespace mmui {
 
     // Sub-widgets
     Gtk::VBox vbox;
-    DrawingArea draw;
-
-    // Parameters
-    double x, y, radius;
-    int maxiter;
+    View view;
   };
 
 }
