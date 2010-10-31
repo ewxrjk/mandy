@@ -52,7 +52,7 @@ namespace mmui {
     if(event->type == GDK_BUTTON_PRESS
        && event->button == 1
        && event->state == 0) {
-      Dragging = TRUE;
+      Dragging = true;
       DragFromX = event->x;
       DragFromY = event->y;
       return true;
@@ -63,11 +63,13 @@ namespace mmui {
   bool View::on_button_release_event(GdkEventButton *event) {
     if(event->type == GDK_BUTTON_RELEASE
        && event->button == 1) {
-      DragToX = event->x;
-      DragToY = event->y;
-      DragComplete();
-      Dragging = false;
-      return true;
+      if(Dragging) {
+        DragToX = event->x;
+        DragToY = event->y;
+        DragComplete();
+        Dragging = false;
+        return true;
+      }
     }
     return false;
   }
@@ -95,11 +97,21 @@ namespace mmui {
     if(!(deltax == 0 && deltay == 0)) {
       DragFromX = DragToX;
       DragFromY = DragToY;
-      int w, h;
-      get_window()->get_size(w, h);
-      drag(w, h, deltax, deltay);
+      Drag(deltax, deltay);
       //Gtkui::Changed();
       NewLocation(DragToX, DragToY);
+    }
+  }
+
+  void View::Drag(int deltax, int deltay) {
+    int w, h;
+    get_window()->get_size(w, h);
+    if(w > h) {
+      xcenter -= deltax * radius * 2 / h;
+      ycenter += deltay * radius * 2 / h;
+    } else {
+      xcenter -= deltax * radius * 2 / w;
+      ycenter += deltay * radius * 2 / w;
     }
   }
 
