@@ -33,9 +33,7 @@ namespace mmui {
     if(event->type == GDK_2BUTTON_PRESS
        && event->button == 1
        && event->state == 0) {
-      int w, h;
-      get_window()->get_size(w, h);
-      zoom(w, h, event->x, event->y, M_SQRT1_2);
+      Zoom(event->x, event->y, M_SQRT1_2);
       //Gtkui::Changed();
       NewLocation();
       return true;
@@ -44,13 +42,12 @@ namespace mmui {
     if(event->type == GDK_2BUTTON_PRESS
        && event->button == 3
        && event->state == 0) {
-      int w, h;
-      get_window()->get_size(w, h);
-      zoom(w, h, event->x, event->y, M_SQRT2);
+      Zoom(event->x, event->y, M_SQRT2);
       //Gtkui::Changed();
       NewLocation();
       return true;
     }
+
     // Hold left button drags
     if(event->type == GDK_BUTTON_PRESS
        && event->button == 1
@@ -102,7 +99,7 @@ namespace mmui {
       get_window()->get_size(w, h);
       drag(w, h, deltax, deltay);
       //Gtkui::Changed();
-      //Gtkui::NewLocation(DragToX, DragToY);
+      NewLocation(DragToX, DragToY);
     }
   }
 
@@ -189,6 +186,20 @@ namespace mmui {
     NewLocation(w/2, h/2);
   }
 
+  // Zooming ------------------------------------------------------------------
+
+  void View::Zoom(double x, double y, double scale) {
+    int w, h;
+    get_window()->get_size(w, h);
+    if(w > h) {
+      xcenter += radius * (1-scale) * (x * 2.0 - w) / h;
+      ycenter += radius * (1-scale) * ((h - 1 - y) * 2.0 / h - 1);
+    } else {
+      xcenter += radius * (1-scale) * (x * 2.0 / w - 1);
+      ycenter += radius * (1-scale) * ((h - 1 - y) * 2 - h) / w;
+    }
+    radius *= scale;
+  }
 }
 
 /*

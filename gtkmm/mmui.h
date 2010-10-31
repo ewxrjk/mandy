@@ -38,6 +38,7 @@ namespace mmui {
 
     void NewLocation(int xpos = -1, int ypos = -1);
     void NewSize();
+    void Zoom(double x, double y, double scale);
   private:
     // Reference back to top-level window
     Toplevel &toplevel;
