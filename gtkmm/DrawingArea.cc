@@ -17,12 +17,15 @@
 
 namespace mmui {
   DrawingArea::DrawingArea(Toplevel *tl): toplevel(*tl),
+                                          dest(NULL),
                                           Dragging(false) {
     set_size_request(384, 384);
     add_events(Gdk::BUTTON_PRESS_MASK
 	       |Gdk::BUTTON_RELEASE_MASK
 	       |Gdk::POINTER_MOTION_MASK);
   }
+
+  // Mouse movement -----------------------------------------------------------
 
   bool DrawingArea::on_button_press_event(GdkEventButton *event) {
     // Double-click left button zooms in
@@ -102,6 +105,8 @@ namespace mmui {
     }
   }
 
+  // Redrawing ----------------------------------------------------------------
+
   bool DrawingArea::on_expose_event(GdkEventExpose *) {
     int w, h;
     get_window()->get_size(w, h);
@@ -118,6 +123,12 @@ namespace mmui {
     }
     */
     return true;
+  }
+
+  void DrawingArea::Redraw(int x, int y, int w, int h) {
+    get_window()->draw_pixbuf(get_style()->get_fg_gc(Gtk::STATE_NORMAL),
+                              pixbuf, x, y, x, y, w, h,
+                              Gdk::RGB_DITHER_NONE, 0, 0);
   }
 
 }

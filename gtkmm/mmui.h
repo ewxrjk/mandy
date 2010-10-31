@@ -18,13 +18,14 @@
 #define MMUI_H
 
 #include "mandy.h"
+#include "IterBuffer.h"
 
 #include <gtkmm.h>
 
 namespace mmui {
 
   class Toplevel;
-  
+
   class DrawingArea: public Gtk::DrawingArea {
   public:
     DrawingArea(Toplevel *toplevel);
@@ -33,7 +34,16 @@ namespace mmui {
     bool on_motion_notify_event(GdkEventMotion *);
     bool on_expose_event(GdkEventExpose *);
   private:
+    // Reference back to top-level window
     Toplevel &toplevel;
+
+    // Iteration count and pixel data
+    IterBuffer *dest;
+    Glib::RefPtr<Gdk::Pixbuf> pixbuf;
+
+    void Redraw(int x, int y, int w, int h);
+
+    // Dragging support
     bool Dragging;
     double DragFromX, DragFromY;
     double DragToX, DragToY;
@@ -49,8 +59,13 @@ namespace mmui {
     bool on_delete_event(GdkEventAny *);
     bool on_key_release_event(GdkEventKey *);
 
+    // Sub-widgets
     Gtk::VBox vbox;
     DrawingArea draw;
+
+    // Parameters
+    double x, y, radius;
+    int maxiter;
   };
 
 }
