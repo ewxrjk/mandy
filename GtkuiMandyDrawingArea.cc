@@ -29,8 +29,8 @@ namespace Gtkui {
     if(event->type == GDK_2BUTTON_PRESS
        && event->button == 1
        && event->state == 0) {
-      gint w, h;
-      gdk_drawable_get_size(Gtkui::Drawable, &w, &h);
+      int w, h;
+      get_window()->get_size(w, h);
       zoom(w, h, event->x, event->y, M_SQRT1_2);
       Gtkui::Changed();
       Gtkui::NewLocation(-1, -1);
@@ -40,8 +40,8 @@ namespace Gtkui {
     if(event->type == GDK_2BUTTON_PRESS
        && event->button == 3
        && event->state == 0) {
-      gint w, h;
-      gdk_drawable_get_size(Gtkui::Drawable, &w, &h);
+      int w, h;
+      get_window()->get_size(w, h);
       zoom(w, h, event->x, event->y, M_SQRT2);
       Gtkui::Changed();
       Gtkui::NewLocation(-1, -1);
@@ -94,8 +94,8 @@ namespace Gtkui {
     if(!(deltax == 0 && deltay == 0)) {
       DragFromX = DragToX;
       DragFromY = DragToY;
-      gint w, h;
-      gdk_drawable_get_size(Gtkui::Drawable, &w, &h);
+      int w, h;
+      get_window()->get_size(w, h);
       drag(w, h, deltax, deltay);
       Gtkui::Changed();
       Gtkui::NewLocation(DragToX, DragToY);
@@ -103,8 +103,8 @@ namespace Gtkui {
   }
 
   bool MandyDrawingArea::on_expose_event(GdkEventExpose *) {
-    gint w, h;
-    gdk_drawable_get_size(Drawable, &w, &h);
+    int w, h;
+    get_window()->get_size(w, h);
     if(w != gdk_pixbuf_get_width(LatestPixbuf)
        || h != gdk_pixbuf_get_height(LatestPixbuf)) {
       // The pixbuf is the wrong size (i.e. the window has been
