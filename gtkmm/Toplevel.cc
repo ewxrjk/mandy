@@ -43,11 +43,11 @@ namespace mmui {
 	int w, h;
         view.get_window()->get_size(w, h);
 	if(event->keyval == GDK_equal || event->keyval == GDK_KP_Add)
-	  size *= M_SQRT1_2;
+          view.Zoom(w/2, h/2, M_SQRT1_2);
 	else
-	  size *= M_SQRT2;
+          view.Zoom(w/2, h/2, M_SQRT2);
 	//Gtkui::Changed();
-	//Gtkui::NewLocation(w/2, h/2);
+	view.NewLocation(w/2, h/2);
 	return true;
       }
       }
