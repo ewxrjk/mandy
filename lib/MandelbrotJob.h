@@ -16,74 +16,13 @@
 #ifndef MANDELBROTJOB_H
 #define MANDELBROTJOB_H
 
-#include "Job.h"
-
-class FractalJobParameters {
-public:
-  FractalJobParameters(): dest(NULL) {
-  }
-
-  void set(IterBuffer *dest_,
-           double xcenter_, double ycenter_, double radius_,
-           int maxiters_, int x_, int y_,int w_ ,int h_) {
-    dest = dest_;
-    xleft = xcenter_ - (dest->w > dest->h
-                        ? radius_ * dest->w / dest->h
-                        : radius_);
-    ybottom = ycenter_ - (dest->w > dest->h
-                          ? radius_
-                          : radius_ * dest->h / dest->w);
-    xsize = (dest->w > dest->h
-             ? radius_ * 2 * dest->w / dest->h
-             : radius_ * 2);
-    maxiters = maxiters_;
-    x = x_;
-    y = y_;
-    w = w_;
-    h = h_;
-    dest->acquire();
-  }
-
-  ~FractalJobParameters() {
-    if(dest)
-      dest->release();
-  }
-
-  IterBuffer *dest;                     // buffer to store results in
-  double xleft, ybottom;                // complex-plane location
-  double xsize;                         // complex-plane size
-  int maxiters;                         // maximum iterations
-  int x, y;                             // pixel location
-  int w, h;                             // pixel dimensions
-};
-
-class FractalJobFactory;
-
-class FractalJob: public Job {
-public:
-  FractalJobParameters params;          // job parameters
-
-  // Create a new IterBuffer and start to asynchronously populate it.  It will
-  // be returned with one ref owned by the caller (and many by the background
-  // jobs).  Uncomputed locations are set to -1.
-  static IterBuffer *recompute(double cx, double cy, double r, 
-                               int maxiters, int w, int h,
-                               void (*completion_callback)(Job *, void *),
-                               void *completion_data,
-                               int xpos, int ypos,
-                               const FractalJobFactory *factory);
-};
+#include "FractalJob.h"
 
 class MandelbrotJob: public FractalJob {
 public:
 
   // Do the computation (called in background thread)
   void work();
-};
-
-class FractalJobFactory {
-public:
-  virtual FractalJob *create() const = 0;
 };
 
 class MandelbrotJobFactory: public FractalJobFactory {

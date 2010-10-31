@@ -48,50 +48,16 @@ void MandelbrotJob::work() {
   }
 }
 
-struct comparator {
-  int cx, cy;
-  comparator(int cx_, int cy_): cx(cx_), cy(cy_) {}
-  int operator()(FractalJob *a, FractalJob *b) {
-    int adx = a->params.x - cx, ady = a->params.y - cy;
-    int ar2 = adx * adx + ady * ady;
-    int bdx = b->params.x - cx, bdy = b->params.y - cy;
-    int br2 = bdx * bdx + bdy * bdy;
-    return ar2 < br2;
-  }
-};
-
-IterBuffer *FractalJob::recompute(double cx, double cy, double r, 
-				  int maxiters, int w, int h,
-				  void (*completion_callback)(Job *, void *),
-				  void *completion_data,
-				  int xpos, int ypos,
-				  const FractalJobFactory *factory) {
-  // Discard stale work
-  Job::cancel();
-  IterBuffer *dest = new IterBuffer(w, h);
-  // Set everything to 'unknown'
-  memset(dest->data, 0xFF, dest->w * dest->h * sizeof(int));
-  // Chunks need to be large enough that the overhead of jobs doesn't
-  // add up to much but small enough that stale jobs don't hog the CPU
-  // much.
-  const int chunk = 32;
-  std::vector<FractalJob *> jobs;
-  for(int px = 0; px < dest->w; px += chunk) {
-    const int pw = std::min(chunk, dest->w - px);
-    for(int py = 0; py < dest->h; py += chunk) {
-      const int ph = std::min(chunk, dest->h - py);
-      FractalJob *j = factory->create();
-      j->params.set(dest, cx, cy, r, maxiters, px, py, pw, ph);
-      jobs.push_back(j);
-    }
-  }
-  comparator c(xpos, ypos);
-  std::sort(jobs.begin(), jobs.end(), c);
-  for(size_t n = 0; n < jobs.size(); ++n)
-    jobs[n]->submit(completion_callback, completion_data);
-  return dest;
-}
-
 FractalJob *MandelbrotJobFactory::create() const {
   return new MandelbrotJob();
 }
+
+/*
+Local Variables:
+mode:c++
+c-basic-offset:2
+comment-column:40
+fill-column:79
+indent-tabs-mode:nil
+End:
+*/
