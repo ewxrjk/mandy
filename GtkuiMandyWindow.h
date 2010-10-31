@@ -16,6 +16,8 @@
 #ifndef GTKUIMANDYWINDOW_H
 #define GTKUIMANDYWINDOW_H
 
+#include "GtkuiMandyDrawingArea.h"
+
 namespace Gtkui {
 
   class MandyWindow: public Gtk::Window {
@@ -23,6 +25,9 @@ namespace Gtkui {
     MandyWindow();
     bool on_delete_event(GdkEventAny *);
     bool on_key_release_event(GdkEventKey *);
+
+    Gtk::VBox vbox;
+    MandyDrawingArea DrawingArea;
   };
 
 }

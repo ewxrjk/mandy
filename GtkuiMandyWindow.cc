@@ -19,9 +19,12 @@
 
 namespace Gtkui {
 
-  MandyWindow::MandyWindow() {
+  MandyWindow::MandyWindow(): vbox(false, 0) {
     set_title("mandy");
     add_events(Gdk::KEY_RELEASE_MASK);
+    // TODO control panel
+    vbox.pack_end(DrawingArea, true, true, 0);
+    add(vbox);
   }
 
   bool MandyWindow::on_delete_event(GdkEventAny *) {
@@ -36,8 +39,8 @@ namespace Gtkui {
 	Job::destroy();
 	exit(0);
       case GDK_equal: case GDK_minus: case GDK_KP_Add: case GDK_KP_Subtract: {
-	gint w, h;
-	gdk_drawable_get_size(Gtkui::Drawable, &w, &h);
+	int w, h;
+        DrawingArea.get_window()->get_size(w, h);
 	if(event->keyval == GDK_equal || event->keyval == GDK_KP_Add)
 	  size *= M_SQRT1_2;
 	else
