@@ -19,10 +19,13 @@
 
 namespace mmui {
 
-  Toplevel::Toplevel(): vbox(false, 0) {
+  Toplevel::Toplevel(): controls(&view),
+                        vbox(false, 0) {
+    view.SetControlPanel(&controls);
     set_title("mandy");
     add_events(Gdk::KEY_RELEASE_MASK);
-    // TODO control panel
+    frame.add(controls);
+    vbox.pack_start(frame, false, false, 1);
     vbox.pack_end(view, true, true, 0);
     add(vbox);
     show_all();

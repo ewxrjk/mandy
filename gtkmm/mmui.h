@@ -25,6 +25,12 @@
 #include <gtkmm/drawingarea.h>
 #include <gtkmm/window.h>
 #include <gtkmm/box.h>
+#include <gtkmm/label.h>
+#include <gtkmm/entry.h>
+#include <gtkmm/table.h>
+#include <gtkmm/frame.h>
+
+#include "Controls.h"
 
 namespace mmui {
 
@@ -44,11 +50,16 @@ namespace mmui {
     void Drag(int deltax, int deltay);
     void Zoom(double x, double y, double scale);
     inline void SetControlPanel(ControlPanel *p) { controls = p; }
-  private:
 
     // Parameters
     double xcenter, ycenter, radius;
     int maxiter;
+
+  private:
+    // Colors
+    struct color { unsigned char r, g, b; };
+    std::vector<color> colors;
+    void NewColors();                   // recompute colors array
 
     // Iteration count and pixel data
     IterBuffer *dest;
@@ -77,8 +88,10 @@ namespace mmui {
     bool on_key_release_event(GdkEventKey *);
 
     // Sub-widgets
-    Gtk::VBox vbox;
     View view;
+    ControlPanel controls;
+    Gtk::Frame frame;
+    Gtk::VBox vbox;
   };
 
 }

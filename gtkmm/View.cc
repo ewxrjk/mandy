@@ -33,7 +33,7 @@ namespace mmui {
        && event->button == 1
        && event->state == 0) {
       Zoom(event->x, event->y, M_SQRT1_2);
-      //Gtkui::Changed();
+      controls->Update();
       NewLocation();
       return true;
     }
@@ -42,7 +42,7 @@ namespace mmui {
        && event->button == 3
        && event->state == 0) {
       Zoom(event->x, event->y, M_SQRT2);
-      //Gtkui::Changed();
+      controls->Update();
       NewLocation();
       return true;
     }
@@ -97,7 +97,7 @@ namespace mmui {
       dragFromX = dragToX;
       dragFromY = dragToY;
       Drag(deltax, deltay);
-      //Gtkui::Changed();
+      controls->Update();
       NewLocation(dragToX, dragToY);
     }
   }
@@ -143,9 +143,9 @@ namespace mmui {
       guchar *pixelrow = pixels + y * rowstride + j->x * 3;
       for(int x = j->x; x < lx; ++x) {
 	const int count = *datarow++;
-	*pixelrow++ = colors[count].r;
-	*pixelrow++ = colors[count].g;
-	*pixelrow++ = colors[count].b;
+	*pixelrow++ = v->colors[count].r;
+	*pixelrow++ = v->colors[count].g;
+	*pixelrow++ = v->colors[count].b;
       }
     }
     v->Redraw(j->x, j->y, j->w, j->h);
@@ -170,6 +170,8 @@ namespace mmui {
                                     Completed,
                                     this,
                                     xpos, ypos);
+    if(colors.size() != (unsigned)(maxiter + 1))
+      NewColors();
   }
 
   void View::NewSize() {
@@ -183,6 +185,18 @@ namespace mmui {
     int w, h;
     get_window()->get_size(w, h);
     NewLocation(w/2, h/2);
+  }
+
+  // Colors -------------------------------------------------------------------
+
+  void View::NewColors() {
+    colors.resize(maxiter + 1);
+    for(int n = 0; n < maxiter; ++n) {
+      colors[n].r = (cos(2 * M_PI * n / 256) + 1.0) * 127;
+      colors[n].g = (cos(2 * M_PI * n / 1024) + 1.0) * 127;
+      colors[n].b = (cos(2 * M_PI * n / 512) + 1.0) * 127;
+    }
+    colors[maxiter].r = colors[maxiter].g = colors[maxiter].b = 0;
   }
 
   // Motion -------------------------------------------------------------------
