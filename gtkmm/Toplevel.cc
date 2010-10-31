@@ -49,7 +49,7 @@ namespace mmui {
           view.Zoom(w/2, h/2, M_SQRT1_2);
 	else
           view.Zoom(w/2, h/2, M_SQRT2);
-	//Gtkui::Changed();
+	controls.Update();
 	view.NewLocation(w/2, h/2);
 	return true;
       }

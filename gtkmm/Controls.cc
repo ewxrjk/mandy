@@ -48,13 +48,15 @@ namespace mmui {
       if(!c->Valid(c->get_text().c_str())) {
 	c->grab_focus();
 	view->get_window()->beep();
+	return;
       }
     }
     for(size_t n = 0; n < controls.size(); ++n) {
       Control *c = controls[n];
-      c->Set(c->get_text().c_str());
+      c->Render(value);
+      if(value != c->get_text())
+	c->Set(c->get_text().c_str());
     }
-    // TODO maybe maxiter has changed
     int w, h;
     view->get_window()->get_size(w, h);
     view->NewLocation(w / 2, h / 2);
