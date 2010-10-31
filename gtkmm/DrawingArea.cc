@@ -13,18 +13,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "mandy.h"
-#include "Gtkui.h"
+#include "mmui.h"
 
-namespace Gtkui {
-  MandyDrawingArea::MandyDrawingArea(): Dragging(false) {
+namespace mmui {
+  DrawingArea::DrawingArea(Toplevel *tl): toplevel(*tl),
+                                          Dragging(false) {
     set_size_request(384, 384);
     add_events(Gdk::BUTTON_PRESS_MASK
 	       |Gdk::BUTTON_RELEASE_MASK
 	       |Gdk::POINTER_MOTION_MASK);
   }
 
-  bool MandyDrawingArea::on_button_press_event(GdkEventButton *event) {
+  bool DrawingArea::on_button_press_event(GdkEventButton *event) {
     // Double-click left button zooms in
     if(event->type == GDK_2BUTTON_PRESS
        && event->button == 1
@@ -32,8 +32,8 @@ namespace Gtkui {
       int w, h;
       get_window()->get_size(w, h);
       zoom(w, h, event->x, event->y, M_SQRT1_2);
-      Gtkui::Changed();
-      Gtkui::NewLocation(-1, -1);
+      //Gtkui::Changed();
+      //Gtkui::NewLocation(-1, -1);
       return true;
     }
     // Double-click right button zooms out
@@ -43,8 +43,8 @@ namespace Gtkui {
       int w, h;
       get_window()->get_size(w, h);
       zoom(w, h, event->x, event->y, M_SQRT2);
-      Gtkui::Changed();
-      Gtkui::NewLocation(-1, -1);
+      //Gtkui::Changed();
+      //Gtkui::NewLocation(-1, -1);
       return true;
     }
     // Hold left button drags
@@ -59,7 +59,7 @@ namespace Gtkui {
     return false;
   }
 
-  bool MandyDrawingArea::on_button_release_event(GdkEventButton *event) {
+  bool DrawingArea::on_button_release_event(GdkEventButton *event) {
     if(event->type == GDK_BUTTON_RELEASE
        && event->button == 1) {
       DragToX = event->x;
@@ -71,24 +71,24 @@ namespace Gtkui {
     return false;
   }
 
-  bool MandyDrawingArea::on_motion_notify_event(GdkEventMotion *event) {
+  bool DrawingArea::on_motion_notify_event(GdkEventMotion *event) {
     if(!Dragging)
       return false;
     DragToX = event->x;
     DragToY = event->y;
     if(!DragIdleConnection.connected())
       DragIdleConnection = Glib::signal_idle().connect
-        (sigc::mem_fun(*this, &MandyDrawingArea::DragIdle));
+        (sigc::mem_fun(*this, &DrawingArea::DragIdle));
     return true;
   }
 
-  bool MandyDrawingArea::DragIdle() {
+  bool DrawingArea::DragIdle() {
     DragComplete();
     DragIdleConnection.disconnect();
     return false;
   }
 
-  void MandyDrawingArea::DragComplete() {
+  void DrawingArea::DragComplete() {
     const int deltax = DragToX - DragFromX;
     const int deltay = DragToY - DragFromY;
     if(!(deltax == 0 && deltay == 0)) {
@@ -97,14 +97,15 @@ namespace Gtkui {
       int w, h;
       get_window()->get_size(w, h);
       drag(w, h, deltax, deltay);
-      Gtkui::Changed();
-      Gtkui::NewLocation(DragToX, DragToY);
+      //Gtkui::Changed();
+      //Gtkui::NewLocation(DragToX, DragToY);
     }
   }
 
-  bool MandyDrawingArea::on_expose_event(GdkEventExpose *) {
+  bool DrawingArea::on_expose_event(GdkEventExpose *) {
     int w, h;
     get_window()->get_size(w, h);
+    /*
     if(w != gdk_pixbuf_get_width(LatestPixbuf)
        || h != gdk_pixbuf_get_height(LatestPixbuf)) {
       // The pixbuf is the wrong size (i.e. the window has been
@@ -115,7 +116,8 @@ namespace Gtkui {
       // TODO only redraw the bit that was exposed
       Redraw(0, 0, w, h);
     }
-    return TRUE;
+    */
+    return true;
   }
 
 }

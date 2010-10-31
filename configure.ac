@@ -28,5 +28,5 @@ AC_DEFINE([_GNU_SOURCE], [1], [use GNU extensions])
 if test "x$GCC" = xyes; then
   CXX="$CXX -Wall -W -Werror -Wpointer-arith -Wwrite-strings"
 fi
-AC_CONFIG_FILES([Makefile lib/Makefile gtkui/Makefile])
+AC_CONFIG_FILES([Makefile lib/Makefile gtkui/Makefile gtkmm/Makefile])
 AC_OUTPUT

@@ -13,19 +13,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef GTKUIMANDYDRAWINGAREA_H
-#define GTKUIMANDYDRAWINGAREA_H
 
-namespace Gtkui {
+#ifndef MMUI_H
+#define MMUI_H
 
-  class MandyDrawingArea: public Gtk::DrawingArea {
+#include "mandy.h"
+
+#include <gtkmm.h>
+
+namespace mmui {
+
+  class Toplevel;
+  
+  class DrawingArea: public Gtk::DrawingArea {
   public:
-    MandyDrawingArea();
+    DrawingArea(Toplevel *toplevel);
     bool on_button_press_event(GdkEventButton *);
     bool on_button_release_event(GdkEventButton *);
     bool on_motion_notify_event(GdkEventMotion *);
     bool on_expose_event(GdkEventExpose *);
   private:
+    Toplevel &toplevel;
     bool Dragging;
     double DragFromX, DragFromY;
     double DragToX, DragToY;
@@ -35,9 +43,19 @@ namespace Gtkui {
     bool DragIdle();
   };
 
+  class Toplevel: public Gtk::Window {
+  public:
+    Toplevel();
+    bool on_delete_event(GdkEventAny *);
+    bool on_key_release_event(GdkEventKey *);
+
+    Gtk::VBox vbox;
+    DrawingArea draw;
+  };
+
 }
 
-#endif /* GTKUIMANDYDRAWINGAREA_H */
+#endif /* MMUI_H */
 
 /*
 Local Variables:

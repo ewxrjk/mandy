@@ -13,26 +13,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef GTKUIMANDYWINDOW_H
-#define GTKUIMANDYWINDOW_H
+#include "mmui.h"
 
-#include "GtkuiMandyDrawingArea.h"
-
-namespace Gtkui {
-
-  class MandyWindow: public Gtk::Window {
-  public:
-    MandyWindow();
-    bool on_delete_event(GdkEventAny *);
-    bool on_key_release_event(GdkEventKey *);
-
-    Gtk::VBox vbox;
-    MandyDrawingArea DrawingArea;
-  };
-
+int main() {
 }
-
-#endif /* GTKUIMANDYWINDOW_H */
 
 /*
 Local Variables:

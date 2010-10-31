@@ -13,26 +13,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "mandy.h"
-#include "Gtkui.h"
+#include "mmui.h"
 #include "Job.h"
 
-namespace Gtkui {
+namespace mmui {
 
-  MandyWindow::MandyWindow(): vbox(false, 0) {
+  Toplevel::Toplevel(): vbox(false, 0),
+                        draw(this) {
     set_title("mandy");
     add_events(Gdk::KEY_RELEASE_MASK);
     // TODO control panel
-    vbox.pack_end(DrawingArea, true, true, 0);
+    vbox.pack_end(draw, true, true, 0);
     add(vbox);
   }
 
-  bool MandyWindow::on_delete_event(GdkEventAny *) {
+  bool Toplevel::on_delete_event(GdkEventAny *) {
     Job::destroy();
     exit(0);
   }
 
-  bool MandyWindow::on_key_release_event(GdkEventKey *event) {
+  bool Toplevel::on_key_release_event(GdkEventKey *event) {
     if(event->state == Gdk::CONTROL_MASK) {
       switch(event->keyval) {
       case 'w': case 'W':
@@ -40,13 +40,13 @@ namespace Gtkui {
 	exit(0);
       case GDK_equal: case GDK_minus: case GDK_KP_Add: case GDK_KP_Subtract: {
 	int w, h;
-        DrawingArea.get_window()->get_size(w, h);
+        draw.get_window()->get_size(w, h);
 	if(event->keyval == GDK_equal || event->keyval == GDK_KP_Add)
 	  size *= M_SQRT1_2;
 	else
 	  size *= M_SQRT2;
-	Gtkui::Changed();
-	Gtkui::NewLocation(w/2, h/2);
+	//Gtkui::Changed();
+	//Gtkui::NewLocation(w/2, h/2);
 	return TRUE;
       }
       }
