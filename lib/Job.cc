@@ -29,13 +29,19 @@ void Job::submit(void (*completion_callback_)(Job *, void *),
   releaseLock();
 }
 
-void Job::cancel() {
+void Job::cancel(void *classId) {
   acquireLock();
   for(std::list<Job *>::iterator it = queue.begin();
       it != queue.end();
-      ++it)
-    delete *it;
-  queue.clear();
+      ) {
+    std::list<Job *>::iterator here = it;
+    ++it;
+    Job *j = *here;
+    if(classId == NULL || j->classId == classId) {
+      delete j;
+      queue.erase(here);
+    }
+  }
   releaseLock();
 }
 
