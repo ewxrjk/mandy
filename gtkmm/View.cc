@@ -18,7 +18,8 @@
 namespace mmui {
   View::View(): xcenter(0), ycenter(0), radius(2), maxiters(255),
                 dest(NULL),
-                dragging(false) {
+                dragging(false),
+                jobFactory(NULL) {
     set_size_request(384, 384);
     add_events(Gdk::BUTTON_PRESS_MASK
 	       |Gdk::BUTTON_RELEASE_MASK
@@ -165,13 +166,12 @@ namespace mmui {
     // to provide continuity.
     if(xpos == -1 || ypos == -1)
       get_pointer(xpos, ypos);
-    MandelbrotJobFactory factory;
     dest = FractalJob::recompute(xcenter, ycenter, radius,
                                  maxiters, w, h,
                                  Completed,
                                  this,
                                  xpos, ypos,
-                                 &factory);
+                                 jobFactory);
     if(colors.size() != (unsigned)(maxiters + 1))
       NewColors();
   }

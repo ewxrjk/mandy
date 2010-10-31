@@ -50,6 +50,7 @@ namespace mmui {
     void Drag(int deltax, int deltay);
     void Zoom(double x, double y, double scale);
     inline void SetControlPanel(ControlPanel *p) { controls = p; }
+    inline void SetJobFactory(FractalJobFactory *jf) { jobFactory = jf; }
 
     // Parameters
     double xcenter, ycenter, radius;
@@ -79,6 +80,8 @@ namespace mmui {
 
     // Control panel interface
     ControlPanel *controls;
+
+    const FractalJobFactory *jobFactory;
   };
 
   class Toplevel: public Gtk::Window {
@@ -92,6 +95,8 @@ namespace mmui {
     ControlPanel controls;
     Gtk::Frame frame;
     Gtk::VBox vbox;
+
+    MandelbrotJobFactory mandelbrotFactory;
   };
 
 }
