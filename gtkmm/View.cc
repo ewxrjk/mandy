@@ -172,7 +172,7 @@ namespace mmui {
     dest = MandelbrotJob::recompute(xcenter, ycenter, radius,
                                     maxiter, w, h,
                                     Completed,
-                                    NULL,
+                                    this,
                                     xpos, ypos);
   }
 

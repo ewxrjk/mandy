@@ -15,11 +15,23 @@
  */
 #include "mmui.h"
 
+static bool periodic() {
+  Job::poll();
+  return true;
+}
+
 int main(int argc, char **argv) {
   Gtk::Main kit(argc, argv);
+
+  init_colors();
+  Job::init();
+  Glib::signal_timeout().connect
+    (sigc::ptr_fun(periodic), 10);
+
   mmui::Toplevel toplevel;
   toplevel.view.NewSize();
   //Changed(); TODO
+
   Gtk::Main::run(toplevel);
   return 0;
 }
