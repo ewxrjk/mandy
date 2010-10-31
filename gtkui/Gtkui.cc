@@ -16,6 +16,7 @@
 #include "mandy.h"
 #include "Gtkui.h"
 #include "Job.h"
+#include <cstdlib>
 
 namespace Gtkui {
 
