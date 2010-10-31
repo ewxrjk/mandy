@@ -16,5 +16,5 @@ bin_PROGRAMS=mandy
 mandy_SOURCES=Controls.cc Toplevel.cc View.cc mmui.cc Controls.h	\
 mmui.h
 mandy_LDADD=../lib/libmandy.a $(gtkmm_LIBS)
-AM_CPPFLAGS=-I../lib
+AM_CPPFLAGS=-I${top_srcdir}/lib
 AM_CXXFLAGS=$(gtkmm_CFLAGS)
