@@ -27,6 +27,7 @@
 namespace mmui {
 
   class Toplevel;
+  class ControlPanel;
 
   class View: public Gtk::DrawingArea {
   public:
@@ -40,6 +41,7 @@ namespace mmui {
     void NewSize();
     void Drag(int deltax, int deltay);
     void Zoom(double x, double y, double scale);
+    inline void SetControlPanel(ControlPanel *p) { controls = p; }
   private:
 
     // Parameters
@@ -61,6 +63,9 @@ namespace mmui {
 
     void DragComplete();
     bool DragIdle();
+
+    // Control panel interface
+    ControlPanel *controls;
   };
 
   class Toplevel: public Gtk::Window {
