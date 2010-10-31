@@ -283,10 +283,10 @@ namespace mmui {
       get_window()->get_size(w, h);
       if(w > h) {
         x = xcenter + radius * (xpos * 2.0 - w)/h;
-        y = ycenter - radius * ((h - 1 - ypos) * 2.0 / h - 1);
+        y = ycenter - radius * (ypos * 2.0 / h - 1);
       } else {
         x = xcenter - radius * (xpos * 2.0 / w - 1);
-        y = ycenter + radius * ((h - 1 - ypos) * 2.0 - h)/w;
+        y = ycenter + radius * (ypos * 2.0 - h)/w;
       }
       juliaWindow->Update(x, y);
     }
