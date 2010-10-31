@@ -12,12 +12,4 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-bin_PROGRAMS=mandy
-mandy_SOURCES=Gtkui.cc GtkuiControls.cc GtkuiDrawing.cc		\
-GtkuiKeyboard.cc GtkuiMandyDrawingArea.cc GtkuiMandyWindow.cc	\
-GtkuiPointer.cc IterBuffer.cc Job.cc MandelbrotJob.cc colors.cc	\
-fatal.cc location.cc mandy.cc movement.cc Gtkui.h		\
-GtkuiMandyDrawingArea.h GtkuiMandyWindow.h IterBuffer.h Job.h	\
-MandelbrotJob.h mandy.h
-AM_CXXFLAGS=$(gtkmm_CFLAGS)
-AM_LDFLAGS=$(gtkmm_LIBS)
+SUBDIRS=lib gtkui
