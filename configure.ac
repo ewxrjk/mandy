@@ -15,7 +15,7 @@
 AC_INIT([mandy], [0.0.WIP], [rjk@greenend.org.uk])
 AC_CONFIG_AUX_DIR([config.aux])
 AM_INIT_AUTOMAKE([mandy], [0.0.WIP])
-AC_CONFIG_SRCDIR([mandy.cc])
+AC_CONFIG_SRCDIR([gtkui/mandy.cc])
 AM_CONFIG_HEADER([config.h])
 AM_PATH_GLIB_2_0
 AM_PATH_GTK_2_0
