@@ -110,7 +110,11 @@ namespace mmui {
     View view;
     JuliaJobFactory juliaFactory;
 
-    void UpdateC(double cx_, double cy_);
+    void Update(double x, double y) {
+      juliaFactory.cx = x;
+      juliaFactory.cy = y;
+      view.NewLocation();
+    }
   };
 
 }

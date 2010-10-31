@@ -41,6 +41,7 @@ int main(int argc, char **argv) {
   mmui::Toplevel toplevel;
   mmui::JuliaWindow julia;
   toplevel.view.NewSize();
+  toplevel.view.SetJuliaWindow(&julia);
   julia.view.NewSize();
 
   Gtk::Main::run(toplevel);

@@ -77,6 +77,19 @@ namespace mmui {
   }
 
   bool View::on_motion_notify_event(GdkEventMotion *event) {
+    if(juliaWindow) {
+      double x, y;
+      int w, h;
+      get_window()->get_size(w, h);
+      if(w > h) {
+        x = xcenter + radius * (event->x * 2 - w)/h;
+        y = ycenter - radius * ((h - 1 - event->y) * 2 / h - 1);
+      } else {
+        x = xcenter - radius * (event->x * 2 / w - 1);
+        y = ycenter + radius * ((h - 1 - event->y) * 2 - h)/w;
+      }
+      juliaWindow->Update(x, y);
+    }
     if(!dragging)
       return false;
     dragToX = event->x;
