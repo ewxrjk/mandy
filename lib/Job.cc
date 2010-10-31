@@ -17,9 +17,11 @@
 #include "Job.h"
 #include <unistd.h>
 
-void Job::submit(void (*completion_callback_)(Job *)) {
+void Job::submit(void (*completion_callback_)(Job *, void *),
+                 void *completion_data_) {
   int rc;
   completion_callback = completion_callback_;
+  completion_data = completion_data_;
   acquireLock();
   queue.push_back(this);
   if((rc = pthread_cond_signal(&queued)))
@@ -67,7 +69,7 @@ void Job::poll() {
     Job *j = completed.front();
     completed.pop_front();
     releaseLock();
-    j->completion_callback(j);
+    j->completion_callback(j, j->completion_data);
     delete j;
     acquireLock();
   }

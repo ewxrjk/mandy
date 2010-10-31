@@ -29,7 +29,7 @@ namespace Gtkui {
   }
 
   // Job completion callback
-  void Completed(Job *generic_job) {
+  void Completed(Job *generic_job, void *) {
     MandelbrotJob *j = dynamic_cast<MandelbrotJob *>(generic_job);
     // Ignore stale jobs
     if(j->dest != LatestDest)
@@ -69,6 +69,7 @@ namespace Gtkui {
     LatestDest = MandelbrotJob::recompute(xcenter, ycenter, size,
 					  maxiter, w, h,
 					  Completed,
+                                          NULL,
 					  xpos, ypos);
   }
 

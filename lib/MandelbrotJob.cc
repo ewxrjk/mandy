@@ -86,7 +86,8 @@ struct comparator {
 
 IterBuffer *MandelbrotJob::recompute(double cx, double cy, double r, 
 				     int maxiters, int w, int h,
-				     void (*completion_callback)(Job *),
+				     void (*completion_callback)(Job *, void *),
+				     void *completion_data,
 				     int xpos, int ypos) {
   // Discard stale work
   Job::cancel();
@@ -108,7 +109,7 @@ IterBuffer *MandelbrotJob::recompute(double cx, double cy, double r,
   comparator c(xpos, ypos);
   std::sort(jobs.begin(), jobs.end(), c);
   for(size_t n = 0; n < jobs.size(); ++n)
-    jobs[n]->submit(completion_callback);
+    jobs[n]->submit(completion_callback, completion_data);
   return dest;
 }
 

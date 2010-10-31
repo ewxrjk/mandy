@@ -26,7 +26,8 @@
  * of cores, the idea being that all the work gets done with a minimum of
  * context switching. */
 class Job {
-  void (*completion_callback)(Job *);   // called upon completion
+  void (*completion_callback)(Job *, void *);   // called upon completion
+  void *completion_data;                        // passed to callback
 
   static std::list<Job *> queue;        // job queue
   static std::list<Job *> completed;    // completed jobs
@@ -60,7 +61,8 @@ public:
   // held while it's being called, making it safe to invoke Job::submit(),
   // Job::cancel() and even Job::poll().  After the completion callback returns
   // the job will be deleted.
-  void submit(void (*completion_callback)(Job *));
+  void submit(void (*completion_callback)(Job *, void *),
+              void *completion_data = NULL);
 
   static void cancel();                 // cancel outstanding jobs
   static void poll();                   // call outstanding completion callbacks
