@@ -42,6 +42,17 @@ void Job::cancel(void *classId) {
       queue.erase(here);
     }
   }
+  for(std::list<Job *>::iterator it = completed.begin();
+      it != completed.end();
+      ) {
+    std::list<Job *>::iterator here = it;
+    ++it;
+    Job *j = *here;
+    if(classId == NULL || j->classId == classId) {
+      delete j;
+      completed.erase(here);
+    }
+  }
   releaseLock();
 }
 
@@ -69,9 +80,9 @@ void Job::destroy() {
   }
 }
 
-void Job::poll() {
+bool Job::poll(int max) {
   acquireLock();
-  while(!completed.empty()) {
+  while(!completed.empty() && max-- > 0) {
     Job *j = completed.front();
     completed.pop_front();
     releaseLock();
@@ -79,7 +90,9 @@ void Job::poll() {
     delete j;
     acquireLock();
   }
+  bool nowEmpty = completed.empty();
   releaseLock();
+  return !nowEmpty;
 }
 
 void *Job::worker(void *) {

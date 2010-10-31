@@ -67,7 +67,7 @@ public:
               void *completion_data = NULL);
 
   static void cancel(void *classId = NULL); // cancel outstanding jobs
-  static void poll();                   // call outstanding completion callbacks
+  static bool poll(int max = 16);      // call outstanding completion callbacks
 
   static void init();                   // initialize thread pool
   static void destroy();                // destroy thread pool

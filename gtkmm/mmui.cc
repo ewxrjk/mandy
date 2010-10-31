@@ -16,8 +16,18 @@
 #include "mmui.h"
 #include <gtkmm/main.h>
 
+static sigc::connection pollAgainConnection;
+
+static bool pollAgainHandler() {
+  bool more = Job::poll(1);
+  return more;
+}
+
 static bool periodic() {
-  Job::poll();
+  bool more = Job::poll(1);
+  if(more && !pollAgainConnection.connected())
+    pollAgainConnection = Glib::signal_idle().connect
+      (sigc::ptr_fun(pollAgainHandler));
   return true;
 }
 
