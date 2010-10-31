@@ -18,6 +18,8 @@
 #include <vector>
 #include <cerrno>
 #include <cmath>
+#include <cstring>
+#include <cstdlib>
 
 namespace Gtkui {
 
