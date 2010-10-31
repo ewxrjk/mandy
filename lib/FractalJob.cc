@@ -37,7 +37,7 @@ IterBuffer *FractalJob::recompute(double cx, double cy, double r,
 				  int xpos, int ypos,
 				  const FractalJobFactory *factory) {
   // Discard stale work
-  Job::cancel();
+  Job::cancel(completion_data);
   IterBuffer *dest = new IterBuffer(w, h);
   // Set everything to 'unknown'
   memset(dest->data, 0xFF, dest->w * dest->h * sizeof(int));
@@ -51,6 +51,7 @@ IterBuffer *FractalJob::recompute(double cx, double cy, double r,
     for(int py = 0; py < dest->h; py += chunk) {
       const int ph = std::min(chunk, dest->h - py);
       FractalJob *j = factory->create();
+      j->classId = completion_data;
       j->set(dest, cx, cy, r, maxiters, px, py, pw, ph);
       jobs.push_back(j);
     }

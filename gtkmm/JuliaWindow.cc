@@ -14,37 +14,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "mmui.h"
-#include <gtkmm/main.h>
 
-static sigc::connection pollAgainConnection;
+namespace mmui {
 
-static bool pollAgainHandler() {
-  bool more = Job::poll(1);
-  return more;
-}
+  JuliaWindow::JuliaWindow() {
+    view.SetJobFactory(&juliaFactory);
+    add(view);
+    set_title("Julia Set");
+    show_all();
+  }
 
-static bool periodic() {
-  bool more = Job::poll(1);
-  if(more && !pollAgainConnection.connected())
-    pollAgainConnection = Glib::signal_idle().connect
-      (sigc::ptr_fun(pollAgainHandler));
-  return true;
-}
 
-int main(int argc, char **argv) {
-  Gtk::Main kit(argc, argv);
-
-  Job::init();
-  Glib::signal_timeout().connect
-    (sigc::ptr_fun(periodic), 10);
-
-  mmui::Toplevel toplevel;
-  mmui::JuliaWindow julia;
-  toplevel.view.NewSize();
-  julia.view.NewSize();
-
-  Gtk::Main::run(toplevel);
-  return 0;
 }
 
 /*

@@ -21,6 +21,7 @@
 #include "IterBuffer.h"
 #include "Job.h"
 #include "MandelbrotJob.h"
+#include "JuliaJob.h"
 
 #include <gtkmm/drawingarea.h>
 #include <gtkmm/window.h>
@@ -36,6 +37,7 @@ namespace mmui {
 
   class Toplevel;
   class ControlPanel;
+  class JuliaWindow;
 
   class View: public Gtk::DrawingArea {
   public:
@@ -51,6 +53,7 @@ namespace mmui {
     void Zoom(double x, double y, double scale);
     inline void SetControlPanel(ControlPanel *p) { controls = p; }
     inline void SetJobFactory(FractalJobFactory *jf) { jobFactory = jf; }
+    inline void SetJuliaWindow(JuliaWindow *w) { juliaWindow = w; }
 
     // Parameters
     double xcenter, ycenter, radius;
@@ -82,6 +85,8 @@ namespace mmui {
     ControlPanel *controls;
 
     const FractalJobFactory *jobFactory;
+
+    JuliaWindow *juliaWindow;
   };
 
   class Toplevel: public Gtk::Window {
@@ -97,6 +102,15 @@ namespace mmui {
     Gtk::VBox vbox;
 
     MandelbrotJobFactory mandelbrotFactory;
+  };
+
+  class JuliaWindow: public Gtk::Window {
+  public:
+    JuliaWindow();
+    View view;
+    JuliaJobFactory juliaFactory;
+
+    void UpdateC(double cx_, double cy_);
   };
 
 }

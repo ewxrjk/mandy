@@ -26,7 +26,7 @@
  * of cores, the idea being that all the work gets done with a minimum of
  * context switching. */
 class Job {
-  void *classId;
+public:
   void (*completion_callback)(Job *, void *);   // called upon completion
   void *completion_data;                        // passed to callback
 
@@ -55,6 +55,8 @@ public:
 
   // Override in derived class to define what the job does
   virtual void work() = 0;
+
+  void *classId;
 
   // Submit the job.  It will be run at some point in a background thread
   // unless cancel() is called before it reaches the head of the queue.

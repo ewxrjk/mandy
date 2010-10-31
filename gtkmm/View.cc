@@ -34,7 +34,8 @@ namespace mmui {
        && event->button == 1
        && event->state == 0) {
       Zoom(event->x, event->y, M_SQRT1_2);
-      controls->Update();
+      if(controls)
+        controls->Update();
       NewLocation();
       return true;
     }
@@ -43,7 +44,8 @@ namespace mmui {
        && event->button == 3
        && event->state == 0) {
       Zoom(event->x, event->y, M_SQRT2);
-      controls->Update();
+      if(controls)
+        controls->Update();
       NewLocation();
       return true;
     }
@@ -98,7 +100,8 @@ namespace mmui {
       dragFromX = dragToX;
       dragFromY = dragToY;
       Drag(deltax, deltay);
-      controls->Update();
+      if(controls)
+        controls->Update();
       NewLocation(dragToX, dragToY);
     }
   }
@@ -130,7 +133,7 @@ namespace mmui {
   // Job completion callback
   void View::Completed(Job *generic_job, void *data) {
     View *v = (View *)data;
-    MandelbrotJob *j = dynamic_cast<MandelbrotJob *>(generic_job);
+    FractalJob *j = dynamic_cast<FractalJob *>(generic_job);
     // Ignore stale jobs
     if(j->dest != v->dest)
       return;
