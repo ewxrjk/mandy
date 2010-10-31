@@ -132,24 +132,24 @@ namespace mmui {
     View *v = (View *)data;
     MandelbrotJob *j = dynamic_cast<MandelbrotJob *>(generic_job);
     // Ignore stale jobs
-    if(j->params.dest != v->dest)
+    if(j->dest != v->dest)
       return;
     const int w = v->dest->w;
     guint8 *pixels = v->pixbuf->get_pixels();
     const int rowstride = v->pixbuf->get_rowstride();
-    const int lx = j->params.x + j->params.w;
-    const int ly = j->params.y + j->params.h;
-    for(int y = j->params.y; y < ly; ++y) {
-      int *datarow = &v->dest->data[y * w + j->params.x];
-      guchar *pixelrow = pixels + y * rowstride + j->params.x * 3;
-      for(int x = j->params.x; x < lx; ++x) {
+    const int lx = j->x + j->w;
+    const int ly = j->y + j->h;
+    for(int y = j->y; y < ly; ++y) {
+      int *datarow = &v->dest->data[y * w + j->x];
+      guchar *pixelrow = pixels + y * rowstride + j->x * 3;
+      for(int x = j->x; x < lx; ++x) {
 	const int count = *datarow++;
 	*pixelrow++ = v->colors[count].r;
 	*pixelrow++ = v->colors[count].g;
 	*pixelrow++ = v->colors[count].b;
       }
     }
-    v->Redraw(j->params.x, j->params.y, j->params.w, j->params.h);
+    v->Redraw(j->x, j->y, j->w, j->h);
   }
 
   // Called to set a new location, scale or maxiters

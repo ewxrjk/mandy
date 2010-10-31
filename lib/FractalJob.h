@@ -18,9 +18,22 @@
 
 #include "Job.h"
 
-class FractalJobParameters {
+class FractalJobFactory;
+
+class FractalJob: public Job {
 public:
-  FractalJobParameters(): dest(NULL) {
+  IterBuffer *dest;                     // buffer to store results in
+  double xleft, ybottom;                // complex-plane location
+  double xsize;                         // complex-plane size
+  int maxiters;                         // maximum iterations
+  int x, y;                             // pixel location
+  int w, h;                             // pixel dimensions
+
+  FractalJob(): dest(NULL) {
+  }
+  ~FractalJob() {
+    if(dest)
+      dest->release();
   }
 
   void set(IterBuffer *dest_,
@@ -44,29 +57,10 @@ public:
     dest->acquire();
   }
 
-  ~FractalJobParameters() {
-    if(dest)
-      dest->release();
-  }
-
-  IterBuffer *dest;                     // buffer to store results in
-  double xleft, ybottom;                // complex-plane location
-  double xsize;                         // complex-plane size
-  int maxiters;                         // maximum iterations
-  int x, y;                             // pixel location
-  int w, h;                             // pixel dimensions
-};
-
-class FractalJobFactory;
-
-class FractalJob: public Job {
-public:
-  FractalJobParameters params;          // job parameters
-
   // Create a new IterBuffer and start to asynchronously populate it.  It will
   // be returned with one ref owned by the caller (and many by the background
   // jobs).  Uncomputed locations are set to -1.
-  static IterBuffer *recompute(double cx, double cy, double r, 
+  static IterBuffer *recompute(double cx, double cy, double r,
                                int maxiters, int w, int h,
                                void (*completion_callback)(Job *, void *),
                                void *completion_data,

@@ -20,17 +20,17 @@
 
 void MandelbrotJob::work() {
   // Compute the pixel limits
-  const int lx = params.x + params.w, ly = params.y + params.h;
+  const int lx = x + w, ly = y + h;
   // Iterate over rows
-  for(int py = params.y; py < ly; ++py) {
+  for(int py = y; py < ly; ++py) {
     // Starting point for this row's results
-    int *res = params.dest->data + py * params.dest->w + params.x;
+    int *res = dest->data + py * dest->w + x;
     // Complex-plane location of this row
-    const double cy = params.ybottom + (params.dest->h - 1 - py) * params.xsize / params.dest->w;
+    const double cy = ybottom + (dest->h - 1 - py) * xsize / dest->w;
     // Iterate over columns
-    for(int px = params.x; px < lx; ++px) {
+    for(int px = x; px < lx; ++px) {
       // Complex-plane location of this column
-      const double cx = params.xleft + px * params.xsize / params.dest->w;
+      const double cx = xleft + px * xsize / dest->w;
       // let c = cx + icy
       // let z = zx + izy
       //
@@ -38,7 +38,7 @@ void MandelbrotJob::work() {
       int iterations = 0;
       double zx = 0, zy = 0, zx2, zy2;
       while(((zx2 = zx * zx) + (zy2 = zy * zy) < 4.0)
-	    && iterations < params.maxiters) {
+	    && iterations < maxiters) {
 	zy = 2 * zx * zy  + cy;
 	zx = zx2 - zy2 + cx;
 	++iterations;

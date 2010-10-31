@@ -22,9 +22,9 @@ struct comparator {
   int cx, cy;
   comparator(int cx_, int cy_): cx(cx_), cy(cy_) {}
   int operator()(FractalJob *a, FractalJob *b) {
-    int adx = a->params.x - cx, ady = a->params.y - cy;
+    int adx = a->x - cx, ady = a->y - cy;
     int ar2 = adx * adx + ady * ady;
-    int bdx = b->params.x - cx, bdy = b->params.y - cy;
+    int bdx = b->x - cx, bdy = b->y - cy;
     int br2 = bdx * bdx + bdy * bdy;
     return ar2 < br2;
   }
@@ -51,7 +51,7 @@ IterBuffer *FractalJob::recompute(double cx, double cy, double r,
     for(int py = 0; py < dest->h; py += chunk) {
       const int ph = std::min(chunk, dest->h - py);
       FractalJob *j = factory->create();
-      j->params.set(dest, cx, cy, r, maxiters, px, py, pw, ph);
+      j->set(dest, cx, cy, r, maxiters, px, py, pw, ph);
       jobs.push_back(j);
     }
   }
