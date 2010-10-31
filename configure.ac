@@ -15,10 +15,8 @@
 AC_INIT([mandy], [0.0.WIP], [rjk@greenend.org.uk])
 AC_CONFIG_AUX_DIR([config.aux])
 AM_INIT_AUTOMAKE([mandy], [0.0.WIP])
-AC_CONFIG_SRCDIR([gtkui/mandy.cc])
+AC_CONFIG_SRCDIR([lib/MandelbrotJob.cc])
 AM_CONFIG_HEADER([config.h])
-AM_PATH_GLIB_2_0
-AM_PATH_GTK_2_0
 AC_LANG([C++])
 AC_PROG_CXX
 AC_PROG_RANLIB
@@ -28,5 +26,5 @@ AC_DEFINE([_GNU_SOURCE], [1], [use GNU extensions])
 if test "x$GCC" = xyes; then
   CXX="$CXX -Wall -W -Werror -Wpointer-arith -Wwrite-strings"
 fi
-AC_CONFIG_FILES([Makefile lib/Makefile gtkui/Makefile gtkmm/Makefile])
+AC_CONFIG_FILES([Makefile lib/Makefile gtkmm/Makefile])
 AC_OUTPUT
