@@ -29,9 +29,10 @@ namespace Gtkui {
     bool Dragging;
     double DragFromX, DragFromY;
     double DragToX, DragToY;
-    guint DragIdleHandle;
+    sigc::connection DragIdleConnection;
+
     void DragComplete();
-    static gboolean DragIdle(gpointer);
+    bool DragIdle();
   };
 
 }

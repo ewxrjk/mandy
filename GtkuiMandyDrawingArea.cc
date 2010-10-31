@@ -17,8 +17,7 @@
 #include "Gtkui.h"
 
 namespace Gtkui {
-  MandyDrawingArea::MandyDrawingArea(): Dragging(false),
-                                        DragIdleHandle(0) {
+  MandyDrawingArea::MandyDrawingArea(): Dragging(false) {
     set_size_request(384, 384);
     add_events(Gdk::BUTTON_PRESS_MASK
 	       |Gdk::BUTTON_RELEASE_MASK
@@ -74,19 +73,19 @@ namespace Gtkui {
 
   bool MandyDrawingArea::on_motion_notify_event(GdkEventMotion *event) {
     if(!Dragging)
-      return FALSE;
+      return false;
     DragToX = event->x;
     DragToY = event->y;
-    if(DragIdleHandle == 0)
-      DragIdleHandle = g_idle_add(DragIdle, this);
+    if(!DragIdleConnection.connected())
+      DragIdleConnection = Glib::signal_idle().connect
+        (sigc::mem_fun(*this, &MandyDrawingArea::DragIdle));
     return true;
   }
 
-  gboolean MandyDrawingArea::DragIdle(gpointer self) {
-    MandyDrawingArea *da = (MandyDrawingArea *)self;
-    da->DragComplete();
-    da->DragIdleHandle = 0;
-    return FALSE;
+  bool MandyDrawingArea::DragIdle() {
+    DragComplete();
+    DragIdleConnection.disconnect();
+    return false;
   }
 
   void MandyDrawingArea::DragComplete() {
