@@ -31,7 +31,6 @@ int main(int argc, char **argv) {
 
   mmui::Toplevel toplevel;
   toplevel.view.NewSize();
-  //Changed(); TODO
 
   Gtk::Main::run(toplevel);
   return 0;
