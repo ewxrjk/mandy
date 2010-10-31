@@ -18,43 +18,19 @@
 #include <algorithm>
 #include <cstring>
 
-MandelbrotJob::MandelbrotJob(int x_, int y_,
-			     int w_, int h_,
-			     double cx_, double cy_,
-			     double cr_,
-			     int maxiters_,
-			     IterBuffer *dest_):
-  dest(dest_),
-  x(x_), y(y_),
-  w(w_), h(h_),
-  xcenter(cx_), ycenter(cy_), radius(cr_),
-  maxiters(maxiters_) {
-  dest->acquire();
-}
-
 void MandelbrotJob::work() {
-  // Compute the full size of the rectangle
-  const double xleft = xcenter - (dest->w > dest->h
-				  ? radius * dest->w / dest->h
-				  : radius);
-  const double ybottom = ycenter - (dest->w > dest->h
-				    ? radius
-				    : radius * dest->h / dest->w);
-  const double xsize = (dest->w > dest->h
-			? radius * 2 * dest->w / dest->h
-			: radius * 2);
   // Compute the pixel limits
-  const int lx = x + w, ly = y + h;
+  const int lx = params.x + params.w, ly = params.y + params.h;
   // Iterate over rows
-  for(int py = y; py < ly; ++py) {
+  for(int py = params.y; py < ly; ++py) {
     // Starting point for this row's results
-    int *res = dest->data + py * dest->w + x;
+    int *res = params.dest->data + py * params.dest->w + params.x;
     // Complex-plane location of this row
-    const double cy = ybottom + (dest->h - 1 - py) * xsize / dest->w;
+    const double cy = params.ybottom + (params.dest->h - 1 - py) * params.xsize / params.dest->w;
     // Iterate over columns
-    for(int px = x; px < lx; ++px) {
+    for(int px = params.x; px < lx; ++px) {
       // Complex-plane location of this column
-      const double cx = xleft + px * xsize / dest->w;
+      const double cx = params.xleft + px * params.xsize / params.dest->w;
       // let c = cx + icy
       // let z = zx + izy
       //
@@ -62,7 +38,7 @@ void MandelbrotJob::work() {
       int iterations = 0;
       double zx = 0, zy = 0, zx2, zy2;
       while(((zx2 = zx * zx) + (zy2 = zy * zy) < 4.0)
-	    && iterations < maxiters) {
+	    && iterations < params.maxiters) {
 	zy = 2 * zx * zy  + cy;
 	zx = zx2 - zy2 + cx;
 	++iterations;
@@ -76,9 +52,9 @@ struct comparator {
   int cx, cy;
   comparator(int cx_, int cy_): cx(cx_), cy(cy_) {}
   int operator()(MandelbrotJob *a, MandelbrotJob *b) {
-    int adx = a->x - cx, ady = a->y - cy;
+    int adx = a->params.x - cx, ady = a->params.y - cy;
     int ar2 = adx * adx + ady * ady;
-    int bdx = b->x - cx, bdy = b->y - cy;
+    int bdx = b->params.x - cx, bdy = b->params.y - cy;
     int br2 = bdx * bdx + bdy * bdy;
     return ar2 < br2;
   }
@@ -103,7 +79,9 @@ IterBuffer *MandelbrotJob::recompute(double cx, double cy, double r,
     const int pw = std::min(chunk, dest->w - px);
     for(int py = 0; py < dest->h; py += chunk) {
       const int ph = std::min(chunk, dest->h - py);
-      jobs.push_back(new MandelbrotJob(px, py, pw, ph, cx, cy, r, maxiters, dest));
+      MandelbrotJob *j = new MandelbrotJob();
+      j->params.set(dest, cx, cy, r, maxiters, px, py, pw, ph);
+      jobs.push_back(j);
     }
   }
   comparator c(xpos, ypos);
@@ -114,5 +92,4 @@ IterBuffer *MandelbrotJob::recompute(double cx, double cy, double r,
 }
 
 MandelbrotJob::~MandelbrotJob() {
-  dest->release();
 }

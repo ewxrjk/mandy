@@ -18,24 +18,50 @@
 
 #include "Job.h"
 
+class FractalJobParameters {
+public:
+  FractalJobParameters(): dest(NULL) {
+  }
+
+  void set(IterBuffer *dest_,
+           double xcenter_, double ycenter_, double radius_,
+           int maxiters_, int x_, int y_,int w_ ,int h_) {
+    dest = dest_;
+    xleft = xcenter_ - (dest->w > dest->h
+                        ? radius_ * dest->w / dest->h
+                        : radius_);
+    ybottom = ycenter_ - (dest->w > dest->h
+                          ? radius_
+                          : radius_ * dest->h / dest->w);
+    xsize = (dest->w > dest->h
+             ? radius_ * 2 * dest->w / dest->h
+             : radius_ * 2);
+    maxiters = maxiters_;
+    x = x_;
+    y = y_;
+    w = w_;
+    h = h_;
+    dest->acquire();
+  }
+
+  ~FractalJobParameters() {
+    if(dest)
+      dest->release();
+  }
+
+  IterBuffer *dest;                     // buffer to store results in
+  double xleft, ybottom;                // complex-plane location
+  double xsize;                         // complex-plane size
+  int maxiters;                         // maximum iterations
+  int x, y;                             // pixel location
+  int w, h;                             // pixel dimensions
+};
+
 class MandelbrotJob: public Job {
 public:
-  IterBuffer *dest;                     // buffer to store results in
-  int x, y;                             // pixel location in buffer
-  int w, h;                             // pixel size in buffer
-  double xcenter, ycenter;              // complex-plane image location
-  double radius;                        // complex-plane radius
-  int maxiters;
+  FractalJobParameters params;          // job parameters
 
   ~MandelbrotJob();
-
-  // Construct a job which fills in a rectangle
-  MandelbrotJob(int x, int y,           // pixel location to draw at
-                int w, int h,           // pixel size to draw
-                double cx, double cy,   // center of image
-                double r,               // radius of biggest circle in image
-                int maxiters,           // max iteration count
-                IterBuffer *dest);
 
   // Do the computation (called in background thread)
   void work();
