@@ -112,9 +112,11 @@ namespace mmui {
     JuliaJobFactory juliaFactory;
 
     void Update(double x, double y) {
-      juliaFactory.cx = x;
-      juliaFactory.cy = y;
-      view.NewLocation();
+      if(juliaFactory.cx != x || juliaFactory.cy != y) {
+        juliaFactory.cx = x;
+        juliaFactory.cy = y;
+        view.NewLocation();
+      }
     }
   };
 
