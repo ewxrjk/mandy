@@ -12,20 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-AC_INIT([mandy], [0.0.WIP], [rjk@greenend.org.uk])
-AC_CONFIG_AUX_DIR([config.aux])
-AM_INIT_AUTOMAKE([mandy], [0.0.WIP])
-AC_CONFIG_SRCDIR([mandy.cc])
-AM_CONFIG_HEADER([config.h])
-AM_PATH_GLIB_2_0
-AM_PATH_GTK_2_0
-AC_LANG([C++])
-AC_PROG_CXX
-AC_PROG_RANLIB
-AC_SET_MAKE
-AC_DEFINE([_GNU_SOURCE], [1], [use GNU extensions])
-if test "x$GCC" = xyes; then
-  CXX="$CXX -Wall -W -Werror -Wpointer-arith -Wwrite-strings"
-fi
-AC_CONFIG_FILES([Makefile lib/Makefile gtkui/Makefile])
-AC_OUTPUT
+noinst_LIBRARIES=libmandy.a
+libmandy_a_SOURCES=IterBuffer.cc Job.cc MandelbrotJob.cc colors.cc	\
+fatal.cc location.cc movement.cc IterBuffer.h Job.h MandelbrotJob.h	\
+mandy.h

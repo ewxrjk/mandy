@@ -12,20 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-AC_INIT([mandy], [0.0.WIP], [rjk@greenend.org.uk])
-AC_CONFIG_AUX_DIR([config.aux])
-AM_INIT_AUTOMAKE([mandy], [0.0.WIP])
-AC_CONFIG_SRCDIR([mandy.cc])
-AM_CONFIG_HEADER([config.h])
-AM_PATH_GLIB_2_0
-AM_PATH_GTK_2_0
-AC_LANG([C++])
-AC_PROG_CXX
-AC_PROG_RANLIB
-AC_SET_MAKE
-AC_DEFINE([_GNU_SOURCE], [1], [use GNU extensions])
-if test "x$GCC" = xyes; then
-  CXX="$CXX -Wall -W -Werror -Wpointer-arith -Wwrite-strings"
-fi
-AC_CONFIG_FILES([Makefile lib/Makefile gtkui/Makefile])
-AC_OUTPUT
+bin_PROGRAMS=mandy
+mandy_SOURCES=Gtkui.cc GtkuiControls.cc GtkuiDrawing.cc	\
+GtkuiKeyboard.cc GtkuiPointer.cc mandy.cc Gtkui.h
+mandy_LDADD=../lib/libmandy.a $(GTK_LIBS)
+AM_CPPFLAGS=-I../lib
+AM_CXXFLAGS=$(GLIB_CFLAGS) $(GTK_CFLAGS)
