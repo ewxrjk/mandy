@@ -24,7 +24,6 @@ namespace mmui {
     show_all();
   }
 
-
 }
 
 /*

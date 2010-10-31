@@ -77,19 +77,7 @@ namespace mmui {
   }
 
   bool View::on_motion_notify_event(GdkEventMotion *event) {
-    if(juliaWindow) {
-      double x, y;
-      int w, h;
-      get_window()->get_size(w, h);
-      if(w > h) {
-        x = xcenter + radius * (event->x * 2 - w)/h;
-        y = ycenter - radius * ((h - 1 - event->y) * 2 / h - 1);
-      } else {
-        x = xcenter - radius * (event->x * 2 / w - 1);
-        y = ycenter + radius * ((h - 1 - event->y) * 2 - h)/w;
-      }
-      juliaWindow->Update(x, y);
-    }
+    NewJulia();
     if(!dragging)
       return false;
     dragToX = event->x;
@@ -229,6 +217,7 @@ namespace mmui {
       xcenter -= deltax * radius * 2 / w;
       ycenter += deltay * radius * 2 / w;
     }
+    NewJulia();
   }
 
   void View::Zoom(double x, double y, double scale) {
@@ -281,6 +270,26 @@ namespace mmui {
       ycenter += radius * (1-scale) * ((h - 1 - y) * 2 - h) / w;
     }
     radius *= scale;
+    NewJulia();
+  }
+
+  // Julia set integration ----------------------------------------------------
+
+  void View::NewJulia() {
+    if(juliaWindow) {
+      int xpos, ypos, w, h;
+      double x, y;
+      get_pointer(xpos, ypos);
+      get_window()->get_size(w, h);
+      if(w > h) {
+        x = xcenter + radius * (xpos * 2.0 - w)/h;
+        y = ycenter - radius * ((h - 1 - ypos) * 2.0 / h - 1);
+      } else {
+        x = xcenter - radius * (xpos * 2.0 / w - 1);
+        y = ycenter + radius * ((h - 1 - ypos) * 2.0 - h)/w;
+      }
+      juliaWindow->Update(x, y);
+    }
   }
 }
 

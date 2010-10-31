@@ -87,6 +87,7 @@ namespace mmui {
     const FractalJobFactory *jobFactory;
 
     JuliaWindow *juliaWindow;
+    void NewJulia();
   };
 
   class Toplevel: public Gtk::Window {
