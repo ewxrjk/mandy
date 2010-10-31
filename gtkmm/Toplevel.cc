@@ -18,8 +18,7 @@
 
 namespace mmui {
 
-  Toplevel::Toplevel(): vbox(false, 0),
-                        view(this) {
+  Toplevel::Toplevel(): vbox(false, 0) {
     set_title("mandy");
     add_events(Gdk::KEY_RELEASE_MASK);
     // TODO control panel

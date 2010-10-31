@@ -18,7 +18,7 @@
 namespace mmui {
   View::View(): xcenter(0), ycenter(0), radius(2), maxiter(255),
                 dest(NULL),
-                Dragging(false) {
+                dragging(false) {
     set_size_request(384, 384);
     add_events(Gdk::BUTTON_PRESS_MASK
 	       |Gdk::BUTTON_RELEASE_MASK
@@ -51,9 +51,9 @@ namespace mmui {
     if(event->type == GDK_BUTTON_PRESS
        && event->button == 1
        && event->state == 0) {
-      Dragging = true;
-      DragFromX = event->x;
-      DragFromY = event->y;
+      dragging = true;
+      dragFromX = event->x;
+      dragFromY = event->y;
       return true;
     }
     return false;
@@ -62,11 +62,11 @@ namespace mmui {
   bool View::on_button_release_event(GdkEventButton *event) {
     if(event->type == GDK_BUTTON_RELEASE
        && event->button == 1) {
-      if(Dragging) {
-        DragToX = event->x;
-        DragToY = event->y;
+      if(dragging) {
+        dragToX = event->x;
+        dragToY = event->y;
         DragComplete();
-        Dragging = false;
+        dragging = false;
         return true;
       }
     }
@@ -74,43 +74,31 @@ namespace mmui {
   }
 
   bool View::on_motion_notify_event(GdkEventMotion *event) {
-    if(!Dragging)
+    if(!dragging)
       return false;
-    DragToX = event->x;
-    DragToY = event->y;
-    if(!DragIdleConnection.connected())
-      DragIdleConnection = Glib::signal_idle().connect
+    dragToX = event->x;
+    dragToY = event->y;
+    if(!dragIdleConnection.connected())
+      dragIdleConnection = Glib::signal_idle().connect
         (sigc::mem_fun(*this, &View::DragIdle));
     return true;
   }
 
   bool View::DragIdle() {
     DragComplete();
-    DragIdleConnection.disconnect();
+    dragIdleConnection.disconnect();
     return false;
   }
 
   void View::DragComplete() {
-    const int deltax = DragToX - DragFromX;
-    const int deltay = DragToY - DragFromY;
+    const int deltax = dragToX - dragFromX;
+    const int deltay = dragToY - dragFromY;
     if(!(deltax == 0 && deltay == 0)) {
-      DragFromX = DragToX;
-      DragFromY = DragToY;
+      dragFromX = dragToX;
+      dragFromY = dragToY;
       Drag(deltax, deltay);
       //Gtkui::Changed();
-      NewLocation(DragToX, DragToY);
-    }
-  }
-
-  void View::Drag(int deltax, int deltay) {
-    int w, h;
-    get_window()->get_size(w, h);
-    if(w > h) {
-      xcenter -= deltax * radius * 2 / h;
-      ycenter += deltay * radius * 2 / h;
-    } else {
-      xcenter -= deltax * radius * 2 / w;
-      ycenter += deltay * radius * 2 / w;
+      NewLocation(dragToX, dragToY);
     }
   }
 
@@ -197,7 +185,19 @@ namespace mmui {
     NewLocation(w/2, h/2);
   }
 
-  // Zooming ------------------------------------------------------------------
+  // Motion -------------------------------------------------------------------
+
+  void View::Drag(int deltax, int deltay) {
+    int w, h;
+    get_window()->get_size(w, h);
+    if(w > h) {
+      xcenter -= deltax * radius * 2 / h;
+      ycenter += deltay * radius * 2 / h;
+    } else {
+      xcenter -= deltax * radius * 2 / w;
+      ycenter += deltay * radius * 2 / w;
+    }
+  }
 
   void View::Zoom(double x, double y, double scale) {
     int w, h;

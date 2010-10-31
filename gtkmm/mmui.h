@@ -30,7 +30,7 @@ namespace mmui {
 
   class View: public Gtk::DrawingArea {
   public:
-    View(Toplevel *toplevel);
+    View();
     bool on_button_press_event(GdkEventButton *);
     bool on_button_release_event(GdkEventButton *);
     bool on_motion_notify_event(GdkEventMotion *);
@@ -41,8 +41,6 @@ namespace mmui {
     void Drag(int deltax, int deltay);
     void Zoom(double x, double y, double scale);
   private:
-    // Reference back to top-level window
-    Toplevel &toplevel;
 
     // Parameters
     double xcenter, ycenter, radius;
@@ -56,10 +54,10 @@ namespace mmui {
     static void Completed(Job *generic_job, void *completion_data);
 
     // Dragging support
-    bool Dragging;
-    double DragFromX, DragFromY;
-    double DragToX, DragToY;
-    sigc::connection DragIdleConnection;
+    bool dragging;
+    double dragFromX, dragFromY;
+    double dragToX, dragToY;
+    sigc::connection dragIdleConnection;
 
     void DragComplete();
     bool DragIdle();
