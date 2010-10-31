@@ -1,6 +1,6 @@
 *.o
 *~
-mandy
+gtkmm/mandy
 mandy-*.tar.gz
 .deps
 Makefile
