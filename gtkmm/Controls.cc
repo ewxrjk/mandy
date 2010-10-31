@@ -22,22 +22,22 @@ namespace mmui {
 
   ControlPanel::ControlPanel(View *v):
     view(v),
-    xcenter_caption("X centre"),
-    ycenter_caption("Y centre"),
+    xcenter_caption("X center"),
+    ycenter_caption("Y center"),
     radius_caption("Radius"),
-    maxiter_caption("Iterations"),
+    maxiters_caption("Iterations"),
     xcenter_control(this, &view->xcenter, -HUGE_VAL, HUGE_VAL),
     ycenter_control(this, &view->ycenter, -HUGE_VAL, HUGE_VAL),
     radius_control(this, &view->radius, 0.0, HUGE_VAL),
-    maxiter_control(this, &view->maxiter, 1, INT_MAX - 1) {
+    maxiters_control(this, &view->maxiters, 1, INT_MAX - 1) {
     attach(xcenter_caption, 0, 1, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
     attach(xcenter_control, 1, 2, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
     attach(ycenter_caption, 0, 1, 1, 2, Gtk::FILL, Gtk::SHRINK, 1, 1);
     attach(ycenter_control, 1, 2, 1, 2, Gtk::FILL, Gtk::SHRINK, 1, 1);
     attach(radius_caption, 0, 1, 2, 3, Gtk::FILL, Gtk::SHRINK, 1, 1);
     attach(radius_control, 1, 2, 2, 3, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(maxiter_caption, 2, 3, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(maxiter_control, 3, 4, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
+    attach(maxiters_caption, 2, 3, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
+    attach(maxiters_control, 3, 4, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
     Update();
   }
 

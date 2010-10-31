@@ -67,9 +67,9 @@ namespace mmui {
   class ControlPanel: public Gtk::Table {
     std::vector<Control *> controls;
     View *view;
-    Caption xcenter_caption, ycenter_caption, radius_caption, maxiter_caption;
+    Caption xcenter_caption, ycenter_caption, radius_caption, maxiters_caption;
     DoubleControl xcenter_control, ycenter_control, radius_control;
-    IntegerControl maxiter_control;
+    IntegerControl maxiters_control;
   public:
     ControlPanel(View *);
 

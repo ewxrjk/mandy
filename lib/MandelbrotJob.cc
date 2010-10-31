@@ -27,17 +27,17 @@ MandelbrotJob::MandelbrotJob(int x_, int y_,
   dest(dest_),
   x(x_), y(y_),
   w(w_), h(h_),
-  xcentre(cx_), ycentre(cy_), radius(cr_),
+  xcenter(cx_), ycenter(cy_), radius(cr_),
   maxiters(maxiters_) {
   dest->acquire();
 }
 
 void MandelbrotJob::work() {
   // Compute the full size of the rectangle
-  const double xleft = xcentre - (dest->w > dest->h
+  const double xleft = xcenter - (dest->w > dest->h
 				  ? radius * dest->w / dest->h
 				  : radius);
-  const double ybottom = ycentre - (dest->w > dest->h
+  const double ybottom = ycenter - (dest->w > dest->h
 				    ? radius
 				    : radius * dest->h / dest->w);
   const double xsize = (dest->w > dest->h

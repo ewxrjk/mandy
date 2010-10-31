@@ -23,7 +23,7 @@ public:
   IterBuffer *dest;                     // buffer to store results in
   int x, y;                             // pixel location in buffer
   int w, h;                             // pixel size in buffer
-  double xcentre, ycentre;              // complex-plane image location
+  double xcenter, ycenter;              // complex-plane image location
   double radius;                        // complex-plane radius
   int maxiters;
 
@@ -32,7 +32,7 @@ public:
   // Construct a job which fills in a rectangle
   MandelbrotJob(int x, int y,           // pixel location to draw at
                 int w, int h,           // pixel size to draw
-                double cx, double cy,   // centre of image
+                double cx, double cy,   // center of image
                 double r,               // radius of biggest circle in image
                 int maxiters,           // max iteration count
                 IterBuffer *dest);

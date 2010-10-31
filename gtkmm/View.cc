@@ -16,7 +16,7 @@
 #include "mmui.h"
 
 namespace mmui {
-  View::View(): xcenter(0), ycenter(0), radius(2), maxiter(255),
+  View::View(): xcenter(0), ycenter(0), radius(2), maxiters(255),
                 dest(NULL),
                 dragging(false) {
     set_size_request(384, 384);
@@ -151,7 +151,7 @@ namespace mmui {
     v->Redraw(j->x, j->y, j->w, j->h);
   }
 
-  // Called to set a new location, scale or maxiter
+  // Called to set a new location, scale or maxiters
   void View::NewLocation(int xpos, int ypos) {
     if(dest) {
       dest->release();
@@ -166,11 +166,11 @@ namespace mmui {
     if(xpos == -1 || ypos == -1)
       get_pointer(xpos, ypos);
     dest = MandelbrotJob::recompute(xcenter, ycenter, radius,
-                                    maxiter, w, h,
+                                    maxiters, w, h,
                                     Completed,
                                     this,
                                     xpos, ypos);
-    if(colors.size() != (unsigned)(maxiter + 1))
+    if(colors.size() != (unsigned)(maxiters + 1))
       NewColors();
   }
 
@@ -190,13 +190,13 @@ namespace mmui {
   // Colors -------------------------------------------------------------------
 
   void View::NewColors() {
-    colors.resize(maxiter + 1);
-    for(int n = 0; n < maxiter; ++n) {
+    colors.resize(maxiters + 1);
+    for(int n = 0; n < maxiters; ++n) {
       colors[n].r = (cos(2 * M_PI * n / 256) + 1.0) * 127;
       colors[n].g = (cos(2 * M_PI * n / 1024) + 1.0) * 127;
       colors[n].b = (cos(2 * M_PI * n / 512) + 1.0) * 127;
     }
-    colors[maxiter].r = colors[maxiter].g = colors[maxiter].b = 0;
+    colors[maxiters].r = colors[maxiters].g = colors[maxiters].b = 0;
   }
 
   // Motion -------------------------------------------------------------------
@@ -223,10 +223,10 @@ namespace mmui {
      * xposition_0(w, h, y) = xposition_1(w, h, y)
      *
      * Where [xy]position_0 use [xy]center_0 and size_0 (the before values)
-     * and [xy]position_1 use [xy]centre_1 and size_1 (the after values).
+     * and [xy]position_1 use [xy]center_1 and size_1 (the after values).
      *
      * We know size_1 = k*size_0 (for some scale factor k) and what we
-     * are after is [xy]centre_1.
+     * are after is [xy]center_1.
      *
      * Expanding on the X axis for the w>h case:
      *

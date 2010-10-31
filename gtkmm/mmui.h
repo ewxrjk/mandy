@@ -53,7 +53,7 @@ namespace mmui {
 
     // Parameters
     double xcenter, ycenter, radius;
-    int maxiter;
+    int maxiters;
 
   private:
     // Colors
