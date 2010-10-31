@@ -60,12 +60,12 @@ struct comparator {
   }
 };
 
-IterBuffer *MandelbrotJob::recompute(double cx, double cy, double r, 
-				     int maxiters, int w, int h,
-				     void (*completion_callback)(Job *, void *),
-				     void *completion_data,
-				     int xpos, int ypos) {
-  const MandelbrotJobFactory factory;
+IterBuffer *FractalJob::recompute(double cx, double cy, double r, 
+				  int maxiters, int w, int h,
+				  void (*completion_callback)(Job *, void *),
+				  void *completion_data,
+				  int xpos, int ypos,
+				  const FractalJobFactory *factory) {
   // Discard stale work
   Job::cancel();
   IterBuffer *dest = new IterBuffer(w, h);
@@ -80,7 +80,7 @@ IterBuffer *MandelbrotJob::recompute(double cx, double cy, double r,
     const int pw = std::min(chunk, dest->w - px);
     for(int py = 0; py < dest->h; py += chunk) {
       const int ph = std::min(chunk, dest->h - py);
-      FractalJob *j = factory.create();
+      FractalJob *j = factory->create();
       j->params.set(dest, cx, cy, r, maxiters, px, py, pw, ph);
       jobs.push_back(j);
     }

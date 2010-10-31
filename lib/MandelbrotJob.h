@@ -57,16 +57,11 @@ public:
   int w, h;                             // pixel dimensions
 };
 
+class FractalJobFactory;
+
 class FractalJob: public Job {
 public:
   FractalJobParameters params;          // job parameters
-};
-
-class MandelbrotJob: public FractalJob {
-public:
-
-  // Do the computation (called in background thread)
-  void work();
 
   // Create a new IterBuffer and start to asynchronously populate it.  It will
   // be returned with one ref owned by the caller (and many by the background
@@ -75,7 +70,15 @@ public:
                                int maxiters, int w, int h,
                                void (*completion_callback)(Job *, void *),
                                void *completion_data,
-                               int xpos, int ypos);
+                               int xpos, int ypos,
+                               const FractalJobFactory *factory);
+};
+
+class MandelbrotJob: public FractalJob {
+public:
+
+  // Do the computation (called in background thread)
+  void work();
 };
 
 class FractalJobFactory {

@@ -165,11 +165,13 @@ namespace mmui {
     // to provide continuity.
     if(xpos == -1 || ypos == -1)
       get_pointer(xpos, ypos);
-    dest = MandelbrotJob::recompute(xcenter, ycenter, radius,
-                                    maxiters, w, h,
-                                    Completed,
-                                    this,
-                                    xpos, ypos);
+    MandelbrotJobFactory factory;
+    dest = FractalJob::recompute(xcenter, ycenter, radius,
+                                 maxiters, w, h,
+                                 Completed,
+                                 this,
+                                 xpos, ypos,
+                                 &factory);
     if(colors.size() != (unsigned)(maxiters + 1))
       NewColors();
   }
