@@ -15,7 +15,13 @@
  */
 #include "mmui.h"
 
-int main() {
+int main(int argc, char **argv) {
+  Gtk::Main kit(argc, argv);
+  mmui::Toplevel toplevel;
+  toplevel.view.NewSize();
+  //Changed(); TODO
+  Gtk::Main::run(toplevel);
+  return 0;
 }
 
 /*

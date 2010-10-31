@@ -17,7 +17,7 @@
 
 namespace mmui {
   View::View(Toplevel *tl): toplevel(*tl),
-                            x(0), y(0), radius(2), maxiter(255),
+                            xcenter(0), ycenter(0), radius(2), maxiter(255),
                             dest(NULL),
                             Dragging(false) {
     set_size_request(384, 384);
@@ -37,7 +37,7 @@ namespace mmui {
       get_window()->get_size(w, h);
       zoom(w, h, event->x, event->y, M_SQRT1_2);
       //Gtkui::Changed();
-      //Gtkui::NewLocation(-1, -1);
+      NewLocation();
       return true;
     }
     // Double-click right button zooms out
@@ -48,7 +48,7 @@ namespace mmui {
       get_window()->get_size(w, h);
       zoom(w, h, event->x, event->y, M_SQRT2);
       //Gtkui::Changed();
-      //Gtkui::NewLocation(-1, -1);
+      NewLocation();
       return true;
     }
     // Hold left button drags
@@ -111,9 +111,8 @@ namespace mmui {
   bool View::on_expose_event(GdkEventExpose *) {
     int w, h;
     get_window()->get_size(w, h);
-    /*
-    if(w != gdk_pixbuf_get_width(LatestPixbuf)
-       || h != gdk_pixbuf_get_height(LatestPixbuf)) {
+    if(w != pixbuf->get_width()
+       || h != pixbuf->get_height()) {
       // The pixbuf is the wrong size (i.e. the window has been
       // resized).  Attempt a recompute.
       NewSize();
@@ -122,7 +121,6 @@ namespace mmui {
       // TODO only redraw the bit that was exposed
       Redraw(0, 0, w, h);
     }
-    */
     return true;
   }
 
@@ -130,6 +128,65 @@ namespace mmui {
     get_window()->draw_pixbuf(get_style()->get_fg_gc(Gtk::STATE_NORMAL),
                               pixbuf, x, y, x, y, w, h,
                               Gdk::RGB_DITHER_NONE, 0, 0);
+  }
+
+  // Job completion callback
+  void View::Completed(Job *generic_job, void *data) {
+    View *v = (View *)data;
+    MandelbrotJob *j = dynamic_cast<MandelbrotJob *>(generic_job);
+    // Ignore stale jobs
+    if(j->dest != v->dest)
+      return;
+    const int w = v->dest->w;
+    guint8 *pixels = v->pixbuf->get_pixels();
+    const int rowstride = v->pixbuf->get_rowstride();
+    const int lx = j->x + j->w;
+    const int ly = j->y + j->h;
+    for(int y = j->y; y < ly; ++y) {
+      int *datarow = &v->dest->data[y * w + j->x];
+      guchar *pixelrow = pixels + y * rowstride + j->x * 3;
+      for(int x = j->x; x < lx; ++x) {
+	const int count = *datarow++;
+	*pixelrow++ = colors[count].r;
+	*pixelrow++ = colors[count].g;
+	*pixelrow++ = colors[count].b;
+      }
+    }
+    v->Redraw(j->x, j->y, j->w, j->h);
+  }
+
+  // Called to set a new location, scale or maxiter
+  void View::NewLocation(int xpos, int ypos) {
+    if(dest) {
+      dest->release();
+      dest = NULL;
+    }
+    int w, h;
+    get_window()->get_size(w, h);
+    if(!pixbuf)
+      pixbuf = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, false, 8, w, h);
+    // TODO if there's a pixbuf available then ideally we would move or scale it
+    // to provide continuity.
+    if(xpos == -1 || ypos == -1)
+      get_pointer(xpos, ypos);
+    dest = MandelbrotJob::recompute(xcenter, ycenter, radius,
+                                    maxiter, w, h,
+                                    Completed,
+                                    NULL,
+                                    xpos, ypos);
+  }
+
+  void View::NewSize() {
+    // If there's a pixbuf it'll be the wrong size, so delete it.  We draw it
+    // first to provide visual continuity.
+    if(pixbuf) {
+      // TODO ideally we would rescale the pixbuf
+      Redraw(0, 0, pixbuf->get_width(), pixbuf->get_height());
+      pixbuf.reset();
+    }
+    int w, h;
+    get_window()->get_size(w, h);
+    NewLocation(w/2, h/2);
   }
 
 }

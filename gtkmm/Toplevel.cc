@@ -25,6 +25,7 @@ namespace mmui {
     // TODO control panel
     vbox.pack_end(view, true, true, 0);
     add(vbox);
+    show_all();
   }
 
   bool Toplevel::on_delete_event(GdkEventAny *) {

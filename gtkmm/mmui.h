@@ -20,6 +20,7 @@
 #include "mandy.h"
 #include "IterBuffer.h"
 #include "Job.h"
+#include "MandelbrotJob.h"
 
 #include <gtkmm.h>
 
@@ -34,12 +35,15 @@ namespace mmui {
     bool on_button_release_event(GdkEventButton *);
     bool on_motion_notify_event(GdkEventMotion *);
     bool on_expose_event(GdkEventExpose *);
+
+    void NewLocation(int xpos = -1, int ypos = -1);
+    void NewSize();
   private:
     // Reference back to top-level window
     Toplevel &toplevel;
 
     // Parameters
-    double x, y, radius;
+    double xcenter, ycenter, radius;
     int maxiter;
 
     // Iteration count and pixel data
