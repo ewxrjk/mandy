@@ -22,7 +22,9 @@
 #include "Job.h"
 #include "MandelbrotJob.h"
 
-#include <gtkmm.h>
+#include <gtkmm/drawingarea.h>
+#include <gtkmm/window.h>
+#include <gtkmm/box.h>
 
 namespace mmui {
 

@@ -15,6 +15,7 @@
  */
 #include "mmui.h"
 #include "Job.h"
+#include <gdk/gdkkeysyms.h>
 
 namespace mmui {
 
