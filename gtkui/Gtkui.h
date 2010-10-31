@@ -21,10 +21,6 @@
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include <gdk/gdkkeysyms.h>
 
-#include <gtkmm.h>
-#include "GtkuiMandyWindow.h"
-#include "GtkuiMandyDrawingArea.h"
-
 class IterBuffer;
 class Job;
 
