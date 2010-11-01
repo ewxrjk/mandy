@@ -71,6 +71,7 @@ namespace mmui {
   }
 
   bool View::on_button_release_event(GdkEventButton *event) {
+    // Release left button ends drag
     if(event->type == GDK_BUTTON_RELEASE
        && event->button == 1) {
       if(dragging) {
@@ -81,11 +82,20 @@ namespace mmui {
         return true;
       }
     }
+    // Release right button draws the corresponding Julia set
+    if(event->type == GDK_BUTTON_RELEASE
+       && event->button == 3
+       && !(event->state & (GDK_SHIFT_MASK
+                            |GDK_CONTROL_MASK
+                            |GDK_LOCK_MASK))) {
+      NewJulia(event->x, event->y);
+    }
     return false;
   }
 
   bool View::on_motion_notify_event(GdkEventMotion *event) {
-    NewJulia();
+    if(event->state & GDK_BUTTON3_MASK)
+      NewJulia(event->x, event->y);
     if(!dragging)
       return false;
     dragToX = event->x;
@@ -225,7 +235,6 @@ namespace mmui {
       xcenter -= deltax * radius * 2 / w;
       ycenter += deltay * radius * 2 / w;
     }
-    NewJulia();
   }
 
   void View::Zoom(double x, double y, double scale) {
@@ -278,16 +287,14 @@ namespace mmui {
       ycenter += radius * (1-scale) * ((h - 1 - y) * 2 - h) / w;
     }
     radius *= scale;
-    NewJulia();
   }
 
   // Julia set integration ----------------------------------------------------
 
-  void View::NewJulia() {
+  void View::NewJulia(double xpos, double ypos) {
     if(juliaWindow) {
-      int xpos, ypos, w, h;
+      int w, h;
       double x, y;
-      get_pointer(xpos, ypos);
       get_window()->get_size(w, h);
       if(w > h) {
         x = xcenter + radius * (xpos * 2.0 - w)/h;
