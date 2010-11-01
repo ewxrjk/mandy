@@ -33,7 +33,9 @@ namespace mmui {
     // Double-click left button zooms in
     if(event->type == GDK_2BUTTON_PRESS
        && event->button == 1
-       && event->state == 0) {
+       && !(event->state & (GDK_SHIFT_MASK
+                            |GDK_CONTROL_MASK
+                            |GDK_LOCK_MASK))) {
       Zoom(event->x, event->y, M_SQRT1_2);
       if(controls)
         controls->Update();
@@ -43,7 +45,9 @@ namespace mmui {
     // Double-click right button zooms out
     if(event->type == GDK_2BUTTON_PRESS
        && event->button == 3
-       && event->state == 0) {
+       && !(event->state & (GDK_SHIFT_MASK
+                            |GDK_CONTROL_MASK
+                            |GDK_LOCK_MASK))) {
       Zoom(event->x, event->y, M_SQRT2);
       if(controls)
         controls->Update();
@@ -54,7 +58,9 @@ namespace mmui {
     // Hold left button drags
     if(event->type == GDK_BUTTON_PRESS
        && event->button == 1
-       && event->state == 0) {
+       && !(event->state & (GDK_SHIFT_MASK
+                            |GDK_CONTROL_MASK
+                            |GDK_LOCK_MASK))) {
       dragging = true;
       dragFromX = event->x;
       dragFromY = event->y;
