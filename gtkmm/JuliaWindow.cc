@@ -17,9 +17,14 @@
 
 namespace mmui {
 
-  JuliaWindow::JuliaWindow() {
+  JuliaWindow::JuliaWindow(): controls(&view),
+                              vbox(false, 0) {
+    view.SetControlPanel(&controls);
     view.SetJobFactory(&juliaFactory);
-    add(view);
+    frame.add(controls);
+    vbox.pack_start(frame, false, false, 1);
+    vbox.pack_end(view, true, true, 0);
+    add(vbox);
     set_title("Julia Set");
     show_all();
   }

@@ -109,6 +109,9 @@ namespace mmui {
   public:
     JuliaWindow();
     View view;
+    ControlPanel controls;
+    Gtk::Frame frame;
+    Gtk::VBox vbox;
     JuliaJobFactory juliaFactory;
 
     void Update(double x, double y) {
