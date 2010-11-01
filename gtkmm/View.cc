@@ -19,7 +19,8 @@ namespace mmui {
   View::View(): xcenter(0), ycenter(0), radius(2), maxiters(255),
                 dest(NULL),
                 dragging(false),
-                jobFactory(NULL) {
+                jobFactory(NULL),
+                juliaWindow(NULL) {
     set_size_request(384, 384);
     add_events(Gdk::BUTTON_PRESS_MASK
 	       |Gdk::BUTTON_RELEASE_MASK
