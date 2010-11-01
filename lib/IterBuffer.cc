@@ -28,7 +28,7 @@ void IterBuffer::finished() {
 }
 
 IterBuffer::~IterBuffer() {
-  delete data;
+  delete[] data;
 }
 
 /*
