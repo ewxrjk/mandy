@@ -67,6 +67,14 @@ namespace mmui {
       dragFromY = event->y;
       return true;
     }
+    // Shifted left button draws the corresponding Julia set
+    if(event->type == GDK_BUTTON_PRESS
+       && event->button == 1
+       && (event->state & (GDK_SHIFT_MASK
+                           |GDK_CONTROL_MASK
+                           |GDK_LOCK_MASK)) == GDK_SHIFT_MASK) {
+      NewJulia(event->x, event->y);
+    }
     return false;
   }
 
@@ -82,19 +90,23 @@ namespace mmui {
         return true;
       }
     }
-    // Release right button draws the corresponding Julia set
+    // Release shifted left button draws the corresponding Julia set
     if(event->type == GDK_BUTTON_RELEASE
-       && event->button == 3
-       && !(event->state & (GDK_SHIFT_MASK
-                            |GDK_CONTROL_MASK
-                            |GDK_LOCK_MASK))) {
+       && event->button == 1
+       && (event->state & (GDK_SHIFT_MASK
+                           |GDK_CONTROL_MASK
+                           |GDK_LOCK_MASK)) == GDK_SHIFT_MASK) {
       NewJulia(event->x, event->y);
     }
     return false;
   }
 
   bool View::on_motion_notify_event(GdkEventMotion *event) {
-    if(event->state & GDK_BUTTON3_MASK)
+    // Drag with shifted left button draws the corresponding Julia set
+    if((event->state & (GDK_BUTTON1_MASK
+                        |GDK_SHIFT_MASK
+                        |GDK_CONTROL_MASK
+                        |GDK_LOCK_MASK)) == (GDK_BUTTON1_MASK|GDK_SHIFT_MASK))
       NewJulia(event->x, event->y);
     if(!dragging)
       return false;
