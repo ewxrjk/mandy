@@ -43,12 +43,16 @@ namespace mmui {
       NewLocation();
       return true;
     }
-    // Double-click right button zooms out
+    // Double-click right button zooms out; control-double-click left also works.
     if(event->type == GDK_2BUTTON_PRESS
-       && event->button == 3
-       && !(event->state & (GDK_SHIFT_MASK
-                            |GDK_CONTROL_MASK
-                            |GDK_LOCK_MASK))) {
+       && ((event->button == 3
+            && !(event->state & (GDK_SHIFT_MASK
+                                 |GDK_CONTROL_MASK
+                                 |GDK_LOCK_MASK)))
+           || ((event->button == 1
+                && (event->state & (GDK_SHIFT_MASK
+                                    |GDK_CONTROL_MASK
+                                    |GDK_LOCK_MASK)) == GDK_CONTROL_MASK)))) {
       Zoom(event->x, event->y, M_SQRT2);
       if(controls)
         controls->Update();
