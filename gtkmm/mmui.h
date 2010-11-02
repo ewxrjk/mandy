@@ -104,12 +104,12 @@ namespace mmui {
   class JuliaView: public View {
   public:
     JuliaView();
-    JuliaJobFactory juliaFactory;
+    JuliaJobFactory juliaJobFactory;
 
     void Update(double x, double y) {
-      if(juliaFactory.cx != x || juliaFactory.cy != y) {
-        juliaFactory.cx = x;
-        juliaFactory.cy = y;
+      if(juliaJobFactory.cx != x || juliaJobFactory.cy != y) {
+        juliaJobFactory.cx = x;
+        juliaJobFactory.cy = y;
         NewLocation();
       }
     }

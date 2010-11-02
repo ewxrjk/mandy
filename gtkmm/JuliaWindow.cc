@@ -29,7 +29,7 @@ namespace mmui {
   }
 
   JuliaView::JuliaView() {
-    SetJobFactory(&juliaFactory);
+    SetJobFactory(&juliaJobFactory);
   }
 
 }
