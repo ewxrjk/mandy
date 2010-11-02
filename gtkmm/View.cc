@@ -20,8 +20,7 @@ namespace mmui {
                 dest(NULL),
                 dragging(false),
                 controls(NULL),
-                jobFactory(NULL),
-                juliaView(NULL) {
+                jobFactory(NULL) {
     set_size_request(384, 384);
     add_events(Gdk::BUTTON_PRESS_MASK
 	       |Gdk::BUTTON_RELEASE_MASK
@@ -71,14 +70,6 @@ namespace mmui {
       dragFromY = event->y;
       return true;
     }
-    // Shifted left button draws the corresponding Julia set
-    if(event->type == GDK_BUTTON_PRESS
-       && event->button == 1
-       && (event->state & (GDK_SHIFT_MASK
-                           |GDK_CONTROL_MASK
-                           |GDK_LOCK_MASK)) == GDK_SHIFT_MASK) {
-      NewJulia(event->x, event->y);
-    }
     return false;
   }
 
@@ -94,24 +85,10 @@ namespace mmui {
         return true;
       }
     }
-    // Release shifted left button draws the corresponding Julia set
-    if(event->type == GDK_BUTTON_RELEASE
-       && event->button == 1
-       && (event->state & (GDK_SHIFT_MASK
-                           |GDK_CONTROL_MASK
-                           |GDK_LOCK_MASK)) == GDK_SHIFT_MASK) {
-      NewJulia(event->x, event->y);
-    }
     return false;
   }
 
   bool View::on_motion_notify_event(GdkEventMotion *event) {
-    // Drag with shifted left button draws the corresponding Julia set
-    if((event->state & (GDK_BUTTON1_MASK
-                        |GDK_SHIFT_MASK
-                        |GDK_CONTROL_MASK
-                        |GDK_LOCK_MASK)) == (GDK_BUTTON1_MASK|GDK_SHIFT_MASK))
-      NewJulia(event->x, event->y);
     if(!dragging)
       return false;
     dragToX = event->x;
@@ -305,26 +282,6 @@ namespace mmui {
     radius *= scale;
   }
 
-  // Julia set integration ----------------------------------------------------
-
-  void View::NewJulia(double xpos, double ypos) {
-    if(juliaView) {
-      int w, h;
-      double x, y;
-      get_window()->get_size(w, h);
-      if(w > h) {
-        x = xcenter + radius * (xpos * 2.0 - w)/h;
-        y = ycenter - radius * (ypos * 2.0 / h - 1);
-      } else {
-        x = xcenter - radius * (xpos * 2.0 / w - 1);
-        y = ycenter + radius * (ypos * 2.0 - h)/w;
-      }
-      juliaView->Update(x, y);
-      //      char buffer[128];
-      //      snprintf(buffer, sizeof buffer, "Julia set at %g+%gi", x, y);
-      //      juliaWindow->set_title(buffer);
-    }
-  }
 }
 
 /*

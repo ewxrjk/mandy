@@ -43,10 +43,10 @@ namespace mmui {
   class View: public Gtk::DrawingArea {
   public:
     View();
-    bool on_button_press_event(GdkEventButton *);
-    bool on_button_release_event(GdkEventButton *);
-    bool on_motion_notify_event(GdkEventMotion *);
-    bool on_expose_event(GdkEventExpose *);
+    virtual bool on_button_press_event(GdkEventButton *);
+    virtual bool on_button_release_event(GdkEventButton *);
+    virtual bool on_motion_notify_event(GdkEventMotion *);
+    virtual bool on_expose_event(GdkEventExpose *);
 
     void NewLocation(int xpos = -1, int ypos = -1);
     void NewSize();
@@ -54,7 +54,6 @@ namespace mmui {
     void Zoom(double x, double y, double scale);
     inline void SetControlPanel(ControlPanel *p) { controls = p; }
     inline void SetJobFactory(FractalJobFactory *jf) { jobFactory = jf; }
-    inline void SetJuliaView(JuliaView *v) { juliaView = v; }
 
     // Parameters
     double xcenter, ycenter, radius;
@@ -86,9 +85,20 @@ namespace mmui {
     ControlPanel *controls;
 
     const FractalJobFactory *jobFactory;
+  };
+
+  class MandelbrotView: public View {
+  public:
+    MandelbrotView();
+    MandelbrotJobFactory mandelbrotJobFactory;
 
     JuliaView *juliaView;
+
+    inline void SetJuliaView(JuliaView *v) { juliaView = v; }
     void NewJulia(double x, double y);
+    virtual bool on_button_press_event(GdkEventButton *);
+    virtual bool on_button_release_event(GdkEventButton *);
+    virtual bool on_motion_notify_event(GdkEventMotion *);
   };
 
   class JuliaView: public View {
@@ -112,12 +122,10 @@ namespace mmui {
     bool on_key_release_event(GdkEventKey *);
 
     // Sub-widgets
-    View view;
+    MandelbrotView view;
     ControlPanel controls;
     Gtk::Frame frame;
     Gtk::VBox vbox;
-
-    MandelbrotJobFactory mandelbrotFactory;
   };
 
   class JuliaWindow: public Gtk::Window {

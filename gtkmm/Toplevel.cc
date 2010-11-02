@@ -22,7 +22,6 @@ namespace mmui {
   Toplevel::Toplevel(): controls(&view),
                         vbox(false, 0) {
     view.SetControlPanel(&controls);
-    view.SetJobFactory(&mandelbrotFactory);
     set_title("mandy");
     add_events(Gdk::KEY_RELEASE_MASK);
     frame.add(controls);
