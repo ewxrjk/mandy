@@ -38,6 +38,7 @@ namespace mmui {
   class Toplevel;
   class ControlPanel;
   class JuliaWindow;
+  class JuliaView;
 
   class View: public Gtk::DrawingArea {
   public:
@@ -53,7 +54,7 @@ namespace mmui {
     void Zoom(double x, double y, double scale);
     inline void SetControlPanel(ControlPanel *p) { controls = p; }
     inline void SetJobFactory(FractalJobFactory *jf) { jobFactory = jf; }
-    inline void SetJuliaWindow(JuliaWindow *w) { juliaWindow = w; }
+    inline void SetJuliaView(JuliaView *v) { juliaView = v; }
 
     // Parameters
     double xcenter, ycenter, radius;
@@ -86,8 +87,22 @@ namespace mmui {
 
     const FractalJobFactory *jobFactory;
 
-    JuliaWindow *juliaWindow;
+    JuliaView *juliaView;
     void NewJulia(double x, double y);
+  };
+
+  class JuliaView: public View {
+  public:
+    JuliaView();
+    JuliaJobFactory juliaFactory;
+
+    void Update(double x, double y) {
+      if(juliaFactory.cx != x || juliaFactory.cy != y) {
+        juliaFactory.cx = x;
+        juliaFactory.cy = y;
+        NewLocation();
+      }
+    }
   };
 
   class Toplevel: public Gtk::Window {
@@ -108,19 +123,10 @@ namespace mmui {
   class JuliaWindow: public Gtk::Window {
   public:
     JuliaWindow();
-    View view;
+    JuliaView view;
     ControlPanel controls;
     Gtk::Frame frame;
     Gtk::VBox vbox;
-    JuliaJobFactory juliaFactory;
-
-    void Update(double x, double y) {
-      if(juliaFactory.cx != x || juliaFactory.cy != y) {
-        juliaFactory.cx = x;
-        juliaFactory.cy = y;
-        view.NewLocation();
-      }
-    }
   };
 
 }

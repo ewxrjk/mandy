@@ -21,7 +21,7 @@ namespace mmui {
                 dragging(false),
                 controls(NULL),
                 jobFactory(NULL),
-                juliaWindow(NULL) {
+                juliaView(NULL) {
     set_size_request(384, 384);
     add_events(Gdk::BUTTON_PRESS_MASK
 	       |Gdk::BUTTON_RELEASE_MASK
@@ -308,7 +308,7 @@ namespace mmui {
   // Julia set integration ----------------------------------------------------
 
   void View::NewJulia(double xpos, double ypos) {
-    if(juliaWindow) {
+    if(juliaView) {
       int w, h;
       double x, y;
       get_window()->get_size(w, h);
@@ -319,10 +319,10 @@ namespace mmui {
         x = xcenter - radius * (xpos * 2.0 / w - 1);
         y = ycenter + radius * (ypos * 2.0 - h)/w;
       }
-      juliaWindow->Update(x, y);
-      char buffer[128];
-      snprintf(buffer, sizeof buffer, "Julia set at %g+%gi", x, y);
-      juliaWindow->set_title(buffer);
+      juliaView->Update(x, y);
+      //      char buffer[128];
+      //      snprintf(buffer, sizeof buffer, "Julia set at %g+%gi", x, y);
+      //      juliaWindow->set_title(buffer);
     }
   }
 }
