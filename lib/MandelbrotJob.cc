@@ -41,7 +41,7 @@ void MandelbrotJob::work() {
       const double cxq = (cx-0.25);
       const double cy2 = cy * cy;
       const double q = cxq * cxq + cy2;
-      if(4 * q * (q + cxq) < cy2) { // Main cardiod
+      if(4 * q * (q + cxq) < cy2) { // Main cardioid
 	iterations = maxiters;
 	goto done;
       }
