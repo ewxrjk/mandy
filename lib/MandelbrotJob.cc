@@ -61,12 +61,27 @@ void MandelbrotJob::work() {
       // then z^2 + c = zx^2 - zy^2 + cx + i(2zxzy+cy)
       int iterations = 0;
       double zx = 0, zy = 0, zx2, zy2;
+      // Optimizations as described in WP
+      const double cxq = (cx-0.25);
+      const double cy2 = cy * cy;
+      const double q = cxq * cxq + cy2;
+      if(4 * q * (q + cxq) < cy2) { // Main cardiod
+	iterations = maxiters;
+	goto done;
+      }
+      if(cx * cx + 2 * cx +1 + cy2 < 1.0/16) { // Period-2 bulb
+      	iterations = maxiters;
+      	goto done;
+      }
+      // TODO if the whole square is outside both regions, we could
+      // skip these tests.
       while(((zx2 = zx * zx) + (zy2 = zy * zy) < 4.0)
 	    && iterations < maxiters) {
 	zy = 2 * zx * zy  + cy;
 	zx = zx2 - zy2 + cx;
 	++iterations;
       }
+    done:
       *res++ = iterations;
     }
   }
