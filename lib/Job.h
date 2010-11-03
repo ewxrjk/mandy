@@ -26,6 +26,7 @@
  * of cores, the idea being that all the work gets done with a minimum of
  * context switching. */
 class Job {
+public:
   void (*completion_callback)(Job *, void *);   // called upon completion
   void *completion_data;                        // passed to callback
 
@@ -49,10 +50,13 @@ class Job {
       fatal(rc, "pthread_mutex_unlock");
   }
 public:
+  Job(void *ci = NULL): classId(ci) {}
   virtual ~Job();
 
   // Override in derived class to define what the job does
   virtual void work() = 0;
+
+  void *classId;
 
   // Submit the job.  It will be run at some point in a background thread
   // unless cancel() is called before it reaches the head of the queue.
@@ -64,8 +68,8 @@ public:
   void submit(void (*completion_callback)(Job *, void *),
               void *completion_data = NULL);
 
-  static void cancel();                 // cancel outstanding jobs
-  static void poll();                   // call outstanding completion callbacks
+  static void cancel(void *classId = NULL); // cancel outstanding jobs
+  static bool poll(int max = 16);      // call outstanding completion callbacks
 
   static void init();                   // initialize thread pool
   static void destroy();                // destroy thread pool

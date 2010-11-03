@@ -21,6 +21,7 @@
 #include "IterBuffer.h"
 #include "Job.h"
 #include "MandelbrotJob.h"
+#include "JuliaJob.h"
 
 #include <gtkmm/drawingarea.h>
 #include <gtkmm/window.h>
@@ -36,20 +37,23 @@ namespace mmui {
 
   class Toplevel;
   class ControlPanel;
+  class JuliaWindow;
+  class JuliaView;
 
   class View: public Gtk::DrawingArea {
   public:
     View();
-    bool on_button_press_event(GdkEventButton *);
-    bool on_button_release_event(GdkEventButton *);
-    bool on_motion_notify_event(GdkEventMotion *);
-    bool on_expose_event(GdkEventExpose *);
+    virtual bool on_button_press_event(GdkEventButton *);
+    virtual bool on_button_release_event(GdkEventButton *);
+    virtual bool on_motion_notify_event(GdkEventMotion *);
+    virtual bool on_expose_event(GdkEventExpose *);
 
     void NewLocation(int xpos = -1, int ypos = -1);
     void NewSize();
     void Drag(int deltax, int deltay);
     void Zoom(double x, double y, double scale);
     inline void SetControlPanel(ControlPanel *p) { controls = p; }
+    inline void SetJobFactory(FractalJobFactory *jf) { jobFactory = jf; }
 
     // Parameters
     double xcenter, ycenter, radius;
@@ -79,6 +83,36 @@ namespace mmui {
 
     // Control panel interface
     ControlPanel *controls;
+
+    const FractalJobFactory *jobFactory;
+  };
+
+  class MandelbrotView: public View {
+  public:
+    MandelbrotView();
+    MandelbrotJobFactory mandelbrotJobFactory;
+
+    JuliaView *juliaView;
+
+    inline void SetJuliaView(JuliaView *v) { juliaView = v; }
+    void NewJulia(double x, double y);
+    virtual bool on_button_press_event(GdkEventButton *);
+    virtual bool on_button_release_event(GdkEventButton *);
+    virtual bool on_motion_notify_event(GdkEventMotion *);
+  };
+
+  class JuliaView: public View {
+  public:
+    JuliaView();
+    JuliaJobFactory juliaJobFactory;
+
+    void Update(double x, double y) {
+      if(juliaJobFactory.cx != x || juliaJobFactory.cy != y) {
+        juliaJobFactory.cx = x;
+        juliaJobFactory.cy = y;
+        NewLocation();
+      }
+    }
   };
 
   class Toplevel: public Gtk::Window {
@@ -88,7 +122,16 @@ namespace mmui {
     bool on_key_release_event(GdkEventKey *);
 
     // Sub-widgets
-    View view;
+    MandelbrotView view;
+    ControlPanel controls;
+    Gtk::Frame frame;
+    Gtk::VBox vbox;
+  };
+
+  class JuliaWindow: public Gtk::Window {
+  public:
+    JuliaWindow();
+    JuliaView view;
     ControlPanel controls;
     Gtk::Frame frame;
     Gtk::VBox vbox;

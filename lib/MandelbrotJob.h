@@ -16,38 +16,18 @@
 #ifndef MANDELBROTJOB_H
 #define MANDELBROTJOB_H
 
-#include "Job.h"
+#include "FractalJob.h"
 
-class MandelbrotJob: public Job {
+class MandelbrotJob: public FractalJob {
 public:
-  IterBuffer *dest;                     // buffer to store results in
-  int x, y;                             // pixel location in buffer
-  int w, h;                             // pixel size in buffer
-  double xcenter, ycenter;              // complex-plane image location
-  double radius;                        // complex-plane radius
-  int maxiters;
-
-  ~MandelbrotJob();
-
-  // Construct a job which fills in a rectangle
-  MandelbrotJob(int x, int y,           // pixel location to draw at
-                int w, int h,           // pixel size to draw
-                double cx, double cy,   // center of image
-                double r,               // radius of biggest circle in image
-                int maxiters,           // max iteration count
-                IterBuffer *dest);
 
   // Do the computation (called in background thread)
   void work();
+};
 
-  // Create a new IterBuffer and start to asynchronously populate it.  It will
-  // be returned with one ref owned by the caller (and many by the background
-  // jobs).  Uncomputed locations are set to -1.
-  static IterBuffer *recompute(double cx, double cy, double r, 
-                               int maxiters, int w, int h,
-                               void (*completion_callback)(Job *, void *),
-                               void *completion_data,
-                               int xpos, int ypos);
+class MandelbrotJobFactory: public FractalJobFactory {
+public:
+  FractalJob *create() const;
 };
 
 #endif /* MANDELBROTJOB_H */

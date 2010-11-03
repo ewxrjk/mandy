@@ -13,5 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 noinst_LIBRARIES=libmandy.a
-libmandy_a_SOURCES=IterBuffer.cc Job.cc MandelbrotJob.cc fatal.cc	\
-IterBuffer.h Job.h MandelbrotJob.h mandy.h
+libmandy_a_SOURCES=FractalJob.cc IterBuffer.cc Job.cc JuliaJob.cc	\
+MandelbrotJob.cc fatal.cc FractalJob.h IterBuffer.h Job.h JuliaJob.h	\
+MandelbrotJob.h mandy.h
+

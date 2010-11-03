@@ -18,7 +18,9 @@
 namespace mmui {
   View::View(): xcenter(0), ycenter(0), radius(2), maxiters(255),
                 dest(NULL),
-                dragging(false) {
+                dragging(false),
+                controls(NULL),
+                jobFactory(NULL) {
     set_size_request(384, 384);
     add_events(Gdk::BUTTON_PRESS_MASK
 	       |Gdk::BUTTON_RELEASE_MASK
@@ -35,18 +37,24 @@ namespace mmui {
                             |GDK_CONTROL_MASK
                             |GDK_LOCK_MASK))) {
       Zoom(event->x, event->y, M_SQRT1_2);
-      controls->Update();
+      if(controls)
+        controls->Update();
       NewLocation();
       return true;
     }
-    // Double-click right button zooms out
+    // Double-click right button zooms out; control-double-click left also works.
     if(event->type == GDK_2BUTTON_PRESS
-       && event->button == 3
-       && !(event->state & (GDK_SHIFT_MASK
-                            |GDK_CONTROL_MASK
-                            |GDK_LOCK_MASK))) {
+       && ((event->button == 3
+            && !(event->state & (GDK_SHIFT_MASK
+                                 |GDK_CONTROL_MASK
+                                 |GDK_LOCK_MASK)))
+           || ((event->button == 1
+                && (event->state & (GDK_SHIFT_MASK
+                                    |GDK_CONTROL_MASK
+                                    |GDK_LOCK_MASK)) == GDK_CONTROL_MASK)))) {
       Zoom(event->x, event->y, M_SQRT2);
-      controls->Update();
+      if(controls)
+        controls->Update();
       NewLocation();
       return true;
     }
@@ -66,6 +74,7 @@ namespace mmui {
   }
 
   bool View::on_button_release_event(GdkEventButton *event) {
+    // Release left button ends drag
     if(event->type == GDK_BUTTON_RELEASE
        && event->button == 1) {
       if(dragging) {
@@ -103,7 +112,8 @@ namespace mmui {
       dragFromX = dragToX;
       dragFromY = dragToY;
       Drag(deltax, deltay);
-      controls->Update();
+      if(controls)
+        controls->Update();
       NewLocation(dragToX, dragToY);
     }
   }
@@ -135,7 +145,7 @@ namespace mmui {
   // Job completion callback
   void View::Completed(Job *generic_job, void *data) {
     View *v = (View *)data;
-    MandelbrotJob *j = dynamic_cast<MandelbrotJob *>(generic_job);
+    FractalJob *j = dynamic_cast<FractalJob *>(generic_job);
     // Ignore stale jobs
     if(j->dest != v->dest)
       return;
@@ -171,11 +181,12 @@ namespace mmui {
     // to provide continuity.
     if(xpos == -1 || ypos == -1)
       get_pointer(xpos, ypos);
-    dest = MandelbrotJob::recompute(xcenter, ycenter, radius,
-                                    maxiters, w, h,
-                                    Completed,
-                                    this,
-                                    xpos, ypos);
+    dest = FractalJob::recompute(xcenter, ycenter, radius,
+                                 maxiters, w, h,
+                                 Completed,
+                                 this,
+                                 xpos, ypos,
+                                 jobFactory);
     if(colors.size() != (unsigned)(maxiters + 1))
       NewColors();
   }
@@ -270,6 +281,7 @@ namespace mmui {
     }
     radius *= scale;
   }
+
 }
 
 /*

@@ -13,39 +13,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "mmui.h"
-#include <gtkmm/main.h>
+#include "mandy.h"
+#include "JuliaJob.h"
+#include <algorithm>
+#include <cstring>
 
-static sigc::connection pollAgainConnection;
-
-static bool pollAgainHandler() {
-  bool more = Job::poll(1);
-  return more;
+void JuliaJob::work() {
+  const int lx = x + w, ly = y + h;
+  for(int py = y; py < ly; ++py) {
+    int *res = dest->data + py * dest->w + x;
+    double izy = ybottom + (dest->h - 1 - py) * xsize / dest->w;
+    for(int px = x; px < lx; ++px) {
+      double izx = xleft + px * xsize / dest->w;
+      int iterations = 0;
+      double zx = izx, zy = izy, zx2, zy2;
+      while(((zx2 = zx * zx) + (zy2 = zy * zy) < 4.0)
+	    && iterations < maxiters) {
+	zy = 2 * zx * zy  + cy;
+	zx = zx2 - zy2 + cx;
+	++iterations;
+      }
+      *res++ = iterations;
+    }
+  }
 }
 
-static bool periodic() {
-  bool more = Job::poll(1);
-  if(more && !pollAgainConnection.connected())
-    pollAgainConnection = Glib::signal_idle().connect
-      (sigc::ptr_fun(pollAgainHandler));
-  return true;
-}
-
-int main(int argc, char **argv) {
-  Gtk::Main kit(argc, argv);
-
-  Job::init();
-  Glib::signal_timeout().connect
-    (sigc::ptr_fun(periodic), 10);
-
-  mmui::Toplevel toplevel;
-  mmui::JuliaWindow julia;
-  toplevel.view.NewSize();
-  toplevel.view.SetJuliaView(&julia.view);
-  julia.view.NewSize();
-
-  Gtk::Main::run(toplevel);
-  return 0;
+FractalJob *JuliaJobFactory::create() const {
+  return new JuliaJob(cx, cy);
 }
 
 /*

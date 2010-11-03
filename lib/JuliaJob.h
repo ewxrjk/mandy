@@ -13,40 +13,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "mmui.h"
-#include <gtkmm/main.h>
+#ifndef JULIAJOB_H
+#define JULIAJOB_H
 
-static sigc::connection pollAgainConnection;
+#include "FractalJob.h"
 
-static bool pollAgainHandler() {
-  bool more = Job::poll(1);
-  return more;
-}
+class JuliaJob: public FractalJob {
+  double cx, cy;
+public:
+  JuliaJob(double cx_, double cy_): cx(cx_), cy(cy_) {
+  }
 
-static bool periodic() {
-  bool more = Job::poll(1);
-  if(more && !pollAgainConnection.connected())
-    pollAgainConnection = Glib::signal_idle().connect
-      (sigc::ptr_fun(pollAgainHandler));
-  return true;
-}
+  // Do the computation (called in background thread)
+  void work();
+};
 
-int main(int argc, char **argv) {
-  Gtk::Main kit(argc, argv);
+class JuliaJobFactory: public FractalJobFactory {
+public:
+  JuliaJobFactory(): cx(0), cy(0) {
+  }
+  double cx, cy;
+  FractalJob *create() const;
+};
 
-  Job::init();
-  Glib::signal_timeout().connect
-    (sigc::ptr_fun(periodic), 10);
-
-  mmui::Toplevel toplevel;
-  mmui::JuliaWindow julia;
-  toplevel.view.NewSize();
-  toplevel.view.SetJuliaView(&julia.view);
-  julia.view.NewSize();
-
-  Gtk::Main::run(toplevel);
-  return 0;
-}
+#endif /* JULIAJOB_H */
 
 /*
 Local Variables:

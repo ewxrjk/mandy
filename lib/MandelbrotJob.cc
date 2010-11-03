@@ -18,31 +18,7 @@
 #include <algorithm>
 #include <cstring>
 
-MandelbrotJob::MandelbrotJob(int x_, int y_,
-			     int w_, int h_,
-			     double cx_, double cy_,
-			     double cr_,
-			     int maxiters_,
-			     IterBuffer *dest_):
-  dest(dest_),
-  x(x_), y(y_),
-  w(w_), h(h_),
-  xcenter(cx_), ycenter(cy_), radius(cr_),
-  maxiters(maxiters_) {
-  dest->acquire();
-}
-
 void MandelbrotJob::work() {
-  // Compute the full size of the rectangle
-  const double xleft = xcenter - (dest->w > dest->h
-				  ? radius * dest->w / dest->h
-				  : radius);
-  const double ybottom = ycenter - (dest->w > dest->h
-				    ? radius
-				    : radius * dest->h / dest->w);
-  const double xsize = (dest->w > dest->h
-			? radius * 2 * dest->w / dest->h
-			: radius * 2);
   // Compute the pixel limits
   const int lx = x + w, ly = y + h;
   // Iterate over rows
@@ -87,47 +63,16 @@ void MandelbrotJob::work() {
   }
 }
 
-struct comparator {
-  int cx, cy;
-  comparator(int cx_, int cy_): cx(cx_), cy(cy_) {}
-  int operator()(MandelbrotJob *a, MandelbrotJob *b) {
-    int adx = a->x - cx, ady = a->y - cy;
-    int ar2 = adx * adx + ady * ady;
-    int bdx = b->x - cx, bdy = b->y - cy;
-    int br2 = bdx * bdx + bdy * bdy;
-    return ar2 < br2;
-  }
-};
-
-IterBuffer *MandelbrotJob::recompute(double cx, double cy, double r, 
-				     int maxiters, int w, int h,
-				     void (*completion_callback)(Job *, void *),
-				     void *completion_data,
-				     int xpos, int ypos) {
-  // Discard stale work
-  Job::cancel();
-  IterBuffer *dest = new IterBuffer(w, h);
-  // Set everything to 'unknown'
-  memset(dest->data, 0xFF, dest->w * dest->h * sizeof(int));
-  // Chunks need to be large enough that the overhead of jobs doesn't
-  // add up to much but small enough that stale jobs don't hog the CPU
-  // much.
-  const int chunk = 32;
-  std::vector<MandelbrotJob *> jobs;
-  for(int px = 0; px < dest->w; px += chunk) {
-    const int pw = std::min(chunk, dest->w - px);
-    for(int py = 0; py < dest->h; py += chunk) {
-      const int ph = std::min(chunk, dest->h - py);
-      jobs.push_back(new MandelbrotJob(px, py, pw, ph, cx, cy, r, maxiters, dest));
-    }
-  }
-  comparator c(xpos, ypos);
-  std::sort(jobs.begin(), jobs.end(), c);
-  for(size_t n = 0; n < jobs.size(); ++n)
-    jobs[n]->submit(completion_callback, completion_data);
-  return dest;
+FractalJob *MandelbrotJobFactory::create() const {
+  return new MandelbrotJob();
 }
 
-MandelbrotJob::~MandelbrotJob() {
-  dest->release();
-}
+/*
+Local Variables:
+mode:c++
+c-basic-offset:2
+comment-column:40
+fill-column:79
+indent-tabs-mode:nil
+End:
+*/

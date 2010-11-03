@@ -1,0 +1,17 @@
+
+2010-11-01:
+
+11:19 < fanf2> rjk: can you do the mouseover julias in real time without the 
+               reverse iteration trick now?
+11:23 < fanf2> calculate the inverse of z -> z^2 + c (you get two answers each 
+               time; pick one at random) and plot the course of the point. it 
+               is attracted to the boundary of the julia set and wanders around 
+               it
+11:23 < fanf2> you can use this to draw julias very fast on 1990-era hardware
+
+
+13:54 < fanf2> rjk: re julia sets: you should have a mode where the julia set 
+               is displayed with the same zoom and co-ordinates as the 
+               mandelbrot set, because that best demonstrates the similarity 
+               between them, especially at misiurewicz points. c = i is an 
+               excellent example
