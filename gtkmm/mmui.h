@@ -127,6 +127,7 @@ namespace mmui {
     Gtk::MenuItem helpItem;
     Gtk::Menu helpMenu;
       Gtk::MenuItem aboutItem;
+      void AboutActivated();
   };
 
   class Toplevel: public Gtk::Window {

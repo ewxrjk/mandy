@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "mmui.h"
+#include <gtkmm/dialog.h>
 
 namespace mmui {
   Menubar::Menubar(): fileItem("File"),
@@ -29,10 +30,29 @@ namespace mmui {
     append(helpItem);
     helpItem.set_submenu(helpMenu);
     helpMenu.append(aboutItem);
+    aboutItem.signal_activate().connect(sigc::mem_fun(*this,
+                                                      &Menubar::AboutActivated));
   }
 
   void Menubar::QuitActivated() {
     exit(0);
+  }
+
+  void Menubar::AboutActivated() {
+    Gtk::Dialog about("About Mandy",
+                      get_parent(),
+                      true/*modal*/);
+    Gtk::VBox *vbox = about.get_vbox();
+    Gtk::Label name;
+    name.set_markup("<span font_desc=\"Sans 36\">Mandy</span>");
+    Gtk::Label description("Mandelbrot/Julia Set Generator");
+    Gtk::Label copyright("Version "VERSION" \xC2\xA9 2010 Richard Kettlewell");
+    vbox->pack_start(name);
+    vbox->pack_start(description);
+    vbox->pack_start(copyright);
+    about.add_button("OK", 0);
+    about.show_all();
+    about.run();
   }
 }
 
