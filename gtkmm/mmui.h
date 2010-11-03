@@ -30,6 +30,7 @@
 #include <gtkmm/entry.h>
 #include <gtkmm/table.h>
 #include <gtkmm/frame.h>
+#include <gtkmm/menubar.h>
 
 #include "Controls.h"
 
@@ -115,6 +116,19 @@ namespace mmui {
     }
   };
 
+  class Menubar: public Gtk::MenuBar {
+  public:
+    Menubar();
+    Gtk::MenuItem fileItem;
+    Gtk::Menu fileMenu;
+      Gtk::MenuItem quitItem;
+      void QuitActivated();
+
+    Gtk::MenuItem helpItem;
+    Gtk::Menu helpMenu;
+      Gtk::MenuItem aboutItem;
+  };
+
   class Toplevel: public Gtk::Window {
   public:
     Toplevel();
@@ -122,6 +136,7 @@ namespace mmui {
     bool on_key_release_event(GdkEventKey *);
 
     // Sub-widgets
+    Menubar menubar;
     MandelbrotView view;
     ControlPanel controls;
     Gtk::Frame frame;
