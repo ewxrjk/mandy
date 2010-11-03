@@ -121,12 +121,12 @@ namespace mmui {
     Menubar();
     Gtk::MenuItem fileItem;
     Gtk::Menu fileMenu;
-      Gtk::MenuItem quitItem;
+      Gtk::ImageMenuItem quitItem;
       void QuitActivated();
 
     Gtk::MenuItem helpItem;
     Gtk::Menu helpMenu;
-      Gtk::MenuItem aboutItem;
+      Gtk::ImageMenuItem aboutItem;
       void AboutActivated();
   };
 

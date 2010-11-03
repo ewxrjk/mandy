@@ -15,12 +15,13 @@
  */
 #include "mmui.h"
 #include <gtkmm/dialog.h>
+#include <gtkmm/stock.h>
 
 namespace mmui {
   Menubar::Menubar(): fileItem("File"),
-                        quitItem("Quit"),
+                        quitItem(Gtk::Stock::QUIT),
                       helpItem("Help"),
-                        aboutItem("About") {
+                        aboutItem(Gtk::Stock::ABOUT) {
     append(fileItem);
     fileItem.set_submenu(fileMenu);
     fileMenu.append(quitItem);
