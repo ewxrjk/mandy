@@ -16,6 +16,9 @@
 #include "mmui.h"
 #include <gtkmm/main.h>
 
+mmui::Toplevel *mmui::toplevel;
+mmui::JuliaWindow *mmui::julia;
+
 static sigc::connection pollAgainConnection;
 
 static bool pollAgainHandler() {
@@ -38,13 +41,13 @@ int main(int argc, char **argv) {
   Glib::signal_timeout().connect
     (sigc::ptr_fun(periodic), 10);
 
-  mmui::Toplevel toplevel;
-  mmui::JuliaWindow julia;
-  toplevel.view.NewSize();
-  toplevel.view.SetJuliaView(&julia.view);
-  julia.view.NewSize();
+  mmui::toplevel = new mmui::Toplevel();
+  mmui::julia = new mmui::JuliaWindow();
+  mmui::toplevel->view.NewSize();
+  mmui::toplevel->view.SetJuliaView(&mmui::julia->view);
+  mmui::julia->view.NewSize();
 
-  Gtk::Main::run(toplevel);
+  Gtk::Main::run(*mmui::toplevel);
   return 0;
 }
 

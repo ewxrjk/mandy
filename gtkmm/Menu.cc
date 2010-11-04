@@ -18,10 +18,10 @@
 #include <gtkmm/stock.h>
 
 namespace mmui {
-  Menubar::Menubar(Toplevel *toplevel_):
-    toplevel(toplevel_),
+  Menubar::Menubar():
     fileItem("File"),
-      saveImageItem("Save image"),
+      saveMandelbrotImageItem("Save Mandelbrot set image"),
+      saveJuliaImageItem("Save Julia set image"),
       quitItem(Gtk::Stock::QUIT),
     helpItem("Help"),
       aboutItem(Gtk::Stock::ABOUT) {
@@ -29,10 +29,15 @@ namespace mmui {
     append(fileItem);
     fileItem.set_submenu(fileMenu);
 
-    fileMenu.append(saveImageItem);
-    saveImageItem.signal_activate().connect
+    fileMenu.append(saveMandelbrotImageItem);
+    saveMandelbrotImageItem.signal_activate().connect
       (sigc::mem_fun(*this,
-                     &Menubar::SaveImageActivated));
+                     &Menubar::SaveMandelbrotImageActivated));
+
+    fileMenu.append(saveJuliaImageItem);
+    saveJuliaImageItem.signal_activate().connect
+      (sigc::mem_fun(*this,
+                     &Menubar::SaveJuliaImageActivated));
 
     fileMenu.append(quitItem);
     quitItem.signal_activate().connect(sigc::mem_fun(*this,
@@ -67,8 +72,12 @@ namespace mmui {
     about.run();
   }
 
-  void Menubar::SaveImageActivated() {
+  void Menubar::SaveMandelbrotImageActivated() {
     toplevel->view.Save();
+  }
+
+  void Menubar::SaveJuliaImageActivated() {
+    julia->view.Save();
   }
 }
 

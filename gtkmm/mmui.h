@@ -120,11 +120,13 @@ namespace mmui {
 
   class Menubar: public Gtk::MenuBar {
   public:
-    Menubar(Toplevel *toplevel);
+    Menubar();
     Gtk::MenuItem fileItem;
     Gtk::Menu fileMenu;
-      Gtk::MenuItem saveImageItem;
-      void SaveImageActivated();
+      Gtk::MenuItem saveMandelbrotImageItem;
+      void SaveMandelbrotImageActivated();
+      Gtk::MenuItem saveJuliaImageItem;
+      void SaveJuliaImageActivated();
       Gtk::ImageMenuItem quitItem;
       void QuitActivated();
 
@@ -133,7 +135,6 @@ namespace mmui {
       Gtk::ImageMenuItem aboutItem;
       void AboutActivated();
 
-    Toplevel *toplevel;
   };
 
   class Toplevel: public Gtk::Window {
@@ -158,6 +159,10 @@ namespace mmui {
     Gtk::Frame frame;
     Gtk::VBox vbox;
   };
+
+
+  extern Toplevel *toplevel;
+  extern JuliaWindow *julia;
 
 }
 
