@@ -19,7 +19,8 @@
 
 namespace mmui {
 
-  Toplevel::Toplevel(): controls(&view),
+  Toplevel::Toplevel(): menubar(this),
+                        controls(&view),
                         vbox(false, 0) {
     view.SetControlPanel(&controls);
     set_title("mandy");

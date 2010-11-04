@@ -18,18 +18,29 @@
 #include <gtkmm/stock.h>
 
 namespace mmui {
-  Menubar::Menubar(): fileItem("File"),
-                        quitItem(Gtk::Stock::QUIT),
-                      helpItem("Help"),
-                        aboutItem(Gtk::Stock::ABOUT) {
+  Menubar::Menubar(Toplevel *toplevel_):
+    toplevel(toplevel_),
+    fileItem("File"),
+      saveImageItem("Save image"),
+      quitItem(Gtk::Stock::QUIT),
+    helpItem("Help"),
+      aboutItem(Gtk::Stock::ABOUT) {
+
     append(fileItem);
     fileItem.set_submenu(fileMenu);
+
+    fileMenu.append(saveImageItem);
+    saveImageItem.signal_activate().connect
+      (sigc::mem_fun(*this,
+                     &Menubar::SaveImageActivated));
+
     fileMenu.append(quitItem);
     quitItem.signal_activate().connect(sigc::mem_fun(*this,
                                                      &Menubar::QuitActivated));
 
     append(helpItem);
     helpItem.set_submenu(helpMenu);
+
     helpMenu.append(aboutItem);
     aboutItem.signal_activate().connect(sigc::mem_fun(*this,
                                                       &Menubar::AboutActivated));
@@ -54,6 +65,10 @@ namespace mmui {
     about.add_button("OK", 0);
     about.show_all();
     about.run();
+  }
+
+  void Menubar::SaveImageActivated() {
+    toplevel->view.Save();
   }
 }
 

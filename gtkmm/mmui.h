@@ -56,6 +56,8 @@ namespace mmui {
     inline void SetControlPanel(ControlPanel *p) { controls = p; }
     inline void SetJobFactory(FractalJobFactory *jf) { jobFactory = jf; }
 
+    void Save();
+
     // Parameters
     double xcenter, ycenter, radius;
     int maxiters;
@@ -118,9 +120,11 @@ namespace mmui {
 
   class Menubar: public Gtk::MenuBar {
   public:
-    Menubar();
+    Menubar(Toplevel *toplevel);
     Gtk::MenuItem fileItem;
     Gtk::Menu fileMenu;
+      Gtk::MenuItem saveImageItem;
+      void SaveImageActivated();
       Gtk::ImageMenuItem quitItem;
       void QuitActivated();
 
@@ -128,6 +132,8 @@ namespace mmui {
     Gtk::Menu helpMenu;
       Gtk::ImageMenuItem aboutItem;
       void AboutActivated();
+
+    Toplevel *toplevel;
   };
 
   class Toplevel: public Gtk::Window {
