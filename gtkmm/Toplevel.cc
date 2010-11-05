@@ -25,6 +25,7 @@ namespace mmui {
     set_title("mandy");
     add_events(Gdk::KEY_RELEASE_MASK);
     frame.add(controls);
+    vbox.pack_start(menubar, false, false, 1);
     vbox.pack_start(frame, false, false, 1);
     vbox.pack_end(view, true, true, 0);
     add(vbox);

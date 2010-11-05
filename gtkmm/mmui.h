@@ -30,6 +30,7 @@
 #include <gtkmm/entry.h>
 #include <gtkmm/table.h>
 #include <gtkmm/frame.h>
+#include <gtkmm/menubar.h>
 
 #include "Controls.h"
 
@@ -54,6 +55,8 @@ namespace mmui {
     void Zoom(double x, double y, double scale);
     inline void SetControlPanel(ControlPanel *p) { controls = p; }
     inline void SetJobFactory(FractalJobFactory *jf) { jobFactory = jf; }
+
+    void Save();
 
     // Parameters
     double xcenter, ycenter, radius;
@@ -115,6 +118,25 @@ namespace mmui {
     }
   };
 
+  class Menubar: public Gtk::MenuBar {
+  public:
+    Menubar();
+    Gtk::MenuItem fileItem;
+    Gtk::Menu fileMenu;
+      Gtk::MenuItem saveMandelbrotImageItem;
+      void SaveMandelbrotImageActivated();
+      Gtk::MenuItem saveJuliaImageItem;
+      void SaveJuliaImageActivated();
+      Gtk::ImageMenuItem quitItem;
+      void QuitActivated();
+
+    Gtk::MenuItem helpItem;
+    Gtk::Menu helpMenu;
+      Gtk::ImageMenuItem aboutItem;
+      void AboutActivated();
+
+  };
+
   class Toplevel: public Gtk::Window {
   public:
     Toplevel();
@@ -122,6 +144,7 @@ namespace mmui {
     bool on_key_release_event(GdkEventKey *);
 
     // Sub-widgets
+    Menubar menubar;
     MandelbrotView view;
     ControlPanel controls;
     Gtk::Frame frame;
@@ -136,6 +159,10 @@ namespace mmui {
     Gtk::Frame frame;
     Gtk::VBox vbox;
   };
+
+
+  extern Toplevel *toplevel;
+  extern JuliaWindow *julia;
 
 }
 

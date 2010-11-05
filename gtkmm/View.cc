@@ -14,6 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "mmui.h"
+#include <gtkmm/filechooserdialog.h>
+#include <gtkmm/stock.h>
 
 namespace mmui {
   View::View(): xcenter(0), ycenter(0), radius(2), maxiters(255),
@@ -280,6 +282,26 @@ namespace mmui {
       ycenter += radius * (1-scale) * ((h - 1 - y) * 2 - h) / w;
     }
     radius *= scale;
+  }
+
+  void View::Save() {
+    Gtk::Widget *w = this;
+    Gtk::Window *parent;
+    do {
+      w = w->get_parent();
+    } while((parent = dynamic_cast<Gtk::Window *>(w)) == NULL);
+    Gtk::FileChooserDialog chooser(*parent,
+                                   "Save image",
+                                   Gtk::FILE_CHOOSER_ACTION_SAVE);
+    chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
+    chooser.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_ACCEPT);
+    if(chooser.run() != Gtk::RESPONSE_ACCEPT)
+      return;
+    std::string path = chooser.get_filename();
+    // TODO check for overwrite
+    // TODO wait for pixbuf to finish rendering
+    pixbuf->save(path, "png");
+    // TODO support other file formats!
   }
 
 }
