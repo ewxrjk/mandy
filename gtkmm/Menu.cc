@@ -23,6 +23,8 @@ namespace mmui {
       saveMandelbrotImageItem("Save Mandelbrot set image"),
       saveJuliaImageItem("Save Julia set image"),
       quitItem(Gtk::Stock::QUIT),
+    windowsItem("Windows"),
+      juliaItem("Julia set"),
     helpItem("Help"),
       aboutItem(Gtk::Stock::ABOUT) {
 
@@ -42,6 +44,15 @@ namespace mmui {
     fileMenu.append(quitItem);
     quitItem.signal_activate().connect(sigc::mem_fun(*this,
                                                      &Menubar::QuitActivated));
+    
+    append(windowsItem);
+    windowsItem.set_submenu(windowsMenu);
+    
+    windowsMenu.append(juliaItem);
+    juliaItem.signal_toggled().connect(sigc::mem_fun(*this,
+                                                     &Menubar::JuliaToggled));
+    windowsMenu.signal_show().connect(sigc::mem_fun(*this,
+                                                    &Menubar::WindowsShown));
 
     append(helpItem);
     helpItem.set_submenu(helpMenu);
@@ -78,6 +89,20 @@ namespace mmui {
 
   void Menubar::SaveJuliaImageActivated() {
     julia->view.Save();
+  }
+
+  void Menubar::WindowsShown() {
+    if(julia)
+      juliaItem.set_active(julia->property_visible());
+  }
+
+  void Menubar::JuliaToggled() {
+    if(julia && juliaItem.get_active() != julia->property_visible()) {
+      if(juliaItem.get_active())
+        julia->show_all();
+      else
+        julia->hide();
+    }
   }
 }
 

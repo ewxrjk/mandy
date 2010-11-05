@@ -125,7 +125,8 @@ namespace mmui {
   bool View::on_expose_event(GdkEventExpose *) {
     int w, h;
     get_window()->get_size(w, h);
-    if(w != pixbuf->get_width()
+    if(!pixbuf
+       || w != pixbuf->get_width()
        || h != pixbuf->get_height()) {
       // The pixbuf is the wrong size (i.e. the window has been
       // resized).  Attempt a recompute.
@@ -171,6 +172,8 @@ namespace mmui {
 
   // Called to set a new location, scale or maxiters
   void View::NewLocation(int xpos, int ypos) {
+    if(!property_visible())
+      return;
     if(dest) {
       dest->release();
       dest = NULL;
@@ -194,6 +197,8 @@ namespace mmui {
   }
 
   void View::NewSize() {
+    if(!property_visible())
+      return;
     // If there's a pixbuf it'll be the wrong size, so delete it.  We draw it
     // first to provide visual continuity.
     if(pixbuf) {

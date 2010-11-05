@@ -25,7 +25,11 @@ namespace mmui {
     vbox.pack_end(view, true, true, 0);
     add(vbox);
     set_title("Julia Set");
-    show_all();
+  }
+
+  bool JuliaWindow::on_delete_event(GdkEventAny *) {
+    hide();
+    return true;
   }
 
   JuliaView::JuliaView() {

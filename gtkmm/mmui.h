@@ -130,6 +130,12 @@ namespace mmui {
       Gtk::ImageMenuItem quitItem;
       void QuitActivated();
 
+    Gtk::MenuItem windowsItem;
+    Gtk::Menu windowsMenu;
+    void WindowsShown();
+      Gtk::CheckMenuItem juliaItem;
+      void JuliaToggled();
+
     Gtk::MenuItem helpItem;
     Gtk::Menu helpMenu;
       Gtk::ImageMenuItem aboutItem;
@@ -158,6 +164,8 @@ namespace mmui {
     ControlPanel controls;
     Gtk::Frame frame;
     Gtk::VBox vbox;
+
+    virtual bool on_delete_event(GdkEventAny *);
   };
 
 
