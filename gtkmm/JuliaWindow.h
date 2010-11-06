@@ -20,8 +20,6 @@
 #include "Controls.h"
 
 #include <gtkmm/window.h>
-#include <gtkmm/frame.h>
-#include <gtkmm/box.h>
 
 namespace mmui {
 
@@ -30,8 +28,6 @@ namespace mmui {
     JuliaWindow();
     JuliaView view;
     ControlPanel controls;
-    Gtk::Frame frame;
-    Gtk::VBox vbox;
 
     virtual bool on_delete_event(GdkEventAny *);
   };

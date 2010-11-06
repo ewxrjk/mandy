@@ -18,19 +18,22 @@
 #include "MainMenu.h"
 #include "MandelbrotWindow.h"
 #include <gdk/gdkkeysyms.h>
+#include <gtkmm/frame.h>
+#include <gtkmm/box.h>
 
 namespace mmui {
 
-  MandelbrotWindow::MandelbrotWindow(): controls(&view),
-                                        vbox(false, 0) {
+  MandelbrotWindow::MandelbrotWindow(): controls(&view) {
     view.SetControlPanel(&controls);
     set_title("mandy");
     add_events(Gdk::KEY_RELEASE_MASK);
-    frame.add(controls);
-    vbox.pack_start(*manage(new Menubar()), false, false, 1);
-    vbox.pack_start(frame, false, false, 1);
-    vbox.pack_end(view, true, true, 0);
-    add(vbox);
+    Gtk::Frame *frame = manage(new Gtk::Frame());
+    frame->add(controls);
+    Gtk::VBox *vbox = manage(new Gtk::VBox(false, 0));
+    vbox->pack_start(*manage(new Menubar()), false, false, 1);
+    vbox->pack_start(*frame, false, false, 1);
+    vbox->pack_end(view, true, true, 0);
+    add(*vbox);
     show_all();
   }
 

@@ -16,17 +16,20 @@
 #include "mmui.h"
 #include "MainMenu.h"
 #include "JuliaWindow.h"
+#include <gtkmm/frame.h>
+#include <gtkmm/box.h>
 
 namespace mmui {
 
-  JuliaWindow::JuliaWindow(): controls(&view),
-                              vbox(false, 0) {
+  JuliaWindow::JuliaWindow(): controls(&view) {
     view.SetControlPanel(&controls);
-    frame.add(controls);
-    vbox.pack_start(*manage(new Menubar()), false, false, 1);
-    vbox.pack_start(frame, false, false, 1);
-    vbox.pack_end(view, true, true, 0);
-    add(vbox);
+    Gtk::Frame *frame = manage(new Gtk::Frame());
+    frame->add(controls);
+    Gtk::VBox *vbox = manage(new Gtk::VBox(false, 0));
+    vbox->pack_start(*manage(new Menubar()), false, false, 1);
+    vbox->pack_start(*frame, false, false, 1);
+    vbox->pack_end(view, true, true, 0);
+    add(*vbox);
     set_title("Julia Set");
   }
 

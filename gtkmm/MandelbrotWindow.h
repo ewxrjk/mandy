@@ -20,8 +20,6 @@
 #include "MandelbrotView.h"
 #include "Controls.h"
 #include <gtkmm/window.h>
-#include <gtkmm/frame.h>
-#include <gtkmm/box.h>
 
 namespace mmui {
 
@@ -34,8 +32,6 @@ namespace mmui {
     // Sub-widgets
     MandelbrotView view;
     ControlPanel controls;
-    Gtk::Frame frame;
-    Gtk::VBox vbox;
   };
 
 }
