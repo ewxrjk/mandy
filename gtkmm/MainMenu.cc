@@ -17,6 +17,7 @@
 #include <gtkmm/dialog.h>
 #include <gtkmm/stock.h>
 #include "MainMenu.h"
+#include "JuliaWindow.h"
 
 namespace mmui {
 

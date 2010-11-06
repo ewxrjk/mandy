@@ -103,20 +103,6 @@ namespace mmui {
     virtual bool on_motion_notify_event(GdkEventMotion *);
   };
 
-  class JuliaView: public View {
-  public:
-    JuliaView();
-    JuliaJobFactory juliaJobFactory;
-
-    void Update(double x, double y) {
-      if(juliaJobFactory.cx != x || juliaJobFactory.cy != y) {
-        juliaJobFactory.cx = x;
-        juliaJobFactory.cy = y;
-        NewLocation();
-      }
-    }
-  };
-
   class Toplevel: public Gtk::Window {
   public:
     Toplevel();
@@ -129,18 +115,6 @@ namespace mmui {
     Gtk::Frame frame;
     Gtk::VBox vbox;
   };
-
-  class JuliaWindow: public Gtk::Window {
-  public:
-    JuliaWindow();
-    JuliaView view;
-    ControlPanel controls;
-    Gtk::Frame frame;
-    Gtk::VBox vbox;
-
-    virtual bool on_delete_event(GdkEventAny *);
-  };
-
 
   extern Toplevel *toplevel;
   extern JuliaWindow *julia;

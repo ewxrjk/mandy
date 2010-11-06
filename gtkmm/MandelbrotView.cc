@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "mmui.h"
+#include "JuliaView.h"
 
 namespace mmui {
 

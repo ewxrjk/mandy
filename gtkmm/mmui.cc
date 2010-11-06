@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "mmui.h"
+#include "JuliaWindow.h"
 #include <gtkmm/main.h>
 
 mmui::Toplevel *mmui::toplevel;

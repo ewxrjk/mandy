@@ -14,7 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 bin_PROGRAMS=mandy
 mandy_SOURCES=Controls.cc JuliaWindow.cc MainMenu.cc MandelbrotView.cc	\
-Toplevel.cc View.cc mmui.cc Controls.h MainMenu.h mmui.h
+Toplevel.cc View.cc mmui.cc Controls.h JuliaView.h JuliaWindow.h	\
+MainMenu.h mmui.h
 mandy_LDADD=../lib/libmandy.a $(gtkmm_LIBS)
 AM_CPPFLAGS=-I${top_srcdir}/lib
 AM_CXXFLAGS=$(gtkmm_CFLAGS)

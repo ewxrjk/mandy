@@ -13,33 +13,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "mmui.h"
-#include "MainMenu.h"
-#include "JuliaWindow.h"
+
+#ifndef JULIAVIEW_H
+#define JULIAVIEW_H
 
 namespace mmui {
 
-  JuliaWindow::JuliaWindow(): controls(&view),
-                              vbox(false, 0) {
-    view.SetControlPanel(&controls);
-    frame.add(controls);
-    vbox.pack_start(*manage(new Menubar()), false, false, 1);
-    vbox.pack_start(frame, false, false, 1);
-    vbox.pack_end(view, true, true, 0);
-    add(vbox);
-    set_title("Julia Set");
-  }
+  class ControlPanel;
 
-  bool JuliaWindow::on_delete_event(GdkEventAny *) {
-    hide();
-    return true;
-  }
+  class JuliaView: public View {
+  public:
+    JuliaView();
+    JuliaJobFactory juliaJobFactory;
 
-  JuliaView::JuliaView() {
-    SetJobFactory(&juliaJobFactory);
-  }
+    void Update(double x, double y) {
+      if(juliaJobFactory.cx != x || juliaJobFactory.cy != y) {
+        juliaJobFactory.cx = x;
+        juliaJobFactory.cy = y;
+        NewLocation();
+      }
+    }
+  };
 
 }
+
+#endif /* JULIAVIEW_H */
 
 /*
 Local Variables:
