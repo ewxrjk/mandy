@@ -14,32 +14,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef JULIAVIEW_H
-#define JULIAVIEW_H
+#ifndef MANDELBROTVIEW_H
+#define MANDELBROTVIEW_H
 
 #include "View.h"
 
 namespace mmui {
 
-  class ControlPanel;
-
-  class JuliaView: public View {
+  class MandelbrotView: public View {
   public:
-    JuliaView();
-    JuliaJobFactory juliaJobFactory;
+    MandelbrotView();
+    MandelbrotJobFactory mandelbrotJobFactory;
 
-    void Update(double x, double y) {
-      if(juliaJobFactory.cx != x || juliaJobFactory.cy != y) {
-        juliaJobFactory.cx = x;
-        juliaJobFactory.cy = y;
-        NewLocation();
-      }
-    }
+    JuliaView *juliaView;
+
+    inline void SetJuliaView(JuliaView *v) { juliaView = v; }
+    void NewJulia(double x, double y);
+    virtual bool on_button_press_event(GdkEventButton *);
+    virtual bool on_button_release_event(GdkEventButton *);
+    virtual bool on_motion_notify_event(GdkEventMotion *);
   };
+
 
 }
 
-#endif /* JULIAVIEW_H */
+#endif /* MANDELBROTVIEW_H */
 
 /*
 Local Variables:

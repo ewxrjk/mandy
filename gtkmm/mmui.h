@@ -39,55 +39,6 @@ namespace mmui {
   class JuliaWindow;
   class JuliaView;
 
-  class View: public Gtk::DrawingArea {
-  public:
-    View();
-    virtual bool on_button_press_event(GdkEventButton *);
-    virtual bool on_button_release_event(GdkEventButton *);
-    virtual bool on_motion_notify_event(GdkEventMotion *);
-    virtual bool on_expose_event(GdkEventExpose *);
-
-    void NewLocation(int xpos = -1, int ypos = -1);
-    void NewSize();
-    void Drag(int deltax, int deltay);
-    void Zoom(double x, double y, double scale);
-    inline void SetControlPanel(ControlPanel *p) { controls = p; }
-    inline void SetJobFactory(FractalJobFactory *jf) { jobFactory = jf; }
-
-    void Save();
-
-    // Parameters
-    double xcenter, ycenter, radius;
-    int maxiters;
-
-  private:
-    // Colors
-    struct color { unsigned char r, g, b; };
-    std::vector<color> colors;
-    void NewColors();                   // recompute colors array
-
-    // Iteration count and pixel data
-    IterBuffer *dest;
-    Glib::RefPtr<Gdk::Pixbuf> pixbuf;
-
-    void Redraw(int x, int y, int w, int h);
-    static void Completed(Job *generic_job, void *completion_data);
-
-    // Dragging support
-    bool dragging;
-    double dragFromX, dragFromY;
-    double dragToX, dragToY;
-    sigc::connection dragIdleConnection;
-
-    void DragComplete();
-    bool DragIdle();
-
-    // Control panel interface
-    ControlPanel *controls;
-
-    const FractalJobFactory *jobFactory;
-  };
-
   extern MandelbrotWindow *mandelbrot;
   extern JuliaWindow *julia;
 
