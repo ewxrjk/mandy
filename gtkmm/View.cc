@@ -15,6 +15,7 @@
  */
 #include "mmui.h"
 #include "View.h"
+#include "Controls.h"
 #include <gtkmm/filechooserdialog.h>
 #include <gtkmm/stock.h>
 

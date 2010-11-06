@@ -15,6 +15,7 @@
  */
 #include "mmui.h"
 #include "View.h"
+#include "Controls.h"
 #include <cerrno>
 
 namespace mmui {

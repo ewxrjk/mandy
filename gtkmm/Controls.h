@@ -16,6 +16,10 @@
 #ifndef CONTROLS_H
 #define CONTROLS_H
 
+#include <gtkmm/label.h>
+#include <gtkmm/entry.h>
+#include <gtkmm/table.h>
+
 namespace mmui {
 
   class ControlPanel;

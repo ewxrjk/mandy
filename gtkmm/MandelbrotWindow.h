@@ -17,8 +17,11 @@
 #ifndef MANDELBROTWINDOW_H
 #define MANDELBROTWINDOW_H
 
-#include <gtkmm/window.h>
 #include "MandelbrotView.h"
+#include "Controls.h"
+#include <gtkmm/window.h>
+#include <gtkmm/frame.h>
+#include <gtkmm/box.h>
 
 namespace mmui {
 

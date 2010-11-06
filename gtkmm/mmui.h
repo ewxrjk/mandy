@@ -23,15 +23,6 @@
 #include "MandelbrotJob.h"
 #include "JuliaJob.h"
 
-#include <gtkmm/drawingarea.h>
-#include <gtkmm/box.h>
-#include <gtkmm/label.h>
-#include <gtkmm/entry.h>
-#include <gtkmm/table.h>
-#include <gtkmm/frame.h>
-
-#include "Controls.h"
-
 namespace mmui {
 
   class MandelbrotWindow;

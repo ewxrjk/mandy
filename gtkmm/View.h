@@ -17,6 +17,8 @@
 #ifndef VIEW_H
 #define VIEW_H
 
+#include <gtkmm/drawingarea.h>
+
 namespace mmui {
 
   class ControlPanel;

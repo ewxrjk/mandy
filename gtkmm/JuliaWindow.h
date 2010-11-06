@@ -16,8 +16,12 @@
 #ifndef JULIAWINDOW_H
 #define JULIAWINDOW_H
 
-#include <gtkmm/window.h>
 #include "JuliaView.h"
+#include "Controls.h"
+
+#include <gtkmm/window.h>
+#include <gtkmm/frame.h>
+#include <gtkmm/box.h>
 
 namespace mmui {
 
