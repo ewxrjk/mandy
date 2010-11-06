@@ -58,8 +58,6 @@ namespace mmui {
       quitItem.signal_activate().connect(sigc::ptr_fun(QuitActivated));
     }
 
-    GenericWindow *parent;
-
     Gtk::MenuItem saveMandelbrotImageItem;
     static void SaveMandelbrotImageActivated() {
       mandelbrot->view.Save();
