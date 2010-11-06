@@ -78,9 +78,6 @@ namespace mmui {
         y = ycenter + radius * (ypos * 2.0 - h)/w;
       }
       juliaView->Update(x, y);
-      //      char buffer[128];
-      //      snprintf(buffer, sizeof buffer, "Julia set at %g+%gi", x, y);
-      //      juliaWindow->set_title(buffer);
     }
   }
 }

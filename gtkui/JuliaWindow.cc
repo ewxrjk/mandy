@@ -34,6 +34,16 @@ namespace mmui {
     SetJobFactory(&juliaJobFactory);
   }
 
+  void JuliaView::Update(double x, double y) {
+    if(juliaJobFactory.cx != x || juliaJobFactory.cy != y) {
+      juliaJobFactory.cx = x;
+      juliaJobFactory.cy = y;
+      NewLocation();
+      char buffer[128];
+      snprintf(buffer, sizeof buffer, "Julia set at %g+%gi", x, y);
+      dynamic_cast<Gtk::Window *>(get_parent()->get_parent())->set_title(buffer);
+    }
+  }
 }
 
 /*

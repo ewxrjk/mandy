@@ -29,13 +29,7 @@ namespace mmui {
     JuliaView();
     JuliaJobFactory juliaJobFactory;
 
-    void Update(double x, double y) {
-      if(juliaJobFactory.cx != x || juliaJobFactory.cy != y) {
-        juliaJobFactory.cx = x;
-        juliaJobFactory.cy = y;
-        NewLocation();
-      }
-    }
+    void Update(double x, double y);
   };
 
 }
