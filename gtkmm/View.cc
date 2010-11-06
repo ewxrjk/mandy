@@ -19,6 +19,7 @@
 #include "FractalJob.h"
 #include <gtkmm/filechooserdialog.h>
 #include <gtkmm/stock.h>
+#include <algorithm>
 
 namespace mmui {
   View::View(): xcenter(0), ycenter(0), radius(2), maxiters(255),
@@ -202,16 +203,54 @@ namespace mmui {
   void View::NewSize() {
     if(!property_visible())
       return;
+    int wNew, hNew;
+    get_window()->get_size(wNew, hNew);
     // If there's a pixbuf it'll be the wrong size, so delete it.  We draw it
     // first to provide visual continuity.
     if(pixbuf) {
-      // TODO ideally we would rescale the pixbuf
+      // Figure out the scale factor
+      int wOld = pixbuf->get_width(), hOld = pixbuf->get_height();
+      double xsizeOld = (wOld > hOld
+                        ? radius * 2 * wOld / hOld
+                         : radius * 2);
+      double xsizeNew = (wNew > hNew
+                        ? radius * 2 * wNew / hNew
+                         : radius * 2);
+      double xpixelOld = xsizeOld / wOld;
+      double xpixelNew = xsizeNew / wNew;
+      double scale = xpixelOld / xpixelNew;
+      // The size of the rescaled image
+      int wScaled = wOld * scale, hScaled = hOld * scale;
+      // The rescaling parameters.  If the rescaled image is narrower than the
+      // new window then it will be offset into it, otherwise it will up at the
+      // edge.
+      double dest_x = wNew > wScaled ? (wNew - wScaled)/2 : 0;
+      double dest_y = hNew > hScaled ? (hNew - hScaled)/2 : 0;
+      // The rescaled image is clipped ot the sizeof the new window.
+      double dest_w = std::min(wNew, wScaled);
+      double dest_h = std::min(hNew, hScaled);
+      // The rescaled image is offset to make the centres lines up.
+      double offset_x = (wNew - wScaled)/2;
+      double offset_y = (hNew - hScaled)/2;
+      // Create the new pixbuf
+      Glib::RefPtr<Gdk::Pixbuf> newPixbuf
+        = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, false, 8, wNew, hNew);
+      // Areas outside the rescaled image will be mid-grey
+      memset(newPixbuf->get_pixels(),
+             0x80,
+             newPixbuf->get_rowstride() * hNew);
+      // Do the scale
+      pixbuf->scale(newPixbuf,
+                    dest_x, dest_y,
+                    dest_w, dest_h,
+                    offset_x, offset_y,
+                    scale, scale,
+                    Gdk::INTERP_NEAREST);
+      // Use the new pixbuf henceforth
+      pixbuf = newPixbuf;
       Redraw(0, 0, pixbuf->get_width(), pixbuf->get_height());
-      pixbuf.reset();
     }
-    int w, h;
-    get_window()->get_size(w, h);
-    NewLocation(w/2, h/2);
+    NewLocation(wNew/2, hNew/2);
   }
 
   // Colors -------------------------------------------------------------------
