@@ -19,6 +19,10 @@
 
 #include <gtkmm/drawingarea.h>
 
+class IterBuffer;
+class FractalJobFactory;
+class Job;
+
 namespace mmui {
 
   class ControlPanel;

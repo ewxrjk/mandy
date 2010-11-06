@@ -18,6 +18,7 @@
 #define MANDELBROTVIEW_H
 
 #include "View.h"
+#include "MandelbrotJob.h"
 
 namespace mmui {
 

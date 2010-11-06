@@ -18,10 +18,6 @@
 #define MMUI_H
 
 #include "mandy.h"
-#include "IterBuffer.h"
-#include "Job.h"
-#include "MandelbrotJob.h"
-#include "JuliaJob.h"
 
 namespace mmui {
 

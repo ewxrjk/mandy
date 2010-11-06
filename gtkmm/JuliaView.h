@@ -18,6 +18,7 @@
 #define JULIAVIEW_H
 
 #include "View.h"
+#include "JuliaJob.h"
 
 namespace mmui {
 

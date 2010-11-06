@@ -16,7 +16,7 @@
 #include "mmui.h"
 #include <gtkmm/dialog.h>
 #include <gtkmm/stock.h>
-#include <typeinfo>
+#include <gtkmm/menu.h>
 #include "MainMenu.h"
 #include "JuliaWindow.h"
 #include "MandelbrotWindow.h"

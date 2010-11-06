@@ -18,7 +18,7 @@
 #define MENU_H
 
 #include <gtkmm/menubar.h>
-#include <gtkmm/menu.h>
+#include <gtkmm/menuitem.h>
 
 namespace mmui {
 
