@@ -47,9 +47,9 @@ namespace mmui {
 	int w, h;
         view->get_window()->get_size(w, h);
 	if(event->keyval == GDK_equal || event->keyval == GDK_KP_Add)
-          view->Zoom(w/2, h/2, M_SQRT1_2);
+          view->Zoom(w/2.0, h/2.0, M_SQRT1_2);
 	else
-          view->Zoom(w/2, h/2, M_SQRT2);
+          view->Zoom(w/2.0, h/2.0, M_SQRT2);
 	controls->Update();
 	view->NewLocation(w/2, h/2);
 	return true;

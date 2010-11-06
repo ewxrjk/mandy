@@ -284,10 +284,10 @@ namespace mmui {
      */
     if(w > h) {
       xcenter += radius * (1-scale) * (x * 2.0 - w) / h;
-      ycenter += radius * (1-scale) * ((h - 1 - y) * 2.0 / h - 1);
+      ycenter -= radius * (1-scale) * (y * 2.0 / h - 1);
     } else {
       xcenter += radius * (1-scale) * (x * 2.0 / w - 1);
-      ycenter += radius * (1-scale) * ((h - 1 - y) * 2 - h) / w;
+      ycenter -= radius * (1-scale) * (y * 2.0 - h) / w;
     }
     radius *= scale;
   }
