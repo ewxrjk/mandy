@@ -21,21 +21,13 @@
 
 namespace mmui {
 
-  JuliaWindow::JuliaWindow(): controls(&view) {
-    view.SetControlPanel(&controls);
-    Gtk::Frame *frame = manage(new Gtk::Frame());
-    frame->add(controls);
-    Gtk::VBox *vbox = manage(new Gtk::VBox(false, 0));
-    vbox->pack_start(*manage(new Menubar()), false, false, 1);
-    vbox->pack_start(*frame, false, false, 1);
-    vbox->pack_end(view, true, true, 0);
-    add(*vbox);
+  JuliaWindow::JuliaWindow() {
+    Initialize(&view);
     set_title("Julia Set");
   }
 
-  bool JuliaWindow::on_delete_event(GdkEventAny *) {
+  void JuliaWindow::close() {
     hide();
-    return true;
   }
 
   JuliaView::JuliaView() {

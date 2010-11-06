@@ -13,24 +13,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef JULIAWINDOW_H
-#define JULIAWINDOW_H
 
-#include "JuliaView.h"
-#include "GenericWindow.h"
+#ifndef GENERICWINDOW_H
+#define GENERICWINDOW_H
+
+#include "View.h"
+#include <gtkmm/window.h>
 
 namespace mmui {
 
-  class JuliaWindow: public GenericWindow {
+  class GenericWindow: public Gtk::Window {
   public:
-    JuliaWindow();
-    JuliaView view;
-    void close();
+    GenericWindow();
+    void Initialize(View *view_);
+    virtual bool on_key_release_event(GdkEventKey *);
+    virtual bool on_delete_event(GdkEventAny *);
+
+    virtual void close() = 0;
+    
+    // Sub-widgets
+    View *view;
+    ControlPanel *controls;
   };
 
 }
 
-#endif /* MMUI_H */
+#endif /* GENERICWINDOW_H */
 
 /*
 Local Variables:

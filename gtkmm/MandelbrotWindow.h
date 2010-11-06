@@ -18,20 +18,15 @@
 #define MANDELBROTWINDOW_H
 
 #include "MandelbrotView.h"
-#include "Controls.h"
-#include <gtkmm/window.h>
+#include "GenericWindow.h"
 
 namespace mmui {
 
-  class MandelbrotWindow: public Gtk::Window {
+  class MandelbrotWindow: public GenericWindow {
   public:
     MandelbrotWindow();
-    bool on_delete_event(GdkEventAny *);
-    bool on_key_release_event(GdkEventKey *);
-
-    // Sub-widgets
     MandelbrotView view;
-    ControlPanel controls;
+    void close();
   };
 
 }

@@ -23,46 +23,14 @@
 
 namespace mmui {
 
-  MandelbrotWindow::MandelbrotWindow(): controls(&view) {
-    view.SetControlPanel(&controls);
+  MandelbrotWindow::MandelbrotWindow() {
+    Initialize(&view);
     set_title("mandy");
-    add_events(Gdk::KEY_RELEASE_MASK);
-    Gtk::Frame *frame = manage(new Gtk::Frame());
-    frame->add(controls);
-    Gtk::VBox *vbox = manage(new Gtk::VBox(false, 0));
-    vbox->pack_start(*manage(new Menubar()), false, false, 1);
-    vbox->pack_start(*frame, false, false, 1);
-    vbox->pack_end(view, true, true, 0);
-    add(*vbox);
     show_all();
   }
 
-  bool MandelbrotWindow::on_delete_event(GdkEventAny *) {
-    Job::destroy();
+  void MandelbrotWindow::close() {
     exit(0);
-  }
-
-  bool MandelbrotWindow::on_key_release_event(GdkEventKey *event) {
-    if((event->state & (Gdk::SHIFT_MASK|Gdk::CONTROL_MASK)) == Gdk::CONTROL_MASK) {
-      switch(event->keyval) {
-      case 'w': case 'W':
-	Job::destroy();
-	exit(0);
-      case GDK_equal: case GDK_minus: case GDK_KP_Add: case GDK_KP_Subtract: {
-	int w, h;
-        view.get_window()->get_size(w, h);
-	if(event->keyval == GDK_equal || event->keyval == GDK_KP_Add)
-          view.Zoom(w/2, h/2, M_SQRT1_2);
-	else
-          view.Zoom(w/2, h/2, M_SQRT2);
-	controls.Update();
-	view.NewLocation(w/2, h/2);
-	return true;
-      }
-      }
-    }
-    return false;
-
   }
 
 }

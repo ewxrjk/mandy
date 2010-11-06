@@ -13,10 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 bin_PROGRAMS=mandy
-mandy_SOURCES=Controls.cc JuliaWindow.cc MainMenu.cc MandelbrotView.cc	\
-MandelbrotWindow.cc View.cc mmui.cc Controls.h JuliaView.h		\
-JuliaWindow.h MainMenu.h MandelbrotView.h MandelbrotWindow.h View.h	\
-mmui.h
+mandy_SOURCES=Controls.cc GenericWindow.cc JuliaWindow.cc MainMenu.cc	\
+MandelbrotView.cc MandelbrotWindow.cc View.cc mmui.cc Controls.h	\
+GenericWindow.h JuliaView.h JuliaWindow.h MainMenu.h MandelbrotView.h	\
+MandelbrotWindow.h View.h mmui.h
 mandy_LDADD=../lib/libmandy.a $(gtkmm_LIBS)
 AM_CPPFLAGS=-I${top_srcdir}/lib
 AM_CXXFLAGS=$(gtkmm_CFLAGS)

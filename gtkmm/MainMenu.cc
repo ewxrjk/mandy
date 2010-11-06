@@ -16,20 +16,32 @@
 #include "mmui.h"
 #include <gtkmm/dialog.h>
 #include <gtkmm/stock.h>
+#include <typeinfo>
 #include "MainMenu.h"
 #include "JuliaWindow.h"
 #include "MandelbrotWindow.h"
 
 namespace mmui {
 
+  static GenericWindow *FindParent(Gtk::Menu *menu) {
+    GenericWindow *parent = NULL;
+    Gtk::Widget *attached = menu->property_attach_widget();
+    Gtk::Container *w = attached->get_parent();
+    while(w && (parent = dynamic_cast<GenericWindow *>(w)) == NULL)
+      w = w->get_parent();
+    return parent;
+  }
+
   // File menu ----------------------------------------------------------------
 
   class FileMenu: public Gtk::Menu {
   public:
-    FileMenu(): saveMandelbrotImageItem("Save Mandelbrot set image"),
-                saveJuliaImageItem("Save Julia set image"),
-                quitItem(Gtk::Stock::QUIT) {
-
+    FileMenu():
+      saveMandelbrotImageItem("Save Mandelbrot set image"),
+      saveJuliaImageItem("Save Julia set image"),
+      closeItem(Gtk::Stock::CLOSE),
+      quitItem(Gtk::Stock::QUIT)
+    {
       append(saveMandelbrotImageItem);
       saveMandelbrotImageItem.signal_activate().connect
         (sigc::ptr_fun(SaveMandelbrotImageActivated));
@@ -38,9 +50,15 @@ namespace mmui {
       saveJuliaImageItem.signal_activate().connect
         (sigc::ptr_fun(SaveJuliaImageActivated));
 
+      append(closeItem);
+      closeItem.signal_activate().connect(sigc::mem_fun(*this,
+                                                        &FileMenu::CloseActivated));
+
       append(quitItem);
       quitItem.signal_activate().connect(sigc::ptr_fun(QuitActivated));
     }
+
+    GenericWindow *parent;
 
     Gtk::MenuItem saveMandelbrotImageItem;
     static void SaveMandelbrotImageActivated() {
@@ -52,8 +70,14 @@ namespace mmui {
       julia->view.Save();
     }
 
-    Gtk::ImageMenuItem quitItem;
+    Gtk::ImageMenuItem closeItem;
+    void CloseActivated() {
+      GenericWindow *parent = FindParent(this);
+      if(parent)
+        parent->close();
+    }
 
+    Gtk::ImageMenuItem quitItem;
     static void QuitActivated() {
       exit(0);
     }
@@ -105,7 +129,7 @@ namespace mmui {
 
     void AboutActivated() {
       Gtk::Dialog about("About Mandy",
-                        get_parent(),
+                        FindParent(this),
                         true/*modal*/);
       Gtk::VBox *vbox = about.get_vbox();
       Gtk::Label name;
