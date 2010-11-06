@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "mmui.h"
+#include "MainMenu.h"
 
 namespace mmui {
 
@@ -21,6 +22,7 @@ namespace mmui {
                               vbox(false, 0) {
     view.SetControlPanel(&controls);
     frame.add(controls);
+    vbox.pack_start(*manage(new Menubar()), false, false, 1);
     vbox.pack_start(frame, false, false, 1);
     vbox.pack_end(view, true, true, 0);
     add(vbox);
