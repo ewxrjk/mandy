@@ -15,9 +15,10 @@
  */
 #include "mmui.h"
 #include "JuliaWindow.h"
+#include "MandelbrotWindow.h"
 #include <gtkmm/main.h>
 
-mmui::Toplevel *mmui::toplevel;
+mmui::MandelbrotWindow *mmui::mandelbrot;
 mmui::JuliaWindow *mmui::julia;
 
 static sigc::connection pollAgainConnection;
@@ -42,13 +43,13 @@ int main(int argc, char **argv) {
   Glib::signal_timeout().connect
     (sigc::ptr_fun(periodic), 10);
 
-  mmui::toplevel = new mmui::Toplevel();
+  mmui::mandelbrot = new mmui::MandelbrotWindow();
   mmui::julia = new mmui::JuliaWindow();
-  mmui::toplevel->view.NewSize();
-  mmui::toplevel->view.SetJuliaView(&mmui::julia->view);
+  mmui::mandelbrot->view.NewSize();
+  mmui::mandelbrot->view.SetJuliaView(&mmui::julia->view);
   mmui::julia->view.NewSize();
 
-  Gtk::Main::run(*mmui::toplevel);
+  Gtk::Main::run(*mmui::mandelbrot);
   return 0;
 }
 

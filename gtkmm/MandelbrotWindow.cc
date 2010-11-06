@@ -16,12 +16,13 @@
 #include "mmui.h"
 #include "Job.h"
 #include "MainMenu.h"
+#include "MandelbrotWindow.h"
 #include <gdk/gdkkeysyms.h>
 
 namespace mmui {
 
-  Toplevel::Toplevel(): controls(&view),
-                        vbox(false, 0) {
+  MandelbrotWindow::MandelbrotWindow(): controls(&view),
+                                        vbox(false, 0) {
     view.SetControlPanel(&controls);
     set_title("mandy");
     add_events(Gdk::KEY_RELEASE_MASK);
@@ -33,12 +34,12 @@ namespace mmui {
     show_all();
   }
 
-  bool Toplevel::on_delete_event(GdkEventAny *) {
+  bool MandelbrotWindow::on_delete_event(GdkEventAny *) {
     Job::destroy();
     exit(0);
   }
 
-  bool Toplevel::on_key_release_event(GdkEventKey *event) {
+  bool MandelbrotWindow::on_key_release_event(GdkEventKey *event) {
     if((event->state & (Gdk::SHIFT_MASK|Gdk::CONTROL_MASK)) == Gdk::CONTROL_MASK) {
       switch(event->keyval) {
       case 'w': case 'W':

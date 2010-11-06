@@ -13,28 +13,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef JULIAWINDOW_H
-#define JULIAWINDOW_H
+
+#ifndef MANDELBROTWINDOW_H
+#define MANDELBROTWINDOW_H
 
 #include <gtkmm/window.h>
-#include "JuliaView.h"
+#include "MandelbrotView.h"
 
 namespace mmui {
 
-  class JuliaWindow: public Gtk::Window {
+  class MandelbrotWindow: public Gtk::Window {
   public:
-    JuliaWindow();
-    JuliaView view;
+    MandelbrotWindow();
+    bool on_delete_event(GdkEventAny *);
+    bool on_key_release_event(GdkEventKey *);
+
+    // Sub-widgets
+    MandelbrotView view;
     ControlPanel controls;
     Gtk::Frame frame;
     Gtk::VBox vbox;
-
-    virtual bool on_delete_event(GdkEventAny *);
   };
 
 }
 
-#endif /* MMUI_H */
+#endif /* MANDELBROTWINDOW_H */
 
 /*
 Local Variables:

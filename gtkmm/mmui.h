@@ -24,7 +24,6 @@
 #include "JuliaJob.h"
 
 #include <gtkmm/drawingarea.h>
-#include <gtkmm/window.h>
 #include <gtkmm/box.h>
 #include <gtkmm/label.h>
 #include <gtkmm/entry.h>
@@ -35,7 +34,7 @@
 
 namespace mmui {
 
-  class Toplevel;
+  class MandelbrotWindow;
   class ControlPanel;
   class JuliaWindow;
   class JuliaView;
@@ -89,34 +88,7 @@ namespace mmui {
     const FractalJobFactory *jobFactory;
   };
 
-  class MandelbrotView: public View {
-  public:
-    MandelbrotView();
-    MandelbrotJobFactory mandelbrotJobFactory;
-
-    JuliaView *juliaView;
-
-    inline void SetJuliaView(JuliaView *v) { juliaView = v; }
-    void NewJulia(double x, double y);
-    virtual bool on_button_press_event(GdkEventButton *);
-    virtual bool on_button_release_event(GdkEventButton *);
-    virtual bool on_motion_notify_event(GdkEventMotion *);
-  };
-
-  class Toplevel: public Gtk::Window {
-  public:
-    Toplevel();
-    bool on_delete_event(GdkEventAny *);
-    bool on_key_release_event(GdkEventKey *);
-
-    // Sub-widgets
-    MandelbrotView view;
-    ControlPanel controls;
-    Gtk::Frame frame;
-    Gtk::VBox vbox;
-  };
-
-  extern Toplevel *toplevel;
+  extern MandelbrotWindow *mandelbrot;
   extern JuliaWindow *julia;
 
 }

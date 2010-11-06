@@ -18,6 +18,7 @@
 #include <gtkmm/stock.h>
 #include "MainMenu.h"
 #include "JuliaWindow.h"
+#include "MandelbrotWindow.h"
 
 namespace mmui {
 
@@ -43,7 +44,7 @@ namespace mmui {
 
     Gtk::MenuItem saveMandelbrotImageItem;
     static void SaveMandelbrotImageActivated() {
-      toplevel->view.Save();
+      mandelbrot->view.Save();
     }
 
     Gtk::MenuItem saveJuliaImageItem;

@@ -15,12 +15,12 @@
  */
 #include "mmui.h"
 #include "JuliaView.h"
+#include "MandelbrotView.h"
 
 namespace mmui {
 
   MandelbrotView::MandelbrotView(): juliaView(NULL) {
     SetJobFactory(&mandelbrotJobFactory);
-    
   }
 
   bool MandelbrotView::on_button_press_event(GdkEventButton *event) {
