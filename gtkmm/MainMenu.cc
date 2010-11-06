@@ -25,7 +25,7 @@ namespace mmui {
 
   static GenericWindow *FindParent(Gtk::Menu *menu) {
     GenericWindow *parent = NULL;
-    Gtk::Widget *attached = menu->property_attach_widget();
+    Gtk::Widget *attached = menu->get_attach_widget();
     Gtk::Container *w = attached->get_parent();
     while(w && (parent = dynamic_cast<GenericWindow *>(w)) == NULL)
       w = w->get_parent();
