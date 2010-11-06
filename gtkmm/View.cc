@@ -305,6 +305,8 @@ namespace mmui {
     std::string path = chooser.get_filename();
     // TODO check for overwrite
     // TODO wait for pixbuf to finish rendering
+    while(Job::pending())
+      Job::poll(INT_MAX);
     pixbuf->save(path, "png");
     // TODO support other file formats!
   }

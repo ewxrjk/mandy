@@ -118,6 +118,13 @@ void *Job::worker(void *) {
 Job::~Job() {
 }
 
+bool Job::pending() {
+  acquireLock();
+  bool more = !completed.empty() || !queue.empty();
+  releaseLock();
+  return more;
+}
+
 std::list<Job *> Job::queue;
 std::list<Job *> Job::completed;
 pthread_cond_t Job::queued = PTHREAD_COND_INITIALIZER;

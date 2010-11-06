@@ -70,6 +70,7 @@ public:
 
   static void cancel(void *classId = NULL); // cancel outstanding jobs
   static bool poll(int max = 16);      // call outstanding completion callbacks
+  static bool pending();               // any work left?
 
   static void init();                   // initialize thread pool
   static void destroy();                // destroy thread pool
