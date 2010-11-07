@@ -1,0 +1,8 @@
+?package(disobedience):\
+	needs="x11" \
+	section="Applications/Science/Mathematics" \
+	title="Mandy" \
+        icon16x16="/usr/share/pixmaps/mandy16x16.xpm" \
+        icon32x32="/usr/share/pixmaps/mandy32x32.xpm" \
+	longtitle="Mandelbrot set viewer" \
+	command="/usr/bin/mandy"

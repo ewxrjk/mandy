@@ -48,8 +48,14 @@ export INSTALL_PROGRAM
 SHELL=bash
 
 build:
-	@test -e configure || echo ./autogen.sh; ./autogen.sh
-	./configure ${CONFIGURE} ${CONFIGURE_EXTRA}
+	@if test ! -e configure; then \
+	  echo ./autogen.sh ;\
+	  ./autogen.sh ;\
+	fi
+	@if test ! -e config.status; then \
+	  echo ./configure ${CONFIGURE} ${CONFIGURE_EXTRA} ;\
+	  ./configure ${CONFIGURE} ${CONFIGURE_EXTRA} ;\
+	fi
 	$(MAKE)
 
 binary: binary-arch binary-indep
@@ -63,18 +69,33 @@ clean:
 	rm -f debian/substvars.*
 	rm -rf debian/mandy
 
+ICON=minimand
 pkg-mandy: build
 	rm -rf debian/mandy
 	$(MKDIR) debian/mandy/DEBIAN
 	$(MKDIR) debian/mandy/usr/share/doc/mandy
+	$(MKDIR) debian/mandy/usr/share/menu
+	$(MKDIR) debian/mandy/usr/share/pixmaps
 	$(INSTALL_DATA) debian/changelog debian/mandy/usr/share/doc/mandy/.
 	$(INSTALL_DATA) README debian/mandy/usr/share/doc/mandy/.
 	gzip -9 debian/mandy/usr/share/doc/mandy/*
 	$(INSTALL_DATA) debian/copyright debian/mandy/usr/share/doc/mandy/.
+	$(INSTALL_DATA) images/$(ICON)16.xpm \
+		debian/mandy/usr/share/pixmaps/mandy16x16.xpm
+	$(INSTALL_DATA) images/$(ICON)32.xpm \
+		debian/mandy/usr/share/pixmaps/mandy32x32.xpm
+	$(INSTALL_DATA) debian/usr.share.menu.mandy \
+		debian/mandy/usr/share/menu/mandy
 	$(MAKE) DESTDIR=$(shell pwd)/debian/mandy installdirs install
 	gzip -9 debian/mandy/usr/share/man/*/*
 	strip --remove-section=.comment debian/mandy/usr/bin/*
 	dpkg-shlibdeps -Tdebian/substvars.mandy debian/mandy/usr/bin/*
+	@for f in preinst postinst prerm postrm conffiles templates config; do\
+	  if test -e debian/$$f.mandy; then\
+	    echo $(INSTALL_SCRIPT) debian/$$f.mandy debian/mandy/DEBIAN/$$f; \
+	    $(INSTALL_SCRIPT) debian/$$f.mandy debian/mandy/DEBIAN/$$f; \
+	  fi;\
+	done
 	cd debian/mandy \
 		&& find -name DEBIAN -prune -o -type f -print \
 			| sed 's/^\.\///' \
