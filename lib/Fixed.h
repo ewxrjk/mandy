@@ -200,6 +200,12 @@ public:
   std::string toString(int base = 10) const;
 
 };
+
+inline fixed sqrt(const fixed &f) {
+  fixed r;
+  Fixed_sqrt(&r.f, &f.f);
+  return r;
+}
 #endif
 
 #endif /* FIXED_H */
