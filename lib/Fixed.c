@@ -176,6 +176,24 @@ void Fixed_2str(char buffer[], unsigned bufsize, const struct Fixed *a,
   buffer[i] = 0;
 }
 
+int Fixed_lt(const struct Fixed *a, const struct Fixed *b) {
+  int n;
+  if(a->word[NFIXED - 1] != b->word[NFIXED - 1])
+    return (int32_t)a->word[NFIXED - 1] < (int32_t)b->word[NFIXED - 1];
+  for(n = NFIXED - 2; n >= 0; --n)
+    if(a->word[n] != b->word[n])
+      return a->word[n] < b->word[n];
+  return 0;
+}
+
+int Fixed_eq(const struct Fixed *a, const struct Fixed *b) {
+  int n;
+  for(n = 0; n < NFIXED; ++n)
+    if(a->word[n] != b->word[n])
+      return 0;
+  return 1;
+}
+
 /*
 Local Variables:
 mode:c
