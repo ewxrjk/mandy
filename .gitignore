@@ -21,3 +21,4 @@ gtkui/images.h
 debian/mandy
 debian/substvars.*
 debian/files
+lib/fixed-test

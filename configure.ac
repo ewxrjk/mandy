@@ -18,6 +18,7 @@ AM_INIT_AUTOMAKE([mandy], [0.0.WIP])
 AC_CONFIG_SRCDIR([lib/MandelbrotJob.cc])
 AM_CONFIG_HEADER([config.h])
 AC_LANG([C++])
+AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_RANLIB
 AC_SET_MAKE
@@ -25,6 +26,9 @@ PKG_CHECK_MODULES([gtkmm], [gtkmm-2.4])
 AC_DEFINE([_GNU_SOURCE], [1], [use GNU extensions])
 if test "x$GXX" = xyes; then
   CXX="$CXX -Wall -W -Werror -Wpointer-arith -Wwrite-strings"
+fi
+if test "x$GCC" = xyes; then
+  CC="$CC -Wall -W -Werror -Wpointer-arith -Wwrite-strings"
 fi
 AC_CONFIG_FILES([Makefile lib/Makefile images/Makefile gtkui/Makefile])
 AC_OUTPUT
