@@ -20,6 +20,7 @@
 #include <gtkmm/filechooserdialog.h>
 #include <gtkmm/stock.h>
 #include <algorithm>
+#include <cstring>
 
 namespace mmui {
   View::View(): xcenter(0), ycenter(0), radius(2), maxiters(255),
