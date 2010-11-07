@@ -19,6 +19,7 @@
 #include "FractalJob.h"
 #include <gtkmm/filechooserdialog.h>
 #include <gtkmm/stock.h>
+#include <gtkmm/image.h>
 #include <algorithm>
 
 namespace mmui {

@@ -16,7 +16,16 @@ bin_PROGRAMS=mandy
 mandy_SOURCES=Controls.cc GenericWindow.cc JuliaWindow.cc MainMenu.cc	\
 MandelbrotView.cc MandelbrotWindow.cc View.cc mmui.cc Controls.h	\
 GenericWindow.h JuliaView.h JuliaWindow.h MainMenu.h MandelbrotView.h	\
-MandelbrotWindow.h View.h mmui.h
+MandelbrotWindow.h View.h images.h mmui.h
 mandy_LDADD=../lib/libmandy.a $(gtkmm_LIBS)
 AM_CPPFLAGS=-I${top_srcdir}/lib
 AM_CXXFLAGS=$(gtkmm_CFLAGS)
+
+EMBED_IMAGE=${top_srcdir}/images/minimand256.png
+
+MainMenu.o: images.h
+
+images.h: ${EMBED_IMAGE}
+	gdk-pixbuf-csource --raw --name=logodata ${EMBED_IMAGE} > images.h.new
+	mv images.h.new images.h
+

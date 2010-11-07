@@ -17,3 +17,4 @@ config.status
 configure
 stamp-h1
 *.a
+gtkui/images.h
