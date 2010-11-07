@@ -23,8 +23,8 @@ class FractalJobFactory;
 class FractalJob: public Job {
 public:
   IterBuffer *dest;                     // buffer to store results in
-  double xleft, ybottom;                // complex-plane location
-  double xsize;                         // complex-plane size
+  arith_t xleft, ybottom;               // complex-plane location
+  arith_t xsize;                        // complex-plane size
   int maxiters;                         // maximum iterations
   int x, y;                             // pixel location
   int w, h;                             // pixel dimensions
@@ -37,7 +37,7 @@ public:
   }
 
   void set(IterBuffer *dest_,
-           double xcenter_, double ycenter_, double radius_,
+           arith_t xcenter_, arith_t ycenter_, arith_t radius_,
            int maxiters_, int x_, int y_,int w_ ,int h_) {
     dest = dest_;
     xleft = xcenter_ - (dest->w > dest->h
@@ -60,7 +60,7 @@ public:
   // Create a new IterBuffer and start to asynchronously populate it.  It will
   // be returned with one ref owned by the caller (and many by the background
   // jobs).  Uncomputed locations are set to -1.
-  static IterBuffer *recompute(double cx, double cy, double r,
+  static IterBuffer *recompute(arith_t cx, arith_t cy, arith_t r,
                                int maxiters, int w, int h,
                                void (*completion_callback)(Job *, void *),
                                void *completion_data,

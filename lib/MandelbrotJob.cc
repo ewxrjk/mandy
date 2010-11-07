@@ -26,21 +26,21 @@ void MandelbrotJob::work() {
     // Starting point for this row's results
     int *res = dest->data + py * dest->w + x;
     // Complex-plane location of this row
-    const double cy = ybottom + (dest->h - 1 - py) * xsize / dest->w;
+    const arith_t cy = ybottom + (dest->h - 1 - py) * xsize / dest->w;
     // Iterate over columns
     for(int px = x; px < lx; ++px) {
       // Complex-plane location of this column
-      const double cx = xleft + px * xsize / dest->w;
+      const arith_t cx = xleft + px * xsize / dest->w;
       // let c = cx + icy
       // let z = zx + izy
       //
       // then z^2 + c = zx^2 - zy^2 + cx + i(2zxzy+cy)
       int iterations = 0;
-      double zx = 0, zy = 0, zx2, zy2;
+      arith_t zx = 0, zy = 0, zx2, zy2;
       // Optimizations as described in WP
-      const double cxq = (cx-0.25);
-      const double cy2 = cy * cy;
-      const double q = cxq * cxq + cy2;
+      const arith_t cxq = (cx-0.25);
+      const arith_t cy2 = cy * cy;
+      const arith_t q = cxq * cxq + cy2;
       if(4 * q * (q + cxq) < cy2) { // Main cardioid
 	iterations = maxiters;
 	goto done;

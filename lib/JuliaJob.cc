@@ -22,11 +22,11 @@ void JuliaJob::work() {
   const int lx = x + w, ly = y + h;
   for(int py = y; py < ly; ++py) {
     int *res = dest->data + py * dest->w + x;
-    double izy = ybottom + (dest->h - 1 - py) * xsize / dest->w;
+    arith_t izy = ybottom + (dest->h - 1 - py) * xsize / dest->w;
     for(int px = x; px < lx; ++px) {
-      double izx = xleft + px * xsize / dest->w;
+      arith_t izx = xleft + px * xsize / dest->w;
       int iterations = 0;
-      double zx = izx, zy = izy, zx2, zy2;
+      arith_t zx = izx, zy = izy, zx2, zy2;
       while(((zx2 = zx * zx) + (zy2 = zy * zy) < 4.0)
 	    && iterations < maxiters) {
 	zy = 2 * zx * zy  + cy;

@@ -19,9 +19,9 @@
 #include "FractalJob.h"
 
 class JuliaJob: public FractalJob {
-  double cx, cy;
+  arith_t cx, cy;
 public:
-  JuliaJob(double cx_, double cy_): cx(cx_), cy(cy_) {
+  JuliaJob(arith_t cx_, arith_t cy_): cx(cx_), cy(cy_) {
   }
 
   // Do the computation (called in background thread)
@@ -32,7 +32,7 @@ class JuliaJobFactory: public FractalJobFactory {
 public:
   JuliaJobFactory(): cx(0), cy(0) {
   }
-  double cx, cy;
+  arith_t cx, cy;
   FractalJob *create() const;
 };
 

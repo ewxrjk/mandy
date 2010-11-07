@@ -30,7 +30,7 @@ struct comparator {
   }
 };
 
-IterBuffer *FractalJob::recompute(double cx, double cy, double r, 
+IterBuffer *FractalJob::recompute(arith_t cx, arith_t cy, arith_t r,
 				  int maxiters, int w, int h,
 				  void (*completion_callback)(Job *, void *),
 				  void *completion_data,

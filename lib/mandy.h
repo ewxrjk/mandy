@@ -20,6 +20,9 @@
 
 void fatal(int errno_value, const char *fmt, ...);
 
+// Type in which we do arithmetic
+typedef double arith_t;
+
 #endif /* MANDY_H */
 
 /*
