@@ -212,28 +212,28 @@ namespace mmui {
     if(pixbuf) {
       // Figure out the scale factor
       int wOld = pixbuf->get_width(), hOld = pixbuf->get_height();
-      double xsizeOld = (wOld > hOld
-                        ? radius * 2 * wOld / hOld
-                         : radius * 2);
-      double xsizeNew = (wNew > hNew
-                        ? radius * 2 * wNew / hNew
-                         : radius * 2);
-      double xpixelOld = xsizeOld / wOld;
-      double xpixelNew = xsizeNew / wNew;
-      double scale = xpixelOld / xpixelNew;
+      arith_t xsizeOld = (wOld > hOld
+                          ? radius * 2 * wOld / hOld
+                          : radius * 2);
+      arith_t xsizeNew = (wNew > hNew
+                          ? radius * 2 * wNew / hNew
+                          : radius * 2);
+      arith_t xpixelOld = xsizeOld / wOld;
+      arith_t xpixelNew = xsizeNew / wNew;
+      arith_t scale = xpixelOld / xpixelNew;
       // The size of the rescaled image
       int wScaled = wOld * scale, hScaled = hOld * scale;
       // The rescaling parameters.  If the rescaled image is narrower than the
       // new window then it will be offset into it, otherwise it will up at the
       // edge.
-      double dest_x = wNew > wScaled ? (wNew - wScaled)/2 : 0;
-      double dest_y = hNew > hScaled ? (hNew - hScaled)/2 : 0;
+      arith_t dest_x = wNew > wScaled ? (wNew - wScaled)/2 : 0;
+      arith_t dest_y = hNew > hScaled ? (hNew - hScaled)/2 : 0;
       // The rescaled image is clipped ot the sizeof the new window.
-      double dest_w = std::min(wNew, wScaled);
-      double dest_h = std::min(hNew, hScaled);
+      arith_t dest_w = std::min(wNew, wScaled);
+      arith_t dest_h = std::min(hNew, hScaled);
       // The rescaled image is offset to make the centres lines up.
-      double offset_x = (wNew - wScaled)/2;
-      double offset_y = (hNew - hScaled)/2;
+      arith_t offset_x = (wNew - wScaled)/2;
+      arith_t offset_y = (hNew - hScaled)/2;
       // Create the new pixbuf
       Glib::RefPtr<Gdk::Pixbuf> newPixbuf
         = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, false, 8, wNew, hNew);
@@ -281,7 +281,7 @@ namespace mmui {
     }
   }
 
-  void View::Zoom(double x, double y, double scale) {
+  void View::Zoom(arith_t x, arith_t y, arith_t scale) {
     int w, h;
     get_window()->get_size(w, h);
     /* The idea is that when you click on a point, it should zoom

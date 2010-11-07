@@ -30,7 +30,7 @@ namespace mmui {
     JuliaView *juliaView;
 
     inline void SetJuliaView(JuliaView *v) { juliaView = v; }
-    void NewJulia(double x, double y);
+    void NewJulia(arith_t x, arith_t y);
     virtual bool on_button_press_event(GdkEventButton *);
     virtual bool on_button_release_event(GdkEventButton *);
     virtual bool on_motion_notify_event(GdkEventMotion *);

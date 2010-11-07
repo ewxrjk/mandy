@@ -65,10 +65,10 @@ namespace mmui {
 
   // Julia set integration ----------------------------------------------------
 
-  void MandelbrotView::NewJulia(double xpos, double ypos) {
+  void MandelbrotView::NewJulia(arith_t xpos, arith_t ypos) {
     if(juliaView) {
       int w, h;
-      double x, y;
+      arith_t x, y;
       get_window()->get_size(w, h);
       if(w > h) {
         x = xcenter + radius * (xpos * 2.0 - w)/h;

@@ -29,7 +29,7 @@ namespace mmui {
     JuliaView();
     JuliaJobFactory juliaJobFactory;
 
-    void Update(double x, double y);
+    void Update(arith_t x, arith_t y);
   };
 
 }

@@ -38,14 +38,14 @@ namespace mmui {
     void NewLocation(int xpos = -1, int ypos = -1);
     void NewSize();
     void Drag(int deltax, int deltay);
-    void Zoom(double x, double y, double scale);
+    void Zoom(arith_t x, arith_t y, arith_t scale);
     inline void SetControlPanel(ControlPanel *p) { controls = p; }
     inline void SetJobFactory(FractalJobFactory *jf) { jobFactory = jf; }
 
     void Save();
 
     // Parameters
-    double xcenter, ycenter, radius;
+    arith_t xcenter, ycenter, radius;
     int maxiters;
 
   private:

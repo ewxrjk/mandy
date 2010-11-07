@@ -56,10 +56,10 @@ namespace mmui {
   };
 
   class DoubleControl: public Control {
-    double *value;
-    double min, max;
+    arith_t *value;
+    arith_t min, max;
   public:
-    DoubleControl(ControlPanel *p, double *v, double min_, double max_):
+    DoubleControl(ControlPanel *p, arith_t *v, arith_t min_, arith_t max_):
       Control(p),
       value(v), min(min_), max(max_) {
     }
