@@ -9,7 +9,7 @@ void printFixed(const struct Fixed *f) {
   for(n = NFIXED-3; n >= 0; --n)
     printf(" %08x", f->word[n]);
   printf(" ");
-  Fixed_2dec(buffer, sizeof buffer, f);
+  Fixed_2str(buffer, sizeof buffer, f, 10);
   printf("=%s", buffer);
 }
 

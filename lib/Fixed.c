@@ -135,32 +135,41 @@ int Fixed_eq0(const struct Fixed *a) {
   return 1;
 }
 
-void Fixed_2dec(char buffer[], unsigned bufsize, const struct Fixed *a) {
+void Fixed_2str(char buffer[], unsigned bufsize, const struct Fixed *a,
+		int base) {
 #define ADDCHAR(C) do {				\
   if(i < bufsize - 1)				\
     buffer[i++] = (C);				\
 } while(0)
 
-  size_t i = 0;
-  int j;
+  static const char digits[] = "0123456789abcdefghijklmnopqrstuvwxyz";
 
+
+  size_t i = 0;
   struct Fixed n = *a;
-  struct Fixed ten;
-  Fixed_int2(&ten, 10);
+  struct Fixed radix;
+  Fixed_int2(&radix, base);
+
   if(Fixed_lt0(&n)) {
     Fixed_neg(&n, &n);
     ADDCHAR('-');
   }
-  char ipart[20];
-  sprintf(ipart, "%u", n.word[NFIXED - 1]);
-  for(j = 0; ipart[j]; ++j)
-    ADDCHAR(ipart[j]);
+
+  char ipart[130];
+  unsigned u = n.word[NFIXED - 1];
+  int j = sizeof ipart;
+  do {
+    ipart[--j] = digits[u % base];
+    u /= base;
+  } while(u);
+  while(j < (int)sizeof ipart)
+    ADDCHAR(ipart[j++]);
   n.word[NFIXED - 1] = 0;
   if(!Fixed_eq0(&n)) {
     ADDCHAR('.');
     do {
-      Fixed_mul(&n, &n, &ten);
-      ADDCHAR('0' + n.word[NFIXED - 1]);
+      Fixed_mul(&n, &n, &radix);
+      ADDCHAR(digits[n.word[NFIXED - 1]]);
       n.word[NFIXED - 1] = 0;
     } while(!Fixed_eq0(&n));
   }

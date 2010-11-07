@@ -50,7 +50,8 @@ extern "C" {
 
   int Fixed_eq0(const struct Fixed *a);
 
-  void Fixed_2dec(char buffer[], unsigned bufsize, const struct Fixed *a);
+  void Fixed_2str(char buffer[], unsigned bufsize, const struct Fixed *a,
+                  int base);
 
 #ifdef __cplusplus
 }
