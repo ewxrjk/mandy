@@ -1,0 +1,17 @@
+Source: mandy
+Maintainer: Richard Kettlewell <rjk@greenend.org.uk>
+Section: graphics
+Priority: optional
+Standards-Version: 3.8.1.0
+Build-Depends: libgtkmm-2.4-dev, libglibmm-2.4-dev, libgtk2.0-dev, pkg-config
+Vcs-Git: git://git.chiark.greenend.org.uk/~richardk/mandy.git
+Homepage: http://www.chiark.greenend.org.uk/ucgi/~richardk/git/mandy.git
+
+Package: mandy
+Architecture: any
+Section: graphics
+Priority: extra
+Depends: ${shlibs:Depends}
+Description: GTK+ program to draw images of the Mandelbrot set
+ Use this program to navigate around the Mandelbrot set (or strictly
+ speaking, its complement) and to view the corresponding Julia sets.
