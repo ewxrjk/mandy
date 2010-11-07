@@ -58,5 +58,19 @@ int main() {
   Fixed_mul(&c, &a, &b);
   printf("2^-64: "); printFixed(&c); putchar('\n');
 
+  // Division
+  Fixed_int2(&a, 1);
+  Fixed_int2(&b, 16);
+  Fixed_div(&c, &a, &b);
+  printf("1/16:  "); printFixed(&c); putchar('\n');
+
+  Fixed_int2(&a, 1);
+  Fixed_int2(&b, 3);
+  Fixed_div(&c, &a, &b);
+  printf("1/3:   "); printFixed(&c); putchar('\n');
+
+  Fixed_div(&c, &c, &b);
+  printf("1/3/3: "); printFixed(&c); putchar('\n');
+
   return 0;
 }

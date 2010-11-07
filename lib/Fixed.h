@@ -36,21 +36,45 @@ extern "C" {
 
   void Fixed_sub(struct Fixed *r, const struct Fixed *a, const struct Fixed *b);
 
-  void Fixed_neg(struct Fixed *r, const struct Fixed *a);
+  int Fixed_neg(struct Fixed *r, const struct Fixed *a);
 
-  void Fixed_mul(struct Fixed *r, const struct Fixed *a, const struct Fixed *b);
+  int Fixed_mul(struct Fixed *r, const struct Fixed *a, const struct Fixed *b);
 
   void Fixed_divu(struct Fixed *r, const struct Fixed *a, unsigned u);
+
+  void Fixed_div(struct Fixed *r, const struct Fixed *a, const struct Fixed *b);
+
+  void Fixed_sqrt(struct Fixed *r, const struct Fixed *a);
 
   void Fixed_int2(struct Fixed *r, int i);
 
   static inline int Fixed_lt0(const struct Fixed *a) {
-    return a->word[0] & 0x80000000;
+    return a->word[NFIXED - 1] & 0x80000000;
+  }
+
+  static inline int Fixed_ge0(const struct Fixed *a) {
+    return !(a->word[NFIXED - 1] & 0x80000000);
   }
 
   int Fixed_eq(const struct Fixed *a, const struct Fixed *b);
 
+  static inline int Fixed_ne(const struct Fixed *a, const struct Fixed *b) {
+    return !Fixed_eq(a, b);
+  }
+
   int Fixed_lt(const struct Fixed *a, const struct Fixed *b);
+
+  static inline int Fixed_gt(const struct Fixed *a, const struct Fixed *b) {
+    return Fixed_lt(b, a);
+  }
+
+  static inline int Fixed_le(const struct Fixed *a, const struct Fixed *b) {
+    return !Fixed_gt(a, b);
+  }
+
+  static inline int Fixed_ge(const struct Fixed *a, const struct Fixed *b) {
+    return !Fixed_lt(a, b);
+  }
 
   int Fixed_eq0(const struct Fixed *a);
 
@@ -104,6 +128,11 @@ public:
     return *this;
   }
 
+  fixed &operator/=(const fixed &that) {
+    Fixed_div(&f, &f, &that.f);
+    return *this;
+  }
+
   fixed &operator=(int n) {
     Fixed_int2(&f, n);
     return *this;
@@ -126,6 +155,12 @@ public:
   fixed operator*(const fixed &that) const {
     fixed r;
     Fixed_mul(&r.f, &f, &that.f);
+    return r;
+  }
+
+  fixed operator/(const fixed &that) const {
+    fixed r;
+    Fixed_div(&r.f, &f, &that.f);
     return r;
   }
 
@@ -163,7 +198,6 @@ public:
 
   // Conversions
   std::string toString(int base = 10) const;
-
 
 };
 #endif

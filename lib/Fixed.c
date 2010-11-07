@@ -16,6 +16,9 @@
 #include "Fixed.h"
 #include <stdio.h>
 
+// TODO Fixed_sqrt() - we need it at least to compute constants
+// TODO assembler versions (...perhaps just of fractal calculation loop)
+
 void Fixed_add(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
   uint64_t s = 0;
   int n;
@@ -38,44 +41,26 @@ void Fixed_sub(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
   }
 }
 
-void Fixed_neg(struct Fixed *r, const struct Fixed *a) {
+int Fixed_neg(struct Fixed *r, const struct Fixed *a) {
   uint64_t s = 1;
   int n;
+  uint32_t sign = a->word[NFIXED - 1] & 0x80000000;
 
   for(n = 0; n < NFIXED; ++n) {
     s = s + (a->word[n] ^ 0xFFFFFFFF);
     r->word[n] = s;
     s >>= 32;
   }
+  if(sign && (r->word[NFIXED - 1] & 0x80000000))
+    return 1;
+  else
+    return 0;
 }
 
-void Fixed_mul(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
+static int Fixed_mul_unsigned(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
   int n, m, i;
-  /* Sort out sign */
-  if(Fixed_lt0(a)) {
-    if(Fixed_lt0(b)) {
-      struct Fixed aa, bb;
-      Fixed_neg(&aa, a);
-      Fixed_neg(&bb, b);
-      Fixed_mul(r, &aa, &bb);
-      return;
-    } else {
-      struct Fixed aa;
-      Fixed_neg(&aa, a);
-      Fixed_mul(r, &aa, b);
-      Fixed_neg(r, r);
-      return;
-    }
-  } else {
-    if(Fixed_lt0(b)) {
-      struct Fixed bb;
-      Fixed_neg(&bb, b);
-      Fixed_mul(r, a, &bb);
-      Fixed_neg(r, r);
-      return;
-    }
-  }
   /* Clear result accumulator */
+  int overflow = 0;
   uint32_t result[2 * NFIXED];
   for(n = 0; n < NFIXED * 2; ++n)
     result[n] = 0;
@@ -93,6 +78,8 @@ void Fixed_mul(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
 	result[i] = s;
 	p = s >> 32;
       }
+      if(p)
+	overflow = 1;
     }
   }
   if(result[NFIXED - 1] > 0x80000000) {
@@ -102,9 +89,32 @@ void Fixed_mul(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
       result[n] = s;
       s >>= 32;
     }
+    if(s)
+      overflow = 1;
   }
   for(n = 0; n < NFIXED; ++n)
     r->word[n] = result[NFIXED + n];
+  return overflow;
+}
+
+int Fixed_mul(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
+  struct Fixed aa, bb;
+  int sign = 0, overflow = 0;
+  /* Sort out sign */
+  if(Fixed_lt0(a)) {
+    overflow |= Fixed_neg(&aa, a);
+    a = &aa;
+    sign = !sign;
+  }
+  if(Fixed_lt0(b)) {
+    overflow |= Fixed_neg(&bb, b);
+    b = &bb;
+    sign = !sign;
+  }
+  overflow |= Fixed_mul_unsigned(r, a, b);
+  if(sign)
+    overflow |= Fixed_neg(r, r);
+  return overflow;
 }
 
 void Fixed_divu(struct Fixed *r, const struct Fixed *a, unsigned u) {
@@ -156,7 +166,7 @@ void Fixed_2str(char buffer[], unsigned bufsize, const struct Fixed *a,
   }
 
   char ipart[130];
-  unsigned u = n.word[NFIXED - 1];
+  uint32_t u = n.word[NFIXED - 1];
   int j = sizeof ipart;
   do {
     ipart[--j] = digits[u % base];
@@ -186,12 +196,87 @@ int Fixed_lt(const struct Fixed *a, const struct Fixed *b) {
   return 0;
 }
 
+static int Fixed_lt_unsigned(const struct Fixed *a, const struct Fixed *b) {
+  int n;
+  for(n = NFIXED - 1; n >= 0; --n)
+    if(a->word[n] != b->word[n])
+      return a->word[n] < b->word[n];
+  return 0;
+}
+
+static inline int Fixed_gt_unsigned(const struct Fixed *a, const struct Fixed *b) {
+  return Fixed_lt_unsigned(b, a);
+}
+
+static inline int Fixed_le_unsigned(const struct Fixed *a, const struct Fixed *b) {
+  return !Fixed_gt_unsigned(a, b);
+}
+
+static inline int Fixed_ge_unsigned(const struct Fixed *a, const struct Fixed *b) {
+  return !Fixed_lt_unsigned(a, b);
+}
+
 int Fixed_eq(const struct Fixed *a, const struct Fixed *b) {
   int n;
   for(n = 0; n < NFIXED; ++n)
     if(a->word[n] != b->word[n])
       return 0;
   return 1;
+}
+
+static void Fixed_div_unsigned(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
+  // Slow and naive bit-by-bit algorithm
+  struct Fixed result, product;
+  int n;
+  uint32_t bit;
+  Fixed_int2(&result, 0);
+  for(n = NFIXED - 1; n >= 0; --n) {
+    for(bit = 1 << 31; bit > 0; bit >>= 1) {
+      result.word[n] |= bit;
+      int overflow = Fixed_mul_unsigned(&product, &result, b);
+      /*
+      {
+	char rbuf[256], pbuf[256], abuf[256], bbuf[256];
+	Fixed_2str(rbuf, sizeof rbuf, &result, 16);
+	Fixed_2str(pbuf, sizeof pbuf, &product, 16);
+	Fixed_2str(abuf, sizeof abuf, a, 16);
+	Fixed_2str(bbuf, sizeof bbuf, b, 16);
+	printf("%d:%08x: 0x%s * 0x%s -> 0x%s%s <= 0x%s?\n",
+	       n, bit, bbuf, rbuf, pbuf,
+	       overflow ? " [OVERFLOW]" : "",
+	       abuf);
+      }
+      */
+      if(!overflow && Fixed_le_unsigned(&product, a)) {
+	if(Fixed_eq(&product, a))
+	  break;		/* Exact answer! */
+	/* Keep that bit */
+	//printf("   ...keep!\n");
+      } else {
+	result.word[n] ^= bit;
+      }
+    }
+  }
+  *r = result;
+}
+
+void Fixed_div(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
+  struct Fixed aa, bb;
+  int sign = 0;
+  /* Sort out sign */
+  if(Fixed_lt0(a)) {
+    Fixed_neg(&aa, a);
+    a = &aa;
+    sign = !sign;
+  }
+  if(Fixed_lt0(b)) {
+    Fixed_neg(&bb, b);
+    b = &bb;
+    sign = !sign;
+  }
+  Fixed_div_unsigned(r, a, b);
+  if(sign)
+    Fixed_neg(r, r);
 }
 
 /*
