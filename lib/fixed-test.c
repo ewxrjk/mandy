@@ -72,5 +72,19 @@ int main() {
   Fixed_div(&c, &c, &b);
   printf("1/3/3: "); printFixed(&c); putchar('\n');
 
+  // Square roots
+  Fixed_int2(&a, 2);
+  Fixed_sqrt(&a, &a);
+  printf("√2:    "); printFixed(&a); putchar('\n');
+  Fixed_mul(&b, &a, &a);
+  printf("(√2)²: "); printFixed(&b); putchar('\n');
+
+  Fixed_int2(&a, 1);
+  Fixed_divu(&a, &a, 2);
+  Fixed_sqrt(&a, &a);
+  printf("√½:    "); printFixed(&a); putchar('\n');
+  Fixed_mul(&b, &a, &a);
+  printf("(√½)²: "); printFixed(&b); putchar('\n');
+
   return 0;
 }

@@ -16,7 +16,6 @@
 #include "Fixed.h"
 #include <stdio.h>
 
-// TODO Fixed_sqrt() - we need it at least to compute constants
 // TODO assembler versions (...perhaps just of fractal calculation loop)
 
 void Fixed_add(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
@@ -258,6 +257,7 @@ static void Fixed_div_unsigned(struct Fixed *r, const struct Fixed *a, const str
     }
   }
   *r = result;
+  // TODO we always round down, we need another bit
 }
 
 void Fixed_div(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
@@ -277,6 +277,43 @@ void Fixed_div(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
   Fixed_div_unsigned(r, a, b);
   if(sign)
     Fixed_neg(r, r);
+}
+
+void Fixed_sqrt(struct Fixed *r, const struct Fixed *a) {
+  // Slow and naive bit-by-bit algorithm
+  struct Fixed result, product;
+  int n;
+  uint32_t bit;
+  Fixed_int2(&result, 0);
+  for(n = NFIXED - 1; n >= 0; --n) {
+    for(bit = 1 << 31; bit > 0; bit >>= 1) {
+      result.word[n] |= bit;
+      int overflow = Fixed_mul_unsigned(&product, &result, &result);
+      /*
+      {
+	char rbuf[256], pbuf[256], abuf[256], bbuf[256];
+	Fixed_2str(rbuf, sizeof rbuf, &result, 16);
+	Fixed_2str(pbuf, sizeof pbuf, &product, 16);
+	Fixed_2str(abuf, sizeof abuf, a, 16);
+	Fixed_2str(bbuf, sizeof bbuf, b, 16);
+	printf("%d:%08x: 0x%s * 0x%s -> 0x%s%s <= 0x%s?\n",
+	       n, bit, bbuf, rbuf, pbuf,
+	       overflow ? " [OVERFLOW]" : "",
+	       abuf);
+      }
+      */
+      if(!overflow && Fixed_le_unsigned(&product, a)) {
+	if(Fixed_eq(&product, a))
+	  break;		/* Exact answer! */
+	/* Keep that bit */
+	//printf("   ...keep!\n");
+      } else {
+	result.word[n] ^= bit;
+      }
+    }
+  }
+  *r = result;
+  // TODO we always round down, we need another bit
 }
 
 /*
