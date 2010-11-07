@@ -9,57 +9,14 @@ set.
 Installation
 ============
 
+You will need gtkmm and GNU C++.
+
   ./autogen.sh          # only if building from git
   ./configure
   make
   sudo make install
 
-Use
-===
-
-Display:
-
-  When you start 'mandy' the display is divided into two halves.  The
-  bottom half has the pretty pictures and the top half tells you where
-  you are.
-
-  'X centre' and 'Y centre' define the location of the centre of the
-  window in the complex plane.  (X means the real part and Y the
-  imaginary part.)  You start at (0,0).
-
-  'Radius' defines gives the radius of the largest circle visible.
-
-  'Iterations' defines the maximum number of iterations for each
-  point.  Lower values are faster, higher values give more detail.
-
-  All of the above fields can be edited directly.  Press ENTER to set
-  the new values.  You will get a beep if you entered something
-  invalid.
-
-Mouse:
-
-  You can use the left mouse button to drag the image around.
-
-  You can double-click the left mouse button to zoom in on the point
-  you click, and double-click the right mouse button to zoom back out.
-
-Keyboard:
-
-  The + and - keys together with CTRL can also be use to zoom in on,
-  and out from, the centre of the image.
-
-Hacking
-=======
-
-This program requires G++.
-
-All the GTK+-specific code is kept in mandy.cc.  The idea is to
-support the possibility of other UIs.
-
-The calculations are done in background threads in background.cc.  A
-worker thread is created for each CPU core that is online when the
-program starts.  If cores are offlined or onlined while it runs then
-the number of threads will no longer match the number of cores.
+See 'man mandy' for documentation.
 
 Copyright
 =========

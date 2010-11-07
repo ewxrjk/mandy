@@ -8,7 +8,7 @@ mandy - Mandelbrot set drawer
 draws images of the Mandelbrot set, with its complement colored
 according to the escape time algorithm.
 Optionally it displays the corresponding Julia set image.
-.SH "MOUSE CONTROLS"
+.SH MOUSE
 Double click at a point to zoom in on that point.  Hold control while
 double clicking to zoom out.
 .PP
@@ -16,7 +16,24 @@ Drag to move the displayed image without zooming.
 .PP
 If the Julia set window is displayed, click or drag with shift held
 to, in the Mandelbrot set window, to set the Julia set parameter.
-.SH "KEYBOARD CONTROLS"
+.SH KEYBOARD
 Use control with + or minus to zoom in and out respectively.
+.SH MENU
+Using the
+.B File
+menu you can save the current Mandelbrot or Julia set image, close the
+window, or quit the program.
+.PP
+The
+.B Windows
+menu allows you to create and destroy the Julia set window.
+.SH "CONTROL PANEL"
+The control panel contains two text entry boxes for the centre of the
+image and a third for the size.
+All of these may be edited; press RETURN to commit to the new values.
+The size is the radius of the biggest circle that fits on the display,
+or (looked at another way) the size of the smaller dimension.
+.PP
+A fourth box allows the maximum iteration count to be adjusted.
 .SH AUTHOR
 Richard Kettlewell <rjk@greenend.org.uk>
