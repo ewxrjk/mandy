@@ -26,8 +26,9 @@ namespace mmui {
     set_title("Julia Set");
   }
 
-  void JuliaWindow::close() {
+  bool JuliaWindow::close() {
     hide();
+    return true;
   }
 
   JuliaView::JuliaView() {

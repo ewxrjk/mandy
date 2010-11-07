@@ -26,7 +26,7 @@ namespace mmui {
   public:
     MandelbrotWindow();
     MandelbrotView view;
-    void close();
+    bool close();
   };
 
 }

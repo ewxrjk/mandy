@@ -61,7 +61,7 @@ namespace mmui {
   }
 
   bool GenericWindow::on_delete_event(GdkEventAny *) {
-    close();
+    return close();
   }
 
 }

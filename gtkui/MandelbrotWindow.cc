@@ -29,7 +29,7 @@ namespace mmui {
     show_all();
   }
 
-  void MandelbrotWindow::close() {
+  bool MandelbrotWindow::close() {
     exit(0);
   }
 

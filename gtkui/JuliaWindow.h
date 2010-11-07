@@ -25,7 +25,7 @@ namespace mmui {
   public:
     JuliaWindow();
     JuliaView view;
-    void close();
+    bool close();
   };
 
 }
