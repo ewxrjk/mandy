@@ -26,11 +26,11 @@ void MandelbrotJob::work() {
     // Starting point for this row's results
     int *res = dest->data + py * dest->w + x;
     // Complex-plane location of this row
-    const arith_t cy = ybottom + (dest->h - 1 - py) * xsize / dest->w;
+    const arith_t cy = ybottom + arith_t(dest->h - 1 - py) * xsize / dest->w;
     // Iterate over columns
     for(int px = x; px < lx; ++px) {
       // Complex-plane location of this column
-      const arith_t cx = xleft + px * xsize / dest->w;
+      const arith_t cx = xleft + arith_t(px) * xsize / dest->w;
       // let c = cx + icy
       // let z = zx + izy
       //
@@ -41,11 +41,11 @@ void MandelbrotJob::work() {
       const arith_t cxq = (cx-0.25);
       const arith_t cy2 = cy * cy;
       const arith_t q = cxq * cxq + cy2;
-      if(4 * q * (q + cxq) < cy2) { // Main cardioid
+      if(arith_t(4) * q * (q + cxq) < cy2) { // Main cardioid
 	iterations = maxiters;
 	goto done;
       }
-      if(cx * cx + 2 * cx +1 + cy2 < 1.0/16) { // Period-2 bulb
+      if(cx * cx + arith_t(2) * cx + 1 + cy2 < arith_t(1)/arith_t(16)) { // Period-2 bulb
       	iterations = maxiters;
       	goto done;
       }
@@ -53,7 +53,7 @@ void MandelbrotJob::work() {
       // skip these tests.
       while(((zx2 = zx * zx) + (zy2 = zy * zy) < 4.0)
 	    && iterations < maxiters) {
-	zy = 2 * zx * zy  + cy;
+	zy = arith_t(2) * zx * zy  + cy;
 	zx = zx2 - zy2 + cx;
 	++iterations;
       }
