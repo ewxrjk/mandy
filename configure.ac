@@ -23,7 +23,7 @@ AC_PROG_RANLIB
 AC_SET_MAKE
 PKG_CHECK_MODULES([gtkmm], [gtkmm-2.4])
 AC_DEFINE([_GNU_SOURCE], [1], [use GNU extensions])
-if test "x$GCC" = xyes; then
+if test "x$GXX" = xyes; then
   CXX="$CXX -Wall -W -Werror -Wpointer-arith -Wwrite-strings"
 fi
 AC_CONFIG_FILES([Makefile lib/Makefile images/Makefile gtkui/Makefile])

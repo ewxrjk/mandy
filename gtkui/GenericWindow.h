@@ -29,8 +29,8 @@ namespace mmui {
     virtual bool on_key_release_event(GdkEventKey *);
     virtual bool on_delete_event(GdkEventAny *);
 
-    virtual void close() = 0;
-    
+    virtual bool close() = 0;
+
     // Sub-widgets
     View *view;
     ControlPanel *controls;
