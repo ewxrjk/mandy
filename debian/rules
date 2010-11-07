@@ -72,6 +72,7 @@ pkg-mandy: build
 	gzip -9 debian/mandy/usr/share/doc/mandy/*
 	$(INSTALL_DATA) debian/copyright debian/mandy/usr/share/doc/mandy/.
 	$(MAKE) DESTDIR=$(shell pwd)/debian/mandy installdirs install
+	gzip -9 debian/mandy/usr/share/man/*/*
 	strip --remove-section=.comment debian/mandy/usr/bin/*
 	dpkg-shlibdeps -Tdebian/substvars.mandy debian/mandy/usr/bin/*
 	cd debian/mandy \

@@ -18,6 +18,7 @@ MandelbrotView.cc MandelbrotWindow.cc View.cc mmui.cc Controls.h	\
 GenericWindow.h JuliaView.h JuliaWindow.h MainMenu.h MandelbrotView.h	\
 MandelbrotWindow.h View.h images.h mmui.h
 mandy_LDADD=../lib/libmandy.a $(gtkmm_LIBS)
+man_MANS=mandy.1
 AM_CPPFLAGS=-I${top_srcdir}/lib
 AM_CXXFLAGS=$(gtkmm_CFLAGS)
 
