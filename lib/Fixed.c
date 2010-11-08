@@ -223,6 +223,24 @@ int Fixed_eq(const struct Fixed *a, const struct Fixed *b) {
   return 1;
 }
 
+#if 0
+static int Fixed_shl_unsigned(struct Fixed *a) {
+  int n;
+  int overflow = !!(a->words[NFIXED - 1] & 0x80000000);
+  for(int n = NFIXED - 1; n >0; --n)
+    a->words[n] = (a->words[n] << 1) + !!(a->words[n-1] & 0x80000000);
+  a->words[0] <<= 1;
+  return overflow;
+}
+
+static void Fixed_shr_unsigned(struct Fixed *a) {
+  int n;
+  for(n = 0; n < NFIXED - 1; ++n)
+    a->words[n] = (a->words[n] >> 1) + ((a->words[n+1] & 1) ? 0x80000000 : 0);
+  a->words[NFIXED - 1] >>= 1;
+}
+#endif
+
 static void Fixed_div_unsigned(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
   // Slow and naive bit-by-bit algorithm
   struct Fixed result, product;
