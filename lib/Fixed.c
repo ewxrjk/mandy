@@ -30,11 +30,11 @@ void Fixed_add(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
 }
 
 void Fixed_sub(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
-  uint64_t s = 0;
+  uint64_t s = 1;
   int n;
 
   for(n = 0; n < NFIXED; ++n) {
-    s = s + a->word[n] - b->word[n];
+    s = s + a->word[n] + (b->word[n] ^ 0xFFFFFFFF);
     r->word[n] = s;
     s >>= 32;
   }
@@ -223,58 +223,60 @@ int Fixed_eq(const struct Fixed *a, const struct Fixed *b) {
   return 1;
 }
 
-#if 0
-static int Fixed_shl_unsigned(struct Fixed *a) {
-  int n;
-  int overflow = !!(a->words[NFIXED - 1] & 0x80000000);
-  for(int n = NFIXED - 1; n >0; --n)
-    a->words[n] = (a->words[n] << 1) + !!(a->words[n-1] & 0x80000000);
-  a->words[0] <<= 1;
-  return overflow;
+static int Fixed_shl_unsigned(struct Fixed *a, int bits) {
+  uint32_t overflow = 0;
+  while(bits-- > 0) {
+    int n;
+    overflow |= a->word[NFIXED - 1] & 0x80000000;
+    for(n = NFIXED - 1; n >0; --n)
+      a->word[n] = (a->word[n] << 1) + !!(a->word[n-1] & 0x80000000);
+    a->word[0] <<= 1;
+  }
+  return !!overflow;
 }
 
-static void Fixed_shr_unsigned(struct Fixed *a) {
-  int n;
-  for(n = 0; n < NFIXED - 1; ++n)
-    a->words[n] = (a->words[n] >> 1) + ((a->words[n+1] & 1) ? 0x80000000 : 0);
-  a->words[NFIXED - 1] >>= 1;
+static void Fixed_shr_unsigned(struct Fixed *a, int bits) {
+  while(bits-- > 0) {
+    int n;
+    for(n = 0; n < NFIXED - 1; ++n)
+      a->word[n] = (a->word[n] >> 1) + ((a->word[n+1] & 1) ? 0x80000000 : 0);
+    a->word[NFIXED - 1] >>= 1;
+  }
 }
-#endif
+
+static void Fixed_setbit(struct Fixed *a, int bit) {
+  if(bit >= 0)
+    a->word[NFIXED-1] |= 1 << bit;
+  else {
+    // bits -1..-32 are te first word; -33..-64 the second; etc.
+    int word = NFIXED - 2 - -(bit+1) / 32;
+    bit = bit & 31;
+    a->word[word] |= 1 << bit;
+  }
+}
 
 static void Fixed_div_unsigned(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
-  // Slow and naive bit-by-bit algorithm
-  struct Fixed result, product;
-  int n;
-  uint32_t bit;
-  Fixed_int2(&result, 0);
-  for(n = NFIXED - 1; n >= 0; --n) {
-    for(bit = 1 << 31; bit > 0; bit >>= 1) {
-      result.word[n] |= bit;
-      int overflow = Fixed_mul_unsigned(&product, &result, b);
-      /*
-      {
-	char rbuf[256], pbuf[256], abuf[256], bbuf[256];
-	Fixed_2str(rbuf, sizeof rbuf, &result, 16);
-	Fixed_2str(pbuf, sizeof pbuf, &product, 16);
-	Fixed_2str(abuf, sizeof abuf, a, 16);
-	Fixed_2str(bbuf, sizeof bbuf, b, 16);
-	printf("%d:%08x: 0x%s * 0x%s -> 0x%s%s <= 0x%s?\n",
-	       n, bit, bbuf, rbuf, pbuf,
-	       overflow ? " [OVERFLOW]" : "",
-	       abuf);
-      }
-      */
-      if(!overflow && Fixed_le_unsigned(&product, a)) {
-	if(Fixed_eq(&product, a))
-	  break;		/* Exact answer! */
-	/* Keep that bit */
-	//printf("   ...keep!\n");
-      } else {
-	result.word[n] ^= bit;
-      }
-    }
+  struct Fixed rem = *a, sub = *b, quot;
+  int bit;
+  bit = 0;
+  while(Fixed_lt(&sub, &rem)) {
+    Fixed_shl_unsigned(&sub, 1);
+    ++bit;
   }
-  *r = result;
+  Fixed_int2(&quot, 0);
+  while(bit >= -NFRACBITS) {
+    struct Fixed diff;
+    Fixed_sub(&diff, &rem, &sub);
+    if(Fixed_ge0(&diff)) {
+      rem = diff;
+      Fixed_setbit(&quot, bit);
+      if(Fixed_eq0(&diff))
+        break;
+    }
+    Fixed_shr_unsigned(&sub, 1);
+    --bit;
+  }
+  *r = quot;
   // TODO we always round down, we need another bit
 }
 

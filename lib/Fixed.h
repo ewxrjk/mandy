@@ -23,6 +23,7 @@ extern "C" {
 #endif
 
 #define NFIXED 4                        /* == 128 bits */
+#define NFRACBITS 32 * (NFIXED - 1)
 
   struct Fixed {
     // Least significant word is first

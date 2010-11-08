@@ -19,72 +19,102 @@ int main() {
   // Divide by 2 across word boundary...
   Fixed_int2(&a, 1);
   Fixed_divu(&a, &a, 2);
-  printf("0.5:   "); printFixed(&a); putchar('\n');
+  printf("0.5:     "); printFixed(&a); putchar('\n');
   // ...and within one word
   Fixed_divu(&a, &a, 4);
-  printf("0.125: "); printFixed(&a); putchar('\n');
+  printf("0.125:   "); printFixed(&a); putchar('\n');
 
   // Add across word boundary
   Fixed_int2(&b, 1);
   Fixed_add(&c, &a, &b);
-  printf("1.125: "); printFixed(&c); putchar('\n');
+  printf("1.125:   "); printFixed(&c); putchar('\n');
 
   // Add with carry
   Fixed_int2(&a, 1);
   Fixed_divu(&a, &a, 2);
   b = a;
   Fixed_add(&c, &a, &b);
-  printf("1:     "); printFixed(&c); putchar('\n');
+  printf("1:       "); printFixed(&c); putchar('\n');
+
+  // Subtraction
+  Fixed_int2(&a, 1);
+  Fixed_int2(&b, 10);
+  Fixed_sub(&c, &b, &a);
+  printf("9:       "); printFixed(&c); putchar('\n');
+  Fixed_sub(&c, &a, &b);
+  printf("-9:      "); printFixed(&c); putchar('\n');
+
+  Fixed_int2(&a, 1);
+  Fixed_divu(&a, &a, 16);
+  Fixed_int2(&b, 1);
+  Fixed_divu(&b, &b, 256);
+  Fixed_sub(&c, &a, &b);
+  printf("-15/16:  "); printFixed(&c); putchar('\n');
+
+  Fixed_int2(&a, 0);
+  b = a;
+  a.word[NFIXED-1] = 0x4321;
+  a.word[NFIXED-2] = 0x5678abcd;
+  a.word[NFIXED-3] = 0xef012345;
+  b.word[NFIXED-1] = 0x1234;
+  b.word[NFIXED-2] = 0xabcd5678;
+  b.word[NFIXED-3] = 0x12345678;
+  printf("a:       "); printFixed(&a); putchar('\n');
+  printf("b:       "); printFixed(&b); putchar('\n');
+  Fixed_sub(&c, &a, &b);
+  printf("a-b:     "); printFixed(&c); putchar('\n');
+  Fixed_sub(&c, &b, &a);
+  printf("b-a:     "); printFixed(&c); putchar('\n');
 
   // Multiply
   Fixed_int2(&a, 5);
   Fixed_int2(&b, 7);
   Fixed_mul(&c, &a, &b);
-  printf("35:    "); printFixed(&c); putchar('\n');
+  printf("35:      "); printFixed(&c); putchar('\n');
 
   // Multiply by 0.5
   Fixed_int2(&a, 101);
   Fixed_int2(&b, 1);
   Fixed_divu(&b, &b, 2);
   Fixed_mul(&c, &a, &b);
-  printf("50.5:  "); printFixed(&c); putchar('\n');
+  printf("50.5:    "); printFixed(&c); putchar('\n');
 
   // Very small numbers
   Fixed_int2(&a, 1);
   Fixed_divu(&a, &a, 65536);
   Fixed_divu(&a, &a, 65536);
-  printf("2^-32: "); printFixed(&a); putchar('\n');
+  printf("2^-32:   "); printFixed(&a); putchar('\n');
   b = a;
   Fixed_mul(&c, &a, &b);
-  printf("2^-64: "); printFixed(&c); putchar('\n');
+  printf("2^-64:   "); printFixed(&c); putchar('\n');
 
   // Division
   Fixed_int2(&a, 1);
   Fixed_int2(&b, 16);
   Fixed_div(&c, &a, &b);
-  printf("1/16:  "); printFixed(&c); putchar('\n');
+  printf("1/16:    "); printFixed(&c); putchar('\n');
 
   Fixed_int2(&a, 1);
   Fixed_int2(&b, 3);
   Fixed_div(&c, &a, &b);
-  printf("1/3:   "); printFixed(&c); putchar('\n');
+  printf("1/3:     "); printFixed(&c); putchar('\n');
 
   Fixed_div(&c, &c, &b);
-  printf("1/3/3: "); printFixed(&c); putchar('\n');
+  printf("1/3/3:   "); printFixed(&c); putchar('\n');
 
   // Square roots
   Fixed_int2(&a, 2);
   Fixed_sqrt(&a, &a);
-  printf("√2:    "); printFixed(&a); putchar('\n');
+  printf("√2:      "); printFixed(&a); putchar('\n');
   Fixed_mul(&b, &a, &a);
-  printf("(√2)²: "); printFixed(&b); putchar('\n');
+  printf("(√2)²:   "); printFixed(&b); putchar('\n');
 
   Fixed_int2(&a, 1);
   Fixed_divu(&a, &a, 2);
   Fixed_sqrt(&a, &a);
-  printf("√½:    "); printFixed(&a); putchar('\n');
+  printf("√½:      "); printFixed(&a); putchar('\n');
   Fixed_mul(&b, &a, &a);
-  printf("(√½)²: "); printFixed(&b); putchar('\n');
+  printf("(√½)²:   "); printFixed(&b); putchar('\n');
 
   return 0;
 }
