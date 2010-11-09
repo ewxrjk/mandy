@@ -19,22 +19,22 @@ int main() {
   // Divide by 2 across word boundary...
   Fixed_int2(&a, 1);
   Fixed_divu(&a, &a, 2);
-  printf("0.5:     "); printFixed(&a); putchar('\n');
+  printf("1/2:     "); printFixed(&a); putchar('\n');
   // ...and within one word
   Fixed_divu(&a, &a, 4);
-  printf("0.125:   "); printFixed(&a); putchar('\n');
+  printf("0.5/4:   "); printFixed(&a); putchar('\n');
 
   // Add across word boundary
   Fixed_int2(&b, 1);
   Fixed_add(&c, &a, &b);
-  printf("1.125:   "); printFixed(&c); putchar('\n');
+  printf("1+0.125: "); printFixed(&c); putchar('\n');
 
   // Add with carry
   Fixed_int2(&a, 1);
   Fixed_divu(&a, &a, 2);
   b = a;
   Fixed_add(&c, &a, &b);
-  printf("1:       "); printFixed(&c); putchar('\n');
+  printf("0.5+0.5: "); printFixed(&c); putchar('\n');
 
   // Negation
   Fixed_int2(&a, 10);
@@ -47,9 +47,9 @@ int main() {
   Fixed_int2(&a, 1);
   Fixed_int2(&b, 10);
   Fixed_sub(&c, &b, &a);
-  printf("9:       "); printFixed(&c); putchar('\n');
+  printf("10-1:    "); printFixed(&c); putchar('\n');
   Fixed_sub(&c, &a, &b);
-  printf("-9:      "); printFixed(&c); putchar('\n');
+  printf("1-10:    "); printFixed(&c); putchar('\n');
 
   Fixed_int2(&a, 1);
   Fixed_divu(&a, &a, 16);

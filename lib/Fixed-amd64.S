@@ -16,6 +16,8 @@
 #include <config.h>
 
 #if HAVE_ASM_AMD64
+	.intel_syntax
+
 /*
  * Some possibly-relevant rules:
  * - %rsp+8 points at arguments
@@ -41,71 +43,112 @@
  *   %r11       smash
  *   %r12-%r15  preserve
  * See: http://www.x86-64.org/documentation/abi.pdf
- *
- * gas syntax is OP SRC,DEST (like traditional 68k syntax)
- * $ means 'immediate'
- * % means 'register'
- * OPl means 32-bit, OPq means 64-bit
  */
 
 #if NFIXED == 4
 	.text
 
-/* void Fixed_shl_unsigned(struct Fixed *a=%rdi) */
+/* void Fixed_shl_unsigned(struct Fixed *a=rdi) */
 	.globl _Fixed_shl_unsigned
 _Fixed_shl_unsigned:
-	shlq	$1,(%rdi)
-	rclq	$1,8(%rdi)
+	shl	[qword ptr rdi],1
+	rcl	[qword ptr rdi+8],1
 	ret
 
-/* void Fixed_shr_unsigned(struct Fixed *a=%rdi) */
+/* void Fixed_shr_unsigned(struct Fixed *a=rdi) */
 	.globl _Fixed_shr_unsigned
 _Fixed_shr_unsigned:
-	shrq	$1,8(%rdi)
-	rcrq	$1,(%rdi)
+	shr	[qword ptr rdi+8],1
+	rcr	[qword ptr rdi],1
 	ret
 
-/* void Fixed_add(struct Fixed *r=%rdi,
- *                const struct Fixed *a=%rsi,
- *                const struct Fixed *b=%rdx) */
+/* void Fixed_add(struct Fixed *r=rdi,
+ *                const struct Fixed *a=rsi,
+ *                const struct Fixed *b=rdx) */
 	.globl _Fixed_add
 _Fixed_add:
-	movq	(%rsi),%rax
-	movq	8(%rsi),%rcx
-	addq	(%rdx),%rax
-	movq	%rax,(%rdi)
-	adcq	8(%rdx),%rcx
-	movq	%rcx,8(%rdi)
+	mov	rax,[rsi]
+	mov	rcx,[rsi+8]
+	add	rax,[rdx]
+	mov	[rdi],rax
+	adc	rcx,[rdx+8]
+	mov	[rdi+8],rcx
 	ret
 
-/* void Fixed_sub(struct Fixed *r=%rdi,
- *                const struct Fixed *a=%rsi,
- *                const struct Fixed *b=%rdx) */
+/* void Fixed_sub(struct Fixed *r=rdi,
+ *                const struct Fixed *a=rsi,
+ *                const struct Fixed *b=rdx) */
 	.globl _Fixed_sub
 _Fixed_sub:
-	movq	(%rsi),%rax
-	movq	8(%rsi),%rcx
-	subq	(%rdx),%rax
-	movq	%rax,(%rdi)
-	sbbq	8(%rdx),%rcx
-	movq	%rcx,8(%rdi)
+	mov	rax,[rsi]
+	mov	rcx,[rsi+8]
+	sub	rax,[rdx]
+	mov	[rdi],rax
+	sbb	rcx,[rdx+8]
+	mov	[rdi+8],rcx
 	ret
 
-/* int Fixed_neg(struct Fixed *r=%rdi, const struct Fixed *a=%rsi) */
+/* int Fixed_neg(struct Fixed *r=rdi, const struct Fixed *a=rsi) */
 	.globl _Fixed_neg
 _Fixed_neg:
-	movq	(%rsi),%rdx
-	movq	8(%rsi),%rax
-	movq	%rax,%rcx	// save for overflow detection
-	notq	%rdx
-	addq	$1,%rdx		// we need the carry so we cannot use incq
-	movq	%rdx,(%rdi)
-	notq	%rax
-	adcq	$0,%rax
-	movq	%rax,8(%rdi)
-	xorq	%rcx,%rax	// yields 1... if the top bit has changed
-	notq	%rax		// yields 1... if the top bit has NOT changed
-	shrq	$63,%rax	// 0 for success, 1 for overflow
+	mov	rdx,[rsi]
+	mov	rax,[rsi+8]
+	mov	rcx,rax	// save for overflow detection
+	not	rdx
+	add	rdx,1		// we need the carry so we cannot use incq
+	mov	[rdi],rdx
+	not	rax
+	adc	rax,0
+	mov	[rdi+8],rax
+	xor	rax,rcx	// yields 1... if the top bit has changed
+	not	rax		// yields 1... if the top bit has NOT changed
+	shr	rax,63		// 0 for success, 1 for overflow
 	ret
+
+#if 0
+/* int Fixed_mul(struct Fixed *r=rdi,
+ *               const struct Fixed *a=rsi,
+ *               const struct Fixed *b=rdx) */
+	.globl _Fixed_mul
+	// We have, representing each byte with a letter:
+	//
+	//        AAAA.bbbb cccc dddd
+	//      * EEEE.ffff gggg hhhh
+	//
+	//   ==== ==== ==== ====                      Ab * Ef
+	//             ==== ==== ==== ====            Ab * gh
+	//             ==== ==== ==== ====            cd * Ef
+	//                       ==== ==== ==== ====  cd * gh
+	//
+_Fixed_mul:
+	// Get the values into registers
+	mov	r8,[rdx]	// gh
+	mov	r9,[rdx+8]	// Ef
+	mov	r10,[rsi]     // cd
+	mov	r11,[rsi+8]	// Ab
+	mov	cl,0		// sign of result
+	// Make everything +ve but remember the intended sign of the result
+	cmp	r9,0
+	jae	1f
+	not	r8
+	add	r8,1
+	not	r9
+	adc	r9,0
+	not	cl
+1:
+	cmp	r11,0
+	jae	2f
+	not	r10
+	add	r10,1
+	not	r11
+	adc	r11,0
+	not	cl
+2:
+	// Do the multiplies.
+	// All multiplies are rax * something -> rdx:rax
+	mov	rax,r11	// Ab
+	mul	r9		// Ab * EF -> rdx:rax
+
+#endif
 #endif
 #endif
