@@ -17,9 +17,11 @@ AC_CONFIG_AUX_DIR([config.aux])
 AM_INIT_AUTOMAKE([mandy], [0.0.WIP])
 AC_CONFIG_SRCDIR([lib/MandelbrotJob.cc])
 AM_CONFIG_HEADER([config.h])
+AC_CANONICAL_HOST
 AC_LANG([C++])
 AC_PROG_CC
 AC_PROG_CXX
+AM_PROG_AS
 AC_PROG_RANLIB
 AC_SET_MAKE
 PKG_CHECK_MODULES([gtkmm], [gtkmm-2.4])
@@ -30,5 +32,12 @@ fi
 if test "x$GCC" = xyes; then
   CC="$CC -Wall -W -Werror -Wpointer-arith -Wwrite-strings"
 fi
+case $host_cpu in
+x86_64 )
+  AC_DEFINE([HAVE_ASM], [1], [use assembly fixed point support])
+  AC_DEFINE([HAVE_ASM_AMD64], [1], [use amd64 assembler])
+  ;;
+esac
+AC_DEFINE([NFIXED],[4], [number of words in a fixed point integer])
 AC_CONFIG_FILES([Makefile lib/Makefile images/Makefile gtkui/Makefile])
 AC_OUTPUT

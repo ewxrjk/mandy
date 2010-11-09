@@ -13,6 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <config.h>
 #include "Fixed.h"
 #include <stdio.h>
 
@@ -223,28 +224,25 @@ int Fixed_eq(const struct Fixed *a, const struct Fixed *b) {
   return 1;
 }
 
-static int Fixed_shl_unsigned(struct Fixed *a, int bits) {
-  uint32_t overflow = 0;
-  while(bits-- > 0) {
-    int n;
-    overflow |= a->word[NFIXED - 1] & 0x80000000;
-    for(n = NFIXED - 1; n >0; --n)
-      a->word[n] = (a->word[n] << 1) + !!(a->word[n-1] & 0x80000000);
-    a->word[0] <<= 1;
-  }
-  return !!overflow;
+#if !(HAVE_ASM && NFIXED == 4)
+void Fixed_shl_unsigned(struct Fixed *a) {
+  int n;
+  for(n = NFIXED - 1; n > 0; --n)
+    a->word[n] = (a->word[n] << 1) + !!(a->word[n-1] & 0x80000000);
+  a->word[0] <<= 1;
 }
+#endif
 
-static void Fixed_shr_unsigned(struct Fixed *a, int bits) {
-  while(bits-- > 0) {
+#if !(HAVE_ASM && NFIXED == 4)
+void Fixed_shr_unsigned(struct Fixed *a) {
     int n;
     for(n = 0; n < NFIXED - 1; ++n)
       a->word[n] = (a->word[n] >> 1) + ((a->word[n+1] & 1) ? 0x80000000 : 0);
     a->word[NFIXED - 1] >>= 1;
-  }
 }
+#endif
 
-static void Fixed_setbit(struct Fixed *a, int bit) {
+void Fixed_setbit(struct Fixed *a, int bit) {
   if(bit >= 0)
     a->word[NFIXED-1] |= 1 << bit;
   else {
@@ -260,7 +258,7 @@ static void Fixed_div_unsigned(struct Fixed *r, const struct Fixed *a, const str
   int bit;
   bit = 0;
   while(Fixed_lt(&sub, &rem)) {
-    Fixed_shl_unsigned(&sub, 1);
+    Fixed_shl_unsigned(&sub);
     ++bit;
   }
   Fixed_int2(&quot, 0);
@@ -273,7 +271,7 @@ static void Fixed_div_unsigned(struct Fixed *r, const struct Fixed *a, const str
       if(Fixed_eq0(&diff))
         break;
     }
-    Fixed_shr_unsigned(&sub, 1);
+    Fixed_shr_unsigned(&sub);
     --bit;
   }
   *r = quot;

@@ -49,6 +49,10 @@ extern "C" {
 
   void Fixed_int2(struct Fixed *r, int i);
 
+  void Fixed_shl_unsigned(struct Fixed *a);
+
+  void Fixed_shr_unsigned(struct Fixed *a);
+
   static inline int Fixed_lt0(const struct Fixed *a) {
     return a->word[NFIXED - 1] & 0x80000000;
   }
