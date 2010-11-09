@@ -36,6 +36,13 @@ int main() {
   Fixed_add(&c, &a, &b);
   printf("1:       "); printFixed(&c); putchar('\n');
 
+  // Negation
+  Fixed_int2(&a, 10);
+  Fixed_neg(&b, &a);
+  Fixed_neg(&c, &b);
+  printf("-10:     "); printFixed(&b); putchar('\n');
+  printf("-(-10):  "); printFixed(&b); putchar('\n');
+
   // Subtraction
   Fixed_int2(&a, 1);
   Fixed_int2(&b, 10);

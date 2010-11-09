@@ -43,6 +43,7 @@ void Fixed_sub(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
 }
 #endif
 
+#if !(HAVE_ASM && NFIXED == 4)
 int Fixed_neg(struct Fixed *r, const struct Fixed *a) {
   uint64_t s = 1;
   int n;
@@ -58,6 +59,7 @@ int Fixed_neg(struct Fixed *r, const struct Fixed *a) {
   else
     return 0;
 }
+#endif
 
 static int Fixed_mul_unsigned(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
   int n, m, i;

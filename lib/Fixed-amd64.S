@@ -71,11 +71,11 @@ _Fixed_shr_unsigned:
 	.globl _Fixed_add
 _Fixed_add:
 	movq	(%rsi),%rax
+	movq	8(%rsi),%rcx
 	addq	(%rdx),%rax
 	movq	%rax,(%rdi)
-	movq	8(%rsi),%rax
-	adcq	8(%rdx),%rax
-	movq	%rax,8(%rdi)
+	adcq	8(%rdx),%rcx
+	movq	%rcx,8(%rdi)
 	ret
 
 /* void Fixed_sub(struct Fixed *r=%rdi,
@@ -84,11 +84,28 @@ _Fixed_add:
 	.globl _Fixed_sub
 _Fixed_sub:
 	movq	(%rsi),%rax
+	movq	8(%rsi),%rcx
 	subq	(%rdx),%rax
 	movq	%rax,(%rdi)
+	sbbq	8(%rdx),%rcx
+	movq	%rcx,8(%rdi)
+	ret
+
+/* int Fixed_neg(struct Fixed *r=%rdi, const struct Fixed *a=%rsi) */
+	.globl _Fixed_neg
+_Fixed_neg:
+	movq	(%rsi),%rdx
 	movq	8(%rsi),%rax
-	sbbq	8(%rdx),%rax
+	movq	%rax,%rcx	// save for overflow detection
+	notq	%rdx
+	addq	$1,%rdx		// we need the carry so we cannot use incq
+	movq	%rdx,(%rdi)
+	notq	%rax
+	adcq	$0,%rax
 	movq	%rax,8(%rdi)
+	xorq	%rcx,%rax	// yields 1... if the top bit has changed
+	notq	%rax		// yields 1... if the top bit has NOT changed
+	shrq	$63,%rax	// 0 for success, 1 for overflow
 	ret
 #endif
 #endif
