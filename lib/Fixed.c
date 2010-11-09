@@ -17,8 +17,7 @@
 #include "Fixed.h"
 #include <stdio.h>
 
-// TODO assembler versions (...perhaps just of fractal calculation loop)
-
+#if !(HAVE_ASM && NFIXED == 4)
 void Fixed_add(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
   uint64_t s = 0;
   int n;
@@ -29,7 +28,9 @@ void Fixed_add(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
     s >>= 32;
   }
 }
+#endif
 
+#if !(HAVE_ASM && NFIXED == 4)
 void Fixed_sub(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
   uint64_t s = 1;
   int n;
@@ -40,6 +41,7 @@ void Fixed_sub(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
     s >>= 32;
   }
 }
+#endif
 
 int Fixed_neg(struct Fixed *r, const struct Fixed *a) {
   uint64_t s = 1;

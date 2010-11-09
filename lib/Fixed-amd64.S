@@ -18,17 +18,28 @@
 #if HAVE_ASM_AMD64
 /*
  * Some possibly-relevant rules:
- * - preserve %rbp, %rbx, %r12-%r15
- * -
- * - %rsp points at return address
  * - %rsp+8 points at arguments
  * - %rsp+8 mod 16 = 0
  * - %rsp-128 up to %rsp (red zone) is safe to use for temporaries
  * - pointer arguments count as class INTEGER
  * - INTEGER arguments are passed in %rdi %rsi %rdx %rcx %r8 %r9
- * - other classes get other registers
+ *   (other classes get other registers)
  * - when you run out the stack is used in reverse order
- * - INTEGER class returns are returned via %rax
+ *
+ * Register usage table:
+ *   %rax	Smash, 1st return value
+ *   %rbx       preserve
+ *   %rcx       4th arg, smash
+ *   %rdx       3rd arg, 2nd return value, smash
+ *   %rsi       2nd arg, smash
+ *   %rdi       1st arg, smash
+ *   %rsp       stack pointer, duh
+ *   %rbp       preserve
+ *   %r8        5th arg, smash
+ *   %r9        6th arg, smash
+ *   %r10       smash
+ *   %r11       smash
+ *   %r12-%r15  preserve
  * See: http://www.x86-64.org/documentation/abi.pdf
  *
  * gas syntax is OP SRC,DEST (like traditional 68k syntax)
@@ -40,19 +51,44 @@
 #if NFIXED == 4
 	.text
 
-/* void Fixed_shl_unsigned(struct Fixed *a) */
+/* void Fixed_shl_unsigned(struct Fixed *a=%rdi) */
 	.globl _Fixed_shl_unsigned
 _Fixed_shl_unsigned:
 	shlq	$1,(%rdi)
 	rclq	$1,8(%rdi)
 	ret
 
-/* void Fixed_shr_unsigned(struct Fixed *a) */
+/* void Fixed_shr_unsigned(struct Fixed *a=%rdi) */
 	.globl _Fixed_shr_unsigned
 _Fixed_shr_unsigned:
 	shrq	$1,8(%rdi)
 	rcrq	$1,(%rdi)
 	ret
 
+/* void Fixed_add(struct Fixed *r=%rdi,
+ *                const struct Fixed *a=%rsi,
+ *                const struct Fixed *b=%rdx) */
+	.globl _Fixed_add
+_Fixed_add:
+	movq	(%rsi),%rax
+	addq	(%rdx),%rax
+	movq	%rax,(%rdi)
+	movq	8(%rsi),%rax
+	adcq	8(%rdx),%rax
+	movq	%rax,8(%rdi)
+	ret
+
+/* void Fixed_sub(struct Fixed *r=%rdi,
+ *                const struct Fixed *a=%rsi,
+ *                const struct Fixed *b=%rdx) */
+	.globl _Fixed_sub
+_Fixed_sub:
+	movq	(%rsi),%rax
+	subq	(%rdx),%rax
+	movq	%rax,(%rdi)
+	movq	8(%rsi),%rax
+	sbbq	8(%rdx),%rax
+	movq	%rax,8(%rdi)
+	ret
 #endif
 #endif
