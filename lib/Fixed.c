@@ -61,6 +61,7 @@ int Fixed_neg(struct Fixed *r, const struct Fixed *a) {
 }
 #endif
 
+#if !(HAVE_ASM && NFIXED == 4)
 static int Fixed_mul_unsigned(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
   int n, m, i;
   /* Clear result accumulator */
@@ -101,7 +102,6 @@ static int Fixed_mul_unsigned(struct Fixed *r, const struct Fixed *a, const stru
   return overflow;
 }
 
-#if !(HAVE_ASM && NFIXED == 4)
 int Fixed_mul(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
   struct Fixed aa, bb;
   int sign = 0, overflow = 0;
@@ -312,7 +312,7 @@ void Fixed_sqrt(struct Fixed *r, const struct Fixed *a) {
   for(n = NFIXED - 1; n >= 0; --n) {
     for(bit = 1 << 31; bit > 0; bit >>= 1) {
       result.word[n] |= bit;
-      int overflow = Fixed_mul_unsigned(&product, &result, &result);
+      int overflow = Fixed_mul(&product, &result, &result);
       /*
       {
 	char rbuf[256], pbuf[256], abuf[256], bbuf[256];

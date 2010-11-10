@@ -172,9 +172,12 @@ _Fixed_mul:
 	add	r12,rdx
 	adc	rbp,0
 	adc	rsi,0
-	// Now we must:
-	//  - set the sign of the result
-	//  - store the result
+	// Check for overflow
+	xor	rax,rax
+	cmp	rsi,2147483647
+	jbe	4f
+	mov	rax,1
+4:
 	// Rearrange the top 128 bits of the answer into rsi/rbp
 	shld	rsi,rbp,32
 	shld	rbp,r12,32
