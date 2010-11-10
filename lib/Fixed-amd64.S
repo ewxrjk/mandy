@@ -108,7 +108,6 @@ _Fixed_neg:
 /* int Fixed_mul(struct Fixed *r=rdi,
  *               const struct Fixed *a=rsi,
  *               const struct Fixed *b=rdx) */
-	.globl _Fixed_mul_inprogress
 	// We have, representing each byte with a letter:
 	//
 	//        AAAA.bbbb cccc dddd
@@ -118,9 +117,10 @@ _Fixed_neg:
 	//             ==== ==== ==== ====            Ab * gh
 	//             ==== ==== ==== ====            cd * Ef
 	//                       ==== ==== ==== ====  cd * gh
-	//   <- rsi -> <- rbp -> <- r12 -> <- junk->
+	//   <- rsi -> <- rbp -> <- r12 -> <- rax ->
 	//
-_Fixed_mul_inprogress:
+	.globl _Fixed_mul
+_Fixed_mul:
 	push	rbp
 	push	r12
 	// Get the values into registers
@@ -132,7 +132,7 @@ _Fixed_mul_inprogress:
 	// TODO could we stick the sign in some other register and save a push?
 	// Make everything +ve but remember the intended sign of the result
 	cmp	r9,0
-	jb	1f
+	jae	1f
 	not	r8
 	add	r8,1
 	not	r9
@@ -140,7 +140,7 @@ _Fixed_mul_inprogress:
 	not	cl
 1:
 	cmp	r11,0
-	jb	2f
+	jae	2f
 	not	r10
 	add	r10,1
 	not	r11
@@ -173,10 +173,27 @@ _Fixed_mul_inprogress:
 	adc	rbp,0
 	adc	rsi,0
 	// Now we must:
-	//  - maybe round up
-	//  - reorganize everything back into a pair of 64 bit words
 	//  - set the sign of the result
 	//  - store the result
-
+	// Rearrange the top 128 bits of the answer into rsi/rbp
+	shld	rsi,rbp,32
+	shld	rbp,r12,32
+	// Maybe round up
+	bt	r12,31
+	adc	rbp,0
+	adc	rsi,0
+	// Set the right sign
+	cmp	cl,0
+	je	3f
+	not	rbp
+	add	rbp,1
+	not	rsi
+	adc	rsi,0
+3:
+	mov	[rdi+8],rsi
+	mov	[rdi],rbp
+	pop	r12
+	pop	rbp
+	ret
 #endif
 #endif

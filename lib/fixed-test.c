@@ -14,7 +14,7 @@ void printFixed(const struct Fixed *f) {
 }
 
 int main() {
-  struct Fixed a, b, c;
+  struct Fixed a, b, c, d;
 
   // Divide by 2 across word boundary...
   Fixed_int2(&a, 1);
@@ -77,23 +77,33 @@ int main() {
   Fixed_int2(&a, 5);
   Fixed_int2(&b, 7);
   Fixed_mul(&c, &a, &b);
-  printf("35:      "); printFixed(&c); putchar('\n');
+  printf("5*7:     "); printFixed(&c); putchar('\n');
 
   // Multiply by 0.5
   Fixed_int2(&a, 101);
   Fixed_int2(&b, 1);
   Fixed_divu(&b, &b, 2);
   Fixed_mul(&c, &a, &b);
-  printf("50.5:    "); printFixed(&c); putchar('\n');
+  printf("101*0.5  "); printFixed(&c); putchar('\n');
 
   // Very small numbers
   Fixed_int2(&a, 1);
   Fixed_divu(&a, &a, 65536);
   Fixed_divu(&a, &a, 65536);
-  printf("2^-32:   "); printFixed(&a); putchar('\n');
+  printf("2⁻³²:    "); printFixed(&a); putchar('\n');
   b = a;
   Fixed_mul(&c, &a, &b);
-  printf("2^-64:   "); printFixed(&c); putchar('\n');
+  printf("(2⁻³²)²: "); printFixed(&c); putchar('\n');
+
+  // Even smaller than that
+  Fixed_mul(&d, &a, &c);
+  printf("(2⁻³²)³: "); printFixed(&d); putchar('\n');
+
+  // Underflow rounding
+  Fixed_int2(&a, 1);
+  Fixed_divu(&a, &a, 2);
+  Fixed_mul(&c, &a, &d);
+  printf("½(2⁻³²)³:"); printFixed(&d); putchar('\n');
 
   // Division
   Fixed_int2(&a, 1);

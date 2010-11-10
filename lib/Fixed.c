@@ -101,6 +101,7 @@ static int Fixed_mul_unsigned(struct Fixed *r, const struct Fixed *a, const stru
   return overflow;
 }
 
+#if !(HAVE_ASM && NFIXED == 4)
 int Fixed_mul(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
   struct Fixed aa, bb;
   int sign = 0, overflow = 0;
@@ -120,6 +121,7 @@ int Fixed_mul(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
     overflow |= Fixed_neg(r, r);
   return overflow;
 }
+#endif
 
 void Fixed_divu(struct Fixed *r, const struct Fixed *a, unsigned u) {
   uint64_t quot, rem = 0, d;
