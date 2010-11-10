@@ -93,23 +93,22 @@ _Fixed_sub:
 _Fixed_neg:
 	mov	rdx,[rsi]
 	mov	rax,[rsi+8]
-	mov	rcx,rax	// save for overflow detection
+	mov	rcx,rax		// save for overflow detection
 	not	rdx
 	add	rdx,1		// we need the carry so we cannot use incq
 	mov	[rdi],rdx
 	not	rax
 	adc	rax,0
 	mov	[rdi+8],rax
-	xor	rax,rcx	// yields 1... if the top bit has changed
+	xor	rax,rcx	        // yields 1... if the top bit has changed
 	not	rax		// yields 1... if the top bit has NOT changed
 	shr	rax,63		// 0 for success, 1 for overflow
 	ret
 
-#if 0
 /* int Fixed_mul(struct Fixed *r=rdi,
  *               const struct Fixed *a=rsi,
  *               const struct Fixed *b=rdx) */
-	.globl _Fixed_mul
+	.globl _Fixed_mul_inprogress
 	// We have, representing each byte with a letter:
 	//
 	//        AAAA.bbbb cccc dddd
@@ -119,17 +118,21 @@ _Fixed_neg:
 	//             ==== ==== ==== ====            Ab * gh
 	//             ==== ==== ==== ====            cd * Ef
 	//                       ==== ==== ==== ====  cd * gh
+	//   <- rsi -> <- rbp -> <- r12 -> <- junk->
 	//
-_Fixed_mul:
+_Fixed_mul_inprogress:
+	push	rbp
+	push	r12
 	// Get the values into registers
-	mov	r8,[rdx]	// gh
 	mov	r9,[rdx+8]	// Ef
-	mov	r10,[rsi]     // cd
 	mov	r11,[rsi+8]	// Ab
+	mov	r8,[rdx]	// gh
+	mov	r10,[rsi]	// cd
 	mov	cl,0		// sign of result
+	// TODO could we stick the sign in some other register and save a push?
 	// Make everything +ve but remember the intended sign of the result
 	cmp	r9,0
-	jae	1f
+	jb	1f
 	not	r8
 	add	r8,1
 	not	r9
@@ -137,7 +140,7 @@ _Fixed_mul:
 	not	cl
 1:
 	cmp	r11,0
-	jae	2f
+	jb	2f
 	not	r10
 	add	r10,1
 	not	r11
@@ -146,9 +149,34 @@ _Fixed_mul:
 2:
 	// Do the multiplies.
 	// All multiplies are rax * something -> rdx:rax
-	mov	rax,r11	// Ab
-	mul	r9		// Ab * EF -> rdx:rax
+	// Result will be accumulated in rsi:rbp:r12:<junk>
+	mov	rax,r11		// Ab
+	mul	r9		// Ab * Ef -> rdx:rax
+	mov	rsi,rdx
+	mov	rbp,rax
+	//
+	mov	rax,r11		// Ab
+	mul	r8		// Ab * gh -> rdx:rax
+	mov	r12,rax
+	add	rbp,rdx
+	adc	rsi,0
+	//
+	mov	rax,r10		// cd
+	mul	r9		// cd * Ef -> rdx:rax
+	add	r12,rax
+	adc	rbp,rdx
+	adc	rsi,0
+	//
+	mov	rax,r10		// cd
+	mul	r8		// cd * fg -> rdx:rax
+	add	r12,rdx
+	adc	rbp,0
+	adc	rsi,0
+	// Now we must:
+	//  - maybe round up
+	//  - reorganize everything back into a pair of 64 bit words
+	//  - set the sign of the result
+	//  - store the result
 
-#endif
 #endif
 #endif
