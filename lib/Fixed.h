@@ -86,6 +86,8 @@ extern "C" {
   void Fixed_2str(char buffer[], unsigned bufsize, const struct Fixed *a,
                   int base);
 
+  void Fixed_double2(struct Fixed *r, double n);
+
 #ifdef __cplusplus
 }
 #endif
@@ -103,6 +105,10 @@ public:
 
   fixed(int i) {
     Fixed_int2(&f, i);
+  }
+
+  fixed(double n) {
+    Fixed_double2(&f, n);
   }
 
   fixed() {

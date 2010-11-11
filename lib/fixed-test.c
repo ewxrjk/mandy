@@ -1,6 +1,7 @@
 #include <config.h>
 #include "Fixed.h"
 #include <stdio.h>
+#include <math.h>
 
 void printFixed(const struct Fixed *f) {
   char buffer[128];
@@ -142,6 +143,14 @@ int main() {
   printf("√½:      "); printFixed(&a); putchar('\n');
   Fixed_mul(&b, &a, &a);
   printf("(√½)²:   "); printFixed(&b); putchar('\n');
+
+  // Conversion from double
+  Fixed_double2(&a, 1.0);
+  printf("1.0:     "); printFixed(&a); putchar('\n');
+  Fixed_double2(&a, 0.5);
+  printf("0.5:     "); printFixed(&a); putchar('\n');
+  Fixed_double2(&a, M_PI);
+  printf("π:       "); printFixed(&a); putchar('\n');
 
   return 0;
 }

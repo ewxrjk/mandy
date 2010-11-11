@@ -16,6 +16,7 @@
 #include <config.h>
 #include "Fixed.h"
 #include <stdio.h>
+#include <math.h>
 
 #if !(HAVE_ASM && NFIXED == 4)
 void Fixed_add(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
@@ -338,6 +339,23 @@ void Fixed_sqrt(struct Fixed *r, const struct Fixed *a) {
   }
   *r = result;
   // TODO we always round down, we need another bit
+}
+
+void Fixed_double2(struct Fixed *r, double n) {
+  Fixed_int2(r, 0);
+  if(n < 0) {
+    Fixed_double2(r, -n);
+    Fixed_neg(r, r);
+    return;
+  }
+  int i = NFIXED - 1;
+  while(n && i >= 0) {
+    double ipart = floor(n);
+    r->word[i] = ipart;
+    n -= ipart;
+    n *= 4294967296.0;
+    --i;
+  }
 }
 
 /*
