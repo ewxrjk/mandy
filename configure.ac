@@ -38,6 +38,12 @@ x86_64 )
   AC_DEFINE([HAVE_ASM_AMD64], [1], [use amd64 assembler])
   ;;
 esac
+AC_ARG_WITH([fixed-point],
+            [AS_HELP_STRING([--with-fixed-point],
+			    [use fixed point arithmetic])],
+            [arithtype=fixed],
+            [arithtype=double])
+AC_DEFINE_UNQUOTED([arith_t],[${arithtype}],[arithmetic type])
 AC_DEFINE([NFIXED],[4], [number of words in a fixed point integer])
 AC_CONFIG_FILES([Makefile lib/Makefile images/Makefile gtkui/Makefile])
 AC_OUTPUT

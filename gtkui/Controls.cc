@@ -17,6 +17,9 @@
 #include "View.h"
 #include "Controls.h"
 #include <cerrno>
+#include "arith.h"
+#include "fixed.h"
+#include "double.h"
 
 namespace mmui {
 
@@ -28,9 +31,11 @@ namespace mmui {
     ycenter_caption("Y center"),
     radius_caption("Radius"),
     maxiters_caption("Iterations"),
-    xcenter_control(this, &view->xcenter, -HUGE_VAL, HUGE_VAL),
-    ycenter_control(this, &view->ycenter, -HUGE_VAL, HUGE_VAL),
-    radius_control(this, &view->radius, 0.0, HUGE_VAL),
+    xcenter_control(this, &view->xcenter, -arith_traits<arith_t>::maximum(),
+                    arith_traits<arith_t>::maximum()),
+    ycenter_control(this, &view->ycenter, -arith_traits<arith_t>::maximum(),
+                    arith_traits<arith_t>::maximum()),
+    radius_control(this, &view->radius, 0, arith_traits<arith_t>::maximum()),
     maxiters_control(this, &view->maxiters, 1, INT_MAX - 1) {
     attach(xcenter_caption, 0, 1, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
     attach(xcenter_control, 1, 2, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
@@ -112,27 +117,24 @@ namespace mmui {
     s.assign(buffer);
   }
 
-  // Double entry widget ------------------------------------------------------
+  // Real entry widget ------------------------------------------------------
 
-  bool DoubleControl::Valid(const char *s) const {
-    char *end;
+  bool RealControl::Valid(const char *s) const {
+    char *end = NULL;                   // TODO
     errno = 0;
-    double n = strtod(s, &end);
+    arith_t n = arith_traits<arith_t>::fromString(s, &end);
     if(errno || n < min || n > max || *end)
       return false;
     else
       return true;
   }
 
-  void DoubleControl::Set(const char *s) {
-    *value = strtod(s, NULL);
+  void RealControl::Set(const char *s) {
+    *value = arith_traits<arith_t>::fromString(s, NULL);
   }
 
-  void DoubleControl::Render(Glib::ustring &s) const {
-    char buffer[128];
-
-    snprintf(buffer, sizeof buffer, "%g", *value);
-    s.assign(buffer);
+  void RealControl::Render(Glib::ustring &s) const {
+    s.assign(arith_traits<arith_t>::toString(*value));
   }
 
 }

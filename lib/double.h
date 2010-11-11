@@ -13,15 +13,39 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef MANDY_H
-#define MANDY_H
+#ifndef DOUBLE_H
+#define DOUBLE_H
 
-#include <config.h>
-#include "Fixed.h"
+#include "arith.h"
 
-void fatal(int errno_value, const char *fmt, ...);
+template<>
+class arith_traits<double> {
+public:
+  static inline double maximum() {
+    return HUGE_VAL;
+  }
 
-#endif /* MANDY_H */
+  static std::string toString(const double &n) {
+    char buffer[128];
+
+    snprintf(buffer, sizeof buffer, "%g", n);
+    return buffer;
+  }
+
+  static int toInt(const double &n) {
+    return floor(n);
+  }
+
+  static double fromString(const char *s, char **end) {
+    return strtod(s, end);
+  }
+
+  static double toDouble(const double &n) {
+    return n;
+  }
+};
+
+#endif /* DOUBLE_H */
 
 /*
 Local Variables:

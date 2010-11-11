@@ -92,6 +92,7 @@ extern "C" {
 
 #ifdef __cplusplus
 
+#include "arith.h"
 #include <string>
 
 class fixed {
@@ -144,6 +145,12 @@ public:
   }
 
   // Arithmetic
+
+  fixed operator-() const{
+    fixed r;
+    Fixed_neg(&r.f, &f);
+    return r;
+  }
 
   fixed operator+(const fixed &that) const {
     fixed r;
@@ -204,6 +211,10 @@ public:
   // Conversions
   std::string toString(int base = 10) const;
 
+  int toInt() const {
+    return f.word[NFIXED - 1];
+  }
+
 };
 
 inline fixed sqrt(const fixed &f) {
@@ -211,6 +222,40 @@ inline fixed sqrt(const fixed &f) {
   Fixed_sqrt(&r.f, &f.f);
   return r;
 }
+
+template<>
+class arith_traits<fixed> {
+public:
+  static inline fixed maximum() {
+    Fixed f;
+    memset(f.word, 0xFF, sizeof f.word);
+    f.word[NFIXED-1] = 0x7FFFFFFF;
+    return fixed(f);
+  }
+
+  static std::string toString(const fixed &n) {
+    return n.toString();
+  }
+
+  static int toInt(const fixed &n) {
+    return n.toInt();
+  }
+
+  static fixed fromString(const char *, char **) {
+    return 0;                           // TODO
+  }
+
+  static double toDouble(const fixed &n) {
+    if(n < 0)
+      return -toDouble(-n);
+    return (n.f.word[NFIXED - 4] / 79228162514264337593543950336.0
+            + n.f.word[NFIXED - 3] / 18446744073709551616.0
+            + n.f.word[NFIXED - 2] / 4294967296.0
+            + n.f.word[NFIXED - 1]);
+    // TODO hacky!
+  }
+};
+
 #endif
 
 #endif /* FIXED_H */

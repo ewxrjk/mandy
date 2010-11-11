@@ -13,15 +13,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef MANDY_H
-#define MANDY_H
+#ifndef ARITH_H
+#define ARITH_H
 
-#include <config.h>
-#include "Fixed.h"
+#include <string>
 
-void fatal(int errno_value, const char *fmt, ...);
+template<typename T> class arith_traits {
+public:
+  static T maximum();
+  static std::string toString(const T &n);
+  static T fromString(const char *s, char **end);
+  static int toInt(const T &n);
+  static double toDouble(const T &n);
+};
 
-#endif /* MANDY_H */
+#endif /* ARITH_H */
 
 /*
 Local Variables:

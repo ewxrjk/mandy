@@ -222,7 +222,8 @@ namespace mmui {
       arith_t xpixelNew = xsizeNew / wNew;
       arith_t scale = xpixelOld / xpixelNew;
       // The size of the rescaled image
-      int wScaled = wOld * scale, hScaled = hOld * scale;
+      int wScaled = arith_traits<arith_t>::toInt(arith_t(wOld) * scale);
+      int hScaled = arith_traits<arith_t>::toInt(arith_t(hOld) * scale);
       // The rescaling parameters.  If the rescaled image is narrower than the
       // new window then it will be offset into it, otherwise it will up at the
       // edge.
@@ -243,10 +244,14 @@ namespace mmui {
              newPixbuf->get_rowstride() * hNew);
       // Do the scale
       pixbuf->scale(newPixbuf,
-                    dest_x, dest_y,
-                    dest_w, dest_h,
-                    offset_x, offset_y,
-                    scale, scale,
+                    arith_traits<arith_t>::toInt(dest_x),
+                    arith_traits<arith_t>::toInt(dest_y),
+                    arith_traits<arith_t>::toInt(dest_w),
+                    arith_traits<arith_t>::toInt(dest_h),
+                    arith_traits<arith_t>::toDouble(offset_x),
+                    arith_traits<arith_t>::toDouble(offset_y),
+                    arith_traits<arith_t>::toDouble(scale),
+                    arith_traits<arith_t>::toDouble(scale),
                     Gdk::INTERP_NEAREST);
       // Use the new pixbuf henceforth
       pixbuf = newPixbuf;
@@ -273,11 +278,11 @@ namespace mmui {
     int w, h;
     get_window()->get_size(w, h);
     if(w > h) {
-      xcenter -= deltax * radius * 2 / h;
-      ycenter += deltay * radius * 2 / h;
+      xcenter -= arith_t(deltax) * radius * 2 / h;
+      ycenter += arith_t(deltay) * radius * 2 / h;
     } else {
-      xcenter -= deltax * radius * 2 / w;
-      ycenter += deltay * radius * 2 / w;
+      xcenter -= arith_t(deltax) * radius * 2 / w;
+      ycenter += arith_t(deltay) * radius * 2 / w;
     }
   }
 
@@ -324,11 +329,11 @@ namespace mmui {
      *           = xcenter_0 + size_0*(1-k)*(x*2/w - 1)
      */
     if(w > h) {
-      xcenter += radius * (1-scale) * (x * 2.0 - w) / h;
-      ycenter -= radius * (1-scale) * (y * 2.0 / h - 1);
+      xcenter += radius * (arith_t(1)-scale) * (x * 2 - w) / h;
+      ycenter -= radius * (arith_t(1)-scale) * (y * 2 / h - 1);
     } else {
-      xcenter += radius * (1-scale) * (x * 2.0 / w - 1);
-      ycenter -= radius * (1-scale) * (y * 2.0 - h) / w;
+      xcenter += radius * (arith_t(1)-scale) * (x * 2 / w - 1);
+      ycenter -= radius * (arith_t(1)-scale) * (y * 2 - h) / w;
     }
     radius *= scale;
   }

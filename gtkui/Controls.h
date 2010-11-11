@@ -55,11 +55,11 @@ namespace mmui {
     void Render(Glib::ustring &) const;
   };
 
-  class DoubleControl: public Control {
+  class RealControl: public Control {
     arith_t *value;
     arith_t min, max;
   public:
-    DoubleControl(ControlPanel *p, arith_t *v, arith_t min_, arith_t max_):
+    RealControl(ControlPanel *p, arith_t *v, arith_t min_, arith_t max_):
       Control(p),
       value(v), min(min_), max(max_) {
     }
@@ -72,7 +72,7 @@ namespace mmui {
     std::vector<Control *> controls;
     View *view;
     Caption xcenter_caption, ycenter_caption, radius_caption, maxiters_caption;
-    DoubleControl xcenter_control, ycenter_control, radius_control;
+    RealControl xcenter_control, ycenter_control, radius_control;
     IntegerControl maxiters_control;
   public:
     ControlPanel(View *);

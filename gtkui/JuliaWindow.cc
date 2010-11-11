@@ -40,8 +40,11 @@ namespace mmui {
       juliaJobFactory.cx = x;
       juliaJobFactory.cy = y;
       NewLocation();
-      char buffer[128];
-      snprintf(buffer, sizeof buffer, "Julia set at %g+%gi", x, y); // TODO double
+      std::string xs = arith_traits<arith_t>::toString(x);
+      std::string ys = arith_traits<arith_t>::toString(x);
+      char buffer[256];
+      snprintf(buffer, sizeof buffer, "Julia set at %s+%si",
+               xs.c_str(), ys.c_str());
       dynamic_cast<Gtk::Window *>(get_parent()->get_parent())->set_title(buffer);
     }
   }
