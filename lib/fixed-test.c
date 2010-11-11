@@ -86,6 +86,16 @@ int main() {
   Fixed_mul(&c, &a, &b);
   printf("101*0.5  "); printFixed(&c); putchar('\n');
 
+  // Multiply with nontrivial sign
+  Fixed_int2(&a, -10);
+  Fixed_int2(&b, -5);
+  Fixed_mul(&c, &a, &b);
+  printf("-10*-5:  "); printFixed(&c); putchar('\n');
+  Fixed_int2(&a, -10);
+  Fixed_int2(&b, 5);
+  Fixed_mul(&c, &a, &b);
+  printf("-10*5:   "); printFixed(&c); putchar('\n');
+
   // Very small numbers
   Fixed_int2(&a, 1);
   Fixed_divu(&a, &a, 65536);
