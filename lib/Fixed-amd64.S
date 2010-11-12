@@ -147,6 +147,13 @@ _Fixed_mul:
 	adc	r11,0
 	not	cl
 2:
+	// HACK: put the unsigned versions bacl
+	mov	[rdx+8],r9
+	mov	[rsi+8],r11
+	mov	[rdx],r8
+	mov	[rsi],r10
+	// END HACK
+
 	// Do the multiplies.
 	// All multiplies are rax * something -> rdx:rax
 	// Result will be accumulated in rsi:rbp:r12:<junk>

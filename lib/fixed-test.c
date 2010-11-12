@@ -112,6 +112,8 @@ int main() {
   Fixed_mul(&c, &a, &b);
   printf("a*b:     "); printFixed(&c); putchar('\n');
   printf("  ...should be about -0.0122038841\n");
+  printf("a:       "); printFixed(&a); putchar('\n');
+  printf("b:       "); printFixed(&b); putchar('\n');
 
   // Very small numbers
   Fixed_int2(&a, 1);
