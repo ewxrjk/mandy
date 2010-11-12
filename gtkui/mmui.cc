@@ -17,6 +17,7 @@
 #include "JuliaWindow.h"
 #include "MandelbrotWindow.h"
 #include <gtkmm/main.h>
+#include <getopt.h>
 
 mmui::MandelbrotWindow *mmui::mandelbrot;
 mmui::JuliaWindow *mmui::julia;
@@ -36,10 +37,34 @@ static bool periodic() {
   return true;
 }
 
+static const struct option options[] = {
+  { "help", no_argument, NULL, 'h' },
+  { "threads", required_argument, NULL, 't' },
+  { NULL, 0, NULL, 0 }
+};
+
 int main(int argc, char **argv) {
   Gtk::Main kit(argc, argv);
+  int n, nthreads = -1;
 
-  Job::init();
+  while((n = getopt_long(argc, argv, "ht:", options, NULL)) >= 0) {
+    switch(n) {
+    case 'h':
+      printf("Usage:\n"
+             "  mandy [OPTIONS]\n"
+             "Options:\n"
+             "  --help, -h        Display help message\n"
+             "  --threads, -t N   Set maximum number of threads\n");
+      return 0;
+    case 't':
+      nthreads = atoi(optarg);
+      break;
+    default:
+      exit(1);
+    }
+  }
+
+  Job::init(nthreads);
   Glib::signal_timeout().connect
     (sigc::ptr_fun(periodic), 10);
 

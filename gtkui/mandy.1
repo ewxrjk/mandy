@@ -3,6 +3,7 @@
 mandy - Mandelbrot set drawer
 .SH SYNOPSIS
 .B mandy
+.RI [ OPTIONS ]
 .SH DESCRIPTION
 .B mandy
 draws images of the Mandelbrot set, with its complement colored
@@ -35,5 +36,13 @@ The size is the radius of the biggest circle that fits on the display,
 or (looked at another way) the size of the smaller dimension.
 .PP
 A fourth box allows the maximum iteration count to be adjusted.
+.SH OPTIONS
+.TP
+.B --help\fR, \fB-h
+Display a usage message.
+.TP
+.B --threads \fITHREADS\fR, \fB-t \fITHREADS
+Set the number of threads to use.
+The default is the number of online CPU cores.
 .SH AUTHOR
 Richard Kettlewell <rjk@greenend.org.uk>
