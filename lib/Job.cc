@@ -56,9 +56,11 @@ void Job::cancel(void *classId) {
   releaseLock();
 }
 
-void Job::init() {
-  int ncores = sysconf(_SC_NPROCESSORS_ONLN), rc;
-  for(int n = 0; n < ncores; ++n) {
+void Job::init(int nthreads) {
+  int rc;
+  if(nthreads == -1)
+    nthreads = sysconf(_SC_NPROCESSORS_ONLN);
+  for(int n = 0; n < nthreads; ++n) {
     pthread_t id;
     if((rc = pthread_create(&id, NULL, worker, NULL)))
       fatal(rc, "pthread_create");

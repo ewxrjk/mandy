@@ -72,7 +72,7 @@ public:
   static bool poll(int max = 16);      // call outstanding completion callbacks
   static bool pending();               // any work left?
 
-  static void init();                   // initialize thread pool
+  static void init(int nthreads=-1);    // initialize thread pool
   static void destroy();                // destroy thread pool
 };
 
