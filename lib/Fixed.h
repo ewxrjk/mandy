@@ -83,8 +83,8 @@ extern "C" {
 
   int Fixed_eq0(const struct Fixed *a);
 
-  void Fixed_2str(char buffer[], unsigned bufsize, const struct Fixed *a,
-                  int base);
+  char *Fixed_2str(char buffer[], unsigned bufsize, const struct Fixed *a,
+                   int base);
 
   void Fixed_double2(struct Fixed *r, double n);
   double Fixed_2double(const struct Fixed *a);

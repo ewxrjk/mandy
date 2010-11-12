@@ -152,8 +152,8 @@ int Fixed_eq0(const struct Fixed *a) {
   return 1;
 }
 
-void Fixed_2str(char buffer[], unsigned bufsize, const struct Fixed *a,
-		int base) {
+char *Fixed_2str(char buffer[], unsigned bufsize, const struct Fixed *a,
+                 int base) {
 #define ADDCHAR(C) do {				\
   if(i < bufsize - 1)				\
     buffer[i++] = (C);				\
@@ -191,6 +191,7 @@ void Fixed_2str(char buffer[], unsigned bufsize, const struct Fixed *a,
     } while(!Fixed_eq0(&n));
   }
   buffer[i] = 0;
+  return buffer;
 }
 
 int Fixed_lt(const struct Fixed *a, const struct Fixed *b) {
