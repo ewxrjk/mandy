@@ -23,6 +23,14 @@ std::string fixed::toString(int base) const {
   return buffer;
 }
 
+std::string fixed::toHex() const {
+  char buffer[10 * NFIXED + 10];
+  sprintf(buffer, "%08x.%08x", f.word[NFIXED-1], f.word[NFIXED-2]);
+  for(int n = NFIXED-3; n >= 0; --n)
+    sprintf(buffer + strlen(buffer), " %08x", f.word[n]);
+  return buffer;
+}
+
 /*
 Local Variables:
 mode:c

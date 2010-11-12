@@ -2,6 +2,7 @@
 #include "Fixed.h"
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 
 void printFixed(const struct Fixed *f) {
   char buffer[128];
@@ -94,6 +95,23 @@ int main() {
   Fixed_int2(&b, 5);
   Fixed_mul(&c, &a, &b);
   printf("-10*5:   "); printFixed(&c); putchar('\n');
+
+  // Multiply regression
+  memset(&a, 0, sizeof a);
+  memset(&b, 0, sizeof b);
+  a.word[NFIXED-1] = 0x00000000;
+  a.word[NFIXED-2] = 0x95f61998;
+  a.word[NFIXED-3] = 0x0c433000;
+  a.word[NFIXED-4] = 0x00000000;	/* about 0.5857864... */
+  b.word[NFIXED-1] = 0xffffffff;
+  b.word[NFIXED-2] = 0xfaaaaaaa;
+  b.word[NFIXED-3] = 0xaaaaaaaa;
+  b.word[NFIXED-4] = 0xaaaaaaaa;	/* about -0.02083333... */
+  printf("a:       "); printFixed(&a); putchar('\n');
+  printf("b:       "); printFixed(&b); putchar('\n');
+  Fixed_mul(&c, &a, &b);
+  printf("a*b:     "); printFixed(&c); putchar('\n');
+  printf("  ...should be about -0.0122038841\n");
 
   // Very small numbers
   Fixed_int2(&a, 1);

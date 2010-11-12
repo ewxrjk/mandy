@@ -217,6 +217,7 @@ public:
 
   // Conversions
   std::string toString(int base = 10) const;
+  std::string toHex() const;
 
   int toInt() const {
     return f.word[NFIXED - 1];
