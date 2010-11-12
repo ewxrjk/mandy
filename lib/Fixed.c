@@ -358,6 +358,19 @@ void Fixed_double2(struct Fixed *r, double n) {
   }
 }
 
+double Fixed_2double(const struct Fixed *a) {
+  if(Fixed_lt0(a)) {
+    struct Fixed b;
+    Fixed_neg(&b, a);
+    return -Fixed_2double(&b);
+  }
+  // TODO assumes NFIXED==4
+  return (a->word[NFIXED - 4] / 79228162514264337593543950336.0
+          + a->word[NFIXED - 3] / 18446744073709551616.0
+          + a->word[NFIXED - 2] / 4294967296.0
+          + a->word[NFIXED - 1]);
+}
+
 /*
 Local Variables:
 mode:c

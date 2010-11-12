@@ -144,13 +144,16 @@ int main() {
   Fixed_mul(&b, &a, &a);
   printf("(√½)²:   "); printFixed(&b); putchar('\n');
 
-  // Conversion from double
+  // Conversion to/from double
   Fixed_double2(&a, 1.0);
   printf("1.0:     "); printFixed(&a); putchar('\n');
+  printf("and back: %g\n", Fixed_2double(&a));
   Fixed_double2(&a, 0.5);
   printf("0.5:     "); printFixed(&a); putchar('\n');
+  printf("and back: %g\n", Fixed_2double(&a));
   Fixed_double2(&a, M_PI);
   printf("π:       "); printFixed(&a); putchar('\n');
+  printf("and back: %g\n", Fixed_2double(&a));
 
   return 0;
 }

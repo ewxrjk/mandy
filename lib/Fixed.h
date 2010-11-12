@@ -87,6 +87,7 @@ extern "C" {
                   int base);
 
   void Fixed_double2(struct Fixed *r, double n);
+  double Fixed_2double(const struct Fixed *a);
 
 #ifdef __cplusplus
 }
@@ -221,6 +222,10 @@ public:
     return f.word[NFIXED - 1];
   }
 
+  double toDouble() const {
+    return Fixed_2double(&f);
+  }
+
 };
 
 inline fixed sqrt(const fixed &f) {
@@ -252,13 +257,7 @@ public:
   }
 
   static double toDouble(const fixed &n) {
-    if(n < 0)
-      return -toDouble(-n);
-    return (n.f.word[NFIXED - 4] / 79228162514264337593543950336.0
-            + n.f.word[NFIXED - 3] / 18446744073709551616.0
-            + n.f.word[NFIXED - 2] / 4294967296.0
-            + n.f.word[NFIXED - 1]);
-    // TODO hacky!
+    return n.toDouble();
   }
 };
 
