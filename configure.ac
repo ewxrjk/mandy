@@ -32,17 +32,24 @@ fi
 if test "x$GCC" = xyes; then
   CC="$CC -Wall -W -Werror -Wpointer-arith -Wwrite-strings"
 fi
-case $host_cpu in
-x86_64 )
-  AC_DEFINE([HAVE_ASM], [1], [use assembly fixed point support])
-  AC_DEFINE([HAVE_ASM_AMD64], [1], [use amd64 assembler])
-  ;;
-esac
 AC_ARG_WITH([fixed-point],
             [AS_HELP_STRING([--with-fixed-point],
 			    [use fixed point arithmetic])],
             [arithtype=fixed],
             [arithtype=double])
+AC_ARG_WITH([assembler],
+            [AS_HELP_STRING([--without-assembler],
+			    [suppress assembler implementations])],
+            [],
+            [with_assembler=yes])
+if test "x$with_assembler" != xno; then
+  case $host_cpu in
+  x86_64 )
+    AC_DEFINE([HAVE_ASM], [1], [use assembly fixed point support])
+    AC_DEFINE([HAVE_ASM_AMD64], [1], [use amd64 assembler])
+    ;;
+  esac
+fi
 AC_DEFINE_UNQUOTED([arith_t],[${arithtype}],[arithmetic type])
 AC_DEFINE([NFIXED],[4], [number of words in a fixed point integer])
 AC_CONFIG_FILES([Makefile lib/Makefile images/Makefile gtkui/Makefile])
