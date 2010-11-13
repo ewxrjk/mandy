@@ -349,6 +349,8 @@ iterloop:
 	jb	iterloop
 	.intel_syntax noprefix
 escaped:
+        // Retrieve iteration count
+	movd	rax,xmm4
 	// TODO if we're going to do smooth coloring then we'll need
 	// to return latest zx/zy.
 	// Restore registers

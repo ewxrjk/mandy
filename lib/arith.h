@@ -109,11 +109,7 @@ public:
 
   static int iterate(fixed zx, fixed zy, fixed cx, fixed cy, int maxiters) {
 #if HAVE_ASM && NFIXED == 4
-    int n = Fixed_iterate(&zx.f, &zy.f, &cx.f, &cy.f, maxiters);
-    fprintf(stderr, "[%d] ", n);
-    assert(n >= 0);
-    assert(n <= maxiters);
-    return n;
+    return Fixed_iterate(&zx.f, &zy.f, &cx.f, &cy.f, maxiters);
 #else
     return defaultIterate(zx, zy, cx, cy, maxiters);
 #endif
