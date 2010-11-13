@@ -22,7 +22,7 @@ template<typename T> class arith_traits {
 public:
   static T maximum();
   static std::string toString(const T &n);
-  static T fromString(const char *s, char **end);
+  static int fromString(T &n, const char *s, char **end);
   static int toInt(const T &n);
   static double toDouble(const T &n);
 };

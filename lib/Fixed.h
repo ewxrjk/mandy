@@ -85,6 +85,7 @@ extern "C" {
 
   char *Fixed_2str(char buffer[], unsigned bufsize, const struct Fixed *a,
                    int base);
+  int Fixed_str2(struct Fixed *r, const char *s, char **endptr);
 
   void Fixed_double2(struct Fixed *r, double n);
   double Fixed_2double(const struct Fixed *a);
@@ -218,6 +219,9 @@ public:
   // Conversions
   std::string toString(int base = 10) const;
   std::string toHex() const;
+  int fromString(const char *s, char **endptr) {
+    return Fixed_str2(&f, s, endptr);
+  }
 
   int toInt() const {
     return f.word[NFIXED - 1];
@@ -253,8 +257,8 @@ public:
     return n.toInt();
   }
 
-  static fixed fromString(const char *, char **) {
-    return 0;                           // TODO
+  static int fromString(fixed &n, const char *s, char **endptr) {
+    return n.fromString(s, endptr);
   }
 
   static double toDouble(const fixed &n) {

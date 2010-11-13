@@ -171,5 +171,19 @@ int main() {
   printf("π:       "); printFixed(&a); putchar('\n');
   printf("and back: %g\n", Fixed_2double(&a));
 
+  // Conversion from string
+  Fixed_str2(&a, "1.0", NULL);
+  printf("1.0:     "); printFixed(&a); putchar('\n');
+  Fixed_str2(&a, "1.5", NULL);
+  printf("1.5:     "); printFixed(&a); putchar('\n');
+  Fixed_str2(&a, "1.1", NULL);
+  printf("-1.1:    "); printFixed(&a); putchar('\n');
+  Fixed_str2(&a, "0.000000000000000000000000000012621774483536188886587657044524579674771302961744368076324462890625", NULL);
+  printf("2⁻⁹⁶:    "); printFixed(&a); putchar('\n');
+  Fixed_str2(&a, "2147483647.000000000000000000000000000012621774483536188886587657044524579674771302961744368076324462890625", NULL);
+  printf("2³¹-1+2⁻⁹⁶:"); printFixed(&a); putchar('\n');
+  Fixed_str2(&a, "-2147483647.000000000000000000000000000012621774483536188886587657044524579674771302961744368076324462890625", NULL);
+  printf("-(2³¹-1+2⁻⁹⁶):"); printFixed(&a); putchar('\n');
+
   return 0;
 }

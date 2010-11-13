@@ -15,9 +15,9 @@
 noinst_LIBRARIES=libmandy.a
 noinst_PROGRAMS=fixed-test
 libmandy_a_SOURCES=FixedCC.cc FractalJob.cc IterBuffer.cc Job.cc	\
-JuliaJob.cc MandelbrotJob.cc fatal.cc Fixed.c fixed-test.c Fixed.h	\
-FractalJob.h IterBuffer.h Job.h JuliaJob.h MandelbrotJob.h mandy.h	\
-Fixed-amd64.S
+JuliaJob.cc MandelbrotJob.cc fatal.cc Fixed.h FractalJob.h		\
+IterBuffer.h Job.h JuliaJob.h MandelbrotJob.h arith.h double.h mandy.h	\
+Fixed-str2.c Fixed.c Fixed-amd64.S
 fixed_test_SOURCES=fixed-test.c
 fixed_test_LDADD=../lib/libmandy.a
 

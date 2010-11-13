@@ -122,15 +122,16 @@ namespace mmui {
   bool RealControl::Valid(const char *s) const {
     char *end = NULL;                   // TODO
     errno = 0;
-    arith_t n = arith_traits<arith_t>::fromString(s, &end);
-    if(errno || n < min || n > max || *end)
+    arith_t n;
+    int error = arith_traits<arith_t>::fromString(n, s, &end);
+    if(error || n < min || n > max || *end)
       return false;
     else
       return true;
   }
 
   void RealControl::Set(const char *s) {
-    *value = arith_traits<arith_t>::fromString(s, NULL);
+    arith_traits<arith_t>::fromString(*value, s, NULL);
   }
 
   void RealControl::Render(Glib::ustring &s) const {

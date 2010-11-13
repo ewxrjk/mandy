@@ -36,8 +36,10 @@ public:
     return floor(n);
   }
 
-  static double fromString(const char *s, char **end) {
-    return strtod(s, end);
+  static int fromString(double *n, const char *s, char **end) {
+    errno = 0;
+    *n = strtod(s, end);
+    return errno;
   }
 
   static double toDouble(const double &n) {
