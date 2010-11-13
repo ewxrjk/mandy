@@ -22,6 +22,7 @@
 #include <gtkmm/image.h>
 #include <algorithm>
 #include <cstring>
+#include "arith.h"
 
 namespace mmui {
   View::View(): xcenter(0), ycenter(0), radius(2), maxiters(255),

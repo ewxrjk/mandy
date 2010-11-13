@@ -17,6 +17,9 @@
 #define ARITH_H
 
 #include <string>
+#include <cmath>
+#include <cerrno>
+#include <cstdlib>
 
 template<typename T> class arith_traits {
 public:
@@ -26,6 +29,37 @@ public:
   static int toInt(const T &n);
   static double toDouble(const T &n);
 };
+
+template<>
+class arith_traits<double> {
+public:
+  static inline double maximum() {
+    return HUGE_VAL;
+  }
+
+  static std::string toString(const double &n) {
+    char buffer[128];
+
+    snprintf(buffer, sizeof buffer, "%g", n);
+    return buffer;
+  }
+
+  static int toInt(const double &n) {
+    return floor(n);
+  }
+
+  static int fromString(double &n, const char *s, char **end) {
+    errno = 0;
+    n = strtod(s, end);
+    return errno;
+  }
+
+  static double toDouble(const double &n) {
+    return n;
+  }
+};
+
+#include "Fixed.h"
 
 #endif /* ARITH_H */
 
