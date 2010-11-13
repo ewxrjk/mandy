@@ -265,17 +265,18 @@ iterloop:
 	// Add them up and compare against the limit
 	add	rcx,r13
 	adc	rbx,r12
-	cmp	r12,4
+	mov	rbp,0x400000000
+	cmp	r12,rbp
 	jge	escaped
 	// Compute zx*zy
 	// First figure out what the sign will be
-	mov	rbp,0
 	cmp	r8,0
 	jge	1f
 	not	r9
 	add	r9,1
 	not	r8
 	adc	r8,0
+	not	bpl
 1:
 	cmp	r10,0
 	jge	2f
@@ -283,6 +284,7 @@ iterloop:
 	add	r11,1
 	not	r10
 	adc	r10,0
+	not	bpl
 2:
 	// rbx,rcx,rdi are used as the accumulator
 	mov	rax,r8
@@ -314,6 +316,14 @@ iterloop:
 	bt	rdi,31
 	adc	rcx,0
 	adc	rbx,0
+	// Set sign
+	cmp	bpl,0
+	je	3f
+	not	rcx
+	add	rcx,1
+	not	rbx
+	adc	rbx,0
+3:
 	// Now we have rbx,rcx = zx.zy
 	// Let rbx,rcx = 2.zx.zy
 	add	rcx,rcx
