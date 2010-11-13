@@ -132,7 +132,7 @@ _Fixed_mul:
 	// TODO could we stick the sign in some other register and save a push?
 	// Make everything +ve but remember the intended sign of the result
 	cmp	r9,0
-	jae	1f
+	jge	1f
 	not	r8
 	add	r8,1
 	not	r9
@@ -140,7 +140,7 @@ _Fixed_mul:
 	not	cl
 1:
 	cmp	r11,0
-	jae	2f
+	jge	2f
 	not	r10
 	add	r10,1
 	not	r11
