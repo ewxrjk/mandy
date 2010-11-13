@@ -374,7 +374,7 @@ square:
 	not	r15
 	add	r15,1
 	not	r14
-	adc	r15,1
+	adc	r14,0
 1:
 	// As with Fixed_mul we start at the most significant end and
 	// work our way down
