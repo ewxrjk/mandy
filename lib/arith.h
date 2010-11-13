@@ -20,6 +20,7 @@
 #include <cmath>
 #include <cerrno>
 #include <cstdlib>
+#include <cassert>
 
 #include "Fixed.h"
 
@@ -108,7 +109,11 @@ public:
 
   static int iterate(fixed zx, fixed zy, fixed cx, fixed cy, int maxiters) {
 #if HAVE_ASM && NFIXED == 4
-    return Fixed_iterate(&zx.f, &zy.f, &cx.f, &cy.f, maxiters);
+    int n = Fixed_iterate(&zx.f, &zy.f, &cx.f, &cy.f, maxiters);
+    fprintf(stderr, "[%d] ", n);
+    assert(n >= 0);
+    assert(n <= maxiters);
+    return n;
 #else
     return defaultIterate(zx, zy, cx, cy, maxiters);
 #endif

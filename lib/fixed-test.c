@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include <assert.h>
 
 void printFixed(const struct Fixed *f) {
   char buffer[128];
@@ -184,6 +185,25 @@ int main() {
   printf("2³¹-1+2⁻⁹⁶:"); printFixed(&a); putchar('\n');
   Fixed_str2(&a, "-2147483647.000000000000000000000000000012621774483536188886587657044524579674771302961744368076324462890625", NULL);
   printf("-(2³¹-1+2⁻⁹⁶):"); printFixed(&a); putchar('\n');
+
+  // Mandelbrot computation
+  Fixed_int2(&a, 0);
+  Fixed_int2(&b, 0);
+  memset(&c, 0, sizeof c);
+  c.word[NFIXED-1] = 0;
+  c.word[NFIXED-2] = 0xa6aaaaaa;
+  c.word[NFIXED-3] = 0xaaaaaaaa;
+  c.word[NFIXED-4] = 0xaaaaaaab;
+  printf("cx:      "); printFixed(&c); putchar('\n');
+  memset(&d, 0, sizeof d);
+  d.word[NFIXED-1] = 0xffffffff;
+  d.word[NFIXED-2] = 0xfd555555;
+  d.word[NFIXED-3] = 0x55555555;
+  d.word[NFIXED-4] = 0x55555555;
+  printf("cy:      "); printFixed(&d); putchar('\n');
+  int count = Fixed_iterate(&a, &b, &c, &d, 255);
+  printf("iterate: %d\n", count);
+  assert(count >= 0);
 
   return 0;
 }
