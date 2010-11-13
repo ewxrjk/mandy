@@ -210,15 +210,15 @@ SYMBOL(Fixed_mul):
  *                   const struct Fixed *cx=rdx, const struct Fixed *cy=rcx,
  *                   int maxiters=r8);
  *
- * Register allocation:
- *  rax, rdx       - destination for multiplication
+ * Outline register allocation (see code for more detail):
+ *  rax, rdx       - destination for mul instruction
  *  rbx, rcx, rdi  - accumulator for multiplication
  *  xmm0,xmm1      - cx
  *  xmm2,xmm3      - cy
  *  r8,r9          - zx
  *  r10,r11        - zy
  *  r12,r13        - zx^2
- *  r14,r15        - zy^2
+ *  r14,r15        - zy^2 + input to square routine
  *  xmm4           - iterations
  *  xmm5           - maxiters
  *  rbp            - sign of zx*zy
@@ -266,7 +266,7 @@ iterloop:
 	add	rcx,r13
 	adc	rbx,r12
 	mov	rbp,0x400000000
-	cmp	r12,rbp
+	cmp	rbx,rbp
 	jge	escaped
 	// Compute zx*zy
 	// First figure out what the sign will be
@@ -309,7 +309,7 @@ iterloop:
 	add	rdi,rdx
 	adc	rcx,0
 	adc	rbx,0
-	// Rerrange top 128 bits into two registers
+	// Rearrange top 128 bits into two registers
 	shld	rbx,rcx,32
 	shld	rcx,rdi,32
 	// Maybe round up
