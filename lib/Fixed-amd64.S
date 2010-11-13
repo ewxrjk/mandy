@@ -329,13 +329,15 @@ iterloop:
 	add	rcx,rcx
 	adc	rbx,rbx
 	// Let zy=r10,r11=2.zx.zy+cy
-	movd	r11,xmm1
-	movd	r10,xmm0
+	movd	r11,xmm3
+	movd	r10,xmm2
 	add	r11,rcx
 	adc	r10,rbx
-	// Let zy=r8,r9=zx^2-zy^2
-	mov	r9,r13
-	mov	r8,r12
+	// Let zy=r8,r9=zx^2-zy^2+cx
+        movd    r9,xmm1
+        movd    r8,xmm0
+	add	r9,r13
+	adc	r8,r12
 	sub	r9,r15
 	sbb	r8,r14
 	// Increment iteration count
