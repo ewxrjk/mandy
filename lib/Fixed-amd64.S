@@ -219,8 +219,8 @@ SYMBOL(Fixed_mul):
  *  r10,r11        - zy
  *  r12,r13        - zx^2
  *  r14,r15        - zy^2
- *  [rsp]          - iterations
- *  [rsp+8]        - maxiters
+ *  xmm4           - iterations
+ *  xmm5           - maxiters
  *  rbp            - sign of zx*zy
  */
 	.globl SYMBOL(Fixed_iterate)
@@ -233,9 +233,9 @@ SYMBOL(Fixed_iterate):
 	push	r14
 	push	r15
 	// Store iteration count info on the stack
-	push	r8
-	xor	rax,rax
-	push	rax
+	movd	xmm5,r8
+	xor	r8,r8
+	movd	xmm4,r8
 	// Get cx/cy into registers for later use
 	movd	xmm1,[rdx]
 	movd	xmm0,[rdx+8]
@@ -339,11 +339,11 @@ iterloop:
 	sub	r9,r15
 	sbb	r8,r14
 	// Increment iteration count
-	mov	rax,[rsp]
+	movd	rax,xmm4
 	inc	rax
-	mov	[rsp],rax
+	movd	xmm4,rax
 	// Only go back round the loop if not too big
-	mov	rbx,[rsp+8]
+	movd	rbx,xmm5
 	cmp	rax,rbx
 	.att_syntax // hack to work around bizarre bug in apple assembler
 	jb	iterloop
@@ -352,7 +352,6 @@ escaped:
 	// TODO if we're going to do smooth coloring then we'll need
 	// to return latest zx/zy.
 	// Restore registers
-	add	rsp,8
 	pop	r15
 	pop	r14
 	pop	r13
