@@ -17,6 +17,7 @@
 #include "JuliaJob.h"
 #include <algorithm>
 #include <cstring>
+#include "arith.h"
 
 void JuliaJob::work() {
   const int lx = x + w, ly = y + h;
@@ -26,13 +27,8 @@ void JuliaJob::work() {
     for(int px = x; px < lx; ++px) {
       arith_t izx = xleft + arith_t(px) * xsize / dest->w;
       int iterations = 0;
-      arith_t zx = izx, zy = izy, zx2, zy2;
-      while(((zx2 = zx * zx) + (zy2 = zy * zy) < 4.0)
-	    && iterations < maxiters) {
-	zy = arith_t(2) * zx * zy  + cy;
-	zx = zx2 - zy2 + cx;
-	++iterations;
-      }
+      arith_t zx = izx, zy = izy;
+      iterations = arith_traits<arith_t>::iterate(zx, zy, cx, cy, maxiters);
       *res++ = iterations;
     }
   }

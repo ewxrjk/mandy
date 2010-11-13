@@ -18,6 +18,7 @@
 #include "JuliaWindow.h"
 #include <gtkmm/frame.h>
 #include <gtkmm/box.h>
+#include "arith.h"
 
 namespace mmui {
 

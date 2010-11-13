@@ -17,6 +17,7 @@
 #include "MandelbrotJob.h"
 #include <algorithm>
 #include <cstring>
+#include "arith.h"
 
 void MandelbrotJob::work() {
   // Compute the pixel limits
@@ -36,7 +37,7 @@ void MandelbrotJob::work() {
       //
       // then z^2 + c = zx^2 - zy^2 + cx + i(2zxzy+cy)
       int iterations = 0;
-      arith_t zx = 0, zy = 0, zx2, zy2;
+      arith_t zx = 0, zy = 0;
       // Optimizations as described in WP
       const arith_t cxq = (cx-0.25);
       const arith_t cy2 = cy * cy;
@@ -51,12 +52,7 @@ void MandelbrotJob::work() {
       }
       // TODO if the whole square is outside both regions, we could
       // skip these tests.
-      while(((zx2 = zx * zx) + (zy2 = zy * zy) < 4.0)
-	    && iterations < maxiters) {
-	zy = arith_t(2) * zx * zy  + cy;
-	zx = zx2 - zy2 + cx;
-	++iterations;
-      }
+      iterations = arith_traits<arith_t>::iterate(zx, zy, cx, cy, maxiters);
     done:
       *res++ = iterations;
     }

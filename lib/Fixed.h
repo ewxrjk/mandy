@@ -97,7 +97,6 @@ extern "C" {
 
 #ifdef __cplusplus
 
-#include "arith.h"
 #include <string>
 
 class fixed {
@@ -239,33 +238,6 @@ inline fixed sqrt(const fixed &f) {
   Fixed_sqrt(&r.f, &f.f);
   return r;
 }
-
-template<>
-class arith_traits<fixed> {
-public:
-  static inline fixed maximum() {
-    Fixed f;
-    memset(f.word, 0xFF, sizeof f.word);
-    f.word[NFIXED-1] = 0x7FFFFFFF;
-    return fixed(f);
-  }
-
-  static std::string toString(const fixed &n) {
-    return n.toString();
-  }
-
-  static int toInt(const fixed &n) {
-    return n.toInt();
-  }
-
-  static int fromString(fixed &n, const char *s, char **endptr) {
-    return n.fromString(s, endptr);
-  }
-
-  static double toDouble(const fixed &n) {
-    return n.toDouble();
-  }
-};
 
 #endif
 

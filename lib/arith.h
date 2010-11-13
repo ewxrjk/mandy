@@ -21,6 +21,8 @@
 #include <cerrno>
 #include <cstdlib>
 
+#include "Fixed.h"
+
 template<typename T> class arith_traits {
 public:
   static T maximum();
@@ -28,7 +30,21 @@ public:
   static int fromString(T &n, const char *s, char **end);
   static int toInt(const T &n);
   static double toDouble(const T &n);
+  static int iterate(T zx, T zy, T cx, T cy, int maxiters);
 };
+
+template<typename T>
+int defaultIterate(T zx, T zy, T cx, T cy, int maxiters) {
+  T zx2, zy2;
+  int iterations = 0;
+  while(((zx2 = zx * zx) + (zy2 = zy * zy) < T(4))
+        && iterations < maxiters) {
+    zy = T(2) * zx * zy  + cy;
+    zx = zx2 - zy2 + cx;
+    ++iterations;
+  }
+  return iterations;
+}
 
 template<>
 class arith_traits<double> {
@@ -57,9 +73,43 @@ public:
   static double toDouble(const double &n) {
     return n;
   }
+
+  static int iterate(double zx, double zy, double cx, double cy, int maxiters) {
+    return defaultIterate(zx, zy, cx, cy, maxiters);
+  }
+
 };
 
-#include "Fixed.h"
+template<>
+class arith_traits<fixed> {
+public:
+  static inline fixed maximum() {
+    Fixed f;
+    memset(f.word, 0xFF, sizeof f.word);
+    f.word[NFIXED-1] = 0x7FFFFFFF;
+    return fixed(f);
+  }
+
+  static std::string toString(const fixed &n) {
+    return n.toString();
+  }
+
+  static int toInt(const fixed &n) {
+    return n.toInt();
+  }
+
+  static int fromString(fixed &n, const char *s, char **endptr) {
+    return n.fromString(s, endptr);
+  }
+
+  static double toDouble(const fixed &n) {
+    return n.toDouble();
+  }
+
+  static int iterate(fixed zx, fixed zy, fixed cx, fixed cy, int maxiters) {
+    return defaultIterate(zx, zy, cx, cy, maxiters);
+  }
+};
 
 #endif /* ARITH_H */
 
