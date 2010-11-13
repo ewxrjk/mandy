@@ -237,10 +237,10 @@ SYMBOL(Fixed_iterate):
 	xor	r8,r8
 	movd	xmm4,r8
 	// Get cx/cy into registers for later use
-	movd	xmm1,[rdx]
-	movd	xmm0,[rdx+8]
-	movd	xmm3,[rcx]
-	movd	xmm2,[rcx+8]
+	movd	xmm1,[qword ptr rdx]
+	movd	xmm0,[qword ptr rdx+8]
+	movd	xmm3,[qword ptr rcx]
+	movd	xmm2,[qword ptr rcx+8]
 	// Load initial zx/zy
 	mov	r9,[rdi]
 	mov	r8,[rdi+8]
