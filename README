@@ -18,6 +18,15 @@ You will need gtkmm and GNU C++.
 
 See 'man mandy' for documentation.
 
+Fixed Point Maths
+=================
+
+For an alternative slower but higher-precision version:
+  ./configure --with-fixed-point
+
+This version is optimized for x86-64 CPUs, though should work on other
+microprocessors.
+
 Copyright
 =========
 
