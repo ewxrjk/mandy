@@ -18,7 +18,7 @@
 #include "Controls.h"
 #include <cerrno>
 #include "arith.h"
-#include "fixed.h"
+#include "Fixed.h"
 #include "double.h"
 
 namespace mmui {

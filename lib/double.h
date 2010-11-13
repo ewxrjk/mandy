@@ -36,9 +36,9 @@ public:
     return floor(n);
   }
 
-  static int fromString(double *n, const char *s, char **end) {
+  static int fromString(double &n, const char *s, char **end) {
     errno = 0;
-    *n = strtod(s, end);
+    n = strtod(s, end);
     return errno;
   }
 

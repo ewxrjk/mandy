@@ -16,7 +16,13 @@
 #include <config.h>
 
 #if HAVE_ASM_AMD64
-	.intel_syntax
+	.intel_syntax noprefix
+
+#if __linux__
+# define SYMBOL(s) s
+#else
+# define SYMBOL(s) _##s
+#endif
 
 /*
  * Some possibly-relevant rules:
@@ -49,15 +55,15 @@
 	.text
 
 /* void Fixed_shl_unsigned(struct Fixed *a=rdi) */
-	.globl _Fixed_shl_unsigned
-_Fixed_shl_unsigned:
+	.globl SYMBOL(Fixed_shl_unsigned)
+SYMBOL(Fixed_shl_unsigned):
 	shl	[qword ptr rdi],1
 	rcl	[qword ptr rdi+8],1
 	ret
 
 /* void Fixed_shr_unsigned(struct Fixed *a=rdi) */
-	.globl _Fixed_shr_unsigned
-_Fixed_shr_unsigned:
+	.globl SYMBOL(Fixed_shr_unsigned)
+SYMBOL(Fixed_shr_unsigned):
 	shr	[qword ptr rdi+8],1
 	rcr	[qword ptr rdi],1
 	ret
@@ -65,8 +71,8 @@ _Fixed_shr_unsigned:
 /* void Fixed_add(struct Fixed *r=rdi,
  *                const struct Fixed *a=rsi,
  *                const struct Fixed *b=rdx) */
-	.globl _Fixed_add
-_Fixed_add:
+	.globl SYMBOL(Fixed_add)
+SYMBOL(Fixed_add):
 	mov	rax,[rsi]
 	mov	rcx,[rsi+8]
 	add	rax,[rdx]
@@ -78,8 +84,8 @@ _Fixed_add:
 /* void Fixed_sub(struct Fixed *r=rdi,
  *                const struct Fixed *a=rsi,
  *                const struct Fixed *b=rdx) */
-	.globl _Fixed_sub
-_Fixed_sub:
+	.globl SYMBOL(Fixed_sub)
+SYMBOL(Fixed_sub):
 	mov	rax,[rsi]
 	mov	rcx,[rsi+8]
 	sub	rax,[rdx]
@@ -89,8 +95,8 @@ _Fixed_sub:
 	ret
 
 /* int Fixed_neg(struct Fixed *r=rdi, const struct Fixed *a=rsi) */
-	.globl _Fixed_neg
-_Fixed_neg:
+	.globl SYMBOL(Fixed_neg)
+SYMBOL(Fixed_neg):
 	mov	rdx,[rsi]
 	mov	rax,[rsi+8]
 	mov	rcx,rax		// save for overflow detection
@@ -119,8 +125,8 @@ _Fixed_neg:
 	//                       ==== ==== ==== ====  cd * gh
 	//   <- rsi -> <- rbp -> <- r12 -> <- rax ->
 	//
-	.globl _Fixed_mul
-_Fixed_mul:
+	.globl SYMBOL(Fixed_mul)
+SYMBOL(Fixed_mul):
 	push	rbp
 	push	r12
 	// Get the values into registers
