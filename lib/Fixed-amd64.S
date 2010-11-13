@@ -226,7 +226,7 @@ SYMBOL(Fixed_mul):
 	.globl SYMBOL(Fixed_iterate)
 SYMBOL(Fixed_iterate):
 	// Registers we must preserve
-	push	rcx
+	push	rbx
 	push	rbp
 	push	r12
 	push	r13
@@ -357,7 +357,7 @@ escaped:
 	pop	r13
 	pop	r12
 	pop	rbp
-	pop	rcx
+	pop	rbx
 	ret
 
 	// Let rbx,rcx=(r14,r15)^2
