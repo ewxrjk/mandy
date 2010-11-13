@@ -186,6 +186,7 @@ int main() {
   Fixed_str2(&a, "-2147483647.000000000000000000000000000012621774483536188886587657044524579674771302961744368076324462890625", NULL);
   printf("-(2³¹-1+2⁻⁹⁶):"); printFixed(&a); putchar('\n');
 
+#if HAVE_ASM && NFIXED == 4
   // Mandelbrot computation
   Fixed_int2(&a, 0);
   Fixed_int2(&b, 0);
@@ -211,6 +212,7 @@ int main() {
   printf("cy:      "); printFixed(&d); putchar('\n');
   count = Fixed_iterate(&a, &b, &c, &d, 255);
   printf("iterate: %d\n", count);
+#endif
 
   return 0;
 }

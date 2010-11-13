@@ -21,6 +21,7 @@
 #include <cerrno>
 #include <cstdlib>
 #include <cassert>
+#include <cstdio>
 
 #include "Fixed.h"
 
