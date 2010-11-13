@@ -125,6 +125,13 @@ int Fixed_mul(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
 #endif
 
 void Fixed_divu(struct Fixed *r, const struct Fixed *a, unsigned u) {
+  if(Fixed_lt0(a)) {
+    struct Fixed aa;
+    Fixed_neg(&aa, a);
+    Fixed_divu(r, &aa, u);
+    Fixed_neg(r, r);
+    return;
+  }
   uint64_t quot, rem = 0, d;
   int n;
 
