@@ -48,6 +48,7 @@
  *   %r10       smash
  *   %r11       smash
  *   %r12-%r15  preserve
+ *   %xmm0-15   smash
  * See: http://www.x86-64.org/documentation/abi.pdf
  */
 
@@ -203,6 +204,197 @@ SYMBOL(Fixed_mul):
 	mov	[rdi],rbp
 	pop	r12
 	pop	rbp
+	ret
+
+/* int Fixed_iterate(struct Fixed *zx=rdi, struct Fixed *zy=rsi,
+ *                   const struct Fixed *cx=rdx, const struct Fixed *cy=rcx,
+ *                   int maxiters=r8);
+ *
+ * Register allocation:
+ *  rax, rdx       - destination for multiplication
+ *  rbx, rcx, rdi  - accumulator for multiplication
+ *  xmm0,xmm1      - cx
+ *  xmm2,xmm3      - cy
+ *  r8,r9          - zx
+ *  r10,r11        - zy
+ *  r12,r13        - zx^2
+ *  r14,r15        - zy^2
+ *  [rsp]          - iterations
+ *  [rsp+8]        - maxiters
+ *  rbp            - sign of zx*zy
+ */
+	.globl SYMBOL(Fixed_iterate)
+SYMBOL(Fixed_iterate):
+	// Registers we must preserve
+	push	rcx
+	push	rbp
+	push	r12
+	push	r13
+	push	r14
+	push	r15
+	// Store iteration count info on the stack
+	push	r8
+	xor	rax,rax
+	push	rax
+	// Get cx/cy into registers for later use
+	movd	xmm1,[rdx]
+	movd	xmm0,[rdx+8]
+	movd	xmm3,[rcx]
+	movd	xmm2,[rcx+8]
+	// Load initial zx/zy
+	mov	r9,[rdi]
+	mov	r8,[rdi+8]
+	mov	r11,[rsi]
+	mov	r10,[rsi+8]
+	// Main loop
+iterloop:
+	// Compute zx^2
+	mov	r14,r8
+	mov	r15,r9
+	call	square
+	mov	r12,rbx
+	mov	r13,rcx
+	// Compute zy^2
+	mov	r14,r10
+	mov	r15,r11
+	.att_syntax // hack to work around bizarre bug in apple assembler
+	call	square
+	.intel_syntax noprefix
+	mov	r14,rbx
+	mov	r15,rcx
+	// Add them up and compare against the limit
+	add	rcx,r13
+	adc	rbx,r12
+	cmp	r12,4
+	jge	escaped
+	// Compute zx*zy
+	// First figure out what the sign will be
+	mov	rbp,0
+	cmp	r8,0
+	jge	1f
+	not	r9
+	add	r9,1
+	not	r8
+	adc	r8,0
+1:
+	cmp	r10,0
+	jge	2f
+	not	r11
+	add	r11,1
+	not	r10
+	adc	r10,0
+2:
+	// rbx,rcx,rdi are used as the accumulator
+	mov	rax,r8
+	mul	r10
+	mov	rcx,rax
+	mov	rbx,rdx
+	//
+	mov	rax,r8
+	mul	r11
+	mov	rdi,rax
+	add	rcx,rdx
+	adc	rbx,0
+	//
+	mov	rax,r9
+	mul	r10
+	add	rdi,rax
+	adc	rcx,rdx
+	adc	rbx,0
+	//
+	mov	rax,r9
+	mul	r11
+	add	rdi,rdx
+	adc	rcx,0
+	adc	rbx,0
+	// Rerrange top 128 bits into two registers
+	shld	rbx,rcx,32
+	shld	rcx,rdi,32
+	// Maybe round up
+	bt	rdi,31
+	adc	rcx,0
+	adc	rbx,0
+	// Now we have rbx,rcx = zx.zy
+	// Let rbx,rcx = 2.zx.zy
+	add	rcx,rcx
+	adc	rbx,rbx
+	// Let zy=r10,r11=2.zx.zy+cy
+	movd	r11,xmm1
+	movd	r10,xmm0
+	add	r11,rcx
+	adc	r10,rbx
+	// Let zy=r8,r9=zx^2-zy^2
+	mov	r9,r13
+	mov	r8,r12
+	sub	r9,r15
+	sbb	r8,r14
+	// Increment iteration count
+	mov	rax,[rsp]
+	inc	rax
+	mov	[rsp],rax
+	// Only go back round the loop if not too big
+	mov	rbx,[rsp+8]
+	cmp	rax,rbx
+	.att_syntax // hack to work around bizarre bug in apple assembler
+	jb	iterloop
+	.intel_syntax noprefix
+escaped:
+	// TODO if we're going to do smooth coloring then we'll need
+	// to return latest zx/zy.
+	// Restore registers
+	add	rsp,8
+	pop	r15
+	pop	r14
+	pop	r13
+	pop	r12
+	pop	rbp
+	pop	rcx
+	ret
+
+	// Let rbx,rcx=(r14,r15)^2
+	// rax,rdx are used by the MUL insn
+	// rbx,rcx,rdi are used as accumulator
+	//
+	// In the language of Fixed_mul, we have r14=Ab=Ef, r15=cd=gh
+square:
+	// We can throw away sign information as the answer is never -ve
+	cmp	r14,0
+	jge	1f
+	not	r15
+	add	r15,1
+	not	r14
+	adc	r15,1
+1:
+	// As with Fixed_mul we start at the most significant end and
+	// work our way down
+	mov	rax,r14
+	mul	r14
+	mov	rcx,rax
+	mov	rbx,rdx
+	//
+	mov	rax,r14
+	mul	r15
+	mov	rdi,rax
+	add	rcx,rdx
+	adc	rbx,0
+	//
+	// We take advantage of (x+y)^2=(x^2+2xy+y^2) to skip a multiply
+	add	rdi,rax
+	adc	rcx,rdx
+	adc	rbx,0
+	//
+	mov	rax,r15
+	mul	r15
+	add	rdi,rdx
+	adc	rcx,0
+	adc	rbx,0
+	// Rearrange top 128 bits into two registers
+	shld	rbx,rcx,32
+	shld	rcx,rdi,32
+	// Maybe round up
+	bt	rdi,31
+	adc	rcx,0
+	adc	rbx,0
 	ret
 #endif
 #endif

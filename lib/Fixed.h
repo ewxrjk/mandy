@@ -91,6 +91,10 @@ extern "C" {
   void Fixed_double2(struct Fixed *r, double n);
   double Fixed_2double(const struct Fixed *a);
 
+  int Fixed_iterate(struct Fixed *zx, struct Fixed *zy,
+                    const struct Fixed *cx, const struct Fixed *cy,
+                    int maxiters);
+
 #ifdef __cplusplus
 }
 #endif
