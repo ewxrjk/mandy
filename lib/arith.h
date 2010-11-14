@@ -39,7 +39,7 @@ template<typename T>
 count_t defaultIterate(T zx, T zy, T cx, T cy, int maxiters) {
   T r2, zx2, zy2;
   int iterations = 0;
-  while(((r2 = (zx2 = zx * zx) + (zy2 = zy * zy)) < T(4))
+  while(((r2 = (zx2 = zx * zx) + (zy2 = zy * zy)) < T(64))
         && iterations < maxiters) {
     zy = T(2) * zx * zy  + cy;
     zx = zx2 - zy2 + cx;
@@ -48,7 +48,7 @@ count_t defaultIterate(T zx, T zy, T cx, T cy, int maxiters) {
   if(iterations == maxiters)
     return maxiters;
   else
-    return (count_t)iterations - log2(log(arith_traits<T>::toDouble(r2)));
+    return log(1 + iterations - log2(log(arith_traits<T>::toDouble(r2))));
 }
 
 template<>
