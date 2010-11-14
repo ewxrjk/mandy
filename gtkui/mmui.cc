@@ -16,6 +16,7 @@
 #include "mmui.h"
 #include "JuliaWindow.h"
 #include "MandelbrotWindow.h"
+#include "Draw.h"
 #include <gtkmm/main.h>
 #include <getopt.h>
 
@@ -40,24 +41,30 @@ static bool periodic() {
 static const struct option options[] = {
   { "help", no_argument, NULL, 'h' },
   { "threads", required_argument, NULL, 't' },
+  { "draw", no_argument, NULL, 'd' },
   { NULL, 0, NULL, 0 }
 };
 
 int main(int argc, char **argv) {
   Gtk::Main kit(argc, argv);
-  int n, nthreads = -1;
+  int n, nthreads = -1, mode = 0;
 
-  while((n = getopt_long(argc, argv, "ht:", options, NULL)) >= 0) {
+  while((n = getopt_long(argc, argv, "ht:d", options, NULL)) >= 0) {
     switch(n) {
     case 'h':
       printf("Usage:\n"
              "  mandy [OPTIONS]\n"
+             "  mandy [OPTIONS] --draw X Y RADIUS MAXITERS PATH\n"
              "Options:\n"
              "  --help, -h        Display help message\n"
+             "  --draw, -d        Draw one image and terminate\n"
              "  --threads, -t N   Set maximum number of threads\n");
       return 0;
     case 't':
       nthreads = atoi(optarg);
+      break;
+    case 'd':
+      mode = 'd';
       break;
     default:
       exit(1);
@@ -65,6 +72,23 @@ int main(int argc, char **argv) {
   }
 
   Job::init(nthreads);
+
+  switch(mode) {
+  case 'd':
+    if(optind + 5 != argc)
+      fatal(0, "Usage: %s --draw X Y RADIUS MAXITERS PATH", argv[0]);
+    draw(argv[optind],
+         argv[optind + 1],
+         argv[optind + 2],
+         argv[optind + 3],
+         argv[optind + 4]);
+    return 0;
+  default:
+    break;
+  }
+  if(optind != argc)
+    fatal(0, "invalid argument '%s'", argv[optind]);
+
   Glib::signal_timeout().connect
     (sigc::ptr_fun(periodic), 10);
 

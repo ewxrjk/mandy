@@ -24,7 +24,7 @@ void Job::submit(void (*completion_callback_)(Job *, void *),
   completion_data = completion_data_;
   acquireLock();
   queue.push_back(this);
-  if((rc = pthread_cond_signal(&queued)))
+  if((rc = pthread_cond_signal(&queued_cond)))
     fatal(rc, "pthread_cond_signal");
   releaseLock();
 }
@@ -72,7 +72,7 @@ void Job::destroy() {
   int rc;
   acquireLock();
   shutdown = true;
-  if((rc = pthread_cond_broadcast(&queued)))
+  if((rc = pthread_cond_broadcast(&queued_cond)))
     fatal(rc, "pthread_cond_broadcast");
   releaseLock();
   while(workers.size()) {
@@ -82,19 +82,36 @@ void Job::destroy() {
   }
 }
 
+void Job::dequeue() {
+  Job *j = completed.front();
+  completed.pop_front();
+  releaseLock();
+  j->completion_callback(j, j->completion_data);
+  delete j;
+  acquireLock();
+}
+
 bool Job::poll(int max) {
   acquireLock();
-  while(!completed.empty() && max-- > 0) {
-    Job *j = completed.front();
-    completed.pop_front();
-    releaseLock();
-    j->completion_callback(j, j->completion_data);
-    delete j;
-    acquireLock();
-  }
+  while(!completed.empty() && max-- > 0)
+    dequeue();
   bool nowEmpty = completed.empty();
   releaseLock();
   return !nowEmpty;
+}
+
+void Job::pollAll() {
+  int rc;
+  acquireLock();
+  while(!completed.empty() || !queue.empty()) {
+    if(completed.empty()) {
+      if((rc = pthread_cond_wait(&completed_cond, &lock)))
+	fatal(rc, "pthread_cond_wait");
+      continue;
+    }
+    dequeue();
+  }
+  releaseLock();
 }
 
 void *Job::worker(void *) {
@@ -102,7 +119,7 @@ void *Job::worker(void *) {
   acquireLock();
   while(!shutdown) {
     if(queue.empty()) {
-      if((rc = pthread_cond_wait(&queued, &lock)))
+      if((rc = pthread_cond_wait(&queued_cond, &lock)))
 	fatal(rc, "pthread_cond_wait");
       continue;
     }
@@ -112,6 +129,8 @@ void *Job::worker(void *) {
     j->work();
     acquireLock();
     completed.push_back(j);
+    if((rc = pthread_cond_signal(&completed_cond)))
+      fatal(rc, "pthread_cond_signal");
   }
   releaseLock();
   return NULL;
@@ -129,7 +148,8 @@ bool Job::pending() {
 
 std::list<Job *> Job::queue;
 std::list<Job *> Job::completed;
-pthread_cond_t Job::queued = PTHREAD_COND_INITIALIZER;
+pthread_cond_t Job::queued_cond = PTHREAD_COND_INITIALIZER;
+pthread_cond_t Job::completed_cond = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t Job::lock = PTHREAD_MUTEX_INITIALIZER;
 std::vector<pthread_t> Job::workers;
 bool Job::shutdown;

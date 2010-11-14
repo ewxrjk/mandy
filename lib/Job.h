@@ -30,13 +30,16 @@ public:
   void (*completion_callback)(Job *, void *);   // called upon completion
   void *completion_data;                        // passed to callback
 
+private:
   static std::list<Job *> queue;        // job queue
   static std::list<Job *> completed;    // completed jobs
-  static pthread_cond_t queued;         // signaled when a job is queued
+  static pthread_cond_t queued_cond;    // signaled when a job is queued
+  static pthread_cond_t completed_cond; // signaled when a job is completed
   static pthread_mutex_t lock;          // lock protecting jobs
   static std::vector<pthread_t> workers; // worker thread IDs
   static bool shutdown;                  // shutdown flag
   static void *worker(void *);           // work thread
+  static void dequeue();
   static void acquireLock() {
     int rc;
 
@@ -70,6 +73,7 @@ public:
 
   static void cancel(void *classId = NULL); // cancel outstanding jobs
   static bool poll(int max = 16);      // call outstanding completion callbacks
+  static void pollAll();               // wait for everything to complete
   static bool pending();               // any work left?
 
   static void init(int nthreads=-1);    // initialize thread pool
