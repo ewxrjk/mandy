@@ -16,15 +16,18 @@
 #ifndef COLOR_H
 #define COLOR_H
 
-inline int red(int count, int /*maxiters*/) {
+template<typename T>
+inline int red(T count, T /*maxiters*/) {
   return (cos(2 * M_PI * count / 256) + 1.0) * 127;
 }
 
-inline int green(int count, int /*maxiters*/) {
+template<typename T>
+inline int green(T count, T /*maxiters*/) {
   return (cos(2 * M_PI * count / 1024) + 1.0) * 127;
 }
 
-inline int blue(int count, int /*maxiters*/) {
+template<typename T>
+inline int blue(T count, T /*maxiters*/) {
   return (cos(2 * M_PI * count / 512) + 1.0) * 127;
 }
 
