@@ -19,6 +19,7 @@
 #include "Draw.h"
 #include "MandelbrotJob.h"
 #include "Color.h"
+#include <gdkmm/pixbuf.h>
 
 void draw(const char *wstr,
 	  const char *hstr,
@@ -82,7 +83,18 @@ static void completed(Job *, void *) {
 
 void draw(int width, int height, arith_t x, arith_t y, arith_t radius,
 	  int maxiters, const char *path) {
-  // TODO pixel sizes
+  const char *ext = strchr(path, '.');
+  if(!ext)
+    fatal(0, "cannot figure out extension of '%s'", ext);
+  const char *fileType = NULL;
+  if(!strcasecmp(ext, ".png"))
+    fileType = "png";
+  else if(!strcasecmp(ext, ".jpg") || !strcasecmp(ext, ".jpeg"))
+    fileType = "jpeg";
+  else if(!strcasecmp(ext, ".ppm"))
+    fileType = "ppm";
+  else
+    fatal(0, "unknown file tyep '%s'", ext);
   MandelbrotJobFactory jf;
   IterBuffer *dest = FractalJob::recompute(x, y, radius, maxiters,
 					   width, height,
@@ -90,29 +102,44 @@ void draw(int width, int height, arith_t x, arith_t y, arith_t radius,
 					   NULL,
 					   0, 0, &jf);
   Job::pollAll();
-  FILE *fp = fopen(path, "wb");
-  if(!fp)
-    fatal(errno, "opening %s", path);
-  if(fprintf(fp, "P6\n%d %d 255\n", width, height) < 0)
-    fatal(errno, "writing %s", path);
-  for(int y = 0; y < height; ++y) {
-    const count_t *datarow = &dest->data[y * width];
-    for(int x = 0; x < width; ++x) {
+  // Convert to a pixbuf
+  // TODO de-dupe with View::Completed
+  Glib::RefPtr<Gdk::Pixbuf> pixbuf = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, false, 8, width, height);
+  const int rowstride = pixbuf->get_rowstride();
+  guint8 *pixels = pixbuf->get_pixels();
+  for(int py = 0; py < height; ++py) {
+    const count_t *datarow = &dest->data[py * width];
+    guchar *pixelrow = pixels + py * rowstride;
+    for(int px = 0; px < width; ++px) {
       const count_t count = *datarow++;
-      int r, g, b;
       if(count < maxiters) {
-	r = red(count, maxiters);
-	g = green(count, maxiters);
-	b = blue(count, maxiters);
+	*pixelrow++ = red(count, maxiters);
+	*pixelrow++ = green(count, maxiters);
+	*pixelrow++ = blue(count, maxiters);
       } else {
-	r = g = b = 0;
+	*pixelrow++ = 0;
+	*pixelrow++ = 0;
+	*pixelrow++ = 0;
       }
-      if(fprintf(fp, "%c%c%c", r, g, b) < 0)
-	fatal(errno, "writing %s", path);
     }
   }
-  if(fclose(fp) < 0)
-    fatal(errno, "closing %s", path);
+  // Write to a file
+  if(!strcmp(fileType, "ppm")) {
+    FILE *fp = fopen(path, "wb");
+    if(!fp)
+      fatal(errno, "opening %s", path);
+    if(fprintf(fp, "P6\n%d %d 255\n", width, height) < 0)
+      fatal(errno, "writing %s", path);
+    for(int py = 0; py < height; ++py) {
+      guchar *pixelrow = pixels + py * rowstride;
+      fwrite(pixelrow, 3, width, fp);
+      if(ferror(fp))
+	fatal(errno, "writing %s", path);
+    }
+    if(fclose(fp) < 0)
+      fatal(errno, "closing %s", path);
+  } else
+    pixbuf->save(path, fileType);
 }
 
 /*

@@ -20,5 +20,6 @@ FractalJob.h IterBuffer.h Job.h JuliaJob.h MandelbrotJob.h arith.h	\
 mandy.h Fixed-str2.c Fixed.c Fixed-amd64.S
 fixed_test_SOURCES=fixed-test.c
 fixed_test_LDADD=../lib/libmandy.a -lm
+AM_CXXFLAGS=$(gtkmm_CFLAGS)
 
 Fixed-amd64.o: Fixed-amd64.S
