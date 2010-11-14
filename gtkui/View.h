@@ -50,11 +50,6 @@ namespace mmui {
     int maxiters;
 
   private:
-    // Colors
-    struct color { unsigned char r, g, b; };
-    std::vector<color> colors;
-    void NewColors();                   // recompute colors array
-
     // Iteration count and pixel data
     IterBuffer *dest;
     Glib::RefPtr<Gdk::Pixbuf> pixbuf;

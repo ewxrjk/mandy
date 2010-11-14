@@ -17,6 +17,7 @@
 #include "View.h"
 #include "Controls.h"
 #include "FractalJob.h"
+#include "Color.h"
 #include <gtkmm/filechooserdialog.h>
 #include <gtkmm/stock.h>
 #include <gtkmm/image.h>
@@ -169,9 +170,15 @@ namespace mmui {
       guchar *pixelrow = pixels + y * rowstride + j->x * 3;
       for(int x = j->x; x < lx; ++x) {
 	const int count = *datarow++;
-	*pixelrow++ = v->colors[count].r;
-	*pixelrow++ = v->colors[count].g;
-	*pixelrow++ = v->colors[count].b;
+        if(count < v->maxiters) {
+          *pixelrow++ = red(count, v->maxiters);
+          *pixelrow++ = green(count, v->maxiters);
+          *pixelrow++ = blue(count, v->maxiters);
+        } else {
+          *pixelrow++ = 0;
+          *pixelrow++ = 0;
+          *pixelrow++ = 0;
+        }
       }
     }
     v->Redraw(j->x, j->y, j->w, j->h);
@@ -199,8 +206,6 @@ namespace mmui {
                                  this,
                                  xpos, ypos,
                                  jobFactory);
-    if(colors.size() != (unsigned)(maxiters + 1))
-      NewColors();
   }
 
   void View::NewSize() {
@@ -259,18 +264,6 @@ namespace mmui {
       Redraw(0, 0, pixbuf->get_width(), pixbuf->get_height());
     }
     NewLocation(wNew/2, hNew/2);
-  }
-
-  // Colors -------------------------------------------------------------------
-
-  void View::NewColors() {
-    colors.resize(maxiters + 1);
-    for(int n = 0; n < maxiters; ++n) {
-      colors[n].r = (cos(2 * M_PI * n / 256) + 1.0) * 127;
-      colors[n].g = (cos(2 * M_PI * n / 1024) + 1.0) * 127;
-      colors[n].b = (cos(2 * M_PI * n / 512) + 1.0) * 127;
-    }
-    colors[maxiters].r = colors[maxiters].g = colors[maxiters].b = 0;
   }
 
   // Motion -------------------------------------------------------------------
