@@ -4,6 +4,17 @@ mandy - Mandelbrot set drawer
 .SH SYNOPSIS
 .B mandy
 .RI [ OPTIONS ]
+.br
+.B mandy
+.RI [ OPTIONS ]
+.B --draw
+.I WIDTH
+.I HEIGHT
+.I X
+.I Y
+.I RADIUS
+.I MAXITERS
+.I PATH
 .SH DESCRIPTION
 .B mandy
 draws images of the Mandelbrot set, with its complement colored
@@ -44,5 +55,52 @@ Display a usage message.
 .B --threads \fITHREADS\fR, \fB-t \fITHREADS
 Set the number of threads to use.
 The default is the number of online CPU cores.
+.TP
+.B --draw
+Draw a Mandelbrot set image and save it to a file.
+.SH "OFFLINE DRAWING"
+The
+.B --draw
+option may be used to draw a single frame and save it to a file.
+The syntax is:
+.PP
+.B mandy
+.RI [ OPTIONS ]
+.B --draw
+.I WIDTH
+.I HEIGHT
+.I X
+.I Y
+.I RADIUS
+.I MAXITERS
+.I PATH
+.TP
+.B \(bu
+.I WIDTH
+and
+.I HEIGHT
+are the pixel size of the image.
+.TP
+.B \(bu
+.I X
+and
+.I Y
+are the real and imaginary coordinates of the centre of the image and
+.I RADIUS
+is the radius of the largest inscribed circle (equivalently, the
+distance from the centre to the nearest edge).
+.TP
+.B \(bu
+.I MAXITERS
+is the maximum iteration count.
+.TP
+.B \(bu
+.I PATH
+is the name of the file to save to.
+The file type is inferred from the extension, which can be one of
+.BR .png ,
+.B .ppm
+or
+.BR .jpeg .
 .SH AUTHOR
 Richard Kettlewell <rjk@greenend.org.uk>
