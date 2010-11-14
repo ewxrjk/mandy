@@ -36,7 +36,7 @@ void MandelbrotJob::work() {
       // let z = zx + izy
       //
       // then z^2 + c = zx^2 - zy^2 + cx + i(2zxzy+cy)
-      int iterations = 0;
+      count_t iterations = 0;
       arith_t zx = 0, zy = 0;
       // Optimizations as described in WP
       const arith_t cxq = (cx-0.25);

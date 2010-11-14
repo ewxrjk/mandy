@@ -32,23 +32,23 @@ public:
   static int fromString(T &n, const char *s, char **end);
   static int toInt(const T &n);
   static double toDouble(const T &n);
-  static int iterate(T zx, T zy, T cx, T cy, int maxiters);
+  static count_t iterate(T zx, T zy, T cx, T cy, int maxiters);
 };
 
 template<typename T>
-count_t defaultIterate(T &zx_, T &zy_, T cx, T cy, int maxiters) {
-  T zx = zx_, zy = zy_;
-  T zx2, zy2;
+count_t defaultIterate(T zx, T zy, T cx, T cy, int maxiters) {
+  T r2, zx2, zy2;
   int iterations = 0;
-  while(((zx2 = zx * zx) + (zy2 = zy * zy) < T(4))
+  while(((r2 = (zx2 = zx * zx) + (zy2 = zy * zy)) < T(4))
         && iterations < maxiters) {
     zy = T(2) * zx * zy  + cy;
     zx = zx2 - zy2 + cx;
     ++iterations;
   }
-  zx_ = zx;
-  zy_ = zy;
-  return iterations;
+  if(iterations == maxiters)
+    return maxiters;
+  else
+    return (count_t)iterations - log2(log(arith_traits<T>::toDouble(r2)));
 }
 
 template<>
@@ -79,7 +79,7 @@ public:
     return n;
   }
 
-  static count_t iterate(double &zx, double &zy,
+  static count_t iterate(double zx, double zy,
                          double cx, double cy, int maxiters) {
     return defaultIterate(zx, zy, cx, cy, maxiters);
   }
@@ -114,7 +114,7 @@ public:
     return n;
   }
 
-  static count_t iterate(long double &zx, long double &zy,
+  static count_t iterate(long double zx, long double zy,
                          long double cx, long double cy, int maxiters) {
     return defaultIterate(zx, zy, cx, cy, maxiters);
   }
@@ -147,7 +147,7 @@ public:
     return n.toDouble();
   }
 
-  static count_t iterate(fixed &zx, fixed &zy, fixed cx, fixed cy, int maxiters) {
+  static count_t iterate(fixed zx, fixed zy, fixed cx, fixed cy, int maxiters) {
 #if HAVE_ASM && NFIXED == 4
     return Fixed_iterate(&zx.f, &zy.f, &cx.f, &cy.f, maxiters);
 #else

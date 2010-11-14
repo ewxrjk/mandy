@@ -18,17 +18,17 @@
 
 template<typename T>
 inline int red(T count, int /*maxiters*/) {
-  return (cos(2 * M_PI * count / 256) + 1.0) * 127;
+  return (cos(2 * M_PI * count / 16) + 1.0) * 127;
 }
 
 template<typename T>
 inline int green(T count, int /*maxiters*/) {
-  return (cos(2 * M_PI * count / 1024) + 1.0) * 127;
+  return (cos(2 * M_PI * count / 8) + 1.0) * 127;
 }
 
 template<typename T>
 inline int blue(T count, int /*maxiters*/) {
-  return (cos(2 * M_PI * count / 512) + 1.0) * 127;
+  return (cos(2 * M_PI * count / 4) + 1.0) * 127;
 }
 
 #endif /* COLOR_H */
