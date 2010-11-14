@@ -149,7 +149,13 @@ public:
 
   static count_t iterate(fixed zx, fixed zy, fixed cx, fixed cy, int maxiters) {
 #if HAVE_ASM && NFIXED == 4
-    return Fixed_iterate(&zx.f, &zy.f, &cx.f, &cy.f, maxiters);
+    int rawCount = Fixed_iterate(&zx.f, &zy.f, &cx.f, &cy.f, maxiters);
+    if(rawCount == maxiters)
+      return rawCount;
+    else {
+      // r2 is returned in zx (rather oddly)
+      return log(1 + rawCount - log2(log(zx.toDouble())));
+    }
 #else
     return defaultIterate(zx, zy, cx, cy, maxiters);
 #endif

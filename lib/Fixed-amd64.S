@@ -232,6 +232,8 @@ SYMBOL(Fixed_iterate):
 	push	r13
 	push	r14
 	push	r15
+	push	rsi
+	push	rdi
 	// Store iteration count info on the stack
 	movd	xmm5,r8
 	xor	r8,r8
@@ -265,7 +267,7 @@ iterloop:
 	// Add them up and compare against the limit
 	add	rcx,r13
 	adc	rbx,r12
-	mov	rbp,0x400000000
+	mov	rbp,0x4000000000
 	cmp	rbx,rbp
 	jge	escaped
 	// Compute zx*zy
@@ -353,8 +355,11 @@ iterloop:
 escaped:
         // Retrieve iteration count
 	movd	rax,xmm4
-	// TODO if we're going to do smooth coloring then we'll need
-	// to return latest zx/zy.
+	// Return r^2 in the first argument (rather idiosyncratic)
+	pop	rdi
+	pop	rsi
+	mov	[rdi],rcx
+	mov	[rdi+8],rbx
 	// Restore registers
 	pop	r15
 	pop	r14
