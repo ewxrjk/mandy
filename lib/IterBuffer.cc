@@ -19,7 +19,7 @@
 
 IterBuffer::IterBuffer(int w_, int h_): refs(1),
 					w(w_), h(h_),
-					data(new int[w * h]) {
+					data(new count_t[w * h]) {
   memset(data, 0, w * h * sizeof(int));
 }
 

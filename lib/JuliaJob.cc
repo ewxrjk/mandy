@@ -22,7 +22,7 @@
 void JuliaJob::work() {
   const int lx = x + w, ly = y + h;
   for(int py = y; py < ly; ++py) {
-    int *res = dest->data + py * dest->w + x;
+    count_t *res = dest->data + py * dest->w + x;
     arith_t izy = ybottom + arith_t(dest->h - 1 - py) * xsize / dest->w;
     for(int px = x; px < lx; ++px) {
       arith_t izx = xleft + arith_t(px) * xsize / dest->w;

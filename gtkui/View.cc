@@ -166,7 +166,7 @@ namespace mmui {
     const int lx = j->x + j->w;
     const int ly = j->y + j->h;
     for(int y = j->y; y < ly; ++y) {
-      int *datarow = &v->dest->data[y * w + j->x];
+      count_t *datarow = &v->dest->data[y * w + j->x];
       guchar *pixelrow = pixels + y * rowstride + j->x * 3;
       for(int x = j->x; x < lx; ++x) {
 	const count_t count = *datarow++;
