@@ -18,14 +18,27 @@ You will need gtkmm and GNU C++.
 
 See 'man mandy' for documentation.
 
-Fixed Point Maths
-=================
+Arithmetic Type
+===============
 
-For an alternative slower but higher-precision version:
-  ./configure --with-fixed-point
+You can select the arithmetic type used to compute the images.
 
-This version is optimized for x86-64 CPUs, though should work on other
-microprocessors.
+  ./configure                           - selects 'double'
+  ./configure --with-long-double        - selects 'long double'
+  ./configure --with-fixed-point        - selects fixed point arithmetic
+
+'double' gives you about 53 bits of precision.  'long double' gives
+you 64 bits of precision.  Both are floating point types and are
+(probably) directly supported by your hardware, so should be fast
+
+The fixed point type gives you 96 bits of precision (after the point,
+but that's where you need it).
+
+On x86-64 CPUs this type is implemented in hand-written assembly
+language.  It is slower than the floating point version but still
+usable.
+
+On other CPUs it is implemented in C.  It is likely to be rather slow.
 
 Copyright
 =========
