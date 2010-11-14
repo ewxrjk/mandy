@@ -16,13 +16,17 @@
 #ifndef DRAW_H
 #define DRAW_H
 
-void draw(const char *xstr,
+void draw(const char *wstr,
+          const char *hstr,
+          const char *xstr,
           const char *ystr,
           const char *rstr,
           const char *mistr,
           const char *path);
 
-void draw(arith_t x, arith_t y, arith_t r, int maxiters, const char *path);
+void draw(int width, int height, 
+          arith_t x, arith_t y, arith_t r,
+          int maxiters, const char *path);
 
 #endif /* DRAW_H */
 

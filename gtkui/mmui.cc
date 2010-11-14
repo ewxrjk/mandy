@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
     case 'h':
       printf("Usage:\n"
              "  mandy [OPTIONS]\n"
-             "  mandy [OPTIONS] --draw X Y RADIUS MAXITERS PATH\n"
+             "  mandy [OPTIONS] --draw WIDTH HEIGHT X Y RADIUS MAXITERS PATH\n"
              "Options:\n"
              "  --help, -h        Display help message\n"
              "  --draw, -d        Draw one image and terminate\n"
@@ -75,13 +75,15 @@ int main(int argc, char **argv) {
 
   switch(mode) {
   case 'd':
-    if(optind + 5 != argc)
-      fatal(0, "Usage: %s --draw X Y RADIUS MAXITERS PATH", argv[0]);
+    if(optind + 7 != argc)
+      fatal(0, "Usage: %s --draw WIDTH HEIGHT X Y RADIUS MAXITERS PATH", argv[0]);
     draw(argv[optind],
          argv[optind + 1],
          argv[optind + 2],
          argv[optind + 3],
-         argv[optind + 4]);
+         argv[optind + 4],
+         argv[optind + 5],
+         argv[optind + 6]);
     return 0;
   default:
     break;

@@ -20,15 +20,33 @@
 #include "MandelbrotJob.h"
 #include "Color.h"
 
-void draw(const char *xstr,
+void draw(const char *wstr,
+	  const char *hstr,
+	  const char *xstr,
           const char *ystr,
           const char *rstr,
           const char *mistr,
           const char *path) {
   arith_t x, y, radius;
-  long maxiters;
+  long width, height, maxiters;
   char *eptr;
   int error;
+
+  width = strtol(wstr, &eptr, 10);
+  if(errno)
+    fatal(errno, "cannot convert '%s'", wstr);
+  if(eptr == rstr)
+    fatal(0, "cannot convert '%s'", wstr);
+  if(width > INT_MAX || width <= 0)
+    fatal(0, "cannot convert '%s': out of range", wstr);
+
+  height = strtol(hstr, &eptr, 10);
+  if(errno)
+    fatal(errno, "cannot convert '%s'", hstr);
+  if(eptr == rstr)
+    fatal(0, "cannot convert '%s'", hstr);
+  if(height > INT_MAX || height <= 0)
+    fatal(0, "cannot convert '%s': out of range", hstr);
 
   if((error = arith_traits<arith_t>::fromString(x, xstr, &eptr)))
     fatal(error, "cannot convert '%s'", xstr);
@@ -55,16 +73,15 @@ void draw(const char *xstr,
   if(maxiters > INT_MAX || maxiters <= 0)
     fatal(0, "cannot convert '%s': out of range", mistr);
 
-  draw(x, y, radius, maxiters, path);
+  draw(width, height, x, y, radius, maxiters, path);
 }
 
 static void completed(Job *, void *) {
-  fprintf(stderr, ".");
+  // do nothing
 }
 
-void draw(arith_t x, arith_t y, arith_t radius,
+void draw(int width, int height, arith_t x, arith_t y, arith_t radius,
 	  int maxiters, const char *path) {
-  int width = 256, height = 256;
   // TODO pixel sizes
   MandelbrotJobFactory jf;
   IterBuffer *dest = FractalJob::recompute(x, y, radius, maxiters,
@@ -73,7 +90,6 @@ void draw(arith_t x, arith_t y, arith_t radius,
 					   NULL,
 					   0, 0, &jf);
   Job::pollAll();
-  fprintf(stderr, "\n");
   FILE *fp = fopen(path, "wb");
   if(!fp)
     fatal(errno, "opening %s", path);
