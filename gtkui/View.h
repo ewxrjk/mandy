@@ -18,6 +18,7 @@
 #define VIEW_H
 
 #include <gtkmm/drawingarea.h>
+#include "arith.h"
 
 class IterBuffer;
 class FractalJobFactory;

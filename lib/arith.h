@@ -83,6 +83,41 @@ public:
 };
 
 template<>
+class arith_traits<long double> {
+public:
+  static inline long double maximum() {
+    return HUGE_VALL;
+  }
+
+  static std::string toString(const long double &n) {
+    char buffer[128];
+
+    snprintf(buffer, sizeof buffer, "%Lg", n);
+    return buffer;
+  }
+
+  static int toInt(const long double &n) {
+    return floorl(n);
+  }
+
+  static int fromString(long double &n, const char *s, char **end) {
+    errno = 0;
+    n = strtold(s, end);
+    return errno;
+  }
+
+  static double toDouble(const long double &n) {
+    return n;
+  }
+
+  static int iterate(long double zx, long double zy, 
+                     long double cx, long double cy, int maxiters) {
+    return defaultIterate(zx, zy, cx, cy, maxiters);
+  }
+
+};
+
+template<>
 class arith_traits<fixed> {
 public:
   static inline fixed maximum() {
@@ -116,6 +151,8 @@ public:
 #endif
   }
 };
+
+typedef ARITH_TYPE arith_t;
 
 #endif /* ARITH_H */
 

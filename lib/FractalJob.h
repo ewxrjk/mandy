@@ -17,6 +17,7 @@
 #define FRACTALJOB_H
 
 #include "Job.h"
+#include "arith.h"
 
 class FractalJobFactory;
 
