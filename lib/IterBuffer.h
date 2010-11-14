@@ -39,7 +39,7 @@ public:
   // The buffer size.
   int w, h;
   // The actual data.
-  int *data;
+  count_t *data;
 };
 
 #endif /* ITERBUFFER_H */

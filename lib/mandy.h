@@ -19,6 +19,8 @@
 #include <config.h>
 #include "Fixed.h"
 
+typedef int count_t;
+
 void fatal(int errno_value, const char *fmt, ...);
 
 #endif /* MANDY_H */

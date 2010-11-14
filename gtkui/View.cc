@@ -169,7 +169,7 @@ namespace mmui {
       int *datarow = &v->dest->data[y * w + j->x];
       guchar *pixelrow = pixels + y * rowstride + j->x * 3;
       for(int x = j->x; x < lx; ++x) {
-	const int count = *datarow++;
+	const count_t count = *datarow++;
         if(count < v->maxiters) {
           *pixelrow++ = red(count, v->maxiters);
           *pixelrow++ = green(count, v->maxiters);

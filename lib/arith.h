@@ -36,7 +36,8 @@ public:
 };
 
 template<typename T>
-int defaultIterate(T zx, T zy, T cx, T cy, int maxiters) {
+count_t defaultIterate(T &zx_, T &zy_, T cx, T cy, int maxiters) {
+  T zx = zx_, zy = zy_;
   T zx2, zy2;
   int iterations = 0;
   while(((zx2 = zx * zx) + (zy2 = zy * zy) < T(4))
@@ -45,6 +46,8 @@ int defaultIterate(T zx, T zy, T cx, T cy, int maxiters) {
     zx = zx2 - zy2 + cx;
     ++iterations;
   }
+  zx_ = zx;
+  zy_ = zy;
   return iterations;
 }
 
@@ -76,7 +79,8 @@ public:
     return n;
   }
 
-  static int iterate(double zx, double zy, double cx, double cy, int maxiters) {
+  static count_t iterate(double &zx, double &zy,
+                         double cx, double cy, int maxiters) {
     return defaultIterate(zx, zy, cx, cy, maxiters);
   }
 
@@ -110,8 +114,8 @@ public:
     return n;
   }
 
-  static int iterate(long double zx, long double zy, 
-                     long double cx, long double cy, int maxiters) {
+  static count_t iterate(long double &zx, long double &zy,
+                         long double cx, long double cy, int maxiters) {
     return defaultIterate(zx, zy, cx, cy, maxiters);
   }
 
@@ -143,7 +147,7 @@ public:
     return n.toDouble();
   }
 
-  static int iterate(fixed zx, fixed zy, fixed cx, fixed cy, int maxiters) {
+  static count_t iterate(fixed &zx, fixed &zy, fixed cx, fixed cy, int maxiters) {
 #if HAVE_ASM && NFIXED == 4
     return Fixed_iterate(&zx.f, &zy.f, &cx.f, &cy.f, maxiters);
 #else
