@@ -58,15 +58,15 @@
 /* void Fixed_shl_unsigned(struct Fixed *a=rdi) */
 	.globl SYMBOL(Fixed_shl_unsigned)
 SYMBOL(Fixed_shl_unsigned):
-	shl	[qword ptr rdi],1
-	rcl	[qword ptr rdi+8],1
+	shl	qword ptr [rdi],1
+	rcl	qword ptr [rdi+8],1
 	ret
 
 /* void Fixed_shr_unsigned(struct Fixed *a=rdi) */
 	.globl SYMBOL(Fixed_shr_unsigned)
 SYMBOL(Fixed_shr_unsigned):
-	shr	[qword ptr rdi+8],1
-	rcr	[qword ptr rdi],1
+	shr	qword ptr [rdi+8],1
+	rcr	qword ptr [rdi],1
 	ret
 
 /* void Fixed_add(struct Fixed *r=rdi,
@@ -239,10 +239,10 @@ SYMBOL(Fixed_iterate):
 	xor	r8,r8
 	movd	xmm4,r8
 	// Get cx/cy into registers for later use
-	movd	xmm1,[qword ptr rdx]
-	movd	xmm0,[qword ptr rdx+8]
-	movd	xmm3,[qword ptr rcx]
-	movd	xmm2,[qword ptr rcx+8]
+	movd	xmm1,qword ptr [rdx]
+	movd	xmm0,qword ptr [rdx+8]
+	movd	xmm3,qword ptr [rcx]
+	movd	xmm2,qword ptr [rcx+8]
 	// Load initial zx/zy
 	mov	r9,[rdi]
 	mov	r8,[rdi+8]
