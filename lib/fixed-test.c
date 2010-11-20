@@ -57,7 +57,7 @@ int main() {
   Fixed_int2(&b, 1);
   Fixed_divu(&b, &b, 256);
   Fixed_sub(&c, &a, &b);
-  printf("-15/16:  "); printFixed(&c); putchar('\n');
+  printf("15/256:  "); printFixed(&c); putchar('\n');
 
   Fixed_int2(&a, 0);
   b = a;
@@ -177,7 +177,7 @@ int main() {
   printf("1.0:     "); printFixed(&a); putchar('\n');
   Fixed_str2(&a, "1.5", NULL);
   printf("1.5:     "); printFixed(&a); putchar('\n');
-  Fixed_str2(&a, "1.1", NULL);
+  Fixed_str2(&a, "-1.1", NULL);
   printf("-1.1:    "); printFixed(&a); putchar('\n');
   Fixed_str2(&a, "0.000000000000000000000000000012621774483536188886587657044524579674771302961744368076324462890625", NULL);
   printf("2⁻⁹⁶:    "); printFixed(&a); putchar('\n');
