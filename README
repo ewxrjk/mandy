@@ -25,20 +25,23 @@ You can select the arithmetic type used to compute the images.
 
   ./configure                           - selects 'double'
   ./configure --with-long-double        - selects 'long double'
-  ./configure --with-fixed-point        - selects fixed point arithmetic
+  ./configure --with-short-fixed-point  - selects 64-bit fixed point arithmetic
+  ./configure --with-fixed-point        - selects 128-bit fixed point arithmetic
 
 'double' gives you about 53 bits of precision.  'long double' gives
 you 64 bits of precision.  Both are floating point types and are
-(probably) directly supported by your hardware, so should be fast
+(probably) directly supported by your hardware, so should be fast.
 
-The fixed point type gives you 96 bits of precision (after the point,
-but that's where you need it).
+The 64-bit fixed point type gives you 56 bits of precision after the
+point.  It has had some optimization effort but is nevertheless a bit
+slower than using 'double' on an x86-64 CPU.
 
-On x86-64 CPUs this type is implemented in hand-written assembly
-language.  It is slower than the floating point version but still
-usable.
+The 128-bit fixed point type gives you 96 bits of precision after the
+point.  It's relatively slow.
 
-On other CPUs it is implemented in C.  It is likely to be rather slow.
+On x86-64 CPUs the fixed point types are implemented in hand-written
+assembly language.  On other CPUs they are implemented in C and are
+likely to be very slow.
 
 Copyright
 =========
