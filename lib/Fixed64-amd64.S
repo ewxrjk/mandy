@@ -78,12 +78,12 @@ SYMBOL(Fixed64_mul_unsigned):
  *
  * Register allocation:
  * rax,rdx	Accumulator for multiplications
- * rbx		iterations
+ * ebx		iterations
  * rcx		cy
  * rdi		zx
  * rsi		zy
  * r8		r2p
- * r9		maxiters
+ * ebp		maxiters
  * r10,r11	zx^2
  * r12,r13	zy^2
  * r14		cx
@@ -94,12 +94,14 @@ SYMBOL(Fixed64_mul_unsigned):
 	.globl	SYMBOL(Fixed64_iterate)
 SYMBOL(Fixed64_iterate):
 	push	rbx
+	push	rbp
 	push	r12
 	push	r13
 	push	r14
 	push	r15
 	mov	r14,rdx
 	mov	rbx,0
+	mov	rbp,r9
 	mov	r15,0x0040000000000000
 	.align	4
 1:
@@ -127,8 +129,8 @@ SYMBOL(Fixed64_iterate):
 	sub	r11,r13		// r11 = zx^2 - zy^2
 	add	r11,r14		// r11 = zx^2 - zy^2 + cx
 	mov	rdi,r11		// zx = zx^2 - zy^2 + cx
-	inc	rbx
-	cmp	rbx,r9
+	inc	ebx
+	cmp	ebx,ebp
 	jb	1b
 	// Breached iteration limit
 	jmp	6f
@@ -155,6 +157,7 @@ SYMBOL(Fixed64_iterate):
 	pop	r14
 	pop	r13
 	pop	r12
+	pop	rbp
 	pop	rbx
 	ret
 #endif
