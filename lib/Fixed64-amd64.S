@@ -101,6 +101,7 @@ SYMBOL(Fixed64_iterate):
 	mov	r14,rdx
 	mov	rbx,0
 	mov	r15,0x0040000000000000
+	.align	4
 1:
 	// We keep z^2 in 16.112 format, since it may overflow 8.56
 	mov	rax,rdi
@@ -115,17 +116,14 @@ SYMBOL(Fixed64_iterate):
 	adc	rdx,r10		// rdx:rax = zx^2+zy^2
 	cmp	rdx,r15
 	jge	2f
+	shrd	r11,r10,56	// r11 = zx^2
 	mov	rax,rdi
+	shrd	r13,r12,56	// r13 = zy^2
 	imul	rsi		// rdx:rax = zx * zy
 	shrd	rax,rdx,56	// rax = zx * zy
-	add	rax,rax		// rax = 2 * zx * zy
-	add	rax,rcx		// rax = 2 * zx * zy + cy
-	mov	rsi,rax		// zy = 2 * zx * zy + cy
-	shrd	r11,r10,56	// r11 = zx^2
-	shrd	r13,r12,56	// r13 = zy^2
+	lea	rsi,[rcx+rax*2]	// zy = 2 * zx * zy + cy
 	sub	r11,r13		// r11 = zx^2 - zy^2
-	add	r11,r14		// r11 = zx^2 - zy^2 + cx
-	mov	rdi,r11		// zx = zx^2 - zy^2 + cx
+	lea	rdi,[r11+r14]	// zx = zx^2 - zy^2 + cx
 	inc	rbx
 	cmp	rbx,r9
 	jb	1b

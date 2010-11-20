@@ -239,6 +239,7 @@ SYMBOL(Fixed_iterate):
 	xor	r8,r8
 	movd	xmm4,r8
 	// Get cx/cy into registers for later use
+	// TODO amd64 iteration guide recommends spill to memory instead
 	movd	xmm1,qword ptr [rdx]
 	movd	xmm0,qword ptr [rdx+8]
 	movd	xmm3,qword ptr [rcx]
