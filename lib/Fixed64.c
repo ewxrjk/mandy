@@ -114,10 +114,7 @@ Fixed64 Fixed64_sqrt(Fixed64 a) {
   return r;
 }
 
-/* For string conversions we re-use the full-width code - the result is not as
- * fast, but it is easier. */
-
-static int Fixed_to_Fixed64(Fixed64 *r, const struct Fixed *a) {
+int Fixed_to_Fixed64(Fixed64 *r, const struct Fixed *a) {
   int32_t intpart = a->word[NFIXED - 1];
   if(intpart > 127 || intpart < -128)
     return ERANGE;
@@ -134,12 +131,15 @@ static int Fixed_to_Fixed64(Fixed64 *r, const struct Fixed *a) {
   return 0;
 }
 
-static void Fixed64_to_Fixed(struct Fixed *r, Fixed64 a) {
+void Fixed64_to_Fixed(struct Fixed *r, Fixed64 a) {
   memset(r, 0, sizeof *r);
   r->word[NFIXED - 1] = a >> 56;
   r->word[NFIXED - 2] = a >> 24;
   r->word[NFIXED - 3] = a << 8;
 }
+
+/* For string conversions we re-use the full-width code - the result is not as
+ * fast, but it is easier. */
 
 char *Fixed64_2str(char buffer[], unsigned bufsize, Fixed64 a, int base) {
   struct Fixed f;

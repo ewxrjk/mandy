@@ -16,7 +16,7 @@
 #ifndef FIXED64_H
 #define FIXED64_H
 
-#include <inttypes.h>
+#include "Fixed.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,6 +43,9 @@ typedef int64_t Fixed64;
     return (double)a / 72057594037927936.0;
   }
 
+  int Fixed_to_Fixed64(Fixed64 *r, const struct Fixed *a);
+  void Fixed64_to_Fixed(struct Fixed *r, Fixed64 a);
+
   int Fixed64_iterate(Fixed64 zx, Fixed64 zy,
                       Fixed64 cx, Fixed64 cy,
                       double *r2p,
@@ -50,6 +53,120 @@ typedef int64_t Fixed64;
 
 #ifdef __cplusplus
 }
+#endif
+
+#ifdef __cplusplus
+class fixed64 {
+public:
+  Fixed64 f;
+
+  fixed64(int i) { f = Fixed64_int2(i); }
+  fixed64(double n) { f = Fixed64_double2(n); }
+  fixed64() { f = 0; }
+  fixed64(fixed ff) { Fixed_to_Fixed64(&f, &ff.f); }
+
+  // Assignment
+
+  fixed64 &operator/(unsigned that) {
+    f /= that;
+    return *this;
+  }
+
+  fixed64 &operator+=(const fixed64 &that) {
+    f += that.f;
+    return *this;
+  }
+
+  fixed64 &operator-=(const fixed64 &that) {
+    f -= that.f;
+    return *this;
+  }
+
+  fixed64 &operator/=(const fixed64 &that) {
+    f = Fixed64_div(f, that.f);
+    return *this;
+  }
+
+  fixed64 &operator*=(const fixed64 &that) {
+    f = Fixed64_mul(f, that.f);
+    return *this;
+  }
+
+  fixed64 &operator=(int n) {
+    f = Fixed64_int2(n);
+    return *this;
+  }
+
+  // Arithmetic
+
+  fixed64 operator-() const {
+    fixed64 r;
+    r.f = -f;
+    return r;
+  }
+
+  fixed64 operator+(const fixed64 &that) const {
+    fixed64 r;
+    r.f = f + that.f;
+    return r;
+  }
+
+  fixed64 operator-(const fixed64 &that) const {
+    fixed64 r;
+    r.f = f - that.f;
+    return r;
+  }
+
+  fixed64 operator*(const fixed64 &that) const {
+    fixed64 r;
+    r.f = Fixed64_mul(f, that.f);
+    return r;
+  }
+
+  fixed64 operator/(const fixed64 &that) const {
+    fixed64 r;
+    r.f = Fixed64_mul(f, that.f);
+    return r;
+  }
+
+  fixed64 operator/(unsigned that) const {
+    fixed64 r;
+    r.f = f / that;
+    return r;
+  }
+
+  // Comparison
+
+  bool operator<(const fixed64 &that) const { return f < that.f; }
+  bool operator>(const fixed64 &that) const { return f > that.f; }
+  bool operator<=(const fixed64 &that) const { return f <= that.f; }
+  bool operator>=(const fixed64 &that) const { return f >= that.f; }
+  bool operator==(const fixed64 &that) const { return f == that.f; }
+  bool operator!=(const fixed64 &that) const { return f != that.f; }
+
+  // Conversions
+  std::string toString(int base = 10) const;
+  std::string toHex() const;
+
+  int fromString(const char *s, char **endptr) {
+    return Fixed64_str2(&f, s, endptr);
+  }
+
+  int toInt() const {
+    return f >> 56;
+  }
+
+  double toDouble() const {
+    return Fixed64_2double(f);
+  }
+
+};
+
+inline fixed64 sqrt(const fixed64 &a) {
+  fixed64 r;
+  r.f = Fixed64_sqrt(a.f);
+  return r;
+};
 #endif
 
 #endif /* FIXED64_H */
