@@ -148,8 +148,7 @@ SYMBOL(Fixed64_iterate):
 	movd	xmm2,r15
 	mulsd	xmm1,xmm2
 	addsd	xmm0,xmm1
-	movd	rax,xmm0
-	mov	[r8],rax
+	movd	qword ptr [r8],xmm0
 6:
 	mov	rax,rbx		// Return iteration count
 	pop	r15
