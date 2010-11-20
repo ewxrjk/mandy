@@ -101,6 +101,7 @@ SYMBOL(Fixed64_iterate):
 	mov	r14,rdx
 	mov	rbx,0
 	mov	r15,0x0040000000000000
+	.align	4
 1:
 	// We keep z^2 in 16.112 format, since it may overflow 8.56
 	mov	rax,rdi
