@@ -82,7 +82,21 @@ Fixed64 Fixed64_div(Fixed64 a, Fixed64 b) {
 }
 
 static uint64_t Fixed64_div_unsigned(uint64_t a, uint64_t b) {
-  return a/b;                            /* TODO */
+  uint64_t q = 0, bit = (uint64_t)1<<56;
+  while(b < a) {
+    bit <<= 1;
+    b <<= 1;
+  }
+  while(a && bit) {
+    if(a >= b) {
+      q |= bit;
+      a -= b;
+    }
+    bit >>= 1;
+    b >>= 1;
+  }
+  // TODO rounding
+  return q;
 }
 
 //Fixed64 Fixed64_sqrt(Fixed64 a) {

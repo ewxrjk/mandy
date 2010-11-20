@@ -114,21 +114,17 @@ int main() {
   c = Fixed64_mul(Fixed64_int2(1)/2, 1);
   printf("½(2⁻⁵⁶): "); printFixed(c); putchar('\n');
 
-#if 0				/* TODO */
   // Division
-  Fixed64_int2(a, 1);
-  Fixed64_int2(&b, 16);
-  Fixed64_div(&c, a, &b);
+  c = Fixed64_div(Fixed64_int2(1), Fixed64_int2(16));
   printf("1/16:    "); printFixed(c); putchar('\n');
 
-  Fixed64_int2(a, 1);
-  Fixed64_int2(&b, 3);
-  Fixed64_div(&c, a, &b);
+  c = Fixed64_div(Fixed64_int2(1), Fixed64_int2(3));
   printf("1/3:     "); printFixed(c); putchar('\n');
 
-  Fixed64_div(&c, &c, &b);
+  c = Fixed64_div(c, Fixed64_int2(3));
   printf("1/3/3:   "); printFixed(c); putchar('\n');
 
+#if 0
   // Square roots
   Fixed64_int2(a, 2);
   Fixed64_sqrt(a, a);
