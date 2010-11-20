@@ -8,7 +8,7 @@
 void printFixed(Fixed64 f) {
   char buffer[128];
   printf("%02x.%06x%08x",
-	 (unsigned)(f >> 56),
+	 (unsigned char)(f >> 56),
 	 (unsigned)(f >> 32) & 0x00FFFFFF,
 	 (unsigned)f);
   printf(" =%s", Fixed64_2str(buffer, sizeof buffer, f, 10));
@@ -130,14 +130,20 @@ int main() {
 #if HAVE_ASM
   // Mandelbrot computation
   double r2;
-  int count = Fixed64_iterate(0, 0,
-			      0x00a6aaaaaaaaaaab,
-			      0xfffd555555555555,
+  Fixed64 cx = 0x00a6aaaaaaaaaaab;
+  Fixed64 cy = 0xfffd555555555555;
+  printf("cx:      "); printFixed(cx); putchar('\n');
+  printf("cy:      "); printFixed(cy); putchar('\n');
+  int count = Fixed64_iterate(0, 0, cx, cy,
 			      &r2, 255);
   printf("iterate: %d   r2: %g\n", count, r2);
   assert(count == 5);
 
-  count = Fixed64_iterate(0, 0, Fixed64_int2(-1), Fixed64_int2(-1), &r2, 255);
+  cx = Fixed64_int2(-1);
+  cy = Fixed64_int2(-1);
+  printf("cx:      "); printFixed(cx); putchar('\n');
+  printf("cy:      "); printFixed(cy); putchar('\n');
+  count = Fixed64_iterate(0, 0, cx, cy, &r2, 255);
   printf("iterate: %d   r2: %g\n", count, r2);
   assert(count == 4);
 #endif
