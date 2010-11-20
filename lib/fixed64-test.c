@@ -135,10 +135,11 @@ int main() {
 			      0xfffd555555555555,
 			      &r2, 255);
   printf("iterate: %d   r2: %g\n", count, r2);
-  assert(count >= 0);
+  assert(count >= 0);		/* expected 5 */
 
   count = Fixed64_iterate(0, 0, Fixed64_int2(-1), Fixed64_int2(-1), &r2, 255);
   printf("iterate: %d   r2: %g\n", count, r2);
+  /* expected 0 */
 #endif
 
   return 0;
