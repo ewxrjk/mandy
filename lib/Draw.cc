@@ -33,6 +33,7 @@ void draw(const char *wstr,
   char *eptr;
   int error;
 
+  errno = 0;
   width = strtol(wstr, &eptr, 10);
   if(errno)
     fatal(errno, "cannot convert '%s'", wstr);
@@ -41,6 +42,7 @@ void draw(const char *wstr,
   if(width > INT_MAX || width <= 0)
     fatal(0, "cannot convert '%s': out of range", wstr);
 
+  errno = 0;
   height = strtol(hstr, &eptr, 10);
   if(errno)
     fatal(errno, "cannot convert '%s'", hstr);
@@ -66,6 +68,7 @@ void draw(const char *wstr,
   if(radius <= arith_t(0))
     fatal(0, "cannot convert '%s': too small", rstr);
 
+  errno = 0;
   maxiters = strtol(mistr, &eptr, 10);
   if(errno)
     fatal(errno, "cannot convert '%s'", mistr);
