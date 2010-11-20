@@ -117,8 +117,8 @@ SYMBOL(Fixed64_iterate):
 	cmp	rdx,r15
 	jge	2f
 	shrd	r11,r10,56	// r11 = zx^2
-	shrd	r13,r12,56	// r13 = zy^2
 	mov	rax,rdi
+	shrd	r13,r12,56	// r13 = zy^2
 	imul	rsi		// rdx:rax = zx * zy
 	shrd	rax,rdx,56	// rax = zx * zy
 	lea	rsi,[rcx+rax*2]	// zy = 2 * zx * zy + cy
