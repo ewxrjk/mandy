@@ -117,16 +117,15 @@ SYMBOL(Fixed64_iterate):
 	jge	2f
 	mov	rax,rdi
 	imul	rsi		// rdx:rax = zx * zy
-	add	rax,rax
-	adc	rdx,rdx		// rdx:rax = 2 * zx * zy
-	shrd	rax,rdx,56	// rax = 2 * zx * zy
-	adc	rax,rcx		// rax = 2 * zx * zy + cy [plus rounding]
+	shrd	rax,rdx,56	// rax = zx * zy
+	add	rax,rax		// rax = 2 * zx * zy
+	add	rax,rcx		// rax = 2 * zx * zy + cy
 	mov	rsi,rax		// zy = 2 * zx * zy + cy
-	sub	r11,r13
-	sbb	r10,r12		// r10:r11 = zx^2 - zy^2
-	shrd	r11,r10,56	// r11 = zx^2 - zy^2
-	adc	r11,r14		// r11 = zx^2 - zy^2 + cy [plus rounding]
-	mov	rdi,r11		// zx = zx^2 - zy^2 + cy
+	shrd	r11,r10,56	// r11 = zx^2
+	shrd	r13,r12,56	// r13 = zy^2
+	sub	r11,r13		// r11 = zx^2 - zy^2
+	add	r11,r14		// r11 = zx^2 - zy^2 + cx
+	mov	rdi,r11		// zx = zx^2 - zy^2 + cx
 	inc	rbx
 	cmp	rbx,r9
 	jb	1b
