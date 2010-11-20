@@ -119,14 +119,14 @@ SYMBOL(Fixed64_iterate):
 	imul	rsi		// rdx:rax = zx * zy
 	add	rax,rax
 	adc	rdx,rdx		// rdx:rax = 2 * zx * zy
-	shrd	rax,rdx,56	// rax = 2 * zx * zy
-	adc	rax,rcx		// rax = 2 * zx * zy + cy [plus rounding]
-	mov	rsi,rax		// zy = 2 * zx * zy + cy
+	shld	rdx,rax,8	// rdx = 2 * zx * zy
+	adc	rdx,rcx		// rax = 2 * zx * zy + cy [plus rounding]
+	mov	rsi,rdx		// zy = 2 * zx * zy + cy
 	sub	r11,r13
 	sbb	r10,r12		// r10:r11 = zx^2 - zy^2
-	shrd	r11,r10,56	// r11 = zx^2 - zy^2
-	adc	r11,r14		// r11 = zx^2 - zy^2 + cy [plus rounding]
-	mov	rdi,r11		// zx = zx^2 - zy^2 + cy
+	shld	r10,r11,8	// r10 = zx^2 - zy^2
+	adc	r10,r14		// r10 = zx^2 - zy^2 + cy [plus rounding]
+	mov	rdi,r10		// zx = zx^2 - zy^2 + cy
 	inc	rbx
 	cmp	rbx,r9
 	jb	1b
