@@ -110,13 +110,9 @@ int main() {
   c = Fixed64_mul(a, a);
   printf("(2⁻³²)²: "); printFixed(c); putchar('\n');
 
-#if 0				/* TODO */
   // Underflow rounding
-  Fixed64_int2(a, 1);
-  Fixed64_divu(a, a, 2);
-  Fixed64_mul(&c, a, &d);
-  printf("½(2⁻³²)³:"); printFixed(d); putchar('\n');
-#endif
+  c = Fixed64_mul(Fixed64_int2(1)/2, 1);
+  printf("½(2⁻⁵⁶): "); printFixed(c); putchar('\n');
 
 #if 0				/* TODO */
   // Division

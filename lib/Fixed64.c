@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <config.h>
+#include <stdio.h>
 #include "Fixed64.h"
 #include "Fixed.h"
 #include <errno.h>
@@ -60,7 +61,8 @@ static uint64_t Fixed64_mul_unsigned(uint64_t a, uint64_t b) {
    */
   return (((uint64_t)result[3] << 40)
           + ((uint64_t)result[2] << 8)
-          + ((uint64_t)result[3] >> 24));
+          + ((uint64_t)result[1] >> 24)
+          + /*rounding*/(result[1] & 0x00800000) ? 1 : 0);
 }
 
 #undef MLA
