@@ -43,6 +43,11 @@ typedef int64_t Fixed64;
     return (double)a / 72057594037927936.0;
   }
 
+  int Fixed64_iterate(Fixed64 zx, Fixed64 zy,
+                      Fixed64 cx, Fixed64 cy,
+                      double *r2p,
+                      int maxiters);
+
 #ifdef __cplusplus
 }
 #endif

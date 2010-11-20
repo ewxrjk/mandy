@@ -127,34 +127,18 @@ int main() {
   Fixed64_str2(&a, "-127.00000000000000001387778780781445675529539585113525390625", NULL);
   printf("-(127+2⁻⁵⁶):"); printFixed(a); putchar('\n');
 
-#if 0
 #if HAVE_ASM
   // Mandelbrot computation
-  Fixed64_int2(a, 0);
-  Fixed64_int2(&b, 0);
-  memset(&c, 0, sizeof c);
-  c.word[NFIXED-1] = 0;
-  c.word[NFIXED-2] = 0xa6aaaaaa;
-  c.word[NFIXED-3] = 0xaaaaaaaa;
-  c.word[NFIXED-4] = 0xaaaaaaab;
-  printf("cx:      "); printFixed(c); putchar('\n');
-  memset(&d, 0, sizeof d);
-  d.word[NFIXED-1] = 0xffffffff;
-  d.word[NFIXED-2] = 0xfd555555;
-  d.word[NFIXED-3] = 0x55555555;
-  d.word[NFIXED-4] = 0x55555555;
-  printf("cy:      "); printFixed(d); putchar('\n');
-  int count = Fixed64_iterate(a, &b, &c, &d, 255);
-  printf("iterate: %d\n", count);
+  double r2;
+  int count = Fixed64_iterate(0, 0,
+			      0x00a6aaaaaaaaaaab,
+			      0xfffd555555555555,
+			      &r2, 255);
+  printf("iterate: %d   r2: %g\n", count, r2);
   assert(count >= 0);
 
-  Fixed64_int2(&c, -1);
-  Fixed64_int2(&d, -1);
-  printf("cx:      "); printFixed(c); putchar('\n');
-  printf("cy:      "); printFixed(d); putchar('\n');
-  count = Fixed64_iterate(a, &b, &c, &d, 255);
-  printf("iterate: %d\n", count);
-#endif
+  count = Fixed64_iterate(0, 0, Fixed64_int2(-1), Fixed64_int2(-1), &r2, 255);
+  printf("iterate: %d   r2: %g\n", count, r2);
 #endif
 
   return 0;
