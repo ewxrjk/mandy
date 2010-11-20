@@ -24,6 +24,7 @@
 #include <cstdio>
 
 #include "Fixed.h"
+#include "Fixed64.h"
 
 template<typename T> class arith_traits {
 public:
@@ -156,6 +157,46 @@ public:
       // r2 is returned in zx (rather oddly)
       return log(1 + rawCount - log2(log(zx.toDouble())));
     }
+#else
+    return defaultIterate(zx, zy, cx, cy, maxiters);
+#endif
+  }
+};
+
+template<>
+class arith_traits<fixed64> {
+public:
+  static inline fixed64 maximum() {
+    fixed64 n;
+    n.f = 0x7fffffffffffffffLL;
+    return n;
+  }
+
+  static std::string toString(const fixed64 &n) {
+    return n.toString();
+  }
+
+  static int toInt(const fixed64 &n) {
+    return n.toInt();
+  }
+
+  static int fromString(fixed64 n, const char *s, char **endptr) {
+    return n.fromString(s, endptr);
+  }
+
+  static double toDouble(const fixed64 &n) {
+    return n.toDouble();
+  }
+
+  static count_t iterate(fixed64 zx, fixed64 zy, fixed64 cx, fixed64 cy, 
+                         int maxiters) {
+#if HAVE_ASM
+    double r2;
+    int rawCount = Fixed64_iterate(zx.f, zy.f, cx.f, cy.f, &r2, maxiters);
+    if(rawCount == maxiters)
+      return rawCount;
+    else
+      return log(1 + rawCount - log2(log(r2)));
 #else
     return defaultIterate(zx, zy, cx, cy, maxiters);
 #endif
