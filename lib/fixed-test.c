@@ -204,14 +204,17 @@ int main() {
   printf("cy:      "); printFixed(&d); putchar('\n');
   int count = Fixed_iterate(&a, &b, &c, &d, 255);
   printf("iterate: %d\n", count);
-  assert(count >= 0);
+  assert(count == 5);
 
+  Fixed_int2(&a, 0);
+  Fixed_int2(&b, 0);
   Fixed_int2(&c, -1);
   Fixed_int2(&d, -1);
   printf("cx:      "); printFixed(&c); putchar('\n');
   printf("cy:      "); printFixed(&d); putchar('\n');
   count = Fixed_iterate(&a, &b, &c, &d, 255);
   printf("iterate: %d\n", count);
+  assert(count == 4);
 #endif
 
   return 0;
