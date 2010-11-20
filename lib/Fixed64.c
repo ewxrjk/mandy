@@ -62,7 +62,7 @@ static uint64_t Fixed64_mul_unsigned(uint64_t a, uint64_t b) {
   return (((uint64_t)result[3] << 40)
           + ((uint64_t)result[2] << 8)
           + ((uint64_t)result[1] >> 24)
-          + /*rounding*/(result[1] & 0x00800000) ? 1 : 0);
+          + /*rounding*/!!(result[1] & 0x00800000));
 }
 
 #undef MLA
@@ -99,9 +99,18 @@ static uint64_t Fixed64_div_unsigned(uint64_t a, uint64_t b) {
   return q;
 }
 
-//Fixed64 Fixed64_sqrt(Fixed64 a) {
-//  TODO
-//}
+Fixed64 Fixed64_sqrt(Fixed64 a) {
+  uint64_t r = 0, bit = (uint64_t)8 << 56;
+  while(a && bit) {
+    uint64_t rb = r + bit;
+    uint64_t p = Fixed64_mul_unsigned(rb, rb);
+    if(p <= (uint64_t)a)
+      r = rb;
+    bit >>= 1;
+  }
+  // TODO rounding
+  return r;
+}
 
 /* For string conversions we re-use the full-width code - the result is not as
  * fast, but it is easier. */

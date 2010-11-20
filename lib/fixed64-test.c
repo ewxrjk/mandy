@@ -85,6 +85,9 @@ int main() {
   c = Fixed64_mul(Fixed64_int2(-10), Fixed64_int2(5));
   printf("-10*5:   "); printFixed(c); putchar('\n');
 
+  c = Fixed64_mul(Fixed64_int2(8), Fixed64_int2(8));
+  printf("8*8:     "); printFixed(c); putchar('\n');
+  
 #if 0				/* TODO */
   // Multiply regression
   memset(a, 0, sizeof a);
@@ -124,21 +127,16 @@ int main() {
   c = Fixed64_div(c, Fixed64_int2(3));
   printf("1/3/3:   "); printFixed(c); putchar('\n');
 
-#if 0
   // Square roots
-  Fixed64_int2(a, 2);
-  Fixed64_sqrt(a, a);
+  a = Fixed64_sqrt(Fixed64_int2(2));
   printf("√2:      "); printFixed(a); putchar('\n');
-  Fixed64_mul(&b, a, a);
+  a = Fixed64_mul(a, a);
   printf("(√2)²:   "); printFixed(b); putchar('\n');
 
-  Fixed64_int2(a, 1);
-  Fixed64_divu(a, a, 2);
-  Fixed64_sqrt(a, a);
+  a = Fixed64_sqrt(Fixed64_int2(1) / 2);
   printf("√½:      "); printFixed(a); putchar('\n');
-  Fixed64_mul(&b, a, a);
+  a = Fixed64_mul(a, a);
   printf("(√½)²:   "); printFixed(b); putchar('\n');
-#endif
 
   // Conversion to/from double
   a = Fixed64_double2(1.0);
