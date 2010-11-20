@@ -98,7 +98,7 @@ SYMBOL(Fixed64_iterate):
 	push	r13
 	push	r14
 	push	r15
-	mov	r12,rdx
+	mov	r14,rdx
 	mov	rbx,0
 	mov	r15,0x0040000000000000
 1:
