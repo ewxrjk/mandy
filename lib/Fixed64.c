@@ -19,9 +19,10 @@
 #include "Fixed.h"
 #include <errno.h>
 
-static uint64_t Fixed64_mul_unsigned(uint64_t a, uint64_t b);
+uint64_t Fixed64_mul_unsigned(uint64_t a, uint64_t b);
 static uint64_t Fixed64_div_unsigned(uint64_t a, uint64_t b);
 
+#if HAVE_ASM
 Fixed64 Fixed64_mul(Fixed64 a, Fixed64 b) {
   int sign = 0;
   if(a < 0) {
@@ -47,7 +48,7 @@ Fixed64 Fixed64_mul(Fixed64 a, Fixed64 b) {
   }                                                     \
 } while(0)
 
-static uint64_t Fixed64_mul_unsigned(uint64_t a, uint64_t b) {
+uint64_t Fixed64_mul_unsigned(uint64_t a, uint64_t b) {
   uint32_t result[4];                   /* accumulator for result */
   memset(result, 0, sizeof result);
   MLA(a, b, 0);
@@ -66,6 +67,7 @@ static uint64_t Fixed64_mul_unsigned(uint64_t a, uint64_t b) {
 }
 
 #undef MLA
+#endif
 
 Fixed64 Fixed64_div(Fixed64 a, Fixed64 b) {
   int sign = 0;

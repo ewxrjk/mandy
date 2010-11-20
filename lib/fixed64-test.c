@@ -17,6 +17,7 @@ void printFixed(Fixed64 f) {
 int main() {
   Fixed64 a, b, c;
 
+  // Addition
   a = Fixed64_int2(1);
   a /= 2;
   printf("1/2:     "); printFixed(a); putchar('\n');
@@ -27,7 +28,6 @@ int main() {
   c = a + b;
   printf("1+0.125: "); printFixed(c); putchar('\n');
 
-  // Add with carry
   a = Fixed64_int2(1);
   a /= 2;
   b = a;
@@ -54,23 +54,6 @@ int main() {
   c = a - b;
   printf("15/256:  "); printFixed(c); putchar('\n');
 
-#if 0				/* TODO */
-  Fixed64_int2(a, 0);
-  b = a;
-  a.word[NFIXED-1] = 0x4321;
-  a.word[NFIXED-2] = 0x5678abcd;
-  a.word[NFIXED-3] = 0xef012345;
-  b.word[NFIXED-1] = 0x1234;
-  b.word[NFIXED-2] = 0xabcd5678;
-  b.word[NFIXED-3] = 0x12345678;
-  printf("a:       "); printFixed(a); putchar('\n');
-  printf("b:       "); printFixed(b); putchar('\n');
-  Fixed64_sub(&c, a, &b);
-  printf("a-b:     "); printFixed(c); putchar('\n');
-  Fixed64_sub(&c, &b, a);
-  printf("b-a:     "); printFixed(c); putchar('\n');
-#endif
-
   // Multiply
   c = Fixed64_mul(Fixed64_int2(5), Fixed64_int2(7));
   printf("5*7:     "); printFixed(c); putchar('\n');
@@ -88,25 +71,6 @@ int main() {
   c = Fixed64_mul(Fixed64_int2(8), Fixed64_int2(8));
   printf("8*8:     "); printFixed(c); putchar('\n');
   
-#if 0				/* TODO */
-  // Multiply regression
-  memset(a, 0, sizeof a);
-  memset(&b, 0, sizeof b);
-  a.word[NFIXED-1] = 0x00000000;
-  a.word[NFIXED-2] = 0x95f61998;
-  a.word[NFIXED-3] = 0x0c433000;
-  a.word[NFIXED-4] = 0x00000000;	/* about 0.5857864... */
-  b.word[NFIXED-1] = 0xffffffff;
-  b.word[NFIXED-2] = 0xfaaaaaaa;
-  b.word[NFIXED-3] = 0xaaaaaaaa;
-  b.word[NFIXED-4] = 0xaaaaaaaa;	/* about -0.02083333... */
-  printf("a:       "); printFixed(a); putchar('\n');
-  printf("b:       "); printFixed(b); putchar('\n');
-  Fixed64_mul(&c, a, &b);
-  printf("a*b:     "); printFixed(c); putchar('\n');
-  printf("  ...should be about -0.0122038841\n");
-#endif
-
   // Very small numbers
   a = Fixed64_int2(1) / 65536 / 65536;
   printf("2⁻³²:    "); printFixed(a); putchar('\n');
@@ -131,12 +95,12 @@ int main() {
   a = Fixed64_sqrt(Fixed64_int2(2));
   printf("√2:      "); printFixed(a); putchar('\n');
   a = Fixed64_mul(a, a);
-  printf("(√2)²:   "); printFixed(b); putchar('\n');
+  printf("(√2)²:   "); printFixed(a); putchar('\n');
 
   a = Fixed64_sqrt(Fixed64_int2(1) / 2);
   printf("√½:      "); printFixed(a); putchar('\n');
   a = Fixed64_mul(a, a);
-  printf("(√½)²:   "); printFixed(b); putchar('\n');
+  printf("(√½)²:   "); printFixed(a); putchar('\n');
 
   // Conversion to/from double
   a = Fixed64_double2(1.0);
