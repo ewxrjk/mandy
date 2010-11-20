@@ -41,7 +41,7 @@ AC_ARG_WITH([fixed-point],
 AC_ARG_WITH([short-fixed-point],
             [AS_HELP_STRING([--with-short-fixed-point],
 			    [use 64-bit fixed point arithmetic])],
-            [arithtype=fixed64])
+            [arithtype=fixed;itertype=fixed64])
 AC_ARG_WITH([long-double],
             [AS_HELP_STRING([--with-long-double],
 			    [use long double for arithmetic])],
@@ -51,6 +51,7 @@ AC_ARG_WITH([assembler],
 			    [suppress assembler implementations])],
             [],
             [with_assembler=yes])
+itertype=${itertype:-${arithtype}}
 AC_MSG_RESULT([${arithtype}])
 if test "x$with_assembler" != xno; then
   case $host_cpu in
@@ -61,6 +62,7 @@ if test "x$with_assembler" != xno; then
   esac
 fi
 AC_DEFINE_UNQUOTED([ARITH_TYPE],[${arithtype}],[arithmetic type])
+AC_DEFINE_UNQUOTED([ITER_TYPE],[${itertype}],[iteration type])
 AC_DEFINE([NFIXED],[4], [number of words in a fixed point integer])
 AC_CONFIG_FILES([Makefile lib/Makefile images/Makefile gtkui/Makefile])
 AC_OUTPUT

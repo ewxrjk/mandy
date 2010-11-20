@@ -204,6 +204,7 @@ public:
 };
 
 typedef ARITH_TYPE arith_t;
+typedef ITER_TYPE iter_t;
 
 #endif /* ARITH_H */
 

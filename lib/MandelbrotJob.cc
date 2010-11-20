@@ -52,7 +52,7 @@ void MandelbrotJob::work() {
       }
       // TODO if the whole square is outside both regions, we could
       // skip these tests.
-      iterations = arith_traits<arith_t>::iterate(zx, zy, cx, cy, maxiters);
+      iterations = arith_traits<iter_t>::iterate(zx, zy, cx, cy, maxiters);
     done:
       *res++ = iterations;
     }
