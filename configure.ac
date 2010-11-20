@@ -52,7 +52,7 @@ AC_ARG_WITH([assembler],
             [],
             [with_assembler=yes])
 itertype=${itertype:-${arithtype}}
-AC_MSG_RESULT([${arithtype}])
+AC_MSG_RESULT([${itertype}])
 if test "x$with_assembler" != xno; then
   case $host_cpu in
   x86_64 )
