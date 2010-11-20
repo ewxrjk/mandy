@@ -130,12 +130,14 @@ int main() {
 #if HAVE_ASM
   // Mandelbrot computation
   double r2;
+  int count;
   Fixed64 cx = 0x00a6aaaaaaaaaaab;
   Fixed64 cy = 0xfffd555555555555;
+
   printf("cx:      "); printFixed(cx); putchar('\n');
   printf("cy:      "); printFixed(cy); putchar('\n');
-  int count = Fixed64_iterate(0, 0, cx, cy,
-			      &r2, 255);
+  count = Fixed64_iterate(0, 0, cx, cy,
+                          &r2, 255);
   printf("iterate: %d   r2: %g\n", count, r2);
   assert(count == 5);
 
@@ -146,6 +148,25 @@ int main() {
   count = Fixed64_iterate(0, 0, cx, cy, &r2, 255);
   printf("iterate: %d   r2: %g\n", count, r2);
   assert(count == 4);
+  /*
+   *count=0
+   *  z=0 0
+   *  r²=0
+   *count=1
+   *  z=-1 -1
+   *  r²=2
+   *count=2
+   *  z=-1 1
+   *  r²=2
+   *count=3
+   *  z=-1 -3
+   *  r²=10
+   *count=4
+   *  z=-9 5
+   *  r²=106
+   *final count=4
+   */
+
 #endif
 
   return 0;
