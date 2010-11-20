@@ -34,7 +34,7 @@ you 64 bits of precision.  Both are floating point types and are
 
 The 64-bit fixed point type gives you 56 bits of precision after the
 point.  It has had some optimization effort but is nevertheless a bit
-slower than using 'double' on an amd64 CPU.
+slower than using 'double' on an x86-64 CPU.
 
 The 128-bit fixed point type gives you 96 bits of precision after the
 point.  It's relatively slow.
