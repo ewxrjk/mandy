@@ -171,15 +171,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\Fixed-str2.c"
+				RelativePath="..\..\lib\Fixed-str2.c"
 				>
 			</File>
 			<File
-				RelativePath="..\fixed-test.c"
+				RelativePath="..\..\lib\fixed-test.c"
 				>
 			</File>
 			<File
-				RelativePath="..\Fixed.c"
+				RelativePath="..\..\lib\Fixed.c"
 				>
 			</File>
 		</Filter>
@@ -189,11 +189,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\Fixed.h"
+				RelativePath="..\..\lib\Fixed.h"
 				>
 			</File>
 			<File
-				RelativePath="..\mandy.h"
+				RelativePath="..\..\lib\mandy.h"
 				>
 			</File>
 		</Filter>
