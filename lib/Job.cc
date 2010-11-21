@@ -15,7 +15,9 @@
  */
 #include "mandy.h"
 #include "Job.h"
+#if HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 
 void Job::submit(void (*completion_callback_)(Job *, void *),
                  void *completion_data_) {
@@ -55,8 +57,12 @@ void Job::cancel(void *classId) {
 }
 
 void Job::init(int nthreads) {
+#if HAVE_SYSCONF && defined _SC_NPROCESSORS_ONLN
   if(nthreads == -1)
     nthreads = sysconf(_SC_NPROCESSORS_ONLN);
+#endif
+  if(nthreads == -1)
+    nthreads = 1;
   queued_cond = CondCreate();
   completed_cond = CondCreate();
   lock = LockCreate();

@@ -25,6 +25,8 @@ AM_PROG_AS
 AC_PROG_RANLIB
 AC_SET_MAKE
 PKG_CHECK_MODULES([gtkmm], [gtkmm-2.4])
+AC_CHECK_HEADERS([unistd.h])
+AC_CHECK_FUNCS([sysconf])
 AC_DEFINE([_GNU_SOURCE], [1], [use GNU extensions])
 if test "x$GXX" = xyes; then
   CXX="$CXX -Wall -W -Werror -Wpointer-arith -Wwrite-strings"
@@ -32,6 +34,11 @@ fi
 if test "x$GCC" = xyes; then
   CC="$CC -Wall -W -Werror -Wpointer-arith -Wwrite-strings"
 fi
+
+#
+# Identify arithmetic type to use
+# See README for further discussion
+#
 arithtype=double
 AC_MSG_CHECKING([what type to use for arithmetic])
 AC_ARG_WITH([fixed-point],
@@ -46,21 +53,39 @@ AC_ARG_WITH([long-double],
             [AS_HELP_STRING([--with-long-double],
 			    [use long double for arithmetic])],
             [arithtype="long double"])
+itertype=${itertype:-${arithtype}}
+AC_MSG_RESULT([${itertype}])
+AC_DEFINE_UNQUOTED([ARITH_TYPE],[${arithtype}],[arithmetic type])
+AC_DEFINE_UNQUOTED([ITER_TYPE],[${itertype}],[iteration type])
+AC_DEFINE([NFIXED],[4], [number of words in a fixed point integer])
+
+#
+# Assembler support
+#
 AC_ARG_WITH([assembler],
             [AS_HELP_STRING([--without-assembler],
 			    [suppress assembler implementations])],
             [],
             [with_assembler=yes])
-itertype=${itertype:-${arithtype}}
-AC_MSG_RESULT([${itertype}])
 if test "x$with_assembler" != xno; then
+  AC_MSG_CHECKING([for assembler support])
   case $host_cpu in
   x86_64 )
     AC_DEFINE([HAVE_ASM], [1], [use assembly fixed point support])
     AC_DEFINE([HAVE_ASM_AMD64], [1], [use amd64 assembler])
+    AC_MSG_RESULT([x86-64])
+    ;;
+  * )
+    AC_MSG_RESULT([none])
     ;;
   esac
 fi
+
+#
+# Choose a threading API
+# If you have pthreads there is no particular advantage to using glib
+# threads.  The intent is improve support for non-POSIX platforms.
+#
 AC_MSG_CHECKING([what thread API to use])
 threading=pthreads
 AC_ARG_WITH([gthreads],
@@ -77,8 +102,6 @@ glib )
   PKG_CHECK_MODULES([gthread], [gthread-2.0])
   ;;
 esac
-AC_DEFINE_UNQUOTED([ARITH_TYPE],[${arithtype}],[arithmetic type])
-AC_DEFINE_UNQUOTED([ITER_TYPE],[${itertype}],[iteration type])
-AC_DEFINE([NFIXED],[4], [number of words in a fixed point integer])
+
 AC_CONFIG_FILES([Makefile lib/Makefile images/Makefile gtkui/Makefile])
 AC_OUTPUT
