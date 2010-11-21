@@ -258,6 +258,7 @@ iterloop:
 	// Compute zx^2
 	mov	r14,r8
 	mov	r15,r9
+	mov	rbp,0x4000000000
 	call	square
 	// Compute zy^2
 	mov	r14,r10
@@ -272,7 +273,6 @@ iterloop:
 	// Add them up and compare against the limit
 	add	rcx,r13
 	adc	rbx,r12
-	mov	rbp,0x4000000000
 	cmp	rbx,rbp
 	jge	escaped
 	// Compute zx*zy
