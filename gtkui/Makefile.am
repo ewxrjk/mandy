@@ -21,6 +21,7 @@ mandy_LDADD=../lib/libmandy.a $(gtkmm_LIBS) $(gthread_LIBS)
 man_MANS=mandy.1
 AM_CPPFLAGS=-I${top_srcdir}/lib
 AM_CXXFLAGS=$(gtkmm_CFLAGS)
+EXTRA_DIST=${man_MANS}
 
 EMBED_IMAGE=${top_srcdir}/images/minimand256.png
 
