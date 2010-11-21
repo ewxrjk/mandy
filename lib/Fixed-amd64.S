@@ -277,12 +277,12 @@ iterloop:
 	// Compute zx*zy
 	// First figure out what the sign will be
 	cmp	r8,0
+	setl	bpl
 	jge	1f
 	not	r9
 	add	r9,1
 	not	r8
 	adc	r8,0
-	not	bpl
 1:
 	cmp	r10,0
 	jge	2f
@@ -290,7 +290,7 @@ iterloop:
 	add	r11,1
 	not	r10
 	adc	r10,0
-	not	bpl
+	dec	bpl
 2:
 	// rbx,rcx,rdi are used as the accumulator
 	mov	rax,r8
