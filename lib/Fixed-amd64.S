@@ -319,10 +319,10 @@ iterloop:
 	// Rearrange top 128 bits into two registers
 	shld	rbx,rcx,32
 	shld	rcx,rdi,32
-	// Maybe round up
+	// Double and maybe round up
 	bt	rdi,31
-	adc	rcx,0
-	adc	rbx,0
+	adc	rcx,rcx
+	adc	rbx,rbx
 	// Set sign
 	shr	bpl,1
 	jnc	3f
@@ -331,10 +331,7 @@ iterloop:
 	not	rbx
 	adc	rbx,0
 3:
-	// Now we have rbx,rcx = zx.zy
-	// Let rbx,rcx = 2.zx.zy
-	add	rcx,rcx
-	adc	rbx,rbx
+	// Now we have rbx,rcx = 2.zx.zy
 	// Let zy=r10,r11=2.zx.zy+cy
 	mov	r11,[rsp-112]
 	mov	r10,[rsp-104]
