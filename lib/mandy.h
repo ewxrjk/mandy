@@ -16,7 +16,22 @@
 #ifndef MANDY_H
 #define MANDY_H
 
+#if HAVE_CONFIG_H
 #include <config.h>
+#endif
+#if HAVE_INTTYPES_H
+#include <inttypes.h>
+#endif
+
+#if _WIN32
+typedef int int32_t;
+typedef unsigned int uint32_t;
+typedef long long int64_t;
+typedef unsigned long long uint64_t;
+#define inline __inline
+#define M_PI 3.14159265358979323846
+#endif
+
 #include "Fixed.h"
 
 typedef double count_t;

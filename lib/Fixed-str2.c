@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <config.h>
+#include "mandy.h"
 #include "Fixed.h"
 #include <string.h>
 #include <ctype.h>
@@ -54,10 +54,11 @@
 static const char digits[] = "0123456789abcdefghijklmnopqrstuvwxyz";
 
 static int c2digit(int c, int base) {
+  int value;
   const char *ptr = strchr(digits, c);
   if(!ptr)
     return -1;
-  int value = ptr - digits;
+  value = ptr - digits;
   if(value >= base)
     return -1;
   return value;
@@ -117,7 +118,7 @@ static void sub(uint32_t r[NINTWORDS],
 
   for(n = 0; n < NINTWORDS; ++n) {
     s = s + a[n] + (b[n] ^ 0xFFFFFFFF);
-    r[n] = s;
+    r[n] = (uint32_t)s;
     s >>= 32;
   }
 }
@@ -136,14 +137,14 @@ static void print(const uint32_t value[NINTWORDS]) {
 #endif
 
 int Fixed_str2(struct Fixed *r, const char *start, char **endptr) {
-  int base, error = 0;
-  Fixed_int2(r, 0);
+  int base, error = 0, sign = 0, digit, scale = 0;
+  uint32_t value[NINTWORDS];
   const char *s = start;
+  Fixed_int2(r, 0);
   // Consume leading whitespace
   while(isspace((unsigned char)*s))
     ++s;
   // Consume sign
-  int sign = 0;
   if(*s == '+')
     ++s;
   else if(*s == '-') {
@@ -163,10 +164,7 @@ int Fixed_str2(struct Fixed *r, const char *start, char **endptr) {
       *endptr = (char *)start;
     return 0;
   }
-  uint32_t value[NINTWORDS];
   memset(value, 0, sizeof value);
-  int digit;
-  int scale = 0;
   // Integer part
   while((digit = c2digit(*s, base)) >= 0) {
     if(!value[NINTWORDS-1])
@@ -193,10 +191,10 @@ int Fixed_str2(struct Fixed *r, const char *start, char **endptr) {
     }
   }
   if(*s == 'e' || *s == 'E') {
+    int exponent = 0, expsign = 0;
     /* Exponent part.  (This only works for base<=15, and TODO the 'p'
      * form for a binary exponent is not implemented at all.) */
     ++s;
-    int expsign = 0;
     if(*s == '+')
       ++s;
     else if(*s == '-') {
@@ -205,7 +203,6 @@ int Fixed_str2(struct Fixed *r, const char *start, char **endptr) {
     }
     if(isdigit((unsigned char)*s))
       goto noconversion;                /* must be at least 1 digit */
-    int exponent = 0;
     while(isdigit((unsigned char)*s))
       exponent = 10 * exponent + *s - '0';
     if(expsign)
@@ -217,13 +214,13 @@ int Fixed_str2(struct Fixed *r, const char *start, char **endptr) {
     // TODO missing some overflow detection in here
     /* We need to divide down by base^-scale.  First compute the divisor. */
     uint32_t divisor[NINTWORDS];
+    int bit = NFRACBITS;
     memset(divisor, 0, sizeof divisor);
     divisor[0] = 1;
     while(scale < 0) {
       mla(divisor, base, 0);
       ++scale;
     }
-    int bit = NFRACBITS;
     /* Shift the divisor up until it exceeds or equals the dividend,
      * keeping track of the bit number. */
     while(lt(divisor, value)) {
@@ -258,10 +255,11 @@ int Fixed_str2(struct Fixed *r, const char *start, char **endptr) {
     /* The result will just be an integer.  It had better fit (with
      * its sign) into 32 bits. */
     int i;
+    uint64_t n;
+    uint32_t limit = sign ? 0x80000000 : 0x7FFFFFFF;
     for(i = 1; i < NINTWORDS; ++i)
       if(value[i]) { error = ERANGE; goto done; }
-    const uint32_t limit = sign ? 0x80000000 : 0x7FFFFFFF;
-    uint64_t n = value[0];
+    n = value[0];
     if(n >= limit) {
       error = ERANGE;
       goto done;
@@ -271,7 +269,7 @@ int Fixed_str2(struct Fixed *r, const char *start, char **endptr) {
       if(n >= limit) { error = ERANGE; goto done; }
       --scale;
     }
-    Fixed_int2(r, n);
+    Fixed_int2(r, (int)n);
   }
 done:
   if(error == ERANGE) {

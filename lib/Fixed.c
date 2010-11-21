@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <config.h>
+#include "mandy.h"
 #include "Fixed.h"
 #include <stdio.h>
 #include <math.h>
@@ -25,7 +25,7 @@ void Fixed_add(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
 
   for(n = 0; n < NFIXED; ++n) {
     s = s + a->word[n] + b->word[n];
-    r->word[n] = s;
+    r->word[n] = (uint32_t)s;
     s >>= 32;
   }
 }
@@ -38,7 +38,7 @@ void Fixed_sub(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
 
   for(n = 0; n < NFIXED; ++n) {
     s = s + a->word[n] + (b->word[n] ^ 0xFFFFFFFF);
-    r->word[n] = s;
+    r->word[n] = (uint32_t)s;
     s >>= 32;
   }
 }
@@ -52,7 +52,7 @@ int Fixed_neg(struct Fixed *r, const struct Fixed *a) {
 
   for(n = 0; n < NFIXED; ++n) {
     s = s + (a->word[n] ^ 0xFFFFFFFF);
-    r->word[n] = s;
+    r->word[n] = (uint32_t)s;
     s >>= 32;
   }
   if(sign && (r->word[NFIXED - 1] & 0x80000000))
@@ -81,7 +81,7 @@ static int Fixed_mul_unsigned(struct Fixed *r, const struct Fixed *a, const stru
       for(i = 2 * NFIXED - 1 - (n + m); p && i < 2 * NFIXED; ++i) {
 	uint64_t s = result[i] + p;
 	//printf("  %d -> %016llx\n", i, s);
-	result[i] = s;
+	result[i] = (uint32_t)s;
 	p = s >> 32;
       }
       if(p)
@@ -92,7 +92,7 @@ static int Fixed_mul_unsigned(struct Fixed *r, const struct Fixed *a, const stru
     uint64_t s = 1;
     for(n = NFIXED; n < NFIXED; ++n) {
       s = result[n] + s;
-      result[n] = s;
+      result[n] = (uint32_t)s;
       s >>= 32;
     }
     if(s)
@@ -125,6 +125,9 @@ int Fixed_mul(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
 #endif
 
 void Fixed_divu(struct Fixed *r, const struct Fixed *a, unsigned u) {
+  uint64_t quot, rem = 0, d;
+  int n;
+
   if(Fixed_lt0(a)) {
     struct Fixed aa;
     Fixed_neg(&aa, a);
@@ -132,14 +135,11 @@ void Fixed_divu(struct Fixed *r, const struct Fixed *a, unsigned u) {
     Fixed_neg(r, r);
     return;
   }
-  uint64_t quot, rem = 0, d;
-  int n;
-
   for(n = NFIXED - 1; n >= 0; --n) {
     d = a->word[n] + (rem << 32);
     quot = d / u;
     rem = d % u;
-    r->word[n] = quot;
+    r->word[n] = (uint32_t)quot;
   }
 }
 
@@ -168,20 +168,19 @@ char *Fixed_2str(char buffer[], unsigned bufsize, const struct Fixed *a,
 
   static const char digits[] = "0123456789abcdefghijklmnopqrstuvwxyz";
 
-
   size_t i = 0;
   struct Fixed n = *a;
   struct Fixed radix;
-  Fixed_int2(&radix, base);
+  uint32_t u;
+  char ipart[130];
+  int j = sizeof ipart;
 
+  Fixed_int2(&radix, base);
   if(Fixed_lt0(&n)) {
     Fixed_neg(&n, &n);
     ADDCHAR('-');
   }
-
-  char ipart[130];
-  uint32_t u = n.word[NFIXED - 1];
-  int j = sizeof ipart;
+  u = n.word[NFIXED - 1];
   do {
     ipart[--j] = digits[u % base];
     u /= base;
@@ -315,13 +314,13 @@ void Fixed_div(struct Fixed *r, const struct Fixed *a, const struct Fixed *b) {
 void Fixed_sqrt(struct Fixed *r, const struct Fixed *a) {
   // Slow and naive bit-by-bit algorithm
   struct Fixed result, product;
-  int n;
+  int n, overflow;
   uint32_t bit;
   Fixed_int2(&result, 0);
   for(n = NFIXED - 1; n >= 0; --n) {
     for(bit = 1 << 31; bit > 0; bit >>= 1) {
       result.word[n] |= bit;
-      int overflow = Fixed_mul(&product, &result, &result);
+      overflow = Fixed_mul(&product, &result, &result);
       /*
       {
 	char rbuf[256], pbuf[256], abuf[256], bbuf[256];
@@ -350,16 +349,16 @@ void Fixed_sqrt(struct Fixed *r, const struct Fixed *a) {
 }
 
 void Fixed_double2(struct Fixed *r, double n) {
+  int i = NFIXED - 1;
   Fixed_int2(r, 0);
   if(n < 0) {
     Fixed_double2(r, -n);
     Fixed_neg(r, r);
     return;
   }
-  int i = NFIXED - 1;
   while(n && i >= 0) {
     double ipart = floor(n);
-    r->word[i] = ipart;
+    r->word[i] = (uint32_t)ipart;
     n -= ipart;
     n *= 4294967296.0;
     --i;

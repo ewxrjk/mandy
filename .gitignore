@@ -24,3 +24,7 @@ debian/files
 lib/fixed-test
 lib/fixed64-test
 lib/speedtest
+Debug
+*.suo
+*.ncb
+*.vcproj.*
