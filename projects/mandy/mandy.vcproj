@@ -219,6 +219,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\lib\getopt.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\lib\getopt1.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\lib\IterBuffer.cc"
 				>
 			</File>
@@ -269,6 +277,10 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\lib\ansidecl.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\lib\arith.h"
 				>
 			</File>
@@ -298,6 +310,10 @@
 			</File>
 			<File
 				RelativePath="..\..\gtkui\GenericWindow.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\lib\getopt.h"
 				>
 			</File>
 			<File
