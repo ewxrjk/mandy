@@ -13,4 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 SUBDIRS=lib images gtkui
-EXTRA_DIST=debian/rules debian/control debian/changelog debian/copyright
+EXTRA_DIST=debian/rules debian/control debian/changelog		\
+	debian/copyright projects/fixedtest/fixedtest.vcproj	\
+	projects/external/gtkmm-vc90-2_4.vsprops		\
+	projects/external/gtkmm-vc90-d-2_4.vsprops		\
+	projects/mandy/mandy.vcproj				\
+	projects/fixed64test/fixed64test.vcproj mandy.sln
