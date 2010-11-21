@@ -19,18 +19,16 @@
 
 void Job::submit(void (*completion_callback_)(Job *, void *),
                  void *completion_data_) {
-  int rc;
   completion_callback = completion_callback_;
   completion_data = completion_data_;
-  acquireLock();
+  LockAcquire(lock);
   queue.push_back(this);
-  if((rc = pthread_cond_signal(&queued_cond)))
-    fatal(rc, "pthread_cond_signal");
-  releaseLock();
+  CondSignal(queued_cond);
+  LockRelease(lock);
 }
 
 void Job::cancel(void *classId) {
-  acquireLock();
+  LockAcquire(lock);
   for(std::list<Job *>::iterator it = queue.begin();
       it != queue.end();
       ) {
@@ -53,31 +51,26 @@ void Job::cancel(void *classId) {
       completed.erase(here);
     }
   }
-  releaseLock();
+  LockRelease(lock);
 }
 
 void Job::init(int nthreads) {
-  int rc;
   if(nthreads == -1)
     nthreads = sysconf(_SC_NPROCESSORS_ONLN);
   for(int n = 0; n < nthreads; ++n) {
-    pthread_t id;
-    if((rc = pthread_create(&id, NULL, worker, NULL)))
-      fatal(rc, "pthread_create");
+    threadid_t id;
+    ThreadCreate(id, worker);
     workers.push_back(id);
   }
 }
 
 void Job::destroy() {
-  int rc;
-  acquireLock();
+  LockAcquire(lock);
   shutdown = true;
-  if((rc = pthread_cond_broadcast(&queued_cond)))
-    fatal(rc, "pthread_cond_broadcast");
-  releaseLock();
+  CondBroadcast(queued_cond);
+  LockRelease(lock);
   while(workers.size()) {
-    if((rc = pthread_join(workers.back(), NULL)))
-      fatal(rc, "pthread_join");
+    ThreadJoin(workers.back());
     workers.pop_back();
   }
 }
@@ -85,73 +78,67 @@ void Job::destroy() {
 void Job::dequeue() {
   Job *j = completed.front();
   completed.pop_front();
-  releaseLock();
+  LockRelease(lock);
   j->completion_callback(j, j->completion_data);
   delete j;
-  acquireLock();
+  LockAcquire(lock);
 }
 
 bool Job::poll(int max) {
-  acquireLock();
+  LockAcquire(lock);
   while(!completed.empty() && max-- > 0)
     dequeue();
   bool nowEmpty = completed.empty();
-  releaseLock();
+  LockRelease(lock);
   return !nowEmpty;
 }
 
 void Job::pollAll() {
-  int rc;
-  acquireLock();
+  LockAcquire(lock);
   while(!completed.empty() || !queue.empty()) {
     if(completed.empty()) {
-      if((rc = pthread_cond_wait(&completed_cond, &lock)))
-	fatal(rc, "pthread_cond_wait");
+      CondWait(completed_cond, lock);
       continue;
     }
     dequeue();
   }
-  releaseLock();
+  LockRelease(lock);
 }
 
-void *Job::worker(void *) {
-  int rc;
-  acquireLock();
+void Job::worker() {
+  LockAcquire(lock);
   while(!shutdown) {
     if(queue.empty()) {
-      if((rc = pthread_cond_wait(&queued_cond, &lock)))
-	fatal(rc, "pthread_cond_wait");
+      CondWait(queued_cond, lock);
       continue;
     }
     Job *j = queue.front();
     queue.pop_front();
-    releaseLock();
+    LockRelease(lock);
     j->work();
-    acquireLock();
+    LockAcquire(lock);
     completed.push_back(j);
-    if((rc = pthread_cond_signal(&completed_cond)))
-      fatal(rc, "pthread_cond_signal");
+    CondSignal(completed_cond);
   }
-  releaseLock();
-  return NULL;
+  LockRelease(lock);
 }
 
 Job::~Job() {
 }
 
 bool Job::pending() {
-  acquireLock();
+  LockAcquire(lock);
   bool more = !completed.empty() || !queue.empty();
-  releaseLock();
+  LockRelease(lock);
   return more;
 }
 
 std::list<Job *> Job::queue;
 std::list<Job *> Job::completed;
-pthread_cond_t Job::queued_cond = PTHREAD_COND_INITIALIZER;
-pthread_cond_t Job::completed_cond = PTHREAD_COND_INITIALIZER;
-pthread_mutex_t Job::lock = PTHREAD_MUTEX_INITIALIZER;
-std::vector<pthread_t> Job::workers;
+cond_t Job::queued_cond COND_INIT;
+cond_t Job::completed_cond COND_INIT;
+mutex_t Job::lock MUTEX_INIT;
+std::vector<threadid_t> Job::workers;
 bool Job::shutdown;
 
 /*

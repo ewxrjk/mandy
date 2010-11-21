@@ -61,6 +61,21 @@ if test "x$with_assembler" != xno; then
     ;;
   esac
 fi
+AC_MSG_CHECKING([what thread API to use])
+threading=pthreads
+AC_ARG_WITH([gthreads],
+	    [AS_HELP_STRING([--with-gthreads],
+			    [use glib thread support])],
+	    [threading=glib])
+case ${threading} in
+pthreads )
+  AC_DEFINE([USE_PTHREADS],[1],[define to use pthreads])
+  ;;
+glib )
+  AC_DEFINE([USE_GTHREADS],[1],[define to use glib threads])
+  ;;
+esac
+AC_MSG_RESULT([${threading}])
 AC_DEFINE_UNQUOTED([ARITH_TYPE],[${arithtype}],[arithmetic type])
 AC_DEFINE_UNQUOTED([ITER_TYPE],[${itertype}],[iteration type])
 AC_DEFINE([NFIXED],[4], [number of words in a fixed point integer])

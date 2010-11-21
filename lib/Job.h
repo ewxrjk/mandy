@@ -19,7 +19,7 @@
 #include "IterBuffer.h"
 #include <list>
 #include <vector>
-#include <pthread.h>
+#include "Threading.h"
 
 /* Base class for jobs passed to worker threads.  Agnostic about what the job
  * actually does.  A key point is that the number of threads matches the number
@@ -33,25 +33,13 @@ public:
 private:
   static std::list<Job *> queue;        // job queue
   static std::list<Job *> completed;    // completed jobs
-  static pthread_cond_t queued_cond;    // signaled when a job is queued
-  static pthread_cond_t completed_cond; // signaled when a job is completed
-  static pthread_mutex_t lock;          // lock protecting jobs
-  static std::vector<pthread_t> workers; // worker thread IDs
+  static cond_t queued_cond;            // signaled when a job is queued
+  static cond_t completed_cond;         // signaled when a job is completed
+  static mutex_t lock;                  // lock protecting jobs
+  static std::vector<threadid_t> workers; // worker thread IDs
   static bool shutdown;                  // shutdown flag
-  static void *worker(void *);           // work thread
+  static void worker();                  // work thread
   static void dequeue();
-  static void acquireLock() {
-    int rc;
-
-    if((rc = pthread_mutex_lock(&lock)))
-      fatal(rc, "pthread_mutex_lock");
-  }
-  static void releaseLock() {
-    int rc;
-
-    if((rc = pthread_mutex_unlock(&lock)))
-      fatal(rc, "pthread_mutex_unlock");
-  }
 public:
   Job(void *ci = NULL): classId(ci) {}
   virtual ~Job();

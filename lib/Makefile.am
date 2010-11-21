@@ -14,11 +14,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 noinst_LIBRARIES=libmandy.a
 noinst_PROGRAMS=fixed-test fixed64-test speedtest
-libmandy_a_SOURCES=Draw.cc fatal.cc Fixed64CC.cc FixedCC.cc		\
-FractalJob.cc IterBuffer.cc Job.cc JuliaJob.cc MandelbrotJob.cc		\
-arith.h Color.h Draw.h Fixed64.h Fixed.h FractalJob.h IterBuffer.h	\
-Job.h JuliaJob.h MandelbrotJob.h mandy.h Fixed64.c Fixed.c		\
-Fixed-str2.c Fixed64-amd64.S Fixed-amd64.S
+libmandy_a_SOURCES=Color.h Draw.cc Draw.h Fixed-amd64.S Fixed-str2.c	\
+Fixed.c Fixed.h Fixed64-amd64.S Fixed64.c Fixed64.h Fixed64CC.cc	\
+FixedCC.cc FractalJob.cc FractalJob.h IterBuffer.cc IterBuffer.h	\
+Job.cc Job.h JuliaJob.cc JuliaJob.h MandelbrotJob.cc MandelbrotJob.h	\
+Threading-glib.cc Threading-glib.h Threading-pthreads.cc Threading.h	\
+arith.h fatal.cc mandy.h
 fixed_test_SOURCES=fixed-test.c
 fixed_test_LDADD=../lib/libmandy.a -lm
 fixed64_test_SOURCES=fixed64-test.c

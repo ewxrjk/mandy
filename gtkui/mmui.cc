@@ -46,6 +46,7 @@ static const struct option options[] = {
 };
 
 int main(int argc, char **argv) {
+  ThreadInit();
   Gtk::Main kit(argc, argv);
   int n, nthreads = -1, mode = 0;
 
