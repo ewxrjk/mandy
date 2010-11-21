@@ -61,6 +61,11 @@ void Job::init(int nthreads) {
   if(nthreads == -1)
     nthreads = sysconf(_SC_NPROCESSORS_ONLN);
 #endif
+#if _WIN32
+  SYSTEM_INFO sysinfo;
+  GetSystemInfo(&sysinfo);
+  nthreads = sysinfo.dwNumberOfProcessors;
+#endif
   if(nthreads == -1)
     nthreads = 1;
   queued_cond = CondCreate();
