@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 noinst_LIBRARIES=libmandy.a
-noinst_PROGRAMS=fixed-test fixed64-test
+noinst_PROGRAMS=fixed-test fixed64-test speedtest
 libmandy_a_SOURCES=Draw.cc fatal.cc Fixed64CC.cc FixedCC.cc		\
 FractalJob.cc IterBuffer.cc Job.cc JuliaJob.cc MandelbrotJob.cc		\
 arith.h Color.h Draw.h Fixed64.h Fixed.h FractalJob.h IterBuffer.h	\
@@ -23,6 +23,8 @@ fixed_test_SOURCES=fixed-test.c
 fixed_test_LDADD=../lib/libmandy.a -lm
 fixed64_test_SOURCES=fixed64-test.c
 fixed64_test_LDADD=../lib/libmandy.a -lm
+speedtest_SOURCES=speedtest.cc
+speedtest_LDADD=../lib/libmandy.a -lm
 AM_CXXFLAGS=$(gtkmm_CFLAGS)
 
 Fixed-amd64.o: Fixed-amd64.S
