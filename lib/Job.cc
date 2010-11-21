@@ -57,6 +57,9 @@ void Job::cancel(void *classId) {
 void Job::init(int nthreads) {
   if(nthreads == -1)
     nthreads = sysconf(_SC_NPROCESSORS_ONLN);
+  queued_cond = CondCreate();
+  completed_cond = CondCreate();
+  lock = LockCreate();
   for(int n = 0; n < nthreads; ++n) {
     threadid_t id;
     ThreadCreate(id, worker);
@@ -135,9 +138,9 @@ bool Job::pending() {
 
 std::list<Job *> Job::queue;
 std::list<Job *> Job::completed;
-cond_t Job::queued_cond COND_INIT;
-cond_t Job::completed_cond COND_INIT;
-mutex_t Job::lock MUTEX_INIT;
+cond_t *Job::queued_cond;
+cond_t *Job::completed_cond;
+mutex_t *Job::lock;
 std::vector<threadid_t> Job::workers;
 bool Job::shutdown;
 

@@ -17,24 +17,12 @@
 #include "Threading.h"
 
 #if USE_GTHREADS
-void LockAcquire(mutex_t &m) {
-  m.lock();
+void ThreadCreate(threadid_t &id, void (*threadfn)()) {
+  id = Glib::Thread::create(sigc::ptr_fun(threadfn), true/*joinable*/);
 }
 
-void LockRelease(mutex_t &m) {
-  m.unlock();
-}
-
-void CondWait(cond_t &c, mutex_t &m) {
-  c.wait(m);
-}
-
-void CondSignal(cond_t &c) {
-  c.signal();
-}
-
-void CondBroadcast(cond_t &c) {
-  c.broadcast();
+void ThreadJoin(threadid_t &id) {
+  id->join();
 }
 #endif
 

@@ -21,24 +21,32 @@ inline void ThreadInit() {
   Glib::thread_init();
 }
 
-inline void LockAcquire(mutex_t &m) {
-  m.lock();
+inline mutex_t *LockCreate() {
+  return new mutex_t();
 }
 
-inline void LockRelease(mutex_t &m) {
-  m.unlock();
+inline void LockAcquire(mutex_t *m) {
+  m->lock();
 }
 
-inline void CondWait(cond_t &c, mutex_t &m) {
-  c.wait(m);
+inline void LockRelease(mutex_t *m) {
+  m->unlock();
 }
 
-inline void CondSignal(cond_t &c) {
-  c.signal();
+inline cond_t *CondCreate() {
+  return new cond_t();
 }
 
-inline void CondBroadcast(cond_t &c) {
-  c.broadcast();
+inline void CondWait(cond_t *c, mutex_t *m) {
+  c->wait(*m);
+}
+
+inline void CondSignal(cond_t *c) {
+  c->signal();
+}
+
+inline void CondBroadcast(cond_t *c) {
+  c->broadcast();
 }
 #endif
 #endif /* THREADING_GLIB_H */

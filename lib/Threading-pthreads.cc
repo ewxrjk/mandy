@@ -17,38 +17,54 @@
 #include "Threading.h"
 
 #if USE_PTHREADS
-void LockAcquire(mutex_t &m) {
+mutex_t *LockCreate() {
+  int rc;
+  mutex_t *m = new mutex_t();
+  if((rc = pthread_mutex_init(m, NULL)))
+    fatal(rc, "pthread_mutex_init");
+  return m;
+}
+
+void LockAcquire(mutex_t *m) {
   int rc;
 
-  if((rc = pthread_mutex_lock(&m)))
+  if((rc = pthread_mutex_lock(m)))
     fatal(rc, "pthread_mutex_lock");
 }
 
-void LockRelease(mutex_t &m) {
+void LockRelease(mutex_t *m) {
   int rc;
 
-  if((rc = pthread_mutex_unlock(&m)))
+  if((rc = pthread_mutex_unlock(m)))
     fatal(rc, "pthread_mutex_unlock");
 }
 
-void CondWait(cond_t &c, mutex_t &m) {
+cond_t *CondCreate() {
+  int rc;
+  cond_t *c = new cond_t();
+  if((rc = pthread_cond_init(c, NULL)))
+    fatal(rc, "pthread_cond_init");
+  return c;
+}
+
+void CondWait(cond_t *c, mutex_t *m) {
   int rc;
 
-  if((rc = pthread_cond_wait(&c, &m)))
+  if((rc = pthread_cond_wait(c, m)))
     fatal(rc, "pthread_cond_wait");
 }
 
-void CondSignal(cond_t &c) {
+void CondSignal(cond_t *c) {
   int rc;
 
-  if((rc = pthread_cond_signal(&c)))
+  if((rc = pthread_cond_signal(c)))
     fatal(rc, "pthread_cond_signal");
 }
 
-void CondBroadcast(cond_t &c) {
+void CondBroadcast(cond_t *c) {
   int rc;
 
-  if((rc = pthread_cond_broadcast(&c)))
+  if((rc = pthread_cond_broadcast(c)))
     fatal(rc, "pthread_cond_broadcast");
 }
 

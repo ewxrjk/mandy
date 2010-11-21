@@ -39,11 +39,13 @@ typedef Glib::Thread *threadid_t;
 #endif
 
 void ThreadInit();
-void LockAcquire(mutex_t &m);
-void LockRelease(mutex_t &m);
-void CondWait(cond_t &c, mutex_t &m);
-void CondSignal(cond_t &c);
-void CondBroadcast(cond_t &c);
+mutex_t *LockCreate();
+void LockAcquire(mutex_t *m);
+void LockRelease(mutex_t *m);
+cond_t *CondCreate();
+void CondWait(cond_t *c, mutex_t *m);
+void CondSignal(cond_t *c);
+void CondBroadcast(cond_t *c);
 void ThreadCreate(threadid_t &id, void (*threadfn)());
 void ThreadJoin(threadid_t &id);
 

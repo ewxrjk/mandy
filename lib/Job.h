@@ -33,9 +33,9 @@ public:
 private:
   static std::list<Job *> queue;        // job queue
   static std::list<Job *> completed;    // completed jobs
-  static cond_t queued_cond;            // signaled when a job is queued
-  static cond_t completed_cond;         // signaled when a job is completed
-  static mutex_t lock;                  // lock protecting jobs
+  static cond_t *queued_cond;           // signaled when a job is queued
+  static cond_t *completed_cond;        // signaled when a job is completed
+  static mutex_t *lock;                 // lock protecting jobs
   static std::vector<threadid_t> workers; // worker thread IDs
   static bool shutdown;                  // shutdown flag
   static void worker();                  // work thread
