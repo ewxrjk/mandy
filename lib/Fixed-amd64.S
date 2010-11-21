@@ -213,14 +213,14 @@ SYMBOL(Fixed_mul):
  * Outline register allocation (see code for more detail):
  *  rax, rdx       - destination for mul instruction
  *  rbx, rcx, rdi  - accumulator for multiplication
- *  xmm0,xmm1      - cx
- *  xmm2,xmm3      - cy
+ *  [rsp-128]      - cx
+ *  [rsp-112]      - cy
  *  r8,r9          - zx
  *  r10,r11        - zy
  *  r12,r13        - zx^2
  *  r14,r15        - zy^2 + input to square routine
- *  xmm4           - iterations
- *  xmm5           - maxiters
+ *  [rsp-96]       - iterations
+ *  [rsp-88]       - maxiters
  *  rbp            - sign of zx*zy
  */
 	.globl SYMBOL(Fixed_iterate)
@@ -235,15 +235,19 @@ SYMBOL(Fixed_iterate):
 	push	rsi
 	push	rdi
 	// Store iteration count info on the stack
-	movd	xmm5,r8
-	xor	r8,r8
-	movd	xmm4,r8
+	mov	[rsp-88],r8
+	xor	rax,rax
+	mov	[rsp-96],rax
 	// Get cx/cy into registers for later use
 	// TODO amd64 iteration guide recommends spill to memory instead
-	movd	xmm1,qword ptr [rdx]
-	movd	xmm0,qword ptr [rdx+8]
-	movd	xmm3,qword ptr [rcx]
-	movd	xmm2,qword ptr [rcx+8]
+	mov	rax,[rdx]
+	mov	[rsp-128],rax
+	mov	rax,[rdx+8]
+	mov	[rsp-120],rax	// [rsp-128] = cx
+	mov	rax,[rcx]
+	mov	[rsp-112],rax
+	mov	rax,[rcx+8]
+	mov	[rsp-104],rax	// [rsp-112] = cy
 	// Load initial zx/zy
 	mov	r9,[rdi]
 	mov	r8,[rdi+8]
@@ -332,30 +336,30 @@ iterloop:
 	add	rcx,rcx
 	adc	rbx,rbx
 	// Let zy=r10,r11=2.zx.zy+cy
-	movd	r11,xmm3
-	movd	r10,xmm2
+	mov	r11,[rsp-112]
+	mov	r10,[rsp-104]
 	add	r11,rcx
 	adc	r10,rbx
 	// Let zy=r8,r9=zx^2-zy^2+cx
-        movd    r9,xmm1
-        movd    r8,xmm0
+        mov     r9,[rsp-128]
+        mov     r8,[rsp-120]
 	add	r9,r13
 	adc	r8,r12
 	sub	r9,r15
 	sbb	r8,r14
 	// Increment iteration count
-	movd	rax,xmm4
+	mov	rax,[rsp-96]
 	inc	rax
-	movd	xmm4,rax
+	mov	[rsp-96],rax
 	// Only go back round the loop if not too big
-	movd	rbx,xmm5
+	mov	rbx,[rsp-88]
 	cmp	rax,rbx
 	.att_syntax // hack to work around bizarre bug in apple assembler
 	jb	iterloop
 	.intel_syntax noprefix
 escaped:
         // Retrieve iteration count
-	movd	rax,xmm4
+	mov	rax,[rsp-96]
 	// Return r^2 in the first argument (rather idiosyncratic)
 	pop	rdi
 	pop	rsi
