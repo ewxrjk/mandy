@@ -74,7 +74,7 @@ pthreads )
   ;;
 glib )
   AC_DEFINE([USE_GTHREADS],[1],[define to use glib threads])
-  PKG_CHECK_MODULES([gthread], [gthread])
+  PKG_CHECK_MODULES([gthread], [gthread-2.0])
   ;;
 esac
 AC_DEFINE_UNQUOTED([ARITH_TYPE],[${arithtype}],[arithmetic type])
