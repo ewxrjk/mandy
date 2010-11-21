@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include <config.h>
+#include "mandy.h"
 #include <stdio.h>
 #include "Fixed64.h"
 #include "Fixed.h"
@@ -24,6 +24,7 @@ static uint64_t Fixed64_div_unsigned(uint64_t a, uint64_t b);
 
 #if ! HAVE_ASM
 Fixed64 Fixed64_mul(Fixed64 a, Fixed64 b) {
+  Fixed64 r;
   int sign = 0;
   if(a < 0) {
     a = -a;
@@ -33,7 +34,7 @@ Fixed64 Fixed64_mul(Fixed64 a, Fixed64 b) {
     b = -b;
     sign = !sign;
   }
-  Fixed64 r = Fixed64_mul_unsigned(a, b);
+  r = Fixed64_mul_unsigned(a, b);
   return sign ? -r : r;
 }
 
@@ -42,7 +43,7 @@ Fixed64 Fixed64_mul(Fixed64 a, Fixed64 b) {
   int i = (n);                                          \
   while(i <= 3) {                                       \
     r += result[i];                                     \
-    result[i] = r;                                      \
+    result[i] = (uint32_t)r;                            \
     r >>= 32;                                           \
     ++i;                                                \
   }                                                     \
@@ -70,6 +71,7 @@ uint64_t Fixed64_mul_unsigned(uint64_t a, uint64_t b) {
 #endif
 
 Fixed64 Fixed64_div(Fixed64 a, Fixed64 b) {
+  Fixed64 r;
   int sign = 0;
   if(a < 0) {
     a = -a;
@@ -79,7 +81,7 @@ Fixed64 Fixed64_div(Fixed64 a, Fixed64 b) {
     b = -b;
     sign = !sign;
   }
-  Fixed64 r = Fixed64_div_unsigned(a, b);
+  r = Fixed64_div_unsigned(a, b);
   return sign ? -r : r;
 }
 
@@ -116,9 +118,10 @@ Fixed64 Fixed64_sqrt(Fixed64 a) {
 
 int Fixed_to_Fixed64(Fixed64 *r, const struct Fixed *a) {
   int32_t intpart = a->word[NFIXED - 1];
+  uint64_t result;
   if(intpart > 127 || intpart < -128)
     return ERANGE;
-  uint64_t result = (uint64_t)a->word[NFIXED - 1] << 56;
+  result = (uint64_t)a->word[NFIXED - 1] << 56;
   result += (uint64_t)a->word[NFIXED - 2] << 24;
   result += a->word[NFIXED - 3] >> 8;
   if(a->word[NFIXED-3] & 128) {
@@ -134,8 +137,8 @@ int Fixed_to_Fixed64(Fixed64 *r, const struct Fixed *a) {
 void Fixed64_to_Fixed(struct Fixed *r, Fixed64 a) {
   memset(r, 0, sizeof *r);
   r->word[NFIXED - 1] = a >> 56;
-  r->word[NFIXED - 2] = a >> 24;
-  r->word[NFIXED - 3] = a << 8;
+  r->word[NFIXED - 2] = (uint32_t)(a >> 24);
+  r->word[NFIXED - 3] = (uint32_t)(a << 8);
 }
 
 /* For string conversions we re-use the full-width code - the result is not as

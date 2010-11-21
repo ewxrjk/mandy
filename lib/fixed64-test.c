@@ -1,4 +1,4 @@
-#include <config.h>
+#include "mandy.h"
 #include "Fixed64.h"
 #include <stdio.h>
 #include <math.h>
