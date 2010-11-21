@@ -30,9 +30,22 @@ EMBED_IMAGE=${top_srcdir}/images/minimand256.png
 
 MainMenu.o: logo.h
 
-images.h: ${EMBED_IMAGE}
+${srcdir}/images.h: ${EMBED_IMAGE}
 	gdk-pixbuf-csource --raw --name=logodata ${EMBED_IMAGE} > images.h.new
-	mv images.h.new images.h
+	@if cmp -s images.h.new ${srcdir}/images.h; then	\
+	  echo rm -f images.h.new;					\
+	  rm -f images.h.new;					\
+	else							\
+	  echo mv ${srcdir}/images.h.new ${srcdir}/images.h;	\
+	  mv ${srcdir}/images.h.new ${srcdir}/images.h;		\
+	fi
 
-logo.h: mklogoc
-	./mklogoc > logo.h
+${srcdir}/logo.h: mklogoc
+	./mklogoc > logo.h.new
+	@if cmp -s logo.h.new ${srcdir}/logo.h; then		\
+	  echo rm -f logo.h.new;				\
+	  rm -f logo.h.new;					\
+	else							\
+	  echo mv ${srcdir}/logo.h.new ${srcdir}/logo.h;	\
+	  mv ${srcdir}/logo.h.new ${srcdir}/logo.h;		\
+	fi
