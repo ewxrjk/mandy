@@ -109,10 +109,9 @@ namespace mmui {
   }
 
   void IntegerControl::Render(Glib::ustring &s) const {
-    char buffer[128];
-
-    snprintf(buffer, sizeof buffer, "%d", *value);
-    s.assign(buffer);
+    std::stringstream buffer;
+    buffer << *value;
+    s.assign(buffer.str());
   }
 
   // Real entry widget ------------------------------------------------------

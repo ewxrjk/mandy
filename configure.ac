@@ -25,7 +25,7 @@ AM_PROG_AS
 AC_PROG_RANLIB
 AC_SET_MAKE
 PKG_CHECK_MODULES([gtkmm], [gtkmm-2.4])
-AC_CHECK_HEADERS([unistd.h inttypes.h])
+AC_CHECK_HEADERS([unistd.h inttypes.h getopt.h])
 AC_CHECK_FUNCS([sysconf strtold])
 AC_DEFINE([_GNU_SOURCE], [1], [use GNU extensions])
 if test "x$GXX" = xyes; then

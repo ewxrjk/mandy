@@ -41,6 +41,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/I &quot;..\..\lib&quot;"
 				Optimization="0"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
@@ -174,6 +175,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\gtkui\Controls.cc"
+				>
+			</File>
+			<File
 				RelativePath="..\..\lib\Draw.cc"
 				>
 			</File>
@@ -206,7 +211,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\gtkui\GenericWindow.cc"
+				>
+			</File>
+			<File
 				RelativePath="..\..\lib\IterBuffer.cc"
+				>
+			</File>
+			<File
+				RelativePath="..\..\lib\Job.cc"
 				>
 			</File>
 			<File
@@ -214,11 +227,35 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\gtkui\JuliaWindow.cc"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gtkui\MainMenu.cc"
+				>
+			</File>
+			<File
 				RelativePath="..\..\lib\MandelbrotJob.cc"
 				>
 			</File>
 			<File
+				RelativePath="..\..\gtkui\MandelbrotView.cc"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gtkui\MandelbrotWindow.cc"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gtkui\mmui.cc"
+				>
+			</File>
+			<File
 				RelativePath="..\..\lib\Threading-glib.cc"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gtkui\View.cc"
 				>
 			</File>
 		</Filter>
@@ -233,6 +270,10 @@
 			</File>
 			<File
 				RelativePath="..\..\lib\Color.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gtkui\Controls.h"
 				>
 			</File>
 			<File
@@ -252,11 +293,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\lib\IterBuffer.h"
+				RelativePath="..\..\gtkui\GenericWindow.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\lib\Job.cc"
+				RelativePath="..\..\lib\IterBuffer.h"
 				>
 			</File>
 			<File
@@ -268,11 +309,35 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\gtkui\JuliaView.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gtkui\JuliaWindow.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gtkui\MainMenu.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\lib\MandelbrotJob.h"
 				>
 			</File>
 			<File
+				RelativePath="..\..\gtkui\MandelbrotView.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gtkui\MandelbrotWindow.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\lib\mandy.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gtkui\mmui.h"
 				>
 			</File>
 			<File
@@ -285,6 +350,10 @@
 			</File>
 			<File
 				RelativePath="..\..\lib\Threading.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\gtkui\View.h"
 				>
 			</File>
 		</Filter>

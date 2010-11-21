@@ -43,10 +43,9 @@ namespace mmui {
       NewLocation();
       std::string xs = arith_traits<arith_t>::toString(x);
       std::string ys = arith_traits<arith_t>::toString(x);
-      char buffer[256];
-      snprintf(buffer, sizeof buffer, "Julia set at %s+%si",
-               xs.c_str(), ys.c_str());
-      dynamic_cast<Gtk::Window *>(get_parent()->get_parent())->set_title(buffer);
+      std::stringstream buffer;
+      buffer << "Julia set at " << xs << "+" << ys << "i";
+      dynamic_cast<Gtk::Window *>(get_parent()->get_parent())->set_title(buffer.str());
     }
   }
 }

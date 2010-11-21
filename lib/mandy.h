@@ -35,6 +35,8 @@ typedef long long int64_t;
 typedef unsigned long long uint64_t;
 #define inline __inline
 #define M_PI 3.14159265358979323846
+#define M_SQRT2 1.41421356237309504880
+#define M_SQRT1_2 0.70710678118654752440
 #define USE_GTHREADS 1
 #define ARITH_TYPE double
 #define ITER_TYPE double
@@ -44,6 +46,7 @@ typedef unsigned long long uint64_t;
 #define ATOMIC_DEC(x) InterlockedDecrement(&(x))
 #define strcasecmp _stricmp
 #define log2(x) (log(x) * 1.44269504088896340737)
+#define VERSION "0.0.WIP"
 #endif
 
 #if !HAVE_STRTOLD

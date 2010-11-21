@@ -116,15 +116,15 @@ namespace mmui {
   }
 
   void View::DragComplete() {
-    const int deltax = dragToX - dragFromX;
-    const int deltay = dragToY - dragFromY;
+    const int deltax = (int)(dragToX - dragFromX);
+    const int deltay = (int)(dragToY - dragFromY);
     if(!(deltax == 0 && deltay == 0)) {
       dragFromX = dragToX;
       dragFromY = dragToY;
       Drag(deltax, deltay);
       if(controls)
         controls->Update();
-      NewLocation(dragToX, dragToY);
+      NewLocation((int)dragToX, (int)dragToY);
     }
   }
 

@@ -18,7 +18,9 @@
 #include "MandelbrotWindow.h"
 #include "Draw.h"
 #include <gtkmm/main.h>
+#if HAVE_GETOPT_H
 #include <getopt.h>
+#endif
 
 mmui::MandelbrotWindow *mmui::mandelbrot;
 mmui::JuliaWindow *mmui::julia;
@@ -38,18 +40,22 @@ static bool periodic() {
   return true;
 }
 
+#if HAVE_GETOPT_H // TODO
 static const struct option options[] = {
   { "help", no_argument, NULL, 'h' },
   { "threads", required_argument, NULL, 't' },
   { "draw", no_argument, NULL, 'd' },
   { NULL, 0, NULL, 0 }
 };
+#endif
 
 int main(int argc, char **argv) {
   ThreadInit();
   Gtk::Main kit(argc, argv);
-  int n, nthreads = -1, mode = 0;
+  int nthreads = -1, mode = 0;
 
+#if HAVE_GETOPT_H // TODO
+  int n;
   while((n = getopt_long(argc, argv, "ht:d", options, NULL)) >= 0) {
     switch(n) {
     case 'h':
@@ -71,6 +77,9 @@ int main(int argc, char **argv) {
       exit(1);
     }
   }
+#else
+  int optind = argc;
+#endif
 
   Job::init(nthreads);
 
