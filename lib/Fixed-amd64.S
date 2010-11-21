@@ -375,6 +375,7 @@ escaped:
 	// rbx,rcx,rdi are used as accumulator
 	//
 	// In the language of Fixed_mul, we have r14=Ab=Ef, r15=cd=gh
+	.align	4
 square:
 	// We can throw away sign information as the answer is never -ve
 	cmp	r14,0
