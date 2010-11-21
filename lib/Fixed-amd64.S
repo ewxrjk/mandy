@@ -219,7 +219,7 @@ SYMBOL(Fixed_mul):
  *  r10,r11        - zy
  *  r12,r13        - zx^2
  *  r14,r15        - zy^2 + input to square routine
- *  [rsp-96]       - iterations
+ *  rsi            - iterations
  *  [rsp-88]       - maxiters
  *  rbp            - sign of zx*zy
  */
@@ -234,12 +234,9 @@ SYMBOL(Fixed_iterate):
 	push	r15
 	push	rsi
 	push	rdi
-	// Store iteration count info on the stack
+	// Store maxiters in the red zone
 	mov	[rsp-88],r8
-	xor	rax,rax
-	mov	[rsp-96],rax
-	// Get cx/cy into registers for later use
-	// TODO amd64 iteration guide recommends spill to memory instead
+	// Ditto cx/cy
 	mov	rax,[rdx]
 	mov	[rsp-128],rax
 	mov	rax,[rdx+8]
@@ -253,6 +250,8 @@ SYMBOL(Fixed_iterate):
 	mov	r8,[rdi+8]
 	mov	r11,[rsi]
 	mov	r10,[rsi+8]
+	// Iteration count
+	xor	rsi,rsi
 	// Main loop
 iterloop:
 	// Compute zx^2
@@ -348,18 +347,15 @@ iterloop:
 	sub	r9,r15
 	sbb	r8,r14
 	// Increment iteration count
-	mov	rax,[rsp-96]
-	inc	rax
-	mov	[rsp-96],rax
+	inc	rsi
 	// Only go back round the loop if not too big
-	mov	rbx,[rsp-88]
-	cmp	rax,rbx
+	cmp	rsi,[rsp-88]
 	.att_syntax // hack to work around bizarre bug in apple assembler
 	jb	iterloop
 	.intel_syntax noprefix
 escaped:
         // Retrieve iteration count
-	mov	rax,[rsp-96]
+	mov	rax,rsi
 	// Return r^2 in the first argument (rather idiosyncratic)
 	pop	rdi
 	pop	rsi
