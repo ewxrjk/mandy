@@ -21,9 +21,7 @@
 #include "JuliaWindow.h"
 #include "MandelbrotWindow.h"
 
-#if !_WIN32 // TODO
-#include "images.h"
-#endif
+#include "logo.h"
 
 namespace mmui {
 
@@ -139,12 +137,10 @@ namespace mmui {
       Gtk::Label copyright("Version "VERSION" \xC2\xA9 2010 Richard Kettlewell");
       about.get_vbox()->pack_start(name, Gtk::PACK_SHRINK);
       about.get_vbox()->pack_start(description, Gtk::PACK_SHRINK);
-#if !_WIN32
       Glib::RefPtr<Gdk::Pixbuf> logo_pixbuf
         = Gdk::Pixbuf::create_from_inline(sizeof logodata, logodata, true);
       Gtk::Image logo_image(logo_pixbuf);
       about.get_vbox()->pack_start(logo_image, Gtk::PACK_SHRINK);
-#endif
       about.get_vbox()->pack_start(copyright, Gtk::PACK_SHRINK);
       about.add_button("OK", 0);
       about.show_all();

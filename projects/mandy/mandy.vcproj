@@ -321,6 +321,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\gtkui\logo.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\gtkui\MainMenu.h"
 				>
 			</File>
