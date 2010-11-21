@@ -5,6 +5,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fixedtest", "projects\fixed
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fixed64test", "projects\fixed64test\fixed64test.vcproj", "{EDB855A8-1223-4AC6-AF42-91AB3DF0BA80}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mandy", "projects\mandy\mandy.vcproj", "{75B85CB2-587B-4676-8D86-45F6DDB3AA88}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,6 +21,10 @@ Global
 		{EDB855A8-1223-4AC6-AF42-91AB3DF0BA80}.Debug|Win32.Build.0 = Debug|Win32
 		{EDB855A8-1223-4AC6-AF42-91AB3DF0BA80}.Release|Win32.ActiveCfg = Release|Win32
 		{EDB855A8-1223-4AC6-AF42-91AB3DF0BA80}.Release|Win32.Build.0 = Release|Win32
+		{75B85CB2-587B-4676-8D86-45F6DDB3AA88}.Debug|Win32.ActiveCfg = Debug|Win32
+		{75B85CB2-587B-4676-8D86-45F6DDB3AA88}.Debug|Win32.Build.0 = Debug|Win32
+		{75B85CB2-587B-4676-8D86-45F6DDB3AA88}.Release|Win32.ActiveCfg = Release|Win32
+		{75B85CB2-587B-4676-8D86-45F6DDB3AA88}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

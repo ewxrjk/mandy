@@ -23,6 +23,9 @@
 #include <cassert>
 #include <cstdio>
 
+#include <iostream>
+#include <sstream>
+
 #include "Fixed.h"
 #include "Fixed64.h"
 
@@ -60,14 +63,14 @@ public:
   }
 
   static std::string toString(const double &n) {
-    char buffer[128];
+    std::stringstream s;
 
-    snprintf(buffer, sizeof buffer, "%g", n);
-    return buffer;
+    s << n;
+    return s.str();
   }
 
   static int toInt(const double &n) {
-    return floor(n);
+    return (int)floor(n);
   }
 
   static int fromString(double &n, const char *s, char **end) {
@@ -91,18 +94,22 @@ template<>
 class arith_traits<long double> {
 public:
   static inline long double maximum() {
+#ifdef HUGE_VALL
     return HUGE_VALL;
+#else
+    return HUGE_VAL;
+#endif
   }
 
   static std::string toString(const long double &n) {
-    char buffer[128];
+    std::stringstream s;
 
-    snprintf(buffer, sizeof buffer, "%Lg", n);
-    return buffer;
+    s << n;
+    return s.str();
   }
 
   static int toInt(const long double &n) {
-    return floorl(n);
+    return (int)floorl(n);
   }
 
   static int fromString(long double &n, const char *s, char **end) {

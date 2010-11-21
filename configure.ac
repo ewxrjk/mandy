@@ -26,7 +26,7 @@ AC_PROG_RANLIB
 AC_SET_MAKE
 PKG_CHECK_MODULES([gtkmm], [gtkmm-2.4])
 AC_CHECK_HEADERS([unistd.h inttypes.h])
-AC_CHECK_FUNCS([sysconf])
+AC_CHECK_FUNCS([sysconf strtold])
 AC_DEFINE([_GNU_SOURCE], [1], [use GNU extensions])
 if test "x$GXX" = xyes; then
   CXX="$CXX -Wall -W -Werror -Wpointer-arith -Wwrite-strings"

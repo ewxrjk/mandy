@@ -16,6 +16,8 @@
 #ifndef MANDY_H
 #define MANDY_H
 
+/* Portability guck */
+
 #if HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -24,12 +26,33 @@
 #endif
 
 #if _WIN32
+#include <windows.h>
 typedef int int32_t;
 typedef unsigned int uint32_t;
 typedef long long int64_t;
 typedef unsigned long long uint64_t;
 #define inline __inline
 #define M_PI 3.14159265358979323846
+#define USE_GTHREADS 1
+#define ARITH_TYPE double
+#define ITER_TYPE double
+#define NFIXED 4
+#define ATOMIC_TYPE long
+#define ATOMIC_INC(x) InterlockedIncrement(&(x))
+#define ATOMIC_DEC(x) InterlockedDecrement(&(x))
+#endif
+
+#if !HAVE_STRTOLD
+# define strtold(s,e) (long double)strtod(s, e)
+#endif
+
+#ifndef ATOMIC_TYPE
+#define ATOMIC_TYPE int
+#endif
+
+#if __GNUC__ && !defined ATOMIC_INC
+#define ATOMIC_INC(x) __sync_add_and_fetch(&(x), 1)
+#define ATOMIC_DEC(x) __sync_sub_and_fetch(&(x), 1)
 #endif
 
 #include "Fixed.h"

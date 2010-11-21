@@ -21,7 +21,7 @@
  * is thread-safe, so acquire/release may be used without reference to
  * locking. */
 class IterBuffer {
-  int refs;
+  ATOMIC_TYPE refs;
   void finished();
   ~IterBuffer();
 public:
@@ -29,11 +29,11 @@ public:
   IterBuffer(int w, int h);
   // Acquire a reference.
   void acquire() {
-    __sync_add_and_fetch(&refs, 1);
+    ATOMIC_INC(refs);
   }
   // Release a reference.
   void release() {
-    if(__sync_sub_and_fetch(&refs, 1) == 0)
+    if(ATOMIC_DEC(refs) == 0)
       finished();
   }
   // The buffer size.
