@@ -263,7 +263,7 @@ iterloop:
 	// Compute zy^2
 	mov	r14,r10
 	mov	r15,r11
-	mov	r12,rbx
+	mov	r12,rbx		// r12:r13 = zx^2
 	mov	r13,rcx
 	.att_syntax // hack to work around bizarre bug in apple assembler
 	call	square
