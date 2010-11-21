@@ -33,7 +33,7 @@ namespace mmui {
     add_events(Gdk::KEY_RELEASE_MASK);
     Gtk::Frame *frame = manage(new Gtk::Frame());
     frame->add(*controls);
-    Gtk::VBox *vbox = manage(new Gtk::VBox(false, 0));
+    Gtk::VBox *vbox = Gtk::manage(new Gtk::VBox(false, 0));
     vbox->pack_start(*manage(new Menubar()), false, false, 1);
     vbox->pack_start(*frame, false, false, 1);
     vbox->pack_end(*view, true, true, 0);
