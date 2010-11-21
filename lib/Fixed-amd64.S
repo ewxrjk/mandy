@@ -223,6 +223,7 @@ SYMBOL(Fixed_mul):
  *  [rsp-88]       - maxiters
  *  rbp            - sign of zx*zy
  */
+	.align	4
 	.globl SYMBOL(Fixed_iterate)
 SYMBOL(Fixed_iterate):
 	// Registers we must preserve
