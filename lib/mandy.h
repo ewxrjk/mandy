@@ -27,6 +27,8 @@
 
 #if _WIN32
 #include <windows.h>
+#undef max
+#undef min
 typedef int int32_t;
 typedef unsigned int uint32_t;
 typedef long long int64_t;
@@ -40,6 +42,8 @@ typedef unsigned long long uint64_t;
 #define ATOMIC_TYPE long
 #define ATOMIC_INC(x) InterlockedIncrement(&(x))
 #define ATOMIC_DEC(x) InterlockedDecrement(&(x))
+#define strcasecmp _stricmp
+#define log2(x) (log(x) * 1.44269504088896340737)
 #endif
 
 #if !HAVE_STRTOLD
