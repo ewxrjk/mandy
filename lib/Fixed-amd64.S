@@ -193,8 +193,8 @@ SYMBOL(Fixed_mul):
 	adc	rbp,0
 	adc	rsi,0
 	// Set the right sign
-	cmp	cl,0
-	je	3f
+	shr	cl,1
+	jnc	3f
 	not	rbp
 	add	rbp,1
 	not	rsi
@@ -324,8 +324,8 @@ iterloop:
 	adc	rcx,0
 	adc	rbx,0
 	// Set sign
-	cmp	bpl,0
-	je	3f
+	shr	bpl,1
+	jnc	3f
 	not	rcx
 	add	rcx,1
 	not	rbx
