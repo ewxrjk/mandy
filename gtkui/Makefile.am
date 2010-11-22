@@ -28,7 +28,8 @@ EXTRA_DIST=${man_MANS}
 
 EMBED_IMAGE=${top_srcdir}/images/minimand256.png
 
-MainMenu.o: logo.h
+MainMenu.o: ${srcdir}/logo.h
+mklogoc.o: ${srcdir}/images.h
 
 ${srcdir}/images.h: ${EMBED_IMAGE}
 	gdk-pixbuf-csource --raw --name=logodata ${EMBED_IMAGE} > images.h.new
