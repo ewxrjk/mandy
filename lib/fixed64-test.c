@@ -39,7 +39,7 @@ int main() {
   b = -a;
   c = -b;
   printf("-10:     "); printFixed(b); putchar('\n');
-  printf("-(-10):  "); printFixed(b); putchar('\n');
+  printf("-(-10):  "); printFixed(c); putchar('\n');
 
   // Subtraction
   a = Fixed64_int2(1);
