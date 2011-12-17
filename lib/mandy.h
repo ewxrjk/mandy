@@ -66,7 +66,9 @@ typedef unsigned long long uint64_t;
 
 typedef double count_t;
 
-void fatal(int errno_value, const char *fmt, ...);
+void fatal(int errno_value, const char *fmt, ...)
+  attribute((format(printf,2,3)))
+  attribute((noreturn));
 
 #endif /* MANDY_H */
 

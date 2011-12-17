@@ -103,5 +103,11 @@ glib )
   ;;
 esac
 
+AH_BOTTOM([#ifdef __GNUC__
+# define attribute(x) __attribute__(x)
+#else
+# define attribute(x)
+#endif])
+
 AC_CONFIG_FILES([Makefile lib/Makefile images/Makefile gtkui/Makefile])
 AC_OUTPUT
