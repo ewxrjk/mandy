@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/sh
 # Copyright © 2010 Richard Kettlewell.
 #
 # This program is free software: you can redistribute it and/or modify
