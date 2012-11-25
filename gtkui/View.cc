@@ -153,27 +153,29 @@ namespace mmui {
                               Gdk::RGB_DITHER_NONE, 0, 0);
   }
 
-  // Job completion callback
-  void View::Completed(Job *generic_job, void *data) {
-    View *v = (View *)data;
-    FractalJob *j = dynamic_cast<FractalJob *>(generic_job);
-    // Ignore stale jobs
-    if(j->dest != v->dest)
-      return;
-    const int w = v->dest->w;
-    guint8 *pixels = v->pixbuf->get_pixels();
-    const int rowstride = v->pixbuf->get_rowstride();
-    const int lx = j->x + j->w;
-    const int ly = j->y + j->h;
-    for(int y = j->y; y < ly; ++y) {
-      count_t *datarow = &v->dest->data[y * w + j->x];
-      guchar *pixelrow = pixels + y * rowstride + j->x * 3;
-      for(int x = j->x; x < lx; ++x) {
+  // Recolor the entire view
+  void View::NewPixels() {
+    int w, h;
+    get_window()->get_size(w, h);
+    NewPixels(0, 0, w, h);
+  }
+
+  // Recolor a region of the view
+  void View::NewPixels(int px, int py, int pw, int ph) {
+    const int w = dest->w;
+    guint8 *pixels = pixbuf->get_pixels();
+    const int rowstride = pixbuf->get_rowstride();
+    const int lx = px + pw;
+    const int ly = py + ph;
+    for(int y = py; y < ly; ++y) {
+      count_t *datarow = &dest->data[y * w + px];
+      guchar *pixelrow = pixels + y * rowstride + px * 3;
+      for(int x = px; x < lx; ++x) {
 	const count_t count = *datarow++;
-        if(count < v->maxiters) {
-          *pixelrow++ = red(count, v->maxiters);
-          *pixelrow++ = green(count, v->maxiters);
-          *pixelrow++ = blue(count, v->maxiters);
+        if(count < maxiters) {
+          *pixelrow++ = red(count, maxiters);
+          *pixelrow++ = green(count, maxiters);
+          *pixelrow++ = blue(count, maxiters);
         } else {
           *pixelrow++ = 0;
           *pixelrow++ = 0;
@@ -181,6 +183,16 @@ namespace mmui {
         }
       }
     }
+  }
+
+  // Job completion callback
+  void View::Completed(Job *generic_job, void *data) {
+    View *v = (View *)data;
+    FractalJob *j = dynamic_cast<FractalJob *>(generic_job);
+    // Ignore stale jobs
+    if(j->dest != v->dest)
+      return;
+    v->NewPixels(j->x, j->y, j->w, j->h);
     v->Redraw(j->x, j->y, j->w, j->h);
   }
 

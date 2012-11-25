@@ -55,6 +55,8 @@ namespace mmui {
     Glib::RefPtr<Gdk::Pixbuf> pixbuf;
 
     void Redraw(int x, int y, int w, int h);
+    void NewPixels(int x, int y, int w, int h);
+    void NewPixels();
     static void Completed(Job *generic_job, void *completion_data);
 
     // Dragging support
