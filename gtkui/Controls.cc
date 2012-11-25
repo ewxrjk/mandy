@@ -29,20 +29,39 @@ namespace mmui {
     ycenter_caption("Y center"),
     radius_caption("Radius"),
     maxiters_caption("Iterations"),
+    xpointer_caption("X position"),
+    ypointer_caption("Y position"),
+    count_caption("Count"),
     xcenter_control(this, &view->xcenter, -arith_traits<arith_t>::maximum(),
                     arith_traits<arith_t>::maximum()),
     ycenter_control(this, &view->ycenter, -arith_traits<arith_t>::maximum(),
                     arith_traits<arith_t>::maximum()),
     radius_control(this, &view->radius, 0, arith_traits<arith_t>::maximum()),
-    maxiters_control(this, &view->maxiters, 1, INT_MAX - 1) {
+    maxiters_control(this, &view->maxiters, 1, INT_MAX - 1),
+    xpointer_control(this, &view->xpointer, -arith_traits<arith_t>::maximum(),
+                     arith_traits<arith_t>::maximum(),
+                     false),
+    ypointer_control(this, &view->ypointer, -arith_traits<arith_t>::maximum(),
+                     arith_traits<arith_t>::maximum(),
+                     false),
+    count_control(this, &view->count, 0,
+                  arith_traits<arith_t>::maximum(),
+                  false)
+  {
     attach(xcenter_caption, 0, 1, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
     attach(xcenter_control, 1, 2, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
     attach(ycenter_caption, 0, 1, 1, 2, Gtk::FILL, Gtk::SHRINK, 1, 1);
     attach(ycenter_control, 1, 2, 1, 2, Gtk::FILL, Gtk::SHRINK, 1, 1);
     attach(radius_caption, 0, 1, 2, 3, Gtk::FILL, Gtk::SHRINK, 1, 1);
     attach(radius_control, 1, 2, 2, 3, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(maxiters_caption, 2, 3, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(maxiters_control, 3, 4, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
+    attach(maxiters_caption, 0, 1, 3, 4, Gtk::FILL, Gtk::SHRINK, 1, 1);
+    attach(maxiters_control, 1, 2, 3, 4, Gtk::FILL, Gtk::SHRINK, 1, 1);
+    attach(xpointer_caption, 2, 3, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
+    attach(xpointer_control, 3, 4, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
+    attach(ypointer_caption, 2, 3, 1, 2, Gtk::FILL, Gtk::SHRINK, 1, 1);
+    attach(ypointer_control, 3, 4, 1, 2, Gtk::FILL, Gtk::SHRINK, 1, 1);
+    attach(count_caption, 2, 3, 2, 3, Gtk::FILL, Gtk::SHRINK, 1, 1); 
+    attach(count_control, 3, 4, 2, 3, Gtk::FILL, Gtk::SHRINK, 1, 1);
     Update();
   }
 
@@ -84,8 +103,10 @@ namespace mmui {
 
   // Base entry widget --------------------------------------------------------
 
-  Control::Control(ControlPanel *p): parent(p) {
+  Control::Control(ControlPanel *p,
+                 bool editable_): parent(p) {
     p->Attach(this);
+    set_editable(editable_);
   }
 
   void Control::on_activate() {

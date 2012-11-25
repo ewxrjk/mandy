@@ -98,7 +98,15 @@ namespace mmui {
     return false;
   }
 
+  void View::NewPointer(int xpos, int ypos) {
+    GetCoordinates(xpointer, ypointer, xpos, ypos);
+    count = dest->data[ypos * dest->w + xpos];
+    if(controls)
+      controls->Update();
+  }
+
   bool View::on_motion_notify_event(GdkEventMotion *event) {
+    NewPointer(event->x, event->y);
     if(!dragging)
       return false;
     dragToX = event->x;
@@ -107,6 +115,18 @@ namespace mmui {
       dragIdleConnection = Glib::signal_idle().connect
         (sigc::mem_fun(*this, &View::DragIdle));
     return true;
+  }
+
+  void View::GetCoordinates(arith_t &x, arith_t &y, int xpos, int ypos) {
+    int w, h;
+    get_window()->get_size(w, h);
+    if(w > h) {
+      x = xcenter + radius * (xpos * 2.0 - w)/h;
+      y = ycenter - radius * (ypos * 2.0 / h - 1);
+    } else {
+      x = xcenter - radius * (xpos * 2.0 / w - 1);
+      y = ycenter + radius * (ypos * 2.0 - h)/w;
+    }
   }
 
   bool View::DragIdle() {

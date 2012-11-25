@@ -36,6 +36,7 @@ namespace mmui {
     virtual bool on_motion_notify_event(GdkEventMotion *);
     virtual bool on_expose_event(GdkEventExpose *);
 
+    void NewPointer(int xpos, int ypos);
     void NewLocation(int xpos = -1, int ypos = -1);
     void NewSize();
     void Drag(int deltax, int deltay);
@@ -43,11 +44,16 @@ namespace mmui {
     inline void SetControlPanel(ControlPanel *p) { controls = p; }
     inline void SetJobFactory(FractalJobFactory *jf) { jobFactory = jf; }
 
+    void GetCoordinates(arith_t &x, arith_t &y, int xpos, int tpos);
+
     void Save();
 
     // Parameters
     arith_t xcenter, ycenter, radius;
     int maxiters;
+
+    // Results
+    arith_t xpointer, ypointer, count;
 
   private:
     // Iteration count and pixel data

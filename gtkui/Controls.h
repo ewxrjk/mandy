@@ -33,7 +33,8 @@ namespace mmui {
   class Control: public Gtk::Entry {
     ControlPanel *parent;
   public:
-    Control(ControlPanel *p);
+    Control(ControlPanel *p,
+            bool editable_);
 
     void on_activate();
 
@@ -46,8 +47,9 @@ namespace mmui {
     int *value;
     int min, max;
   public:
-    IntegerControl(ControlPanel *p, int *v, int min_, int max_):
-      Control(p),
+    IntegerControl(ControlPanel *p, int *v, int min_, int max_,
+                   bool editable_ = true):
+      Control(p, editable_),
       value(v), min(min_), max(max_) {
     }
     bool Valid(const char *s) const;
@@ -59,8 +61,9 @@ namespace mmui {
     arith_t *value;
     arith_t min, max;
   public:
-    RealControl(ControlPanel *p, arith_t *v, arith_t min_, arith_t max_):
-      Control(p),
+    RealControl(ControlPanel *p, arith_t *v, arith_t min_, arith_t max_,
+                bool editable_ = true):
+      Control(p, editable_),
       value(v), min(min_), max(max_) {
     }
     bool Valid(const char *s) const;
@@ -72,8 +75,10 @@ namespace mmui {
     std::vector<Control *> controls;
     View *view;
     Caption xcenter_caption, ycenter_caption, radius_caption, maxiters_caption;
+    Caption xpointer_caption, ypointer_caption, count_caption;
     RealControl xcenter_control, ycenter_control, radius_control;
     IntegerControl maxiters_control;
+    RealControl xpointer_control, ypointer_control, count_control;
   public:
     ControlPanel(View *);
 
