@@ -30,3 +30,7 @@ Debug
 *.vcproj.*
 Release
 gtkui/mklogoc
+GPATH
+GRTAGS
+GSYMS
+GTAGS
