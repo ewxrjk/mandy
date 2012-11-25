@@ -63,10 +63,9 @@ public:
   }
 
   static std::string toString(const double &n) {
-    std::stringstream s;
-
-    s << n;
-    return s.str();
+    char buffer[256];
+    sprintf(buffer, "%.16g", n);
+    return buffer;
   }
 
   static int toInt(const double &n) {

@@ -1,4 +1,4 @@
-/* Copyright © 2010 Richard Kettlewell.
+/* Copyright © 2010, 2012 Richard Kettlewell.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,12 @@
 #include "Color.h"
 #include <gdkmm/pixbuf.h>
 
+#ifndef DEFAULT_FFMPEG
+# define DEFAULT_FFMPEG "ffmpeg"
+#endif
+
+#define TMP_PATTERN "tmp%d.png"
+
 void draw(const char *wstr,
 	  const char *hstr,
 	  const char *xstr,
@@ -36,7 +42,7 @@ void draw(const char *wstr,
   width = strtol(wstr, &eptr, 10);
   if(errno)
     fatal(errno, "cannot convert '%s'", wstr);
-  if(eptr == rstr)
+  if(eptr == wstr)
     fatal(0, "cannot convert '%s'", wstr);
   if(width > INT_MAX || width <= 0)
     fatal(0, "cannot convert '%s': out of range", wstr);
@@ -45,7 +51,7 @@ void draw(const char *wstr,
   height = strtol(hstr, &eptr, 10);
   if(errno)
     fatal(errno, "cannot convert '%s'", hstr);
-  if(eptr == rstr)
+  if(eptr == hstr)
     fatal(0, "cannot convert '%s'", hstr);
   if(height > INT_MAX || height <= 0)
     fatal(0, "cannot convert '%s': out of range", hstr);
@@ -71,7 +77,7 @@ void draw(const char *wstr,
   maxiters = strtol(mistr, &eptr, 10);
   if(errno)
     fatal(errno, "cannot convert '%s'", mistr);
-  if(eptr == rstr)
+  if(eptr == mistr)
     fatal(0, "cannot convert '%s'", mistr);
   if(maxiters > INT_MAX || maxiters <= 0)
     fatal(0, "cannot convert '%s': out of range", mistr);
@@ -142,6 +148,134 @@ void draw(int width, int height, arith_t x, arith_t y, arith_t radius,
       fatal(errno, "closing %s", path);
   } else
     pixbuf->save(path, fileType);
+  dest->release();
+}
+
+static const char *get_default(const char *name, const char *default_value) {
+  const char *value = getenv(name);
+  return value ? value : default_value;
+}
+
+int dive(const char *wstr,
+         const char *hstr,
+         const char *sxstr,
+         const char *systr,
+         const char *srstr,
+         const char *exstr,
+         const char *eystr,
+         const char *erstr,
+         const char *mistr,
+         const char *frstr,
+         const char *path) {
+  arith_t sx, sy, ex, ey, sr, er;
+  long width, height, maxiters, frames;
+  char *eptr;
+  int error;
+
+  errno = 0;
+  width = strtol(wstr, &eptr, 10);
+  if(errno)
+    fatal(errno, "cannot convert '%s'", wstr);
+  if(eptr == wstr)
+    fatal(0, "cannot convert '%s'", wstr);
+  if(width > INT_MAX || width <= 0)
+    fatal(0, "cannot convert '%s': out of range", wstr);
+
+  errno = 0;
+  height = strtol(hstr, &eptr, 10);
+  if(errno)
+    fatal(errno, "cannot convert '%s'", hstr);
+  if(eptr == hstr)
+    fatal(0, "cannot convert '%s'", hstr);
+  if(height > INT_MAX || height <= 0)
+    fatal(0, "cannot convert '%s': out of range", hstr);
+
+  if((error = arith_traits<arith_t>::fromString(sx, sxstr, &eptr)))
+    fatal(error, "cannot convert '%s'", sxstr);
+  if(eptr == sxstr)
+    fatal(0, "cannot convert '%s'", sxstr);
+
+  if((error = arith_traits<arith_t>::fromString(sy, systr, &eptr)))
+    fatal(error, "cannot convert '%s'", systr);
+  if(eptr == systr)
+    fatal(0, "cannot convert '%s'", systr);
+
+  if((error = arith_traits<arith_t>::fromString(sr, srstr, &eptr)))
+    fatal(error, "cannot convert '%s'", srstr);
+  if(eptr == srstr)
+    fatal(0, "cannot convert '%s'", srstr);
+  if(sr <= arith_t(0))
+    fatal(0, "cannot convert '%s': too small", erstr);
+
+  if((error = arith_traits<arith_t>::fromString(ex, exstr, &eptr)))
+    fatal(error, "cannot convert '%s'", exstr);
+  if(eptr == exstr)
+    fatal(0, "cannot convert '%s'", exstr);
+
+  if((error = arith_traits<arith_t>::fromString(ey, eystr, &eptr)))
+    fatal(error, "cannot convert '%s'", eystr);
+  if(eptr == eystr)
+    fatal(0, "cannot convert '%s'", eystr);
+
+  if((error = arith_traits<arith_t>::fromString(er, erstr, &eptr)))
+    fatal(error, "cannot convert '%s'", erstr);
+  if(eptr == erstr)
+    fatal(0, "cannot convert '%s'", erstr);
+  if(er <= arith_t(0))
+    fatal(0, "cannot convert '%s': too small", erstr);
+
+  errno = 0;
+  maxiters = strtol(mistr, &eptr, 10);
+  if(errno)
+    fatal(errno, "cannot convert '%s'", mistr);
+  if(eptr == mistr)
+    fatal(0, "cannot convert '%s'", mistr);
+  if(maxiters > INT_MAX || maxiters <= 0)
+    fatal(0, "cannot convert '%s': out of range", mistr);
+
+  errno = 0;
+  frames = strtol(frstr, &eptr, 10);
+  if(errno)
+    fatal(errno, "cannot convert '%s'", frstr);
+  if(eptr == frstr)
+    fatal(0, "cannot convert '%s'", frstr);
+  if(frames > INT_MAX || frames <= 0)
+    fatal(0, "cannot convert '%s': out of range", frstr);
+
+  double rk = pow(arith_traits<arith_t>::toDouble(er / sr), 1.0/(frames - 1));
+  for(int frame = 0; frame < frames; ++frame) {
+    arith_t radius = sr * pow(rk, frame);
+    arith_t x = sx + arith_t(frame) * (ex - sx) / (frames - 1);
+    arith_t y = sy + arith_t(frame) * (ey - sy) / (frames - 1);
+    fprintf(stderr, "frame %d/%ld centre %s x %s radius %s\n",
+            frame + 1, frames,
+            arith_traits<arith_t>::toString(x).c_str(),
+            arith_traits<arith_t>::toString(y).c_str(),
+            arith_traits<arith_t>::toString(radius).c_str());
+    char tmp[1024];
+    sprintf(tmp, TMP_PATTERN, frame);
+    draw(width, height, x, y, radius, maxiters, tmp);
+  }
+  std::string command;
+  command += get_default("FFMPEG", DEFAULT_FFMPEG);
+  command += " -f image2 -i "TMP_PATTERN;
+  command += " -vcodec ";
+  command += get_default("CODEC", "mpeg4"); 
+  command += " -r ";
+  command += get_default("FRAME_RATE", "25");
+  command += " -b ";
+  command += get_default("BITRATE", "2M");
+  command += " ";
+  command += path;                      // TODO quoting
+  fprintf(stderr, "encoding with: %s\n", command.c_str());
+  remove(path);
+  int rc = system(command.c_str());
+  for(int frame = 0; frame < frames; ++frame) {
+    char tmp[1024];
+    sprintf(tmp, TMP_PATTERN, frame);
+    remove(tmp);
+  }
+  return rc;
 }
 
 /*

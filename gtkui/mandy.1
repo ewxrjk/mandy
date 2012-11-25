@@ -63,6 +63,7 @@ The default is the number of online CPU cores.
 .B --draw
 Draw a Mandelbrot set image and save it to a file.
 .SH "OFFLINE DRAWING"
+.SS Stills
 The
 .B --draw
 option may be used to draw a single frame and save it to a file.
@@ -71,6 +72,7 @@ The syntax is:
 .B mandy
 .RI [ OPTIONS ]
 .B --draw
+.B --
 .I WIDTH
 .I HEIGHT
 .I X
@@ -106,5 +108,54 @@ The file type is inferred from the extension, which can be one of
 .B .ppm
 or
 .BR .jpeg .
+.SS Movies
+The
+.B --dive
+option may be used to create a video of a dive through the set.
+The syntax is:
+.PP
+.B mandy
+.RI [ OPTIONS ]
+.B --dive
+.B --
+.I WIDTH
+.I HEIGHT
+.I START-X
+.I START-Y
+.I START-RADIUS
+.I END-X
+.I END-Y
+.I END-RADIUS
+.I MAXITERS
+.I FRAMES
+.I PATH
+.PP
+The radius progresses from \fISTART-RADIUS\fR to \fIEND-RADIUS\fR
+exponentially, in other words giving a uniform zoom per frame
+transition.
+.PP
+The centre location progresses from \fISTART-X\fR/\fIY\fR to
+\fIEND-X\fR/\fIY\fR linearly.
+This may be changed.
+Until then, it is recommended that the start and end locations be the
+same.
+.PP
+In addition the following environment variables may be set:
+.TP
+.B FFMPEG
+The encoder to use.
+The default is \fBffmpeg\fR.
+You may need to set this to \fBavconv\fR.
+.TP
+.B FRAME_RATE
+The frame rate.
+The default is \fB2\fR.
+.TP
+.B BITRATE
+The output bitrate.
+The default is \fB2M\fR.
+.PP
+Note that this option uses a temporary file for each frame in the
+current directory.
 .SH AUTHOR
 Richard Kettlewell <rjk@greenend.org.uk>

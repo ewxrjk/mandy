@@ -24,6 +24,18 @@ void draw(const char *wstr,
           const char *mistr,
           const char *path);
 
+int dive(const char *wstr,
+         const char *hstr,
+         const char *sxstr,
+         const char *systr,
+         const char *srstr,
+         const char *exstr,
+         const char *eystr,
+         const char *erstr,
+         const char *mistr,
+         const char *frstr,
+         const char *path);
+
 void draw(int width, int height, 
           arith_t x, arith_t y, arith_t r,
           int maxiters, const char *path);
