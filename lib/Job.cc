@@ -109,7 +109,7 @@ bool Job::poll(int max) {
 
 void Job::pollAll() {
   LockAcquire(lock);
-  while(!completed.empty() || !queue.empty()) {
+  while(!completed.empty() || !queue.empty() || working) {
     if(completed.empty()) {
       CondWait(completed_cond, lock);
       continue;
@@ -128,10 +128,12 @@ void Job::worker() {
     }
     Job *j = queue.front();
     queue.pop_front();
+    ++working;
     LockRelease(lock);
     j->work();
     LockAcquire(lock);
     completed.push_back(j);
+    --working;
     CondSignal(completed_cond);
   }
   LockRelease(lock);
@@ -142,7 +144,7 @@ Job::~Job() {
 
 bool Job::pending() {
   LockAcquire(lock);
-  bool more = !completed.empty() || !queue.empty();
+  bool more = !completed.empty() || !queue.empty() || working;
   LockRelease(lock);
   return more;
 }
@@ -154,6 +156,7 @@ cond_t *Job::completed_cond;
 mutex_t *Job::lock;
 std::vector<threadid_t> Job::workers;
 bool Job::shutdown;
+int Job::working;
 
 /*
 Local Variables:
