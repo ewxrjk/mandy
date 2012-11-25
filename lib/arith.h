@@ -52,7 +52,7 @@ count_t defaultIterate(T zx, T zy, T cx, T cy, int maxiters) {
   if(iterations == maxiters)
     return maxiters;
   else
-    return log(1 + iterations - log2(log(arith_traits<T>::toDouble(r2))));
+    return 1 + iterations - log2(log2(arith_traits<T>::toDouble(r2)));
 }
 
 template<>
@@ -162,7 +162,7 @@ public:
       return rawCount;
     else {
       // r2 is returned in zx (rather oddly)
-      return log(1 + rawCount - log2(log(zx.toDouble())));
+      return 1 + rawCount - log2(log2(zx.toDouble()));
     }
 #else
     return defaultIterate(zx, zy, cx, cy, maxiters);
@@ -203,7 +203,7 @@ public:
     if(rawCount == maxiters)
       return rawCount;
     else
-      return log(1 + rawCount - log2(log(r2)));
+      return 1 + rawCount - log2(log2(r2));
 #else
     return defaultIterate(zx, zy, cx, cy, maxiters);
 #endif
