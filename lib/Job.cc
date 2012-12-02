@@ -119,7 +119,7 @@ void Job::pollAll() {
   LockRelease(lock);
 }
 
-void Job::worker() {
+void *Job::worker(void *) {
   LockAcquire(lock);
   while(!shutdown) {
     if(queue.empty()) {
@@ -137,6 +137,7 @@ void Job::worker() {
     CondSignal(completed_cond);
   }
   LockRelease(lock);
+  return NULL;
 }
 
 Job::~Job() {

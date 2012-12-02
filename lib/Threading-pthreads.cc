@@ -68,16 +68,12 @@ void CondBroadcast(cond_t *c) {
     fatal(rc, "pthread_cond_broadcast");
 }
 
-static void *ThreadCreationShim(void *arg) {
-  void (*threadfn)() = (void (*)())arg;
-  threadfn();
-  return NULL;
-}
-
-void ThreadCreate(threadid_t &id, void (*threadfn)()) {
+void ThreadCreate(threadid_t &id, 
+                  void *(*threadfn)(void *arg),
+                  void *arg) {
   int rc;
 
-  if((rc = pthread_create(&id, NULL, ThreadCreationShim, (void *)threadfn)))
+  if((rc = pthread_create(&id, NULL, threadfn, arg)))
     fatal(rc, "pthread_create");
 }
 

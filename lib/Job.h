@@ -39,7 +39,7 @@ private:
   static mutex_t *lock;                 // lock protecting jobs
   static std::vector<threadid_t> workers; // worker thread IDs
   static bool shutdown;                  // shutdown flag
-  static void worker();                  // work thread
+  static void *worker(void *);           // work thread
   static void dequeue();
 public:
   Job(void *ci = NULL): classId(ci) {}
