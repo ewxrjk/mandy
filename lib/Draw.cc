@@ -110,44 +110,55 @@ void draw(int width, int height, arith_t x, arith_t y, arith_t radius,
 					   &jf,
 					   0, 0, &jf);
   Job::poll(&jf);
-  // Convert to a pixbuf
-  // TODO de-dupe with View::Completed
-  Glib::RefPtr<Gdk::Pixbuf> pixbuf = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, false, 8, width, height);
-  const int rowstride = pixbuf->get_rowstride();
-  guint8 *pixels = pixbuf->get_pixels();
-  for(int py = 0; py < height; ++py) {
-    const count_t *datarow = &dest->data[py * width];
-    guchar *pixelrow = pixels + py * rowstride;
-    for(int px = 0; px < width; ++px) {
-      const count_t count = *datarow++;
-      if(count < maxiters) {
-	*pixelrow++ = red(count, maxiters);
-	*pixelrow++ = green(count, maxiters);
-	*pixelrow++ = blue(count, maxiters);
-      } else {
-	*pixelrow++ = 0;
-	*pixelrow++ = 0;
-	*pixelrow++ = 0;
-      }
-    }
-  }
   // Write to a file
   if(!strcmp(fileType, "ppm")) {
+    /* PPMs can be written directly */
     FILE *fp = fopen(path, "wb");
     if(!fp)
       fatal(errno, "opening %s", path);
     if(fprintf(fp, "P6\n%d %d 255\n", width, height) < 0)
       fatal(errno, "writing %s", path);
     for(int py = 0; py < height; ++py) {
-      guchar *pixelrow = pixels + py * rowstride;
-      fwrite(pixelrow, 3, width, fp);
-      if(ferror(fp))
-	fatal(errno, "writing %s", path);
+      const count_t *datarow = &dest->data[py * width];
+      for(int px = 0; px < width; ++px) {
+        const count_t count = *datarow++;
+        int r, g, b;
+        if(count < maxiters) {
+          r = red(count, maxiters);
+          g = green(count, maxiters);
+          b = blue(count, maxiters);
+        } else
+          r = g = b = 0;
+        if(fprintf(fp, "%c%c%c", r, g, b) < 0)
+          fatal(errno, "writing %s", path);
+      }
     }
     if(fclose(fp) < 0)
       fatal(errno, "closing %s", path);
-  } else
+  } else {
+    // Convert to a pixbuf
+    // TODO de-dupe with View::Completed
+    Glib::RefPtr<Gdk::Pixbuf> pixbuf = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, false, 8, width, height);
+    const int rowstride = pixbuf->get_rowstride();
+    guint8 *pixels = pixbuf->get_pixels();
+    for(int py = 0; py < height; ++py) {
+      const count_t *datarow = &dest->data[py * width];
+      guchar *pixelrow = pixels + py * rowstride;
+      for(int px = 0; px < width; ++px) {
+        const count_t count = *datarow++;
+        if(count < maxiters) {
+          *pixelrow++ = red(count, maxiters);
+          *pixelrow++ = green(count, maxiters);
+          *pixelrow++ = blue(count, maxiters);
+        } else {
+          *pixelrow++ = 0;
+          *pixelrow++ = 0;
+          *pixelrow++ = 0;
+        }
+      }
+    }
     pixbuf->save(path, fileType);
+  }
   dest->release();
 }
 
