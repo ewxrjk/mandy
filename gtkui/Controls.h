@@ -22,7 +22,7 @@
 
 namespace mmui {
 
-  class ControlPanel;
+  class ControlContainer;
   class View;
 
   class Caption: public Gtk::Label {
@@ -31,12 +31,16 @@ namespace mmui {
   };
 
   class Control: public Gtk::Entry {
-    ControlPanel *parent;
+    ControlContainer *parent;
+    void Update();
   public:
-    Control(ControlPanel *p,
+    Control(ControlContainer *p,
             bool editable_);
 
     void on_activate();
+    void on_show();
+    void on_buffer_inserted(guint position, const gchar *chars, guint n_chars);
+    void on_buffer_deleted(guint position, guint n_chars);
 
     // Return true if S is valid, else false
     virtual bool Valid(const char *s) const = 0;
@@ -44,13 +48,15 @@ namespace mmui {
     virtual void Set(const char *s) = 0;
     // Render the underlying value to string V
     virtual void Render(Glib::ustring &v) const = 0;
+
+    friend class ControlContainer;
   };
 
   class IntegerControl: public Control {
     int *value;
     int min, max;
   public:
-    IntegerControl(ControlPanel *p, int *v, int min_, int max_,
+    IntegerControl(ControlContainer *p, int *v, int min_, int max_,
                    bool editable_ = true):
       Control(p, editable_),
       value(v), min(min_), max(max_) {
@@ -64,7 +70,7 @@ namespace mmui {
     arith_t *value;
     arith_t min, max;
   public:
-    RealControl(ControlPanel *p, arith_t *v, arith_t min_, arith_t max_,
+    RealControl(ControlContainer *p, arith_t *v, arith_t min_, arith_t max_,
                 bool editable_ = true):
       Control(p, editable_),
       value(v), min(min_), max(max_) {
@@ -74,23 +80,32 @@ namespace mmui {
     void Render(Glib::ustring &) const;
   };
 
-  class ControlPanel: public Gtk::Table {
-    std::vector<Control *> controls;
-    View *view;
-    Caption xcenter_caption, ycenter_caption, radius_caption, maxiters_caption;
-    Caption xpointer_caption, ypointer_caption, count_caption;
-    RealControl xcenter_control, ycenter_control, radius_control;
-    IntegerControl maxiters_control;
-    RealControl xpointer_control, ypointer_control, count_control;
+  class StringControl: public Control {
+    std::string *value;
   public:
-    ControlPanel(View *);
+    StringControl(ControlContainer *p, std::string *v, bool editable_ = true):
+      Control(p, editable_), value(v) {
+    }
+    bool Valid(const char *s) const;
+    void Set(const char *);
+    void Render(Glib::ustring &) const;
+  };    
 
-    void Activated();                   // someone hit ENTER
-    void Update();                      // underlying values changed
+  class ControlContainer: public Gtk::Table {
+  public:
+    std::vector<Control *> controls;
+    virtual void Activated();
+    void ContainerActivated();
+    void Update();
 
     void Attach(Control *c) {
       controls.push_back(c);
     }
+
+    bool allValid() const;
+    virtual void controlChanged(Control *);
+
+    void sensitive(bool sensitivity);
   };
 
 }

@@ -21,57 +21,21 @@
 
 namespace mmui {
 
-  // Control Panel ------------------------------------------------------------
+  // Generic control container
 
-  ControlPanel::ControlPanel(View *v):
-    view(v),
-    xcenter_caption("X center"),
-    ycenter_caption("Y center"),
-    radius_caption("Radius"),
-    maxiters_caption("Iterations"),
-    xpointer_caption("X position"),
-    ypointer_caption("Y position"),
-    count_caption("Count"),
-    xcenter_control(this, &view->xcenter, -arith_traits<arith_t>::maximum(),
-                    arith_traits<arith_t>::maximum()),
-    ycenter_control(this, &view->ycenter, -arith_traits<arith_t>::maximum(),
-                    arith_traits<arith_t>::maximum()),
-    radius_control(this, &view->radius, 0, arith_traits<arith_t>::maximum()),
-    maxiters_control(this, &view->maxiters, 1, INT_MAX - 1),
-    xpointer_control(this, &view->xpointer, -arith_traits<arith_t>::maximum(),
-                     arith_traits<arith_t>::maximum(),
-                     false),
-    ypointer_control(this, &view->ypointer, -arith_traits<arith_t>::maximum(),
-                     arith_traits<arith_t>::maximum(),
-                     false),
-    count_control(this, &view->count, 0,
-                  arith_traits<arith_t>::maximum(),
-                  false)
-  {
-    attach(xcenter_caption, 0, 1, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(xcenter_control, 1, 2, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(ycenter_caption, 0, 1, 1, 2, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(ycenter_control, 1, 2, 1, 2, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(radius_caption, 0, 1, 2, 3, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(radius_control, 1, 2, 2, 3, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(maxiters_caption, 0, 1, 3, 4, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(maxiters_control, 1, 2, 3, 4, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(xpointer_caption, 2, 3, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(xpointer_control, 3, 4, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(ypointer_caption, 2, 3, 1, 2, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(ypointer_control, 3, 4, 1, 2, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(count_caption, 2, 3, 2, 3, Gtk::FILL, Gtk::SHRINK, 1, 1); 
-    attach(count_control, 3, 4, 2, 3, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    Update();
+  void ControlContainer::Update() {
+    Glib::ustring value;
+    for(size_t n = 0; n < controls.size(); ++n)
+      controls[n]->Update();
   }
 
-  void ControlPanel::Activated() {
+  void ControlContainer::ContainerActivated() {
     Glib::ustring value;
     for(size_t n = 0; n < controls.size(); ++n) {
       Control *c = controls[n];
       if(!c->Valid(c->get_text().c_str())) {
 	c->grab_focus();
-	view->get_window()->beep();
+	get_window()->beep();
 	return;
       }
     }
@@ -81,17 +45,28 @@ namespace mmui {
       if(value != c->get_text())
 	c->Set(c->get_text().c_str());
     }
-    int w, h;
-    view->get_window()->get_size(w, h);
-    view->NewLocation(w / 2, h / 2);
+    Activated();
   }
 
-  void ControlPanel::Update() {
-    Glib::ustring value;
+  bool ControlContainer::allValid() const {
     for(size_t n = 0; n < controls.size(); ++n) {
       Control *c = controls[n];
-      c->Render(value);
-      c->set_text(value);
+      if(!c->Valid(c->get_text().c_str()))
+        return false;
+    }
+    return true;
+  }
+
+  void ControlContainer::controlChanged(Control *) {
+  }
+
+  void ControlContainer::Activated() {
+  }
+
+  void ControlContainer::sensitive(bool sensitivity) {
+    for(size_t n = 0; n < controls.size(); ++n) {
+      Control *c = controls[n];
+      c->set_sensitive(sensitivity);
     }
   }
 
@@ -103,14 +78,36 @@ namespace mmui {
 
   // Base entry widget --------------------------------------------------------
 
-  Control::Control(ControlPanel *p,
-                 bool editable_): parent(p) {
+  Control::Control(ControlContainer *p,
+                   bool editable_): parent(p) {
     p->Attach(this);
     set_editable(editable_);
   }
 
+  void Control::Update() {
+    Glib::ustring value;
+    Render(value);
+    set_text(value);
+  }
+
+  void Control::on_show() {
+    get_buffer()->signal_inserted_text().connect
+      (sigc::mem_fun(*this, &Control::on_buffer_inserted));
+    get_buffer()->signal_deleted_text().connect
+      (sigc::mem_fun(*this, &Control::on_buffer_deleted));
+    Gtk::Entry::on_show();
+  }
+
+  void Control::on_buffer_inserted(guint, const gchar *, guint) {
+    parent->controlChanged(this);
+  }
+
+  void Control::on_buffer_deleted(guint, guint) {
+    parent->controlChanged(this);
+  }
+
   void Control::on_activate() {
-    parent->Activated();
+    parent->ContainerActivated();
   }
 
   // Integer entry widget -----------------------------------------------------
@@ -154,6 +151,20 @@ namespace mmui {
 
   void RealControl::Render(Glib::ustring &s) const {
     s.assign(arith_traits<arith_t>::toString(*value));
+  }
+
+  // String entry widget
+
+  bool StringControl::Valid(const char *) const {
+    return true;
+  }
+
+  void StringControl::Set(const char *s) {
+    value->assign(s);
+  }
+
+  void StringControl::Render(Glib::ustring &s) const {
+    s = *value;
   }
 
 }
