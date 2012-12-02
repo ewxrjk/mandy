@@ -46,7 +46,7 @@ public:
   virtual ~Job();
 
   // Override in derived class to define what the job does
-  virtual void work() = 0;
+  virtual void work();
 
   // Submit the job.  It will be run at some point in a background thread
   // unless cancel() is called before it reaches the head of the queue.

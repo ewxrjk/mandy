@@ -163,6 +163,9 @@ bool Job::pendingLocked(void *completion_data) {
           || find_jobs(working, completion_data));
 }
 
+void Job::work() {
+}
+
 std::list<Job *> Job::queue;
 std::list<Job *> Job::completed;
 std::set<Job *> Job::working;
