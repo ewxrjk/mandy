@@ -18,6 +18,7 @@ libmandy_a_SOURCES=Color.h Draw.cc Draw.h Fixed-amd64.S Fixed-str2.c	\
 Fixed.c Fixed.h Fixed64-amd64.S Fixed64.c Fixed64.h Fixed64CC.cc	\
 FixedCC.cc FractalJob.cc FractalJob.h IterBuffer.cc IterBuffer.h	\
 Job.cc Job.h JuliaJob.cc JuliaJob.h MandelbrotJob.cc MandelbrotJob.h	\
+Shell.cc Shell.h 						\
 Threading-glib.cc Threading-glib.h Threading-pthreads.cc		\
 Threading-pthreads.h Threading.h arith.h fatal.cc mandy.h
 fixed_test_SOURCES=fixed-test.c

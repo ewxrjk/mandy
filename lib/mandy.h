@@ -47,6 +47,19 @@ typedef unsigned long long uint64_t;
 #define strcasecmp _stricmp
 #define log2(x) (log(x) * 1.44269504088896340737)
 #define VERSION "0.0.WIP"
+#define PATHSEP ';'
+#define EXEEXT ".exe"
+#define DIRSEP "\\"
+#endif
+
+#ifndef PATHSEP
+# define PATHSEP ':'
+#endif
+#ifndef EXEEXT
+# define EXEEXT ""
+#endif
+#ifndef DIRSEP
+# define DIRSEP "/"
 #endif
 
 #if !HAVE_STRTOLD
