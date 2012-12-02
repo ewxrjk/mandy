@@ -1,4 +1,4 @@
-# Copyright © 2010 Richard Kettlewell.
+# Copyright © 2010, 2012 Richard Kettlewell.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,9 +16,10 @@ bin_PROGRAMS=mandy
 noinst_PROGRAMS=mklogoc
 dist_noinst_DATA=logo.h images.h
 mandy_SOURCES=Controls.cc GenericWindow.cc JuliaWindow.cc MainMenu.cc	\
-MandelbrotView.cc MandelbrotWindow.cc View.cc mmui.cc Controls.h	\
+MandelbrotView.cc MandelbrotWindow.cc Movie.cc View.cc mmui.cc \
+Controls.h ControlPanel.h ControlPanel.cc	\
 GenericWindow.h JuliaView.h JuliaWindow.h MainMenu.h MandelbrotView.h	\
-MandelbrotWindow.h View.h logo.h mmui.h
+MandelbrotWindow.h Movie.h View.h logo.h mmui.h
 mandy_LDADD=../lib/libmandy.a $(gtkmm_LIBS) $(gthread_LIBS)
 mklogoc_SOURCES=images.h mklogoc.cc
 man_MANS=mandy.1

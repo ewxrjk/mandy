@@ -40,6 +40,7 @@ namespace mmui {
   public:
     FileMenu():
       saveMandelbrotImageItem("Save Mandelbrot set image"),
+      saveMandelbrotMovieItem("Save Mandelbrot set movie"),
       saveJuliaImageItem("Save Julia set image"),
       closeItem(Gtk::Stock::CLOSE),
       quitItem(Gtk::Stock::QUIT)
@@ -47,6 +48,10 @@ namespace mmui {
       append(saveMandelbrotImageItem);
       saveMandelbrotImageItem.signal_activate().connect
         (sigc::ptr_fun(SaveMandelbrotImageActivated));
+
+      append(saveMandelbrotMovieItem);
+      saveMandelbrotMovieItem.signal_activate().connect
+        (sigc::ptr_fun(SaveMandelbrotMovieActivated));
 
       append(saveJuliaImageItem);
       saveJuliaImageItem.signal_activate().connect
@@ -63,6 +68,11 @@ namespace mmui {
     Gtk::MenuItem saveMandelbrotImageItem;
     static void SaveMandelbrotImageActivated() {
       mandelbrot->view.Save();
+    }
+
+    Gtk::MenuItem saveMandelbrotMovieItem;
+    static void SaveMandelbrotMovieActivated() {
+      mandelbrot->view.Movie();
     }
 
     Gtk::MenuItem saveJuliaImageItem;

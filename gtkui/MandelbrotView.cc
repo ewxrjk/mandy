@@ -16,6 +16,7 @@
 #include "mmui.h"
 #include "JuliaView.h"
 #include "MandelbrotView.h"
+#include "Movie.h"
 
 namespace mmui {
 
@@ -61,6 +62,10 @@ namespace mmui {
       return true;
     }
     return View::on_motion_notify_event(event);
+  }
+
+  void MandelbrotView::Movie() {
+    mmui::Movie(xcenter, ycenter, radius, maxiters);
   }
 
   // Julia set integration ----------------------------------------------------

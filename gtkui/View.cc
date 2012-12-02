@@ -15,7 +15,7 @@
  */
 #include "mmui.h"
 #include "View.h"
-#include "Controls.h"
+#include "ControlPanel.h"
 #include "FractalJob.h"
 #include "Color.h"
 #include <gtkmm/filechooserdialog.h>

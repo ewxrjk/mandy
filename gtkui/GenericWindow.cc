@@ -16,7 +16,7 @@
 #include "mmui.h"
 #include "MainMenu.h"
 #include "GenericWindow.h"
-#include "Controls.h"
+#include "ControlPanel.h"
 #include <gdk/gdkkeysyms.h>
 #include <gtkmm/frame.h>
 #include <gtkmm/box.h>

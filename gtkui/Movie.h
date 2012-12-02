@@ -1,4 +1,4 @@
-/* Copyright © 2010 Richard Kettlewell.
+/* Copyright © 2012 Richard Kettlewell.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,34 +14,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MANDELBROTVIEW_H
-#define MANDELBROTVIEW_H
+#ifndef MOVIEPARAMETERS_H
+#define MOVIEPARAMETERS_H
 
-#include "View.h"
-#include "MandelbrotJob.h"
+#include "Controls.h"
 
 namespace mmui {
 
-  class MandelbrotView: public View {
-  public:
-    MandelbrotView();
-    MandelbrotJobFactory mandelbrotJobFactory;
-
-    JuliaView *juliaView;
-
-    inline void SetJuliaView(JuliaView *v) { juliaView = v; }
-    void NewJulia(arith_t x, arith_t y);
-    virtual bool on_button_press_event(GdkEventButton *);
-    virtual bool on_button_release_event(GdkEventButton *);
-    virtual bool on_motion_notify_event(GdkEventMotion *);
-
-    void Movie();
-  };
-
+  void Movie(arith_t x,
+             arith_t y, 
+             arith_t radius,
+             int maxiters);
 
 }
 
-#endif /* MANDELBROTVIEW_H */
+#endif /* MOVIEPARAMETERS_H */
 
 /*
 Local Variables:
