@@ -42,6 +42,7 @@ private:
   static bool shutdown;                  // shutdown flag
   static void *worker(void *);           // work thread
   static void dequeue();
+  static bool dequeue(void *completion_data);
 public:
   virtual ~Job();
 
@@ -58,14 +59,18 @@ public:
   void submit(void (*completion_callback)(Job *, void *),
               void *completion_data = NULL);
 
-  static void cancel(void *completion_data); // cancel outstanding jobs
+  // Cancel outstanding jobs with matching completion_data.
+  // Jobs already in progress will still complete.
+  static void cancel(void *completion_data);
 
-  static bool poll(int max = 16);      // call outstanding completion callbacks
-  static void poll(void *completion_data); // wait for all jobs with matching
-                                           // completion_data to finish (there
-                                           // had better not be an indefinite
-                                           // supply of such jobs, or this
-                                           // method will not return)
+  // Wait for up to max jobs, and execute their completion callbacks in this
+  // thread.  This must only be used from the main thread.
+  static bool poll(int max = 16);
+
+  // Wait for all jobs with matching completion_data and execute their
+  // completion callbacks in this thread.  This can be used from any thread
+  // that the matched jobs will accept being run in.
+  static void poll(void *completion_data);
 
   static bool pending();               // any work left?
   static bool pending(void *completion_data); // any work left with matching

@@ -98,6 +98,24 @@ void Job::dequeue() {
   LockAcquire(lock);
 }
 
+bool Job::dequeue(void *completion_data) {
+  std::list<Job *>::iterator it;
+  for(it = completed.begin(); it != completed.end(); ++it) {
+    Job *j = *it;
+    if(j->completion_data == completion_data)
+      break;
+  }
+  if(it == completed.end())
+    return false;
+  Job *j = *it;
+  completed.erase(it);
+  LockRelease(lock);
+  j->completion_callback(j, j->completion_data);
+  delete j;
+  LockAcquire(lock);
+  return true;
+}
+
 bool Job::poll(int max) {
   LockAcquire(lock);
   while(!completed.empty() && max-- > 0)
@@ -110,11 +128,8 @@ bool Job::poll(int max) {
 void Job::poll(void *completion_data) {
   LockAcquire(lock);
   while(pendingLocked(completion_data)) {
-    if(completed.empty()) {
+    if(!dequeue(completion_data))
       CondWait(completed_cond, lock);
-      continue;
-    }
-    dequeue();
   }
   LockRelease(lock);
 }
