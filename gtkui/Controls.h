@@ -1,4 +1,4 @@
-/* Copyright © 2010 Richard Kettlewell.
+/* Copyright © 2010, 2012 Richard Kettlewell.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,9 +38,12 @@ namespace mmui {
 
     void on_activate();
 
+    // Return true if S is valid, else false
     virtual bool Valid(const char *s) const = 0;
+    // Set underlying value control from string S (which will be valid)
     virtual void Set(const char *s) = 0;
-    virtual void Render(Glib::ustring &) const = 0;
+    // Render the underlying value to string V
+    virtual void Render(Glib::ustring &v) const = 0;
   };
 
   class IntegerControl: public Control {
