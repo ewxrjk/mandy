@@ -18,6 +18,7 @@
 #include "Draw.h"
 #include "MandelbrotJob.h"
 #include "Color.h"
+#include "Shell.h"
 #include <gdkmm/pixbuf.h>
 
 #ifndef DEFAULT_FFMPEG
@@ -268,7 +269,8 @@ int dive(const char *wstr,
     draw(width, height, x, y, radius, maxiters, tmp);
   }
   std::string command;
-  command += get_default("FFMPEG", DEFAULT_FFMPEG);
+  command += shellQuote(get_default("FFMPEG",
+                                    isOnPath("avconv") ? "avconv" : "ffmpeg"));
   command += " -f image2 -i "TMP_PATTERN;
   command += " -vcodec ";
   command += get_default("CODEC", "mpeg4"); 
@@ -277,7 +279,7 @@ int dive(const char *wstr,
   command += " -b ";
   command += get_default("BITRATE", "2M");
   command += " ";
-  command += path;                      // TODO quoting
+  command += shellQuote(path);
   fprintf(stderr, "encoding with: %s\n", command.c_str());
   remove(path);
   int rc = system(command.c_str());
