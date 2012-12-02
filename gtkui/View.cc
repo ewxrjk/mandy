@@ -233,6 +233,8 @@ namespace mmui {
     // to provide continuity.
     if(xpos == -1 || ypos == -1)
       get_pointer(xpos, ypos);
+    // Discard stale work
+    Job::cancel(this);
     dest = FractalJob::recompute(xcenter, ycenter, radius,
                                  maxiters, w, h,
                                  Completed,

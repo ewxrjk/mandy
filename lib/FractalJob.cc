@@ -36,8 +36,6 @@ IterBuffer *FractalJob::recompute(arith_t cx, arith_t cy, arith_t r,
 				  void *completion_data,
 				  int xpos, int ypos,
 				  const FractalJobFactory *factory) {
-  // Discard stale work
-  Job::cancel(completion_data);
   IterBuffer *dest = new IterBuffer(w, h);
   // Set everything to 'unknown'
   memset(dest->data, 0xFF, dest->w * dest->h * sizeof(int));
