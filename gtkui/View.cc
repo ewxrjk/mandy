@@ -1,4 +1,4 @@
-/* Copyright © 2010 Richard Kettlewell.
+/* Copyright © 2010, 2012 Richard Kettlewell.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -382,9 +382,9 @@ namespace mmui {
       return;
     std::string path = chooser.get_filename();
     // TODO check for overwrite
-    // TODO wait for pixbuf to finish rendering
-    while(Job::pending())
-      Job::poll(INT_MAX);
+    // Wait for the view to finish rendering.  The user feedback isn't
+    // particularly nice but it should at least produce the correct image.
+    Job::poll(this);
     pixbuf->save(path, "png");
     // TODO support other file formats!
   }

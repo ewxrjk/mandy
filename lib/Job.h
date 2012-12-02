@@ -1,4 +1,4 @@
-/* Copyright © 2010 Richard Kettlewell.
+/* Copyright © 2010, 2012 Richard Kettlewell.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 #include "IterBuffer.h"
 #include <list>
+#include <set>
 #include <vector>
 #include "Threading.h"
 
@@ -32,23 +33,20 @@ public:
 
 private:
   static std::list<Job *> queue;        // job queue
+  static std::set<Job *> working;       // jobs being processed
   static std::list<Job *> completed;    // completed jobs
   static cond_t *queued_cond;           // signaled when a job is queued
   static cond_t *completed_cond;        // signaled when a job is completed
-  static int working;                   // number of jobs actually working
   static mutex_t *lock;                 // lock protecting jobs
   static std::vector<threadid_t> workers; // worker thread IDs
   static bool shutdown;                  // shutdown flag
   static void *worker(void *);           // work thread
   static void dequeue();
 public:
-  Job(void *ci = NULL): classId(ci) {}
   virtual ~Job();
 
   // Override in derived class to define what the job does
   virtual void work() = 0;
-
-  void *classId;
 
   // Submit the job.  It will be run at some point in a background thread
   // unless cancel() is called before it reaches the head of the queue.
@@ -60,13 +58,37 @@ public:
   void submit(void (*completion_callback)(Job *, void *),
               void *completion_data = NULL);
 
-  static void cancel(void *classId = NULL); // cancel outstanding jobs
+  static void cancel(void *completion_data); // cancel outstanding jobs
+
   static bool poll(int max = 16);      // call outstanding completion callbacks
-  static void pollAll();               // wait for everything to complete
+  static void poll(void *completion_data); // wait for all jobs with matching
+                                           // completion_data to finish (there
+                                           // had better not be an indefinite
+                                           // supply of such jobs, or this
+                                           // method will not return)
+
   static bool pending();               // any work left?
+  static bool pending(void *completion_data); // any work left with matching
+                                              // completion_data?
+  static bool pendingLocked(void *completion_data); // any work left with
+                                                    // matching
+                                                    // completion_data?
+                                                    // (Caller must hold lock)
 
   static void init(int nthreads=-1);    // initialize thread pool
   static void destroy();                // destroy thread pool
+
+  template<class T>
+  static bool find_jobs(const T &collection, void *completion_data) {
+    for(typename T::const_iterator it = collection.begin();
+        it != collection.end();
+        ++it) {
+      const Job *j = *it;
+      if(j->completion_data == completion_data)
+        return true;
+    }
+    return false;
+  }
 };
 
 #endif /* JOB_H */

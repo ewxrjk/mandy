@@ -107,9 +107,9 @@ void draw(int width, int height, arith_t x, arith_t y, arith_t radius,
   IterBuffer *dest = FractalJob::recompute(x, y, radius, maxiters,
 					   width, height,
 					   completed,
-					   NULL,
+					   &jf,
 					   0, 0, &jf);
-  Job::pollAll();
+  Job::poll(&jf);
   // Convert to a pixbuf
   // TODO de-dupe with View::Completed
   Glib::RefPtr<Gdk::Pixbuf> pixbuf = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, false, 8, width, height);

@@ -1,4 +1,4 @@
-/* Copyright © 2010 Richard Kettlewell.
+/* Copyright © 2010, 2012 Richard Kettlewell.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ void Job::submit(void (*completion_callback_)(Job *, void *),
   LockRelease(lock);
 }
 
-void Job::cancel(void *classId) {
+void Job::cancel(void *completion_data) {
   LockAcquire(lock);
   for(std::list<Job *>::iterator it = queue.begin();
       it != queue.end();
@@ -37,7 +37,7 @@ void Job::cancel(void *classId) {
     std::list<Job *>::iterator here = it;
     ++it;
     Job *j = *here;
-    if(classId == NULL || j->classId == classId) {
+    if(completion_data == NULL || j->completion_data == completion_data) {
       delete j;
       queue.erase(here);
     }
@@ -48,7 +48,7 @@ void Job::cancel(void *classId) {
     std::list<Job *>::iterator here = it;
     ++it;
     Job *j = *here;
-    if(classId == NULL || j->classId == classId) {
+    if(completion_data == NULL || j->completion_data == completion_data) {
       delete j;
       completed.erase(here);
     }
@@ -107,9 +107,9 @@ bool Job::poll(int max) {
   return !nowEmpty;
 }
 
-void Job::pollAll() {
+void Job::poll(void *completion_data) {
   LockAcquire(lock);
-  while(!completed.empty() || !queue.empty() || working) {
+  while(pendingLocked(completion_data)) {
     if(completed.empty()) {
       CondWait(completed_cond, lock);
       continue;
@@ -128,12 +128,12 @@ void *Job::worker(void *) {
     }
     Job *j = queue.front();
     queue.pop_front();
-    ++working;
+    working.insert(j);
     LockRelease(lock);
     j->work();
     LockAcquire(lock);
+    working.erase(j);
     completed.push_back(j);
-    --working;
     CondSignal(completed_cond);
   }
   LockRelease(lock);
@@ -145,19 +145,32 @@ Job::~Job() {
 
 bool Job::pending() {
   LockAcquire(lock);
-  bool more = !completed.empty() || !queue.empty() || working;
+  bool more = !completed.empty() || !queue.empty() || working.size();
   LockRelease(lock);
   return more;
 }
 
+bool Job::pending(void *completion_data) {
+  LockAcquire(lock);
+  bool more = pendingLocked(completion_data);
+  LockRelease(lock);
+  return more;
+}
+
+bool Job::pendingLocked(void *completion_data) {
+  return (find_jobs(completed, completion_data)
+          || find_jobs(queue, completion_data)
+          || find_jobs(working, completion_data));
+}
+
 std::list<Job *> Job::queue;
 std::list<Job *> Job::completed;
+std::set<Job *> Job::working;
 cond_t *Job::queued_cond;
 cond_t *Job::completed_cond;
 mutex_t *Job::lock;
 std::vector<threadid_t> Job::workers;
 bool Job::shutdown;
-int Job::working;
 
 /*
 Local Variables:

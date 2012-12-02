@@ -1,4 +1,4 @@
-/* Copyright © 2010 Richard Kettlewell.
+/* Copyright © 2010, 2012 Richard Kettlewell.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,7 +49,6 @@ IterBuffer *FractalJob::recompute(arith_t cx, arith_t cy, arith_t r,
     for(int py = 0; py < dest->h; py += chunk) {
       const int ph = std::min(chunk, dest->h - py);
       FractalJob *j = factory->create();
-      j->classId = completion_data;
       j->set(dest, cx, cy, r, maxiters, px, py, pw, ph);
       jobs.push_back(j);
     }
