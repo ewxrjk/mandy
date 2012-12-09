@@ -56,7 +56,7 @@ namespace mmui {
       m_x(0), m_y(0), m_radius(2),
       m_maxiters(255),
       m_seconds(10), m_fps(25),
-      m_bitrate(2 * 1024 * 1024),
+      m_bitrate(8 * 1024 * 1024),
       m_codec("libx264"),
       m_ffmpeg(isOnPath("avconv") ? "avconv" : "ffmpeg"),
       m_path("mandy.avi"),
