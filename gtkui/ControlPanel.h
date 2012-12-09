@@ -20,6 +20,7 @@
 
 namespace mmui {
 
+  // The main window's control panel
   class ControlPanel: public ControlContainer {
     View *view;
     Caption xcenter_caption, ycenter_caption, radius_caption, maxiters_caption;
