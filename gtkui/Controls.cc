@@ -70,12 +70,6 @@ namespace mmui {
     }
   }
 
-  // Captions -----------------------------------------------------------------
-
-  Caption::Caption(const char *caption): Gtk::Label(caption) {
-    set_alignment(1.0, 0.0);
-  }
-
   // Base entry widget --------------------------------------------------------
 
   Control::Control(ControlContainer *p,
@@ -96,6 +90,19 @@ namespace mmui {
 
   void Control::on_activate() {
     parent->ContainerActivated();
+  }
+
+  void Control::Attach(int x, int y, const char *caption, int width) {
+    label.set_text(caption);
+    label.set_alignment(1.0, 0.0);
+    parent->attach(label,
+                   2 * x, 2 * x + 1,
+                   y, y + 1,
+                   Gtk::FILL, Gtk::SHRINK, 1, 1);
+    parent->attach(*this,
+                   2 * x + 1, 2 * (x + width),
+                   y, y + 1,
+                   Gtk::FILL, Gtk::SHRINK, 1, 1);
   }
 
   // Integer entry widget -----------------------------------------------------

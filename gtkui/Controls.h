@@ -25,15 +25,12 @@ namespace mmui {
   class ControlContainer;
   class View;
 
-  // Caption for use in a control container
-  class Caption: public Gtk::Label {
-  public:
-    Caption(const char *caption);
-  };
-
   // Text edit/display entry in a control container
   class Control: public Gtk::Entry {
     ControlContainer *parent;
+
+    // Caption
+    Gtk::Label label;
 
     // Called when underlying value is modified; uses Render() to extract the
     // new value and updates the Gtk::Entry.
@@ -59,6 +56,9 @@ namespace mmui {
 
     // Render the underlying value to string V
     virtual void Render(Glib::ustring &v) const = 0;
+
+    // Attach to parent container, with a caption
+    void Attach(int x, int y, const char *caption, int width = 1);
 
     friend class ControlContainer;
   };

@@ -41,10 +41,6 @@ namespace mmui {
     std::string m_ffmpeg;
     std::string m_path;
 
-    Caption m_x_caption, m_y_caption, m_radius_caption, m_maxiters_caption,
-      m_seconds_caption, m_fps_caption, m_bitrate_caption, m_codec_caption,
-      m_ffmpeg_caption, m_path_caption;
-
     RealControl m_x_control, m_y_control, m_radius_control;
     IntegerControl m_maxiters_control, m_seconds_control, m_fps_control,
       m_bitrate_control;
@@ -60,16 +56,6 @@ namespace mmui {
       m_codec("libx264"),
       m_ffmpeg(isOnPath("avconv") ? "avconv" : "ffmpeg"),
       m_path("mandy.avi"),
-      m_x_caption("X center"),
-      m_y_caption("Y center"),
-      m_radius_caption("Radius"),
-      m_maxiters_caption("Iterations"),
-      m_seconds_caption("Length (s)"),
-      m_fps_caption("Frames/s"),
-      m_bitrate_caption("Bits/s"),
-      m_codec_caption("Codec"),
-      m_ffmpeg_caption("Path to ffmpeg"),
-      m_path_caption("Filename"),
       m_x_control(this, &m_x, -arith_traits<arith_t>::maximum(),
 		  arith_traits<arith_t>::maximum()),
       m_y_control(this, &m_y, -arith_traits<arith_t>::maximum(),
@@ -82,28 +68,19 @@ namespace mmui {
       m_codec_control(this, &m_codec),
       m_ffmpeg_control(this, &m_ffmpeg),
       m_path_control(this, &m_path) {
-      attach(m_x_caption, 0, 1, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
-      attach(m_x_control, 1, 2, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
-      attach(m_y_caption, 0, 1, 1, 2, Gtk::FILL, Gtk::SHRINK, 1, 1);
-      attach(m_y_control, 1, 2, 1, 2, Gtk::FILL, Gtk::SHRINK, 1, 1);
-      attach(m_radius_caption, 0, 1, 2, 3, Gtk::FILL, Gtk::SHRINK, 1, 1);
-      attach(m_radius_control, 1, 2, 2, 3, Gtk::FILL, Gtk::SHRINK, 1, 1);
-      attach(m_maxiters_caption, 0, 1, 3, 4, Gtk::FILL, Gtk::SHRINK, 1, 1);
-      attach(m_maxiters_control, 1, 2, 3, 4, Gtk::FILL, Gtk::SHRINK, 1, 1);
 
-      attach(m_seconds_caption, 2, 3, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
-      attach(m_seconds_control, 3, 4, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
-      attach(m_fps_caption, 2, 3, 1, 2, Gtk::FILL, Gtk::SHRINK, 1, 1);
-      attach(m_fps_control, 3, 4, 1, 2, Gtk::FILL, Gtk::SHRINK, 1, 1);
-      attach(m_bitrate_caption, 2, 3, 2, 3, Gtk::FILL, Gtk::SHRINK, 1, 1);
-      attach(m_bitrate_control, 3, 4, 2, 3, Gtk::FILL, Gtk::SHRINK, 1, 1);
-      attach(m_codec_caption, 2, 3, 3, 4, Gtk::FILL, Gtk::SHRINK, 1, 1);
-      attach(m_codec_control, 3, 4, 3, 4, Gtk::FILL, Gtk::SHRINK, 1, 1);
+      m_x_control.Attach(0, 0, "X center");
+      m_y_control.Attach(0, 1, "Y center");
+      m_radius_control.Attach(0, 2, "Radius");
+      m_maxiters_control.Attach(0, 3, "Iterations");
 
-      attach(m_ffmpeg_caption, 0, 1, 4, 5, Gtk::FILL, Gtk::SHRINK, 1, 1);
-      attach(m_ffmpeg_control, 1, 4, 4, 5, Gtk::FILL, Gtk::SHRINK, 1, 1);
-      attach(m_path_caption, 0, 1, 5, 6, Gtk::FILL, Gtk::SHRINK, 1, 1);
-      attach(m_path_control, 1, 4, 5, 6, Gtk::FILL, Gtk::SHRINK, 1, 1);
+      m_seconds_control.Attach(1, 0, "Length (s)");
+      m_fps_control.Attach(1, 1, "Frames/s");
+      m_bitrate_control.Attach(1, 2, "Bits/s");
+      m_codec_control.Attach(1, 3, "Codec");
+
+      m_ffmpeg_control.Attach(0, 4, "Path to ffmpeg", 2);
+      m_path_control.Attach(0, 5, "Filename", 2);
     }
 
     void controlChanged(Control *);

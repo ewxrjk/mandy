@@ -25,13 +25,6 @@ namespace mmui {
 
   ControlPanel::ControlPanel(View *v):
     view(v),
-    xcenter_caption("X center"),
-    ycenter_caption("Y center"),
-    radius_caption("Radius"),
-    maxiters_caption("Iterations"),
-    xpointer_caption("X position"),
-    ypointer_caption("Y position"),
-    count_caption("Count"),
     xcenter_control(this, &view->xcenter, -arith_traits<arith_t>::maximum(),
                     arith_traits<arith_t>::maximum()),
     ycenter_control(this, &view->ycenter, -arith_traits<arith_t>::maximum(),
@@ -48,20 +41,15 @@ namespace mmui {
                   arith_traits<arith_t>::maximum(),
                   false)
   {
-    attach(xcenter_caption, 0, 1, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(xcenter_control, 1, 2, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(ycenter_caption, 0, 1, 1, 2, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(ycenter_control, 1, 2, 1, 2, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(radius_caption, 0, 1, 2, 3, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(radius_control, 1, 2, 2, 3, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(maxiters_caption, 0, 1, 3, 4, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(maxiters_control, 1, 2, 3, 4, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(xpointer_caption, 2, 3, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(xpointer_control, 3, 4, 0, 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(ypointer_caption, 2, 3, 1, 2, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(ypointer_control, 3, 4, 1, 2, Gtk::FILL, Gtk::SHRINK, 1, 1);
-    attach(count_caption, 2, 3, 2, 3, Gtk::FILL, Gtk::SHRINK, 1, 1); 
-    attach(count_control, 3, 4, 2, 3, Gtk::FILL, Gtk::SHRINK, 1, 1);
+    xcenter_control.Attach(0, 0, "X center");
+    ycenter_control.Attach(0, 1, "Y center");
+    radius_control.Attach(0, 2, "Radius");
+    maxiters_control.Attach(0, 3, "Iterations");
+
+    xpointer_control.Attach(1, 0, "X position");
+    ypointer_control.Attach(1, 1, "Y position");
+    count_control.Attach(1, 2, "Count");
+
     Update();
   }
 
