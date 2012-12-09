@@ -38,9 +38,7 @@ namespace mmui {
             bool editable_);
 
     void on_activate();
-    void on_show();
-    void on_buffer_inserted(guint position, const gchar *chars, guint n_chars);
-    void on_buffer_deleted(guint position, guint n_chars);
+    void on_changed();
 
     // Return true if S is valid, else false
     virtual bool Valid(const char *s) const = 0;

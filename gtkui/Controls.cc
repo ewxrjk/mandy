@@ -90,19 +90,7 @@ namespace mmui {
     set_text(value);
   }
 
-  void Control::on_show() {
-    get_buffer()->signal_inserted_text().connect
-      (sigc::mem_fun(*this, &Control::on_buffer_inserted));
-    get_buffer()->signal_deleted_text().connect
-      (sigc::mem_fun(*this, &Control::on_buffer_deleted));
-    Gtk::Entry::on_show();
-  }
-
-  void Control::on_buffer_inserted(guint, const gchar *, guint) {
-    parent->controlChanged(this);
-  }
-
-  void Control::on_buffer_deleted(guint, guint) {
+  void Control::on_changed() {
     parent->controlChanged(this);
   }
 
