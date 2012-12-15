@@ -19,6 +19,7 @@
 #include <gtkmm/label.h>
 #include <gtkmm/entry.h>
 #include <gtkmm/table.h>
+#include <gtkmm/filechooserbutton.h>
 
 namespace mmui {
 
@@ -63,6 +64,25 @@ namespace mmui {
     virtual Gtk::Widget *widget() = 0;
   protected:
     ControlContainer *parent;
+  };
+
+  // Filename selector in a control container
+  class FileSelectionControl: public Control, public Gtk::FileChooserButton {
+    Gtk::Widget *widget();
+
+    std::string *m_path;
+  public:
+    FileSelectionControl(ControlContainer *p,
+                         std::string *path,
+                         const Glib::ustring &title,
+                         Gtk::FileChooserAction action = Gtk::FILE_CHOOSER_ACTION_OPEN);
+
+    // Update the display value
+    void UpdateDisplay();
+
+    // Update the underlying value
+    void UpdateUnderlying();
+
   };
 
   // Text edit/display entry in a control container

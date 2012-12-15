@@ -45,7 +45,8 @@ namespace mmui {
     IntegerControl m_maxiters_control, m_seconds_control, m_fps_control,
       m_bitrate_control;
     StringControl m_codec_control;		    // TODO use a drop-down?
-    StringControl m_ffmpeg_control, m_path_control; // TODO use a file dialog
+    FileSelectionControl m_ffmpeg_control;
+    StringControl m_path_control; // TODO use a file chooser
 
     MovieControls(MovieWindow *window):
       m_window(window),
@@ -66,7 +67,7 @@ namespace mmui {
       m_fps_control(this, &m_fps, 1, INT_MAX - 1),
       m_bitrate_control(this, &m_bitrate, 1, INT_MAX - 1),
       m_codec_control(this, &m_codec),
-      m_ffmpeg_control(this, &m_ffmpeg),
+      m_ffmpeg_control(this, &m_ffmpeg, "Select Encoder"),
       m_path_control(this, &m_path) {
 
       m_x_control.Attach(0, 0, "X center");
@@ -79,7 +80,7 @@ namespace mmui {
       m_bitrate_control.Attach(1, 2, "Bits/s");
       m_codec_control.Attach(1, 3, "Codec");
 
-      m_ffmpeg_control.Attach(0, 4, "Path to ffmpeg", 2);
+      m_ffmpeg_control.Attach(0, 4, "Encoder", 2);
       m_path_control.Attach(0, 5, "Filename", 2);
     }
 

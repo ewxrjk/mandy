@@ -21,7 +21,7 @@
 
 namespace mmui {
 
-  // Generic control container
+  // Generic control container ------------------------------------------------
 
   void ControlContainer::UpdateDisplay() {
     Glib::ustring value;
@@ -84,6 +84,32 @@ namespace mmui {
   }
 
   void Control::UpdateUnderlying() {
+  }
+
+  // File selection widget ----------------------------------------------------
+
+  FileSelectionControl::FileSelectionControl(ControlContainer *p,
+                                             std::string *path,
+                                             const Glib::ustring &title,
+                                             Gtk::FileChooserAction action):
+    Control(p),
+    Gtk::FileChooserButton(title, action),
+    m_path(path) {
+    select_filename(*m_path);
+    signal_file_set().connect(sigc::mem_fun(*this,
+                                            &FileSelectionControl::UpdateUnderlying));
+  }
+
+  void FileSelectionControl::UpdateDisplay() {
+    select_filename(*m_path);
+  }
+  
+  void FileSelectionControl::UpdateUnderlying() {
+    *m_path = get_filename();
+  }
+  
+  Gtk::Widget *FileSelectionControl::widget() {
+    return this;
   }
 
   // Text entry widget --------------------------------------------------------
