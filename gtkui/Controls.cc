@@ -23,37 +23,30 @@ namespace mmui {
 
   // Generic control container
 
-  void ControlContainer::Update() {
+  void ControlContainer::UpdateDisplay() {
     Glib::ustring value;
     for(size_t n = 0; n < controls.size(); ++n)
-      controls[n]->Update();
+      controls[n]->UpdateDisplay();
   }
 
   void ControlContainer::ContainerActivated() {
-    Glib::ustring value;
     for(size_t n = 0; n < controls.size(); ++n) {
-      TextEntryControl *c = controls[n];
-      if(!c->Valid(c->get_text().c_str())) {
-	c->grab_focus();
+      Control *c = controls[n];
+      if(!c->DisplayIsValid()) {
+	c->widget()->grab_focus();
 	get_window()->beep();
 	return;
       }
     }
-    for(size_t n = 0; n < controls.size(); ++n) {
-      TextEntryControl *c = controls[n];
-      c->Render(value);
-      if(value != c->get_text())
-	c->Set(c->get_text().c_str());
-    }
+    for(size_t n = 0; n < controls.size(); ++n)
+      controls[n]->UpdateUnderlying();
     Activated();
   }
 
-  bool ControlContainer::allValid() const {
-    for(size_t n = 0; n < controls.size(); ++n) {
-      TextEntryControl *c = controls[n];
-      if(!c->Valid(c->get_text().c_str()))
+  bool ControlContainer::allDisplaysValid() const {
+    for(size_t n = 0; n < controls.size(); ++n)
+      if(!controls[n]->DisplayIsValid())
         return false;
-    }
     return true;
   }
 
@@ -63,11 +56,9 @@ namespace mmui {
   void ControlContainer::Activated() {
   }
 
-  void ControlContainer::sensitive(bool sensitivity) {
-    for(size_t n = 0; n < controls.size(); ++n) {
-      TextEntryControl *c = controls[n];
-      c->set_sensitive(sensitivity);
-    }
+  void ControlContainer::SetSensitivity(bool sensitivity) {
+    for(size_t n = 0; n < controls.size(); ++n)
+      controls[n]->widget()->set_sensitive(sensitivity);
   }
 
   // Base for controls --------------------------------------------------------
@@ -85,6 +76,16 @@ namespace mmui {
                    Gtk::FILL, Gtk::SHRINK, 1, 1);
   }
 
+  bool Control::DisplayIsValid() const {
+    return true;
+  }
+
+  void Control::UpdateDisplay() {
+  }
+
+  void Control::UpdateUnderlying() {
+  }
+
   // Text entry widget --------------------------------------------------------
 
   TextEntryControl::TextEntryControl(ControlContainer *p,
@@ -93,7 +94,7 @@ namespace mmui {
     set_editable(editable_);
   }
 
-  void TextEntryControl::Update() {
+  void TextEntryControl::UpdateDisplay() {
     Glib::ustring value;
     Render(value);
     set_text(value);
@@ -111,9 +112,20 @@ namespace mmui {
     return this;
   }
 
+  bool TextEntryControl::DisplayIsValid() const {
+    return DisplayIsValid(get_text().c_str());
+  }
+
+  void TextEntryControl::UpdateUnderlying() {
+    Glib::ustring value;
+    Render(value);
+    if(value != get_text())
+      SetUnderlying(get_text().c_str());
+  }
+
   // Integer entry widget -----------------------------------------------------
 
-  bool IntegerControl::Valid(const char *s) const {
+  bool IntegerControl::DisplayIsValid(const char *s) const {
     char *end;
     errno = 0;
     long n = strtol(s, &end, 10);
@@ -123,7 +135,7 @@ namespace mmui {
       return true;
   }
 
-  void IntegerControl::Set(const char *s) {
+  void IntegerControl::SetUnderlying(const char *s) {
     *value = strtol(s, NULL, 10);
   }
 
@@ -135,7 +147,7 @@ namespace mmui {
 
   // Real entry widget ------------------------------------------------------
 
-  bool RealControl::Valid(const char *s) const {
+  bool RealControl::DisplayIsValid(const char *s) const {
     char *end = NULL;                   // TODO
     errno = 0;
     arith_t n;
@@ -146,7 +158,7 @@ namespace mmui {
       return true;
   }
 
-  void RealControl::Set(const char *s) {
+  void RealControl::SetUnderlying(const char *s) {
     arith_traits<arith_t>::fromString(*value, s, NULL);
   }
 
@@ -156,11 +168,11 @@ namespace mmui {
 
   // String entry widget
 
-  bool StringControl::Valid(const char *) const {
+  bool StringControl::DisplayIsValid(const char *) const {
     return true;
   }
 
-  void StringControl::Set(const char *s) {
+  void StringControl::SetUnderlying(const char *s) {
     value->assign(s);
   }
 

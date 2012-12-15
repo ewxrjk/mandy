@@ -50,7 +50,7 @@ namespace mmui {
     ypointer_control.Attach(1, 1, "Y position");
     count_control.Attach(1, 2, "Count");
 
-    Update();
+    UpdateDisplay();
   }
 
   void ControlPanel::Activated() {

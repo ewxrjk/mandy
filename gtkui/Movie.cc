@@ -117,7 +117,7 @@ namespace mmui {
 		   cancel(Gtk::Stock::CANCEL),
 		   vbox(false, 0),
 		   working(false) {
-      controls.Update();
+      controls.UpdateDisplay();
       frame.add(controls);
       // Action buttons & progress report
       render.signal_clicked().connect
@@ -138,7 +138,7 @@ namespace mmui {
     }
 
     bool configurationValid() {
-      bool valid = controls.allValid();
+      bool valid = controls.allDisplaysValid();
       if(controls.m_path.size() == 0 || controls.m_ffmpeg.size() == 0)
 	valid = false;
       return valid;
@@ -255,7 +255,7 @@ namespace mmui {
     w->controls.m_y = y;
     w->controls.m_radius = radius;
     w->controls.m_maxiters = maxiters;
-    w->controls.Update();
+    w->controls.UpdateDisplay();
     w->show_all();
   }
 

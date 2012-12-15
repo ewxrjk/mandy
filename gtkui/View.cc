@@ -49,7 +49,7 @@ namespace mmui {
                             |GDK_LOCK_MASK))) {
       Zoom(event->x, event->y, M_SQRT1_2);
       if(controls)
-        controls->Update();
+        controls->UpdateDisplay();
       NewLocation();
       return true;
     }
@@ -65,7 +65,7 @@ namespace mmui {
                                     |GDK_LOCK_MASK)) == GDK_CONTROL_MASK)))) {
       Zoom(event->x, event->y, M_SQRT2);
       if(controls)
-        controls->Update();
+        controls->UpdateDisplay();
       NewLocation();
       return true;
     }
@@ -103,7 +103,7 @@ namespace mmui {
     GetCoordinates(xpointer, ypointer, xpos, ypos);
     count = dest->data[ypos * dest->w + xpos];
     if(controls)
-      controls->Update();
+      controls->UpdateDisplay();
   }
 
   bool View::on_motion_notify_event(GdkEventMotion *event) {
@@ -144,7 +144,7 @@ namespace mmui {
       dragFromY = dragToY;
       Drag(deltax, deltay);
       if(controls)
-        controls->Update();
+        controls->UpdateDisplay();
       NewLocation((int)dragToX, (int)dragToY);
     }
   }

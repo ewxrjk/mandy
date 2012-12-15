@@ -50,7 +50,7 @@ namespace mmui {
           view->Zoom(w/2.0, h/2.0, M_SQRT1_2);
 	else
           view->Zoom(w/2.0, h/2.0, M_SQRT2);
-	controls->Update();
+	controls->UpdateDisplay();
 	view->NewLocation(w/2, h/2);
 	return true;
       }

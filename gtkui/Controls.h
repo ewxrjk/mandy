@@ -26,6 +26,13 @@ namespace mmui {
   class View;
 
   // A labelled item in a control container
+  //
+  // Every item has two associated mutable values:
+  //   - The underlying value.  This is an object somewhere in the program.
+  //   - The display value.  This is what the widget currently displays.
+  //
+  // The base class has no idea what types either of these values have (they
+  // don't have to be the same).
   class Control {
     // Caption
     Gtk::Label label;
@@ -35,21 +42,37 @@ namespace mmui {
 
     // Attach to parent container, with a caption
     void Attach(int x, int y, const char *caption, int width = 1);
+
+    // Return true if the current setting is valid
+    // Default is to return true, i.e. all settings are valid
+    virtual bool DisplayIsValid() const;
+
+    // Update the display value
+    // Default is to do nothing(!)
+    virtual void UpdateDisplay();
+
+    // Update the underlying value
+    // Default is to do nothing(!)
+    virtual void UpdateUnderlying();
+
+    // Return the item widget
+    //
+    // (The implementations multiply inherit from the item widget to make it
+    // easy to supply virtual method overrides, but the base doesn't know about
+    // this.)
+    virtual Gtk::Widget *widget() = 0;
   protected:
     ControlContainer *parent;
-    virtual Gtk::Widget *widget() = 0;
   };
 
   // Text edit/display entry in a control container
   class TextEntryControl: public Control, public Gtk::Entry {
-    // Called when underlying value is modified; uses Render() to extract the
-    // new value and updates the Gtk::Entry.
-    void Update();
-
     Gtk::Widget *widget();
   public:
     TextEntryControl(ControlContainer *p,
                      bool editable_);
+
+    // Overrides
 
     // Called when user presses RETURN.  Calls the parent's
     // ContainerActivated() method.
@@ -59,17 +82,27 @@ namespace mmui {
     // method.
     void on_changed();
 
-    // Verify whether a proposed value is good.
+    // Return true if current setting is valid
+    bool DisplayIsValid() const;
+
+    // Update the display value.  Uses Render() to extract the new value and
+    // updates the Gtk::Entry.
+    void UpdateDisplay();
+
+    // Update the underlying value.
+    virtual void UpdateUnderlying();
+
+    // Methods
+
+    // Verify whether a proposed display value is good.
     // Return true if S is valid, else false
-    virtual bool Valid(const char *s) const = 0;
+    virtual bool DisplayIsValid(const char *s) const = 0;
 
     // Set underlying value control from string S (which will be valid)
-    virtual void Set(const char *s) = 0;
+    virtual void SetUnderlying(const char *s) = 0;
 
-    // Render the underlying value to string V
+    // Render the underlying value to string V in display format
     virtual void Render(Glib::ustring &v) const = 0;
-
-    friend class ControlContainer;
 
   };
 
@@ -83,8 +116,8 @@ namespace mmui {
       TextEntryControl(p, editable_),
       value(v), min(min_), max(max_) {
     }
-    bool Valid(const char *s) const;
-    void Set(const char *s);
+    bool DisplayIsValid(const char *s) const;
+    void SetUnderlying(const char *s);
     void Render(Glib::ustring &) const;
   };
 
@@ -98,8 +131,8 @@ namespace mmui {
       TextEntryControl(p, editable_),
       value(v), min(min_), max(max_) {
     }
-    bool Valid(const char *s) const;
-    void Set(const char *);
+    bool DisplayIsValid(const char *s) const;
+    void SetUnderlying(const char *);
     void Render(Glib::ustring &) const;
   };
 
@@ -110,8 +143,8 @@ namespace mmui {
     StringControl(ControlContainer *p, std::string *v, bool editable_ = true):
       TextEntryControl(p, editable_), value(v) {
     }
-    bool Valid(const char *s) const;
-    void Set(const char *);
+    bool DisplayIsValid(const char *s) const;
+    void SetUnderlying(const char *);
     void Render(Glib::ustring &) const;
   };    
 
@@ -119,7 +152,7 @@ namespace mmui {
   class ControlContainer: public Gtk::Table {
   public:
     // Collection of child controls
-    std::vector<TextEntryControl *> controls;
+    std::vector<Control *> controls;
 
     // Called when the user presses ENTER.  The underlying values will have
     // been set to their displayed values.  The default does nothing.
@@ -132,7 +165,7 @@ namespace mmui {
 
     // Called when at least one underlying value has been changed.  Calls the
     // UPdate methods on the child controls.
-    void Update();
+    void UpdateDisplay();
 
     // Attach a child control to this container.
     void Attach(TextEntryControl *c) {
@@ -140,14 +173,14 @@ namespace mmui {
     }
 
     // Return true if all displayed values are valid
-    bool allValid() const;
+    bool allDisplaysValid() const;
 
     // Called when a child control's displayed value changes.  The underlying
     // value will not have been set and the displayed value may be invalid!
     virtual void controlChanged(TextEntryControl *);
 
     // Set the input-sensitivity of all controls.
-    void sensitive(bool sensitivity);
+    void SetSensitivity(bool sensitivity);
   };
 
 }
