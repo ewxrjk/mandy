@@ -18,7 +18,9 @@
 
 std::string shellQuote(const std::string &s);
 
-bool isOnPath(const std::string &name);
+std::string findOnPath(const std::string &name);
+
+std::string ffmpegDefault();
 
 #endif /* SHELL_H */
 

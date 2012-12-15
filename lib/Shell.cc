@@ -41,7 +41,7 @@ std::string shellQuote(const std::string &s) {
     return "\"\"";
 }
 
-bool isOnPath(const std::string &name) {
+std::string findOnPath(const std::string &name) {
   const char *path = getenv("PATH");
   while(*path) {
     const char *sep = strchr(path, PATHSEP);
@@ -54,11 +54,18 @@ bool isOnPath(const std::string &name) {
     candidate.append(name);
     candidate.append(EXEEXT);
     if(access(candidate.c_str(), X_OK) == 0) // TODO windows
-      return true;
+      return candidate;
     if(sep)
       path = sep + 1;
     else
       break;
   }
-  return false;
+  return "";
+}
+
+std::string ffmpegDefault() {
+  std::string path = findOnPath("avconv");
+  if(!path.size())
+    path = findOnPath("ffmpeg");
+  return path;
 }

@@ -163,7 +163,8 @@ void draw(int width, int height, arith_t x, arith_t y, arith_t radius,
   dest->release();
 }
 
-static const char *get_default(const char *name, const char *default_value) {
+static std::string get_default(const char *name, 
+                               const std::string &default_value) {
   const char *value = getenv(name);
   return value ? value : default_value;
 }
@@ -269,8 +270,7 @@ int dive(const char *wstr,
     draw(width, height, x, y, radius, maxiters, tmp);
   }
   std::string command;
-  command += shellQuote(get_default("FFMPEG",
-                                    isOnPath("avconv") ? "avconv" : "ffmpeg"));
+  command += shellQuote(get_default("FFMPEG", ffmpegDefault()));
   command += " -f image2 -i "TMP_PATTERN;
   command += " -vcodec ";
   command += get_default("CODEC", "mpeg4"); 

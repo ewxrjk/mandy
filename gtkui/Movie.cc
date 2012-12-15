@@ -54,7 +54,7 @@ namespace mmui {
       m_seconds(10), m_fps(25),
       m_bitrate(8 * 1024 * 1024),
       m_codec("libx264"),
-      m_ffmpeg(isOnPath("avconv") ? "avconv" : "ffmpeg"),
+      m_ffmpeg(ffmpegDefault()),
       m_path("mandy.avi"),
       m_x_control(this, &m_x, -arith_traits<arith_t>::maximum(),
 		  arith_traits<arith_t>::maximum()),
