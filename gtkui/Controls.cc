@@ -32,7 +32,7 @@ namespace mmui {
   void ControlContainer::ContainerActivated() {
     Glib::ustring value;
     for(size_t n = 0; n < controls.size(); ++n) {
-      Control *c = controls[n];
+      TextEntryControl *c = controls[n];
       if(!c->Valid(c->get_text().c_str())) {
 	c->grab_focus();
 	get_window()->beep();
@@ -40,7 +40,7 @@ namespace mmui {
       }
     }
     for(size_t n = 0; n < controls.size(); ++n) {
-      Control *c = controls[n];
+      TextEntryControl *c = controls[n];
       c->Render(value);
       if(value != c->get_text())
 	c->Set(c->get_text().c_str());
@@ -50,14 +50,14 @@ namespace mmui {
 
   bool ControlContainer::allValid() const {
     for(size_t n = 0; n < controls.size(); ++n) {
-      Control *c = controls[n];
+      TextEntryControl *c = controls[n];
       if(!c->Valid(c->get_text().c_str()))
         return false;
     }
     return true;
   }
 
-  void ControlContainer::controlChanged(Control *) {
+  void ControlContainer::controlChanged(TextEntryControl *) {
   }
 
   void ControlContainer::Activated() {
@@ -65,32 +65,12 @@ namespace mmui {
 
   void ControlContainer::sensitive(bool sensitivity) {
     for(size_t n = 0; n < controls.size(); ++n) {
-      Control *c = controls[n];
+      TextEntryControl *c = controls[n];
       c->set_sensitive(sensitivity);
     }
   }
 
-  // Base entry widget --------------------------------------------------------
-
-  Control::Control(ControlContainer *p,
-                   bool editable_): parent(p) {
-    p->Attach(this);
-    set_editable(editable_);
-  }
-
-  void Control::Update() {
-    Glib::ustring value;
-    Render(value);
-    set_text(value);
-  }
-
-  void Control::on_changed() {
-    parent->controlChanged(this);
-  }
-
-  void Control::on_activate() {
-    parent->ContainerActivated();
-  }
+  // Base for controls --------------------------------------------------------
 
   void Control::Attach(int x, int y, const char *caption, int width) {
     label.set_text(caption);
@@ -99,10 +79,36 @@ namespace mmui {
                    2 * x, 2 * x + 1,
                    y, y + 1,
                    Gtk::FILL, Gtk::SHRINK, 1, 1);
-    parent->attach(*this,
+    parent->attach(*widget(),
                    2 * x + 1, 2 * (x + width),
                    y, y + 1,
                    Gtk::FILL, Gtk::SHRINK, 1, 1);
+  }
+
+  // Text entry widget --------------------------------------------------------
+
+  TextEntryControl::TextEntryControl(ControlContainer *p,
+                                     bool editable_): Control(p) {
+    p->Attach(this);
+    set_editable(editable_);
+  }
+
+  void TextEntryControl::Update() {
+    Glib::ustring value;
+    Render(value);
+    set_text(value);
+  }
+
+  void TextEntryControl::on_changed() {
+    parent->controlChanged(this);
+  }
+
+  void TextEntryControl::on_activate() {
+    parent->ContainerActivated();
+  }
+
+  Gtk::Widget *TextEntryControl::widget() {
+    return this;
   }
 
   // Integer entry widget -----------------------------------------------------

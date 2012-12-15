@@ -25,19 +25,31 @@ namespace mmui {
   class ControlContainer;
   class View;
 
-  // Text edit/display entry in a control container
-  class Control: public Gtk::Entry {
-    ControlContainer *parent;
-
+  // A labelled item in a control container
+  class Control {
     // Caption
     Gtk::Label label;
 
+  public:
+    inline Control(ControlContainer *p): parent(p) {}
+
+    // Attach to parent container, with a caption
+    void Attach(int x, int y, const char *caption, int width = 1);
+  protected:
+    ControlContainer *parent;
+    virtual Gtk::Widget *widget() = 0;
+  };
+
+  // Text edit/display entry in a control container
+  class TextEntryControl: public Control, public Gtk::Entry {
     // Called when underlying value is modified; uses Render() to extract the
     // new value and updates the Gtk::Entry.
     void Update();
+
+    Gtk::Widget *widget();
   public:
-    Control(ControlContainer *p,
-            bool editable_);
+    TextEntryControl(ControlContainer *p,
+                     bool editable_);
 
     // Called when user presses RETURN.  Calls the parent's
     // ContainerActivated() method.
@@ -57,20 +69,18 @@ namespace mmui {
     // Render the underlying value to string V
     virtual void Render(Glib::ustring &v) const = 0;
 
-    // Attach to parent container, with a caption
-    void Attach(int x, int y, const char *caption, int width = 1);
-
     friend class ControlContainer;
+
   };
 
   // Control which displays/accepts an integer within some range
-  class IntegerControl: public Control {
+  class IntegerControl: public TextEntryControl {
     int *value;
     int min, max;
   public:
     IntegerControl(ControlContainer *p, int *v, int min_, int max_,
                    bool editable_ = true):
-      Control(p, editable_),
+      TextEntryControl(p, editable_),
       value(v), min(min_), max(max_) {
     }
     bool Valid(const char *s) const;
@@ -79,13 +89,13 @@ namespace mmui {
   };
 
   // Control which displays/accepts a real within some range.
-  class RealControl: public Control {
+  class RealControl: public TextEntryControl {
     arith_t *value;
     arith_t min, max;
   public:
     RealControl(ControlContainer *p, arith_t *v, arith_t min_, arith_t max_,
                 bool editable_ = true):
-      Control(p, editable_),
+      TextEntryControl(p, editable_),
       value(v), min(min_), max(max_) {
     }
     bool Valid(const char *s) const;
@@ -94,11 +104,11 @@ namespace mmui {
   };
 
   // Control which displays/accepts a string.
-  class StringControl: public Control {
+  class StringControl: public TextEntryControl {
     std::string *value;
   public:
     StringControl(ControlContainer *p, std::string *v, bool editable_ = true):
-      Control(p, editable_), value(v) {
+      TextEntryControl(p, editable_), value(v) {
     }
     bool Valid(const char *s) const;
     void Set(const char *);
@@ -109,7 +119,7 @@ namespace mmui {
   class ControlContainer: public Gtk::Table {
   public:
     // Collection of child controls
-    std::vector<Control *> controls;
+    std::vector<TextEntryControl *> controls;
 
     // Called when the user presses ENTER.  The underlying values will have
     // been set to their displayed values.  The default does nothing.
@@ -125,7 +135,7 @@ namespace mmui {
     void Update();
 
     // Attach a child control to this container.
-    void Attach(Control *c) {
+    void Attach(TextEntryControl *c) {
       controls.push_back(c);
     }
 
@@ -134,7 +144,7 @@ namespace mmui {
 
     // Called when a child control's displayed value changes.  The underlying
     // value will not have been set and the displayed value may be invalid!
-    virtual void controlChanged(Control *);
+    virtual void controlChanged(TextEntryControl *);
 
     // Set the input-sensitivity of all controls.
     void sensitive(bool sensitivity);
