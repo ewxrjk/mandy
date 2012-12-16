@@ -26,10 +26,13 @@ namespace mmui {
     RealControl xcenter_control, ycenter_control, radius_control;
     IntegerControl maxiters_control;
     RealControl xpointer_control, ypointer_control, count_control;
+    DropDownControl arith_control;
   public:
     ControlPanel(View *);
 
     void Activated();                   // someone hit ENTER
+
+    void controlChanged(Control *);     // some control changed value
   };
 
 }

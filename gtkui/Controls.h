@@ -20,6 +20,7 @@
 #include <gtkmm/entry.h>
 #include <gtkmm/table.h>
 #include <gtkmm/filechooserbutton.h>
+#include <gtkmm/comboboxtext.h>
 
 namespace mmui {
 
@@ -64,6 +65,34 @@ namespace mmui {
     virtual Gtk::Widget *widget() = 0;
   protected:
     ControlContainer *parent;
+  };
+
+  // Drop-down in a control container
+  class DropDownControl: public Control, public Gtk::ComboBoxText {
+    Gtk::Widget *widget();
+
+    std::string *m_value;
+  public:
+    template<typename T>
+    DropDownControl(ControlContainer *p,
+                    std::string *value,
+                    const T &s, const T &e):
+      Control(p),
+      m_value(value) {
+      for(T it = s; it != e; ++it)
+        append(*it);
+      set_active_text(*value);
+    }
+
+    // Update the display value
+    void UpdateDisplay();
+
+    // Update the underlying value
+    void UpdateUnderlying();
+
+    // Called when the contents changes.  Calls the parent's ControlChanged()
+    // method.
+    void on_changed();
   };
 
   // Filename selector in a control container
@@ -197,7 +226,7 @@ namespace mmui {
 
     // Called when a child control's displayed value changes.  The underlying
     // value will not have been set and the displayed value may be invalid!
-    virtual void controlChanged(TextEntryControl *);
+    virtual void controlChanged(Control *);
 
     // Set the input-sensitivity of all controls.
     void SetSensitivity(bool sensitivity);

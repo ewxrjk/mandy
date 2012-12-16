@@ -39,7 +39,9 @@ namespace mmui {
                      false),
     count_control(this, &view->count, 0,
                   arith_traits<arith_t>::maximum(),
-                  false)
+                  false),
+    arith_control(this, &view->arith_string,
+                  &arith_names[0], &arith_names[arith_limit])
   {
     xcenter_control.Attach(0, 0, "X center");
     ycenter_control.Attach(0, 1, "Y center");
@@ -49,6 +51,7 @@ namespace mmui {
     xpointer_control.Attach(1, 0, "X position");
     ypointer_control.Attach(1, 1, "Y position");
     count_control.Attach(1, 2, "Count");
+    arith_control.Attach(1, 3, "Precision");
 
     UpdateDisplay();
   }
@@ -57,6 +60,17 @@ namespace mmui {
     int w, h;
     view->get_window()->get_size(w, h);
     view->NewLocation(w / 2, h / 2);
+  }
+
+  void ControlPanel::controlChanged(Control *c) {
+    if(c == &arith_control) {
+      c->UpdateUnderlying();
+      arith_type new_arith = string_to_arith(view->arith_string);
+      if(new_arith != view->arith) {
+        view->arith = new_arith;
+        view->NewLocation();
+      }
+    }
   }
 
 }

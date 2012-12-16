@@ -42,6 +42,8 @@ enum arith_type {
 
 extern const char *const arith_names[];
 
+arith_type string_to_arith(const std::string &s);
+
 template<typename T> class arith_traits {
 public:
   static T maximum();

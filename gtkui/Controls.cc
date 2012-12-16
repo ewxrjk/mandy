@@ -50,7 +50,7 @@ namespace mmui {
     return true;
   }
 
-  void ControlContainer::controlChanged(TextEntryControl *) {
+  void ControlContainer::controlChanged(Control *) {
   }
 
   void ControlContainer::Activated() {
@@ -84,6 +84,24 @@ namespace mmui {
   }
 
   void Control::UpdateUnderlying() {
+  }
+
+  // Drop-down control --------------------------------------------------------
+
+  void DropDownControl::UpdateDisplay() {
+    set_active_text(*m_value);
+  }
+  
+  void DropDownControl::UpdateUnderlying() {
+    *m_value = get_active_text();
+  }
+
+  void DropDownControl::on_changed() {
+    parent->controlChanged(this);
+  }
+
+  Gtk::Widget *DropDownControl::widget() {
+    return this;
   }
 
   // File selection widget ----------------------------------------------------

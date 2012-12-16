@@ -52,6 +52,7 @@ namespace mmui {
     arith_t xcenter, ycenter, radius;
     int maxiters;
     arith_type arith;
+    std::string arith_string;
 
     // Results
     arith_t xpointer, ypointer, count;

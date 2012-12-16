@@ -23,6 +23,13 @@ const char *const arith_names[] = {
   "fixed128",
 };
 
+arith_type string_to_arith(const std::string &s) {
+  for(size_t a = 0; a < arith_limit; ++a)
+    if(arith_names[a] == s)
+      return arith_type(a);
+  abort();
+}
+
 count_t iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy,
                 int maxiters, arith_type arith) {
   switch(arith) {
