@@ -235,7 +235,7 @@ public:
     return Fixed128_2double(&f);
   }
 
-  double toLongDouble() const {
+  long double toLongDouble() const {
     return Fixed128_2longdouble(&f);
   }
 
