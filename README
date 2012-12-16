@@ -21,23 +21,18 @@ See 'man mandy' for documentation.
 Arithmetic Type
 ===============
 
-You can select the arithmetic type used to compute the images.
-
-  ./configure                           - selects 'double'
-  ./configure --with-long-double        - selects 'long double'
-  ./configure --with-short-fixed-point  - selects 64-bit fixed point arithmetic
-  ./configure --with-fixed-point        - selects 128-bit fixed point arithmetic
+You can select at runtime the arithmetic type used to compute the images.
 
 'double' gives you about 53 bits of precision.  'long double' gives
 you 64 bits of precision.  Both are floating point types and are
 (probably) directly supported by your hardware, so should be fast.
 
-The 64-bit fixed point type gives you 56 bits of precision after the
-point.  It has had some optimization effort but is nevertheless a bit
-slower than using 'double' on an x86-64 CPU.
+'fixed64' gives you 56 bits of precision after the point.  It has had
+some optimization effort but is nevertheless a bit slower than using
+'double' on an x86-64 CPU.
 
-The 128-bit fixed point type gives you 96 bits of precision after the
-point.  It's relatively slow.
+'fix128' gives you 96 bits of precision after the point.  It's
+relatively slow.
 
 On x86-64 CPUs the fixed point types are implemented in hand-written
 assembly language.  On other CPUs they are implemented in C and are
@@ -46,7 +41,7 @@ likely to be very slow.
 Copyright
 =========
 
-Copyright © 2010 Richard Kettlewell.
+Copyright © 2010, 2012 Richard Kettlewell.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -35,26 +35,7 @@ if test "x$GCC" = xyes; then
   CC="$CC -Wall -W -Werror -Wpointer-arith -Wwrite-strings"
 fi
 
-#
-# Identify arithmetic type to use
-# See README for further discussion
-#
-arithtype=arith_double
-AC_MSG_CHECKING([what type to use for arithmetic])
-AC_ARG_WITH([fixed-point],
-            [AS_HELP_STRING([--with-fixed-point],
-			    [use 128-bit fixed point arithmetic])],
-            [arithtype=arith_fixed128])
-AC_ARG_WITH([short-fixed-point],
-            [AS_HELP_STRING([--with-short-fixed-point],
-			    [use 64-bit fixed point arithmetic])],
-            [arithtype=arith_fixed64])
-AC_ARG_WITH([long-double],
-            [AS_HELP_STRING([--with-long-double],
-			    [use long double for arithmetic])],
-            [arithtype="arith_long_double"])
-AC_MSG_RESULT([${arithtype}])
-AC_DEFINE_UNQUOTED([ARITH_PREFERRED],[${arithtype}],[preferred arithmetic type])
+AC_DEFINE_UNQUOTED([ARITH_DEFAULT],[arith_double],[default precision])
 
 #
 # Assembler support

@@ -27,7 +27,7 @@
 
 namespace mmui {
   View::View(): xcenter(0), ycenter(0), radius(2), maxiters(255),
-                arith(ARITH_PREFERRED),
+                arith(ARITH_DEFAULT),
                 arith_string(arith_names[arith]),
                 xpointer(0), ypointer(0), count(0),
                 dest(NULL),

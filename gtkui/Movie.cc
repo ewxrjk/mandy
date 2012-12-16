@@ -52,7 +52,7 @@ namespace mmui {
     MovieControls(MovieWindow *window):
       m_window(window),
       m_x(0), m_y(0), m_radius(2),
-      m_arith(ARITH_PREFERRED),
+      m_arith(ARITH_DEFAULT),
       m_maxiters(255),
       m_seconds(10), m_fps(25),
       m_bitrate(8 * 1024 * 1024),

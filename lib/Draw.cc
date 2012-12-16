@@ -83,7 +83,7 @@ void draw(const char *wstr,
   if(maxiters > INT_MAX || maxiters <= 0)
     fatal(0, "cannot convert '%s': out of range", mistr);
 
-  draw(width, height, x, y, radius, maxiters, ARITH_PREFERRED, path);
+  draw(width, height, x, y, radius, maxiters, ARITH_DEFAULT, path);
 }
 
 static void completed(Job *, void *) {
@@ -268,7 +268,7 @@ int dive(const char *wstr,
             arith_traits<arith_t>::toString(radius).c_str());
     char tmp[1024];
     sprintf(tmp, TMP_PATTERN, frame);
-    draw(width, height, x, y, radius, maxiters, ARITH_PREFERRED, tmp);
+    draw(width, height, x, y, radius, maxiters, ARITH_DEFAULT, tmp);
   }
   std::string command;
   command += shellQuote(get_default("FFMPEG", ffmpegDefault()));

@@ -51,6 +51,31 @@ A fourth box on the left side allows the maximum iteration count to be adjusted.
 .PP
 The right side shows the position of the pointer and the number of
 iterations reached at that point.
+.PP
+The \fBPrecision\fR dropdown allows the precision to be chosen from
+the following:
+.TP
+.B double
+Native floating point type.
+Usually this will be the fastest option, but it will also run out of
+precision first.
+.TP
+.B "long double"
+Native floating point type.
+Provides more precision than \fBdouble\fR at a small performance cost.
+.TP
+.B fixed64
+64-bit fixed point type.
+Provides slightly more precision than \fBdouble\fR at a small
+performance cost.
+.TP
+.B fixed128
+128-bit fixed point type.
+Provides much more precision than the other types at a relatively
+large performance cost.
+.PP
+Relative performance depends on your hardware and whether the
+assembler implementations of the underlying algorithm are used.
 .SH OPTIONS
 .TP
 .B --help\fR, \fB-h
