@@ -84,6 +84,12 @@ namespace mmui {
       set_active_text(*value);
     }
 
+    DropDownControl(ControlContainer *p,
+                    std::string *value):
+      Control(p),
+      m_value(value) {
+    }
+
     // Update the display value
     void UpdateDisplay();
 
@@ -93,6 +99,16 @@ namespace mmui {
     // Called when the contents changes.  Calls the parent's ControlChanged()
     // method.
     void on_changed();
+
+    // Update contents
+    template<typename T>
+    void UpdateChoices(const T &s, const T &e) {
+      std::string setting = get_active_text();
+      clear();
+      for(T it = s; it != e; ++it)
+        append_text(*it);
+      set_active_text(setting);
+    }
   };
 
   // Filename selector in a control container
@@ -111,6 +127,8 @@ namespace mmui {
 
     // Update the underlying value
     void UpdateUnderlying();
+
+    void on_file_set();
 
   };
 

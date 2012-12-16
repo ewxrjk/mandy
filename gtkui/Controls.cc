@@ -115,7 +115,7 @@ namespace mmui {
     m_path(path) {
     select_filename(*m_path);
     signal_file_set().connect(sigc::mem_fun(*this,
-                                            &FileSelectionControl::UpdateUnderlying));
+                                            &FileSelectionControl::on_file_set));
   }
 
   void FileSelectionControl::UpdateDisplay() {
@@ -124,6 +124,10 @@ namespace mmui {
   
   void FileSelectionControl::UpdateUnderlying() {
     *m_path = get_filename();
+  }
+
+  void FileSelectionControl::on_file_set() {
+    parent->controlChanged(this);
   }
   
   Gtk::Widget *FileSelectionControl::widget() {

@@ -14,9 +14,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "mandy.h"
+#include <vector>
 #include "Shell.h"
 #include <sstream>
 #include <cstdlib>
+#include <cstdio>
 #if HAVE_UNISTD_H
 # include <unistd.h>
 #endif
@@ -68,4 +70,19 @@ std::string ffmpegDefault() {
   if(!path.size())
     path = findOnPath("ffmpeg");
   return path;
+}
+
+bool Capture(const std::string &cmd, std::vector<std::string> &output) {
+  output.clear();
+  FILE *fp = popen(cmd.c_str(), "r");
+  if(!fp)
+    return false;
+  char *line = 0;
+  size_t len = 0;
+  while(getline(&line, &len, fp) != -1)
+    output.push_back(line);
+  free(line);
+  if(pclose(fp) != 0)
+    return false;
+  return true;
 }
