@@ -75,7 +75,7 @@ typedef unsigned long long uint64_t;
 #define ATOMIC_DEC(x) __sync_sub_and_fetch(&(x), 1)
 #endif
 
-#include "Fixed.h"
+#include "Fixed128.h"
 
 typedef double count_t;
 

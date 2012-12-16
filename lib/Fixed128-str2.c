@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "mandy.h"
-#include "Fixed.h"
+#include "Fixed128.h"
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
@@ -136,11 +136,11 @@ static void print(const uint32_t value[NINTWORDS]) {
 }
 #endif
 
-int Fixed_str2(struct Fixed *r, const char *start, char **endptr) {
+int Fixed128_str2(struct Fixed128 *r, const char *start, char **endptr) {
   int base, error = 0, sign = 0, digit, scale = 0;
   uint32_t value[NINTWORDS];
   const char *s = start;
-  Fixed_int2(r, 0);
+  Fixed128_int2(r, 0);
   // Consume leading whitespace
   while(isspace((unsigned char)*s))
     ++s;
@@ -226,7 +226,7 @@ int Fixed_str2(struct Fixed *r, const char *start, char **endptr) {
     while(lt(divisor, value)) {
       if(sl(divisor)) { error = ERANGE; goto done; }
       ++bit;
-      if(bit > NFIXED * 32)
+      if(bit > NFIXED128 * 32)
 	return -1;
     }
     /* Now we can start extracting bits.  The dividend will be the
@@ -246,10 +246,10 @@ int Fixed_str2(struct Fixed *r, const char *start, char **endptr) {
     }
     if(bit == -1 && le(divisor, value)) {
       // Round up
-      struct Fixed round;
+      struct Fixed128 round;
       memset(&round, 0, sizeof round);
       round.word[0] = 1;
-      Fixed_add(r, r, &round);
+      Fixed128_add(r, r, &round);
     }
   } else if(scale >= 0) {
     /* The result will just be an integer.  It had better fit (with
@@ -269,22 +269,22 @@ int Fixed_str2(struct Fixed *r, const char *start, char **endptr) {
       if(n >= limit) { error = ERANGE; goto done; }
       --scale;
     }
-    Fixed_int2(r, (int)n);
+    Fixed128_int2(r, (int)n);
   }
 done:
   if(error == ERANGE) {
     // Set the maximum value of the given sign
     if(sign) {
       memset(r->word, 0x00, sizeof r->word);
-      r->word[NFIXED - 1] = 0x80000000;
+      r->word[NFIXED128 - 1] = 0x80000000;
     } else {
       memset(r->word, 0xFF, sizeof r->word);
-      r->word[NFIXED - 1] = 0x7FFFFFFF;
+      r->word[NFIXED128 - 1] = 0x7FFFFFFF;
     }
   } else {
     /* Set the sign of the result */
     if(sign)
-      Fixed_neg(r, r);
+      Fixed128_neg(r, r);
   }
   if(endptr)
     *endptr = (char *)s;

@@ -16,7 +16,7 @@
 #ifndef FIXED64_H
 #define FIXED64_H
 
-#include "Fixed.h"
+#include "Fixed128.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,8 +43,8 @@ typedef int64_t Fixed64;
     return (double)a / 72057594037927936.0;
   }
 
-  int Fixed_to_Fixed64(Fixed64 *r, const struct Fixed *a);
-  void Fixed64_to_Fixed(struct Fixed *r, Fixed64 a);
+  int Fixed128_to_Fixed64(Fixed64 *r, const struct Fixed128 *a);
+  void Fixed64_to_Fixed(struct Fixed128 *r, Fixed64 a);
 
   int Fixed64_iterate(Fixed64 zx, Fixed64 zy,
                       Fixed64 cx, Fixed64 cy,
@@ -63,7 +63,7 @@ public:
   fixed64(int i) { f = Fixed64_int2(i); }
   fixed64(double n) { f = Fixed64_double2(n); }
   fixed64() { f = 0; }
-  fixed64(fixed ff) { Fixed_to_Fixed64(&f, &ff.f); }
+  fixed64(fixed128 ff) { Fixed128_to_Fixed64(&f, &ff.f); }
 
   // Assignment
 

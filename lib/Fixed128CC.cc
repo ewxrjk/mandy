@@ -1,4 +1,4 @@
-/* Copyright © 2010 Richard Kettlewell.
+/* Copyright © 2010, 2012 Richard Kettlewell.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,19 +15,19 @@
  */
 #include "mandy.h"
 #include <cstdio>
-#include "Fixed.h"
+#include "Fixed128.h"
 
-std::string fixed::toString(int base) const {
+std::string fixed128::toString(int base) const {
   char buffer[256];
 
-  Fixed_2str(buffer, sizeof buffer, &f, base);
+  Fixed128_2str(buffer, sizeof buffer, &f, base);
   return buffer;
 }
 
-std::string fixed::toHex() const {
-  char buffer[10 * NFIXED + 10];
-  sprintf(buffer, "%08x.%08x", f.word[NFIXED-1], f.word[NFIXED-2]);
-  for(int n = NFIXED-3; n >= 0; --n)
+std::string fixed128::toHex() const {
+  char buffer[10 * NFIXED128 + 10];
+  sprintf(buffer, "%08x.%08x", f.word[NFIXED128-1], f.word[NFIXED128-2]);
+  for(int n = NFIXED128-3; n >= 0; --n)
     sprintf(buffer + strlen(buffer), " %08x", f.word[n]);
   return buffer;
 }

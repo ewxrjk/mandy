@@ -1,4 +1,4 @@
-/* Copyright © 2010 Richard Kettlewell.
+/* Copyright © 2010, 2012 Richard Kettlewell.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,25 +55,25 @@
 #if NFIXED == 4
 	.text
 
-/* void Fixed_shl_unsigned(struct Fixed *a=rdi) */
-	.globl SYMBOL(Fixed_shl_unsigned)
-SYMBOL(Fixed_shl_unsigned):
+/* void Fixed128_shl_unsigned(struct Fixed128 *a=rdi) */
+	.globl SYMBOL(Fixed128_shl_unsigned)
+SYMBOL(Fixed128_shl_unsigned):
 	shl	qword ptr [rdi],1
 	rcl	qword ptr [rdi+8],1
 	ret
 
-/* void Fixed_shr_unsigned(struct Fixed *a=rdi) */
-	.globl SYMBOL(Fixed_shr_unsigned)
-SYMBOL(Fixed_shr_unsigned):
+/* void Fixed128_shr_unsigned(struct Fixed128 *a=rdi) */
+	.globl SYMBOL(Fixed128_shr_unsigned)
+SYMBOL(Fixed128_shr_unsigned):
 	shr	qword ptr [rdi+8],1
 	rcr	qword ptr [rdi],1
 	ret
 
-/* void Fixed_add(struct Fixed *r=rdi,
- *                const struct Fixed *a=rsi,
- *                const struct Fixed *b=rdx) */
-	.globl SYMBOL(Fixed_add)
-SYMBOL(Fixed_add):
+/* void Fixed128_add(struct Fixed128 *r=rdi,
+ *                const struct Fixed128 *a=rsi,
+ *                const struct Fixed128 *b=rdx) */
+	.globl SYMBOL(Fixed128_add)
+SYMBOL(Fixed128_add):
 	mov	rax,[rsi]
 	mov	rcx,[rsi+8]
 	add	rax,[rdx]
@@ -82,11 +82,11 @@ SYMBOL(Fixed_add):
 	mov	[rdi+8],rcx
 	ret
 
-/* void Fixed_sub(struct Fixed *r=rdi,
- *                const struct Fixed *a=rsi,
- *                const struct Fixed *b=rdx) */
-	.globl SYMBOL(Fixed_sub)
-SYMBOL(Fixed_sub):
+/* void Fixed128_sub(struct Fixed128 *r=rdi,
+ *                const struct Fixed128 *a=rsi,
+ *                const struct Fixed128 *b=rdx) */
+	.globl SYMBOL(Fixed128_sub)
+SYMBOL(Fixed128_sub):
 	mov	rax,[rsi]
 	mov	rcx,[rsi+8]
 	sub	rax,[rdx]
@@ -95,9 +95,9 @@ SYMBOL(Fixed_sub):
 	mov	[rdi+8],rcx
 	ret
 
-/* int Fixed_neg(struct Fixed *r=rdi, const struct Fixed *a=rsi) */
-	.globl SYMBOL(Fixed_neg)
-SYMBOL(Fixed_neg):
+/* int Fixed128_neg(struct Fixed128 *r=rdi, const struct Fixed128 *a=rsi) */
+	.globl SYMBOL(Fixed128_neg)
+SYMBOL(Fixed128_neg):
 	mov	rdx,[rsi]
 	mov	rax,[rsi+8]
 	mov	rcx,rax		// save for overflow detection
@@ -112,9 +112,9 @@ SYMBOL(Fixed_neg):
 	shr	rax,63		// 0 for success, 1 for overflow
 	ret
 
-/* int Fixed_mul(struct Fixed *r=rdi,
- *               const struct Fixed *a=rsi,
- *               const struct Fixed *b=rdx) */
+/* int Fixed128_mul(struct Fixed128 *r=rdi,
+ *               const struct Fixed128 *a=rsi,
+ *               const struct Fixed128 *b=rdx) */
 	// We have, representing each byte with a letter:
 	//
 	//        AAAA.bbbb cccc dddd
@@ -126,8 +126,8 @@ SYMBOL(Fixed_neg):
 	//                       ==== ==== ==== ====  cd * gh
 	//   <- rsi -> <- rbp -> <- r12 -> <- rax ->
 	//
-	.globl SYMBOL(Fixed_mul)
-SYMBOL(Fixed_mul):
+	.globl SYMBOL(Fixed128_mul)
+SYMBOL(Fixed128_mul):
 	push	rbp
 	push	r12
 	// Get the values into registers
@@ -206,8 +206,8 @@ SYMBOL(Fixed_mul):
 	pop	rbp
 	ret
 
-/* int Fixed_iterate(struct Fixed *zx=rdi, struct Fixed *zy=rsi,
- *                   const struct Fixed *cx=rdx, const struct Fixed *cy=rcx,
+/* int Fixed128_iterate(struct Fixed128 *zx=rdi, struct Fixed128 *zy=rsi,
+ *                   const struct Fixed128 *cx=rdx, const struct Fixed128 *cy=rcx,
  *                   int maxiters=r8);
  *
  * Outline register allocation (see code for more detail):
@@ -224,8 +224,8 @@ SYMBOL(Fixed_mul):
  *  rbp            - sign of zx*zy
  */
 	.align	4
-	.globl SYMBOL(Fixed_iterate)
-SYMBOL(Fixed_iterate):
+	.globl SYMBOL(Fixed128_iterate)
+SYMBOL(Fixed128_iterate):
 	// Registers we must preserve
 	push	rbx
 	push	rbp
@@ -372,7 +372,7 @@ escaped:
 	// rax,rdx are used by the MUL insn
 	// rbx,rcx,rdi are used as accumulator
 	//
-	// In the language of Fixed_mul, we have r14=Ab=Ef, r15=cd=gh
+	// In the language of Fixed128_mul, we have r14=Ab=Ef, r15=cd=gh
 	.align	4
 square:
 	// We can throw away sign information as the answer is never -ve
@@ -383,7 +383,7 @@ square:
 	not	r14
 	adc	r14,0
 1:
-	// As with Fixed_mul we start at the most significant end and
+	// As with Fixed128_mul we start at the most significant end and
 	// work our way down
 	mov	rax,r14
 	mul	r14

@@ -16,7 +16,7 @@
 #include "mandy.h"
 #include <stdio.h>
 #include "Fixed64.h"
-#include "Fixed.h"
+#include "Fixed128.h"
 #include <errno.h>
 
 uint64_t Fixed64_mul_unsigned(uint64_t a, uint64_t b);
@@ -116,15 +116,15 @@ Fixed64 Fixed64_sqrt(Fixed64 a) {
   return r;
 }
 
-int Fixed_to_Fixed64(Fixed64 *r, const struct Fixed *a) {
-  int32_t intpart = a->word[NFIXED - 1];
+int Fixed128_to_Fixed64(Fixed64 *r, const struct Fixed128 *a) {
+  int32_t intpart = a->word[NFIXED128 - 1];
   uint64_t result;
   if(intpart > 127 || intpart < -128)
     return ERANGE;
-  result = (uint64_t)a->word[NFIXED - 1] << 56;
-  result += (uint64_t)a->word[NFIXED - 2] << 24;
-  result += a->word[NFIXED - 3] >> 8;
-  if(a->word[NFIXED-3] & 128) {
+  result = (uint64_t)a->word[NFIXED128 - 1] << 56;
+  result += (uint64_t)a->word[NFIXED128 - 2] << 24;
+  result += a->word[NFIXED128 - 3] >> 8;
+  if(a->word[NFIXED128-3] & 128) {
     // Round up, checking for overflow
     if(result == 0x7fffffffffffffffLL)
       return ERANGE;
@@ -134,28 +134,28 @@ int Fixed_to_Fixed64(Fixed64 *r, const struct Fixed *a) {
   return 0;
 }
 
-void Fixed64_to_Fixed(struct Fixed *r, Fixed64 a) {
+void Fixed64_to_Fixed128(struct Fixed128 *r, Fixed64 a) {
   memset(r, 0, sizeof *r);
-  r->word[NFIXED - 1] = a >> 56;
-  r->word[NFIXED - 2] = (uint32_t)(a >> 24);
-  r->word[NFIXED - 3] = (uint32_t)(a << 8);
+  r->word[NFIXED128 - 1] = a >> 56;
+  r->word[NFIXED128 - 2] = (uint32_t)(a >> 24);
+  r->word[NFIXED128 - 3] = (uint32_t)(a << 8);
 }
 
 /* For string conversions we re-use the full-width code - the result is not as
  * fast, but it is easier. */
 
 char *Fixed64_2str(char buffer[], unsigned bufsize, Fixed64 a, int base) {
-  struct Fixed f;
-  Fixed64_to_Fixed(&f, a);
-  return Fixed_2str(buffer, bufsize, &f, base);
+  struct Fixed128 f;
+  Fixed64_to_Fixed128(&f, a);
+  return Fixed128_2str(buffer, bufsize, &f, base);
 }
 
 int Fixed64_str2(Fixed64 *r, const char *s, char **endptr) {
-  struct Fixed f;
-  int rc = Fixed_str2(&f, s, endptr);
+  struct Fixed128 f;
+  int rc = Fixed128_str2(&f, s, endptr);
   if(rc)
     return rc;
-  return Fixed_to_Fixed64(r, &f);
+  return Fixed128_to_Fixed64(r, &f);
 }
 
 /*

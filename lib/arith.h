@@ -26,7 +26,7 @@
 #include <iostream>
 #include <sstream>
 
-#include "Fixed.h"
+#include "Fixed128.h"
 #include "Fixed64.h"
 
 template<typename T> class arith_traits {
@@ -129,34 +129,34 @@ public:
 };
 
 template<>
-class arith_traits<fixed> {
+class arith_traits<fixed128> {
 public:
-  static inline fixed maximum() {
-    Fixed f;
+  static inline fixed128 maximum() {
+    Fixed128 f;
     memset(f.word, 0xFF, sizeof f.word);
-    f.word[NFIXED-1] = 0x7FFFFFFF;
-    return fixed(f);
+    f.word[NFIXED128-1] = 0x7FFFFFFF;
+    return fixed128(f);
   }
 
-  static std::string toString(const fixed &n) {
+  static std::string toString(const fixed128 &n) {
     return n.toString();
   }
 
-  static int toInt(const fixed &n) {
+  static int toInt(const fixed128 &n) {
     return n.toInt();
   }
 
-  static int fromString(fixed &n, const char *s, char **endptr) {
+  static int fromString(fixed128 &n, const char *s, char **endptr) {
     return n.fromString(s, endptr);
   }
 
-  static double toDouble(const fixed &n) {
+  static double toDouble(const fixed128 &n) {
     return n.toDouble();
   }
 
-  static count_t iterate(fixed zx, fixed zy, fixed cx, fixed cy, int maxiters) {
-#if HAVE_ASM && NFIXED == 4
-    int rawCount = Fixed_iterate(&zx.f, &zy.f, &cx.f, &cy.f, maxiters);
+  static count_t iterate(fixed128 zx, fixed128 zy, fixed128 cx, fixed128 cy, int maxiters) {
+#if HAVE_ASM && NFIXED128 == 4
+    int rawCount = Fixed128_iterate(&zx.f, &zy.f, &cx.f, &cy.f, maxiters);
     if(rawCount == maxiters)
       return rawCount;
     else {

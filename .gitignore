@@ -21,7 +21,7 @@ gtkui/images.h
 debian/mandy
 debian/substvars.*
 debian/files
-lib/fixed-test
+lib/fixed128-test
 lib/fixed64-test
 lib/speedtest
 Debug

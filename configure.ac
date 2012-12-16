@@ -44,11 +44,11 @@ AC_MSG_CHECKING([what type to use for arithmetic])
 AC_ARG_WITH([fixed-point],
             [AS_HELP_STRING([--with-fixed-point],
 			    [use 128-bit fixed point arithmetic])],
-            [arithtype=fixed])
+            [arithtype=fixed128])
 AC_ARG_WITH([short-fixed-point],
             [AS_HELP_STRING([--with-short-fixed-point],
 			    [use 64-bit fixed point arithmetic])],
-            [arithtype=fixed;itertype=fixed64])
+            [arithtype=fixed128;itertype=fixed64])
 AC_ARG_WITH([long-double],
             [AS_HELP_STRING([--with-long-double],
 			    [use long double for arithmetic])],
