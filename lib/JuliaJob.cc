@@ -28,7 +28,7 @@ void JuliaJob::work() {
       arith_t izx = xleft + arith_t(px) * xsize / dest->w;
       count_t iterations = 0;
       arith_t zx = izx, zy = izy;
-      iterations = arith_traits<arith_t>::iterate(zx, zy, cx, cy, maxiters);
+      iterations = iterate(zx, zy, cx, cy, maxiters, arith);
       *res++ = iterations;
     }
   }

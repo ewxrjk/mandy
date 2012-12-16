@@ -16,22 +16,24 @@
 #include "mandy.h"
 #include "arith.h"
 
-#define REPEATS 10000
+#define REPEATS 40000
 #define MAXITER 20000
 
 int main() {
-  arith_t zx = 0;
-  arith_t zy = 0;
-  arith_t cx = 0.125;
-  arith_t cy = 0.125;
-  clock_t begin = clock();
-  for(int n = 0; n < REPEATS; ++n)
-    arith_traits<iter_t>::iterate(zx, zy, cx, cy, MAXITER);
-  clock_t end = clock();
-  double seconds = (end - begin) / (double)CLOCKS_PER_SEC;
-  double iterations = (double)REPEATS * MAXITER;
-  double ips = iterations / seconds;
-  printf("%gs; %g iterations; %g iterations/second\n", 
-	 seconds, iterations, ips);
+  for(int t = 0; t < arith_limit; ++t) {
+    arith_t zx = 0;
+    arith_t zy = 0;
+    arith_t cx = 0.125;
+    arith_t cy = 0.125;
+    clock_t begin = clock();
+    for(int n = 0; n < REPEATS; ++n)
+      iterate(zx, zy, cx, cy, MAXITER, arith_type(t));
+    clock_t end = clock();
+    double seconds = (end - begin) / (double)CLOCKS_PER_SEC;
+    double iterations = (double)REPEATS * MAXITER;
+    double ips = iterations / seconds;
+    printf("%12s %6gs; %g iterations; %10g iterations/second\n", 
+	   arith_names[t], seconds, iterations, ips);
+  }
   return 0;
 }

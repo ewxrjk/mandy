@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#if !(HAVE_ASM && NFIXED128 == 4)
+#if !HAVE_ASM
 void Fixed128_add(struct Fixed128 *r, const struct Fixed128 *a, const struct Fixed128 *b) {
   uint64_t s = 0;
   int n;
@@ -31,7 +31,7 @@ void Fixed128_add(struct Fixed128 *r, const struct Fixed128 *a, const struct Fix
 }
 #endif
 
-#if !(HAVE_ASM && NFIXED128 == 4)
+#if !HAVE_ASM
 void Fixed128_sub(struct Fixed128 *r, const struct Fixed128 *a, const struct Fixed128 *b) {
   uint64_t s = 1;
   int n;
@@ -44,7 +44,7 @@ void Fixed128_sub(struct Fixed128 *r, const struct Fixed128 *a, const struct Fix
 }
 #endif
 
-#if !(HAVE_ASM && NFIXED128 == 4)
+#if !HAVE_ASM
 int Fixed128_neg(struct Fixed128 *r, const struct Fixed128 *a) {
   uint64_t s = 1;
   int n;
@@ -62,7 +62,7 @@ int Fixed128_neg(struct Fixed128 *r, const struct Fixed128 *a) {
 }
 #endif
 
-#if !(HAVE_ASM && NFIXED128 == 4)
+#if !HAVE_ASM
 static int Fixed128_mul_unsigned(struct Fixed128 *r, const struct Fixed128 *a, const struct Fixed128 *b) {
   int n, m, i;
   /* Clear result accumulator */
@@ -238,7 +238,7 @@ int Fixed128_eq(const struct Fixed128 *a, const struct Fixed128 *b) {
   return 1;
 }
 
-#if !(HAVE_ASM && NFIXED128 == 4)
+#if !HAVE_ASM
 void Fixed128_shl_unsigned(struct Fixed128 *a) {
   int n;
   for(n = NFIXED128 - 1; n > 0; --n)
@@ -247,7 +247,7 @@ void Fixed128_shl_unsigned(struct Fixed128 *a) {
 }
 #endif
 
-#if !(HAVE_ASM && NFIXED128 == 4)
+#if !HAVE_ASM
 void Fixed128_shr_unsigned(struct Fixed128 *a) {
     int n;
     for(n = 0; n < NFIXED128 - 1; ++n)
@@ -374,6 +374,18 @@ double Fixed128_2double(const struct Fixed128 *a) {
   return (a->word[NFIXED128 - 4] / 79228162514264337593543950336.0
           + a->word[NFIXED128 - 3] / 18446744073709551616.0
           + a->word[NFIXED128 - 2] / 4294967296.0
+          + a->word[NFIXED128 - 1]);
+}
+
+long double Fixed128_2longdouble(const struct Fixed128 *a) {
+  if(Fixed128_lt0(a)) {
+    struct Fixed128 b;
+    Fixed128_neg(&b, a);
+    return -Fixed128_2longdouble(&b);
+  }
+  return (a->word[NFIXED128 - 4] / 79228162514264337593543950336.0L
+          + a->word[NFIXED128 - 3] / 18446744073709551616.0L
+          + a->word[NFIXED128 - 2] / 4294967296.0L
           + a->word[NFIXED128 - 1]);
 }
 

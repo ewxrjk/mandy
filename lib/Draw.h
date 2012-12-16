@@ -38,7 +38,9 @@ int dive(const char *wstr,
 
 void draw(int width, int height, 
           arith_t x, arith_t y, arith_t r,
-          int maxiters, const char *path);
+          int maxiters,
+          arith_type arith,
+          const char *path);
 
 #endif /* DRAW_H */
 

@@ -1,4 +1,4 @@
-/* Copyright © 2010 Richard Kettlewell.
+/* Copyright © 2010, 2012 Richard Kettlewell.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,19 @@
 
 #include "Fixed128.h"
 #include "Fixed64.h"
+
+typedef fixed128 arith_t;
+
+enum arith_type {
+  arith_double,
+  arith_long_double,
+  arith_fixed64,
+  arith_fixed128,
+
+  arith_limit
+};
+
+extern const char *const arith_names[];
 
 template<typename T> class arith_traits {
 public:
@@ -82,9 +95,12 @@ public:
     return n;
   }
 
-  static count_t iterate(double zx, double zy,
-                         double cx, double cy, int maxiters) {
-    return defaultIterate(zx, zy, cx, cy, maxiters);
+  static count_t iterate(arith_t zx, arith_t zy,
+                         arith_t cx, arith_t cy, int maxiters) {
+    return defaultIterate(zx.toDouble(),
+                          zy.toDouble(),
+                          cx.toDouble(),
+                          cy.toDouble(), maxiters);
   }
 
 };
@@ -121,9 +137,13 @@ public:
     return n;
   }
 
-  static count_t iterate(long double zx, long double zy,
-                         long double cx, long double cy, int maxiters) {
-    return defaultIterate(zx, zy, cx, cy, maxiters);
+  static count_t iterate(arith_t zx, arith_t zy,
+                         arith_t cx, arith_t cy, int maxiters) {
+    return defaultIterate(zx.toLongDouble(), 
+                          zy.toLongDouble(),
+                          cx.toLongDouble(),
+                          cy.toLongDouble(),
+                          maxiters);
   }
 
 };
@@ -194,8 +214,9 @@ public:
     return n.toDouble();
   }
 
-  static count_t iterate(fixed64 zx, fixed64 zy, fixed64 cx, fixed64 cy, 
+  static count_t iterate(arith_t zxa, arith_t zya, arith_t cxa, arith_t cya,
                          int maxiters) {
+    fixed64 zx = zxa, zy = zya, cx = cxa, cy = cya;
 #if HAVE_ASM
     double r2;
     int rawCount = Fixed64_iterate(zx.f, zy.f, cx.f, cy.f, &r2, maxiters);
@@ -209,8 +230,8 @@ public:
   }
 };
 
-typedef ARITH_TYPE arith_t;
-typedef ITER_TYPE iter_t;
+count_t iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy,
+                int maxiters, arith_type arith);
 
 #endif /* ARITH_H */
 

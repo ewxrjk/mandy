@@ -39,25 +39,22 @@ fi
 # Identify arithmetic type to use
 # See README for further discussion
 #
-arithtype=double
+arithtype=arith_double
 AC_MSG_CHECKING([what type to use for arithmetic])
 AC_ARG_WITH([fixed-point],
             [AS_HELP_STRING([--with-fixed-point],
 			    [use 128-bit fixed point arithmetic])],
-            [arithtype=fixed128])
+            [arithtype=arith_fixed128])
 AC_ARG_WITH([short-fixed-point],
             [AS_HELP_STRING([--with-short-fixed-point],
 			    [use 64-bit fixed point arithmetic])],
-            [arithtype=fixed128;itertype=fixed64])
+            [arithtype=arith_fixed64])
 AC_ARG_WITH([long-double],
             [AS_HELP_STRING([--with-long-double],
 			    [use long double for arithmetic])],
-            [arithtype="long double"])
-itertype=${itertype:-${arithtype}}
-AC_MSG_RESULT([${itertype}])
-AC_DEFINE_UNQUOTED([ARITH_TYPE],[${arithtype}],[arithmetic type])
-AC_DEFINE_UNQUOTED([ITER_TYPE],[${itertype}],[iteration type])
-AC_DEFINE([NFIXED],[4], [number of words in a fixed point integer])
+            [arithtype="arith_long_double"])
+AC_MSG_RESULT([${arithtype}])
+AC_DEFINE_UNQUOTED([ARITH_PREFERRED],[${arithtype}],[preferred arithmetic type])
 
 #
 # Assembler support

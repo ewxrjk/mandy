@@ -52,7 +52,6 @@
  * See: http://www.x86-64.org/documentation/abi.pdf
  */
 
-#if NFIXED == 4
 	.text
 
 /* void Fixed128_shl_unsigned(struct Fixed128 *a=rdi) */
@@ -414,5 +413,4 @@ square:
 	adc	rcx,0
 	adc	rbx,0
 	ret
-#endif
 #endif

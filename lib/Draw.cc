@@ -83,7 +83,7 @@ void draw(const char *wstr,
   if(maxiters > INT_MAX || maxiters <= 0)
     fatal(0, "cannot convert '%s': out of range", mistr);
 
-  draw(width, height, x, y, radius, maxiters, path);
+  draw(width, height, x, y, radius, maxiters, ARITH_PREFERRED, path);
 }
 
 static void completed(Job *, void *) {
@@ -91,7 +91,7 @@ static void completed(Job *, void *) {
 }
 
 void draw(int width, int height, arith_t x, arith_t y, arith_t radius,
-	  int maxiters, const char *path) {
+	  int maxiters, arith_type arith, const char *path) {
   const char *ext = strchr(path, '.');
   if(!ext)
     fatal(0, "cannot figure out extension of '%s'", ext);
@@ -107,6 +107,7 @@ void draw(int width, int height, arith_t x, arith_t y, arith_t radius,
   MandelbrotJobFactory jf;
   IterBuffer *dest = FractalJob::recompute(x, y, radius, maxiters,
 					   width, height,
+                                           arith,
 					   completed,
 					   &jf,
 					   0, 0, &jf);
@@ -267,7 +268,7 @@ int dive(const char *wstr,
             arith_traits<arith_t>::toString(radius).c_str());
     char tmp[1024];
     sprintf(tmp, TMP_PATTERN, frame);
-    draw(width, height, x, y, radius, maxiters, tmp);
+    draw(width, height, x, y, radius, maxiters, ARITH_PREFERRED, tmp);
   }
   std::string command;
   command += shellQuote(get_default("FFMPEG", ffmpegDefault()));

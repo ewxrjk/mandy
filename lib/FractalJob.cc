@@ -32,6 +32,7 @@ struct comparator {
 
 IterBuffer *FractalJob::recompute(arith_t cx, arith_t cy, arith_t r,
 				  int maxiters, int w, int h,
+                                  arith_type arith,
 				  void (*completion_callback)(Job *, void *),
 				  void *completion_data,
 				  int xpos, int ypos,
@@ -49,7 +50,7 @@ IterBuffer *FractalJob::recompute(arith_t cx, arith_t cy, arith_t r,
     for(int py = 0; py < dest->h; py += chunk) {
       const int ph = std::min(chunk, dest->h - py);
       FractalJob *j = factory->create();
-      j->set(dest, cx, cy, r, maxiters, px, py, pw, ph);
+      j->set(dest, cx, cy, r, maxiters, px, py, pw, ph, arith);
       jobs.push_back(j);
     }
   }

@@ -89,6 +89,7 @@ extern "C" {
 
   void Fixed128_double2(struct Fixed128 *r, double n);
   double Fixed128_2double(const struct Fixed128 *a);
+  long double Fixed128_2longdouble(const struct Fixed128 *a);
 
   int Fixed128_iterate(struct Fixed128 *zx, struct Fixed128 *zy,
                     const struct Fixed128 *cx, const struct Fixed128 *cy,
@@ -232,6 +233,10 @@ public:
 
   double toDouble() const {
     return Fixed128_2double(&f);
+  }
+
+  double toLongDouble() const {
+    return Fixed128_2longdouble(&f);
   }
 
 };

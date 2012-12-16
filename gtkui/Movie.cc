@@ -192,7 +192,7 @@ namespace mmui {
 	arith_t y = sy + arith_t(frame) * (ey - sy) / (frames - 1);
 	char tmp[1024];
 	sprintf(tmp, tmp_pattern.c_str(), frame);
-	draw(width, height, x, y, radius, maxiters, tmp);
+	draw(width, height, x, y, radius, maxiters, ARITH_PREFERRED, tmp);
       }
       std::stringstream command, pstream;
       command << shellQuote(controls.m_ffmpeg)

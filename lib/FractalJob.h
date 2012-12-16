@@ -29,6 +29,7 @@ public:
   int maxiters;                         // maximum iterations
   int x, y;                             // pixel location
   int w, h;                             // pixel dimensions
+  arith_type arith;                     // arithmetic type to use
 
   FractalJob(): dest(NULL) {
   }
@@ -39,7 +40,8 @@ public:
 
   void set(IterBuffer *dest_,
            arith_t xcenter_, arith_t ycenter_, arith_t radius_,
-           int maxiters_, int x_, int y_,int w_ ,int h_) {
+           int maxiters_, int x_, int y_,int w_ ,int h_,
+           arith_type arith_) {
     dest = dest_;
     xleft = xcenter_ - (dest->w > dest->h
                         ? radius_ * dest->w / dest->h
@@ -55,6 +57,7 @@ public:
     y = y_;
     w = w_;
     h = h_;
+    arith = arith_;
     dest->acquire();
   }
 
@@ -63,6 +66,7 @@ public:
   // jobs).  Uncomputed locations are set to -1.
   static IterBuffer *recompute(arith_t cx, arith_t cy, arith_t r,
                                int maxiters, int w, int h,
+                               arith_type arith,
                                void (*completion_callback)(Job *, void *),
                                void *completion_data,
                                int xpos, int ypos,

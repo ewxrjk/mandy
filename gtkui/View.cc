@@ -237,6 +237,7 @@ namespace mmui {
     Job::cancel(this);
     dest = FractalJob::recompute(xcenter, ycenter, radius,
                                  maxiters, w, h,
+                                 ARITH_PREFERRED,
                                  Completed,
                                  this,
                                  xpos, ypos,
