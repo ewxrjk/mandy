@@ -102,9 +102,11 @@ namespace mmui {
 
   void View::NewPointer(int xpos, int ypos) {
     GetCoordinates(xpointer, ypointer, xpos, ypos);
-    count = dest->data[ypos * dest->w + xpos];
-    if(controls)
-      controls->UpdateDisplay();
+    if(xpos >= 0 && ypos >= 0 && xpos < dest->w && ypos < dest->h) {
+      count = dest->data[ypos * dest->w + xpos];
+      if(controls)
+        controls->UpdateDisplay();
+    }
   }
 
   bool View::on_motion_notify_event(GdkEventMotion *event) {
