@@ -154,6 +154,7 @@ namespace mmui {
       assert(configurationValid());
       render.set_sensitive(false);
       controls.ContainerActivated(); // TODO a misnamed now?
+      controls.SetSensitivity(false);
       working = true;
       ThreadCreate(thread, MovieWindow::worker, this);
     }
