@@ -80,7 +80,7 @@ namespace mmui {
       Control(p),
       m_value(value) {
       for(T it = s; it != e; ++it)
-        append(*it);
+        append_text(*it);
       set_active_text(*value);
     }
 
