@@ -65,7 +65,7 @@ namespace mmui {
   }
 
   void MandelbrotView::Movie() {
-    mmui::Movie(xcenter, ycenter, radius, maxiters);
+    mmui::Movie(xcenter, ycenter, radius, maxiters, arith);
   }
 
   // Julia set integration ----------------------------------------------------

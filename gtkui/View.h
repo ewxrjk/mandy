@@ -51,6 +51,7 @@ namespace mmui {
     // Parameters
     arith_t xcenter, ycenter, radius;
     int maxiters;
+    arith_type arith;
 
     // Results
     arith_t xpointer, ypointer, count;

@@ -35,6 +35,7 @@ namespace mmui {
   public:
     MovieWindow *m_window;
     arith_t m_x, m_y, m_radius;
+    arith_type m_arith;
     int m_maxiters, m_seconds, m_fps;
     int m_bitrate;
     std::string m_codec;
@@ -51,6 +52,7 @@ namespace mmui {
     MovieControls(MovieWindow *window):
       m_window(window),
       m_x(0), m_y(0), m_radius(2),
+      m_arith(ARITH_PREFERRED),
       m_maxiters(255),
       m_seconds(10), m_fps(25),
       m_bitrate(8 * 1024 * 1024),
@@ -192,7 +194,7 @@ namespace mmui {
 	arith_t y = sy + arith_t(frame) * (ey - sy) / (frames - 1);
 	char tmp[1024];
 	sprintf(tmp, tmp_pattern.c_str(), frame);
-	draw(width, height, x, y, radius, maxiters, ARITH_PREFERRED, tmp);
+	draw(width, height, x, y, radius, maxiters, controls.m_arith, tmp);
       }
       std::stringstream command, pstream;
       command << shellQuote(controls.m_ffmpeg)
@@ -251,12 +253,14 @@ namespace mmui {
   void Movie(arith_t x,
 	     arith_t y,
 	     arith_t radius,
-             int maxiters) {
+             int maxiters,
+	     arith_type arith) {
     MovieWindow *w = new MovieWindow();
     w->controls.m_x = x;
     w->controls.m_y = y;
     w->controls.m_radius = radius;
     w->controls.m_maxiters = maxiters;
+    w->controls.m_arith = arith;
     w->controls.UpdateDisplay();
     w->show_all();
   }
