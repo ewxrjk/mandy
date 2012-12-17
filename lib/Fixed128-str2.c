@@ -58,7 +58,7 @@ static int c2digit(int c, int base) {
   const char *ptr = strchr(digits, c);
   if(!ptr)
     return -1;
-  value = ptr - digits;
+  value = (int)(ptr - digits);
   if(value >= base)
     return -1;
   return value;
