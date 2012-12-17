@@ -15,6 +15,7 @@
  */
 #include "mandy.h"
 #include "arith.h"
+#include <ctime>
 
 #define REPEATS 40000
 #define MAXITER 20000

@@ -33,14 +33,12 @@ typedef int int32_t;
 typedef unsigned int uint32_t;
 typedef long long int64_t;
 typedef unsigned long long uint64_t;
+#ifndef __cplusplus
 #define inline __inline
+#endif
 #define M_PI 3.14159265358979323846
 #define M_SQRT2 1.41421356237309504880
 #define M_SQRT1_2 0.70710678118654752440
-#define USE_GTHREADS 1
-#define ARITH_TYPE double
-#define ITER_TYPE double
-#define NFIXED 4
 #define ATOMIC_TYPE long
 #define ATOMIC_INC(x) InterlockedIncrement(&(x))
 #define ATOMIC_DEC(x) InterlockedDecrement(&(x))
@@ -50,6 +48,16 @@ typedef unsigned long long uint64_t;
 #define PATHSEP ';'
 #define EXEEXT ".exe"
 #define DIRSEP "\\"
+#define attribute(x)
+#ifdef LIBMANDY_EXPORTS
+#define LIBMANDY_API __declspec(dllexport)
+#else
+#define LIBMANDY_API __declspec(dllimport)
+#endif
+#endif
+
+#ifndef LIBMANDY_API
+# define LIBMANDY_API
 #endif
 
 #ifndef PATHSEP

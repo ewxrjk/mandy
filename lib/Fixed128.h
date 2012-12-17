@@ -33,25 +33,25 @@ extern "C" {
     uint32_t word[NFIXED128];
   };
 
-  void Fixed128_add(struct Fixed128 *r, const struct Fixed128 *a, const struct Fixed128 *b);
+  LIBMANDY_API void Fixed128_add(struct Fixed128 *r, const struct Fixed128 *a, const struct Fixed128 *b);
 
-  void Fixed128_sub(struct Fixed128 *r, const struct Fixed128 *a, const struct Fixed128 *b);
+  LIBMANDY_API void Fixed128_sub(struct Fixed128 *r, const struct Fixed128 *a, const struct Fixed128 *b);
 
-  int Fixed128_neg(struct Fixed128 *r, const struct Fixed128 *a);
+  LIBMANDY_API int Fixed128_neg(struct Fixed128 *r, const struct Fixed128 *a);
 
-  int Fixed128_mul(struct Fixed128 *r, const struct Fixed128 *a, const struct Fixed128 *b);
+  LIBMANDY_API int Fixed128_mul(struct Fixed128 *r, const struct Fixed128 *a, const struct Fixed128 *b);
 
-  void Fixed128_divu(struct Fixed128 *r, const struct Fixed128 *a, unsigned u);
+  LIBMANDY_API void Fixed128_divu(struct Fixed128 *r, const struct Fixed128 *a, unsigned u);
 
-  void Fixed128_div(struct Fixed128 *r, const struct Fixed128 *a, const struct Fixed128 *b);
+  LIBMANDY_API void Fixed128_div(struct Fixed128 *r, const struct Fixed128 *a, const struct Fixed128 *b);
 
-  void Fixed128_sqrt(struct Fixed128 *r, const struct Fixed128 *a);
+  LIBMANDY_API void Fixed128_sqrt(struct Fixed128 *r, const struct Fixed128 *a);
 
-  void Fixed128_int2(struct Fixed128 *r, int i);
+  LIBMANDY_API void Fixed128_int2(struct Fixed128 *r, int i);
 
-  void Fixed128_shl_unsigned(struct Fixed128 *a);
+  LIBMANDY_API void Fixed128_shl_unsigned(struct Fixed128 *a);
 
-  void Fixed128_shr_unsigned(struct Fixed128 *a);
+  LIBMANDY_API void Fixed128_shr_unsigned(struct Fixed128 *a);
 
   static inline int Fixed128_lt0(const struct Fixed128 *a) {
     return a->word[NFIXED128 - 1] & 0x80000000;
@@ -67,7 +67,7 @@ extern "C" {
     return !Fixed128_eq(a, b);
   }
 
-  int Fixed128_lt(const struct Fixed128 *a, const struct Fixed128 *b);
+  LIBMANDY_API int Fixed128_lt(const struct Fixed128 *a, const struct Fixed128 *b);
 
   static inline int Fixed128_gt(const struct Fixed128 *a, const struct Fixed128 *b) {
     return Fixed128_lt(b, a);
@@ -81,19 +81,19 @@ extern "C" {
     return !Fixed128_lt(a, b);
   }
 
-  int Fixed128_eq0(const struct Fixed128 *a);
+  LIBMANDY_API int Fixed128_eq0(const struct Fixed128 *a);
 
-  char *Fixed128_2str(char buffer[], unsigned bufsize, const struct Fixed128 *a,
-                   int base);
-  int Fixed128_str2(struct Fixed128 *r, const char *s, char **endptr);
+  LIBMANDY_API char *Fixed128_2str(char buffer[], unsigned bufsize, const struct Fixed128 *a,
+                                   int base);
+  LIBMANDY_API int Fixed128_str2(struct Fixed128 *r, const char *s, char **endptr);
 
-  void Fixed128_double2(struct Fixed128 *r, double n);
-  double Fixed128_2double(const struct Fixed128 *a);
-  long double Fixed128_2longdouble(const struct Fixed128 *a);
+  LIBMANDY_API void Fixed128_double2(struct Fixed128 *r, double n);
+  LIBMANDY_API double Fixed128_2double(const struct Fixed128 *a);
+  LIBMANDY_API long double Fixed128_2longdouble(const struct Fixed128 *a);
 
-  int Fixed128_iterate(struct Fixed128 *zx, struct Fixed128 *zy,
-                    const struct Fixed128 *cx, const struct Fixed128 *cy,
-                    int maxiters);
+  LIBMANDY_API int Fixed128_iterate(struct Fixed128 *zx, struct Fixed128 *zy,
+                                    const struct Fixed128 *cx, const struct Fixed128 *cy,
+                                    int maxiters);
 
 #ifdef __cplusplus
 }
@@ -197,11 +197,11 @@ public:
   // Comparison
 
   bool operator<(const fixed128 &that) const {
-    return Fixed128_lt(&f, &that.f);
+    return !!Fixed128_lt(&f, &that.f);
   }
 
   bool operator>(const fixed128 &that) const {
-    return Fixed128_lt(&that.f, &f);
+    return !!Fixed128_lt(&that.f, &f);
   }
 
   bool operator>=(const fixed128 &that) const {
@@ -213,7 +213,7 @@ public:
   }
 
   bool operator==(const fixed128 &that) const {
-    return Fixed128_eq(&that.f, &f);
+    return !!Fixed128_eq(&that.f, &f);
   }
 
   bool operator!=(const fixed128 &that) const {

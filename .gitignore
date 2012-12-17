@@ -27,10 +27,13 @@ lib/speedtest
 Debug
 *.suo
 *.ncb
-*.vcproj.*
+*.vcxproj.*
+*.sdf
+*.opensdf
 Release
 gtkui/mklogoc
 GPATH
 GRTAGS
 GSYMS
 GTAGS
+ipch
