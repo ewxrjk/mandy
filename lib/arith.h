@@ -219,7 +219,7 @@ public:
   static count_t iterate(arith_t zxa, arith_t zya, arith_t cxa, arith_t cya,
                          int maxiters) {
     fixed64 zx = zxa, zy = zya, cx = cxa, cy = cya;
-#if HAVE_ASM
+#if HAVE_ASM_AMD64_64
     double r2;
     int rawCount = Fixed64_iterate(zx.f, zy.f, cx.f, cy.f, &r2, maxiters);
     if(rawCount == maxiters)
