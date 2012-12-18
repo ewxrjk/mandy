@@ -71,32 +71,43 @@ static int Fixed128_mul_unsigned(struct Fixed128 *r, const struct Fixed128 *a, c
   for(n = 0; n < NFIXED128 * 2; ++n)
     result[n] = 0;
   for(n = 0; n < NFIXED128; ++n) {
+    if(!a->word[NFIXED128 - 1 - n])
+      continue;
     for(m = 0; m < NFIXED128; ++m) {
       uint64_t p = (uint64_t)a->word[NFIXED128 - 1 - n] * b->word[NFIXED128 - 1 - m];
       /*
-      printf("%d %d: %08x * %08x -> %016llx\n", n, m,
+      printf("  mul %d %d[%d]: %08x * %08x -> %016llx\n", n, m,
+             2 * NFIXED128 - 1 - (n + m),
 	     a->word[NFIXED128 - 1 - n], b->word[NFIXED128 - 1 - m],
 	     p);
       */
       for(i = 2 * NFIXED128 - 1 - (n + m); p && i < 2 * NFIXED128; ++i) {
 	uint64_t s = result[i] + p;
-	//printf("  %d -> %016llx\n", i, s);
+	/*printf("    mul %d -> %08lx + %016llx = %016llx\n", i, result[i], p, s);*/
 	result[i] = (uint32_t)s;
 	p = s >> 32;
       }
-      if(p)
+      if(p) {
+        /*printf("    mul leftover product: %016llx  *************************************\n", p);*/
 	overflow = 1;
+      }
     }
   }
+  /*for(n = 2 * NFIXED128-1; n >= 0; --n) {
+    printf("%08lx%c", result[n], n == 2 * NFIXED128-1 ? '.' : ' ');
+  }
+  printf("\n");*/
   if(result[NFIXED128 - 1] > 0x80000000) {
     uint64_t s = 1;
-    for(n = NFIXED128; n < NFIXED128; ++n) {
+    for(n = NFIXED128; n < 2 * NFIXED128; ++n) {
       s = result[n] + s;
       result[n] = (uint32_t)s;
       s >>= 32;
     }
-    if(s)
+    if(s) {
       overflow = 1;
+      /*printf("    mul leftover carry: %016llx  *******************************\n", s);*/
+    }
   }
   for(n = 0; n < NFIXED128; ++n)
     r->word[n] = result[NFIXED128 + n];
@@ -323,13 +334,12 @@ void Fixed128_sqrt(struct Fixed128 *r, const struct Fixed128 *a) {
       overflow = Fixed128_mul(&product, &result, &result);
       /*
       {
-	char rbuf[256], pbuf[256], abuf[256], bbuf[256];
+	char rbuf[256], pbuf[256], abuf[256];
 	Fixed128_2str(rbuf, sizeof rbuf, &result, 16);
 	Fixed128_2str(pbuf, sizeof pbuf, &product, 16);
 	Fixed128_2str(abuf, sizeof abuf, a, 16);
-	Fixed128_2str(bbuf, sizeof bbuf, b, 16);
-	printf("%d:%08x: 0x%s * 0x%s -> 0x%s%s <= 0x%s?\n",
-	       n, bit, bbuf, rbuf, pbuf,
+	printf("%d:%08x: 0x%s * 0x%s -> 0x%s%s <= 0x%s?  ",
+	       n, bit, rbuf, rbuf, pbuf,
 	       overflow ? " [OVERFLOW]" : "",
 	       abuf);
       }
@@ -338,9 +348,10 @@ void Fixed128_sqrt(struct Fixed128 *r, const struct Fixed128 *a) {
 	if(Fixed128_eq(&product, a))
 	  break;		/* Exact answer! */
 	/* Keep that bit */
-	//printf("   ...keep!\n");
+	//printf("   YES\n");
       } else {
 	result.word[n] ^= bit;
+        //printf("   no.\n");
       }
     }
   }
