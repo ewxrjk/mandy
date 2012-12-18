@@ -207,7 +207,7 @@ int main() {
   Fixed128_str2(&a, "-2147483647.000000000000000000000000000012621774483536188886587657044524579674771302961744368076324462890625", NULL);
   printf("-(2³¹-1+2⁻⁹⁶):"); printFixed128(&a, "-2147483647.000000000000000000000000000012621774483536188886587657044524579674771302961744368076324462890625"); putchar('\n');
 
-#if HAVE_ASM
+#if HAVE_ASM_AMD64_128
   // Mandelbrot computation
   Fixed128_int2(&a, 0);
   Fixed128_int2(&b, 0);
@@ -242,5 +242,6 @@ int main() {
   printf("r2:      "); printFixed128(&a, "106"); putchar('\n');
 #endif
 
+  printf("%d errors\n", errors);
   return !!errors;
 }

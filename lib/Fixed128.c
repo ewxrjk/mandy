@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#if !HAVE_ASM
+#if !HAVE_ASM_AMD64_128
 void Fixed128_add(struct Fixed128 *r, const struct Fixed128 *a, const struct Fixed128 *b) {
   uint64_t s = 0;
   int n;
@@ -31,7 +31,7 @@ void Fixed128_add(struct Fixed128 *r, const struct Fixed128 *a, const struct Fix
 }
 #endif
 
-#if !HAVE_ASM
+#if !HAVE_ASM_AMD64_128
 void Fixed128_sub(struct Fixed128 *r, const struct Fixed128 *a, const struct Fixed128 *b) {
   uint64_t s = 1;
   int n;
@@ -44,7 +44,7 @@ void Fixed128_sub(struct Fixed128 *r, const struct Fixed128 *a, const struct Fix
 }
 #endif
 
-#if !HAVE_ASM
+#if !HAVE_ASM_AMD64_128
 int Fixed128_neg(struct Fixed128 *r, const struct Fixed128 *a) {
   uint64_t s = 1;
   int n;
@@ -62,7 +62,7 @@ int Fixed128_neg(struct Fixed128 *r, const struct Fixed128 *a) {
 }
 #endif
 
-#if !HAVE_ASM
+#if !HAVE_ASM_AMD64_128
 static int Fixed128_mul_unsigned(struct Fixed128 *r, const struct Fixed128 *a, const struct Fixed128 *b) {
   int n, m, i;
   /* Clear result accumulator */
