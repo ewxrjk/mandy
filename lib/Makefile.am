@@ -29,5 +29,6 @@ speedtest_SOURCES=speedtest.cc
 speedtest_LDADD=../lib/libmandy.a -lm
 AM_CXXFLAGS=$(gtkmm_CFLAGS)
 EXTRA_DIST=ansidecl.h getopt1.c getopt.c getopt.h
+TESTS=fixed64-test fixed128-test
 
 Fixed128-amd64.o: Fixed128-amd64.S
