@@ -23,6 +23,11 @@ static void printFixed(Fixed64 f, const char *expect) {
 int main() {
   Fixed64 a, b, c;
   double x;
+#if HAVE_ASM_AMD64_64
+  double r2;
+  int count;
+  Fixed64 cx, cy;
+#endif
 
   // Addition
   a = Fixed64_int2(1);
@@ -149,12 +154,10 @@ int main() {
   Fixed64_str2(&a, "-127.00000000000000001387778780781445675529539585113525390625", NULL);
   printf("-(127+2⁻⁵⁶):"); printFixed(a, "-127.00000000000000001387778780781445675529539585113525390625"); putchar('\n');
 
-#if HAVE_ASM
+#if HAVE_ASM_AMD64_64
   // Mandelbrot computation
-  double r2;
-  int count;
-  Fixed64 cx = 0x00a6aaaaaaaaaaab;
-  Fixed64 cy = 0xfffd555555555555;
+  cx = 0x00a6aaaaaaaaaaab;
+  cy = 0xfffd555555555555;
 
   printf("cx:      "); printFixed(cx, "0.65104166666666667129259593593815225176513195037841796875"); putchar('\n');
   printf("cy:      "); printFixed(cy, "-0.01041666666666667129259593593815225176513195037841796875"); putchar('\n');
@@ -198,5 +201,6 @@ int main() {
 
 #endif
 
+  printf("%d errors\n", errors);
   return !!errors;
 }

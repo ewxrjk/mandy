@@ -8,6 +8,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "speedtest", "windows\speedt
 		{E5DDECA6-1F6C-401B-BBB6-1101B1F5B61D} = {E5DDECA6-1F6C-401B-BBB6-1101B1F5B61D}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fixed64-test", "windows\fixed64-test\fixed64-test.vcxproj", "{8A51A96E-3178-4E07-8ADC-31613CFFC2BD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E5DDECA6-1F6C-401B-BBB6-1101B1F5B61D} = {E5DDECA6-1F6C-401B-BBB6-1101B1F5B61D}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -32,6 +37,13 @@ Global
 		{15F60354-A2F4-4C39-91E1-656DA501CE79}.Release|Win32.Build.0 = Release|Win32
 		{15F60354-A2F4-4C39-91E1-656DA501CE79}.Release|x64.ActiveCfg = Release|x64
 		{15F60354-A2F4-4C39-91E1-656DA501CE79}.Release|x64.Build.0 = Release|x64
+		{8A51A96E-3178-4E07-8ADC-31613CFFC2BD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8A51A96E-3178-4E07-8ADC-31613CFFC2BD}.Debug|Win32.Build.0 = Debug|Win32
+		{8A51A96E-3178-4E07-8ADC-31613CFFC2BD}.Debug|x64.ActiveCfg = Debug|x64
+		{8A51A96E-3178-4E07-8ADC-31613CFFC2BD}.Debug|x64.Build.0 = Debug|x64
+		{8A51A96E-3178-4E07-8ADC-31613CFFC2BD}.Release|Win32.ActiveCfg = Release|Win32
+		{8A51A96E-3178-4E07-8ADC-31613CFFC2BD}.Release|Win32.Build.0 = Release|Win32
+		{8A51A96E-3178-4E07-8ADC-31613CFFC2BD}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -24,16 +24,16 @@ extern "C" {
 
 typedef int64_t Fixed64;
 
-  Fixed64 Fixed64_mul(Fixed64 a, Fixed64 b);
-  Fixed64 Fixed64_div(Fixed64 a, Fixed64 b);
-  Fixed64 Fixed64_sqrt(Fixed64 a);
+  LIBMANDY_API Fixed64 Fixed64_mul(Fixed64 a, Fixed64 b);
+  LIBMANDY_API Fixed64 Fixed64_div(Fixed64 a, Fixed64 b);
+  LIBMANDY_API Fixed64 Fixed64_sqrt(Fixed64 a);
 
   static inline Fixed64 Fixed64_int2(int i) {
     return (int64_t)i << 56;
   }
 
-  char *Fixed64_2str(char buffer[], unsigned bufsize, Fixed64 a, int base);
-  int Fixed64_str2(Fixed64 *r, const char *s, char **endptr);
+  LIBMANDY_API char *Fixed64_2str(char buffer[], unsigned bufsize, Fixed64 a, int base);
+  LIBMANDY_API int Fixed64_str2(Fixed64 *r, const char *s, char **endptr);
 
   static inline Fixed64 Fixed64_double2(double n) {
     return (Fixed64)(n* 72057594037927936.0);
@@ -43,13 +43,13 @@ typedef int64_t Fixed64;
     return (double)a / 72057594037927936.0;
   }
 
-  int Fixed128_to_Fixed64(Fixed64 *r, const struct Fixed128 *a);
-  void Fixed64_to_Fixed(struct Fixed128 *r, Fixed64 a);
+  LIBMANDY_API int Fixed128_to_Fixed64(Fixed64 *r, const struct Fixed128 *a);
+  LIBMANDY_API void Fixed64_to_Fixed(struct Fixed128 *r, Fixed64 a);
 
-  int Fixed64_iterate(Fixed64 zx, Fixed64 zy,
-                      Fixed64 cx, Fixed64 cy,
-                      double *r2p,
-                      int maxiters);
+  LIBMANDY_API int Fixed64_iterate(Fixed64 zx, Fixed64 zy,
+                                   Fixed64 cx, Fixed64 cy,
+                                   double *r2p,
+                                   int maxiters);
 
 #ifdef __cplusplus
 }
