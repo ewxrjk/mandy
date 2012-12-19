@@ -23,6 +23,9 @@ static void printFixed128(const struct Fixed128 *f, const char *expect) {
 int main() {
   struct Fixed128 a, b, c, d;
   double x;
+#if HAVE_ASM_AMD64_128
+  int count;
+#endif
 
   // Divide by 2 across word boundary...
   Fixed128_int2(&a, 1);
@@ -223,7 +226,7 @@ int main() {
   d.word[NFIXED128-3] = 0x55555555;
   d.word[NFIXED128-4] = 0x55555555;
   printf("cy:      "); printFixed128(&d, "-0.010416666666666666666666666670873924827845396295529219014841526558257100987248122692108154296875"); putchar('\n');
-  int count = Fixed128_iterate(&a, &b, &c, &d, 255);
+  count = Fixed128_iterate(&a, &b, &c, &d, 255);
   printf("iterate: %d\n", count);
   assert(count == 5);
 

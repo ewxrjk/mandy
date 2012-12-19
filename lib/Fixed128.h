@@ -93,7 +93,7 @@ extern "C" {
 
   LIBMANDY_API int Fixed128_iterate(struct Fixed128 *zx, struct Fixed128 *zy,
                                     const struct Fixed128 *cx, const struct Fixed128 *cy,
-                                    int maxiters);
+                                    int64_t maxiters);
 
 #ifdef __cplusplus
 }

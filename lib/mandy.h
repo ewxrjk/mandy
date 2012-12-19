@@ -55,6 +55,7 @@ typedef unsigned long long uint64_t;
 #define LIBMANDY_API __declspec(dllimport)
 #endif
 #define HAVE_ASM_AMD64_64 1
+#define HAVE_ASM_AMD64_128 1
 #endif
 
 #if HAVE_ASM

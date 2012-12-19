@@ -249,7 +249,7 @@ int Fixed128_eq(const struct Fixed128 *a, const struct Fixed128 *b) {
   return 1;
 }
 
-#if !HAVE_ASM
+#if !HAVE_ASM_AMD64_128
 void Fixed128_shl_unsigned(struct Fixed128 *a) {
   int n;
   for(n = NFIXED128 - 1; n > 0; --n)
@@ -258,7 +258,7 @@ void Fixed128_shl_unsigned(struct Fixed128 *a) {
 }
 #endif
 
-#if !HAVE_ASM
+#if !HAVE_ASM_AMD64_128
 void Fixed128_shr_unsigned(struct Fixed128 *a) {
     int n;
     for(n = 0; n < NFIXED128 - 1; ++n)

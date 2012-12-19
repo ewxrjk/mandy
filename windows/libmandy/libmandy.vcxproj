@@ -101,7 +101,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalOptions>/export:Fixed64_mul /export:Fixed64_iterate %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/export:Fixed64_mul /export:Fixed64_iterate /export:Fixed128_add /export:Fixed128_sub /export:Fixed128_mul /export:Fixed128_neg /export:Fixed128_iterate /export:Fixed128_shl_unsigned /export:Fixed128_shr_unsigned %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -165,6 +165,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <MASM Include="..\..\lib\Fixed128-win64.asm" />
     <MASM Include="..\..\lib\Fixed64-win64.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <FileType>Document</FileType>
