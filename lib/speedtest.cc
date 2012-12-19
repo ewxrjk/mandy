@@ -17,21 +17,23 @@
 #include "arith.h"
 #include <ctime>
 
-#define REPEATS 40000
-#define MAXITER 20000
-
-int main() {
+int main(int argc, char **argv) {
+  int repeats = 40000, maxiter = 20000;
+  if(argc > 1)
+    repeats = atoi(argv[1]);
+  if(argc > 2)
+    maxiter = atoi(argv[2]);
   for(int t = 0; t < arith_limit; ++t) {
     arith_t zx = 0;
     arith_t zy = 0;
     arith_t cx = 0.125;
     arith_t cy = 0.125;
     clock_t begin = clock();
-    for(int n = 0; n < REPEATS; ++n)
-      iterate(zx, zy, cx, cy, MAXITER, arith_type(t));
+    for(int n = 0; n < repeats; ++n)
+      iterate(zx, zy, cx, cy, maxiter, arith_type(t));
     clock_t end = clock();
     double seconds = (end - begin) / (double)CLOCKS_PER_SEC;
-    double iterations = (double)REPEATS * MAXITER;
+    double iterations = (double)repeats * maxiter;
     double ips = iterations / seconds;
     printf("%12s %6gs; %g iterations; %10g iterations/second\n", 
 	   arith_names[t], seconds, iterations, ips);
