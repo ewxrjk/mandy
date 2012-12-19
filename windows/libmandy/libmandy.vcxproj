@@ -165,7 +165,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="..\..\lib\Fixed128-win64.asm" />
+    <MASM Include="..\..\lib\Fixed128-win64.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </MASM>
     <MASM Include="..\..\lib\Fixed64-win64.asm">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <FileType>Document</FileType>
