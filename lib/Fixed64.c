@@ -22,7 +22,7 @@
 uint64_t Fixed64_mul_unsigned(uint64_t a, uint64_t b);
 static uint64_t Fixed64_div_unsigned(uint64_t a, uint64_t b);
 
-#if ! HAVE_ASM_AMD64_64
+#if ! HAVE_ASM_64
 Fixed64 Fixed64_mul(Fixed64 a, Fixed64 b) {
   Fixed64 r;
   int sign = 0;

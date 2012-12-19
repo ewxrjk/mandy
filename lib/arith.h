@@ -177,7 +177,7 @@ public:
   }
 
   static count_t iterate(fixed128 zx, fixed128 zy, fixed128 cx, fixed128 cy, int maxiters) {
-#if HAVE_ASM && NFIXED128 == 4
+#if HAVE_ASM_128 && NFIXED128 == 4
     int rawCount = Fixed128_iterate(&zx.f, &zy.f, &cx.f, &cy.f, maxiters);
     if(rawCount == maxiters)
       return rawCount;
@@ -219,7 +219,7 @@ public:
   static count_t iterate(arith_t zxa, arith_t zya, arith_t cxa, arith_t cya,
                          int maxiters) {
     fixed64 zx = zxa, zy = zya, cx = cxa, cy = cya;
-#if HAVE_ASM_AMD64_64
+#if HAVE_ASM_64
     double r2;
     int rawCount = Fixed64_iterate(zx.f, zy.f, cx.f, cy.f, &r2, maxiters);
     if(rawCount == maxiters)
