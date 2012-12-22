@@ -9,12 +9,16 @@ set.
 Installation
 ============
 
-You will need gtkmm and GNU C++.
+You will need gtkmm and either GNU C++ or Clang.
 
   ./autogen.sh          # only if building from git
   ./configure
   make
   sudo make install
+
+If you want to compile with Clang (recommended on OSX):
+
+  ./configure CC=clang CXX=clang++ CCAS=gcc
 
 See 'man mandy' for documentation.
 
