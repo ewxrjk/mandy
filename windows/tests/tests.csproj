@@ -55,6 +55,7 @@
     <Compile Include="JobQueueTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Fixed128Test.cs" />
+    <Compile Include="IterationTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\mandycs\mandycs.csproj">

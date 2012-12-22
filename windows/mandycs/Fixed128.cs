@@ -8,6 +8,17 @@ using System.Runtime.InteropServices;
 namespace uk.org.greenend.mandy
 {
   /// <summary>
+  /// Possible precisions
+  /// </summary>
+  public enum Precision
+  {
+    Double,
+    LongDouble,
+    Fixed64,
+    Fixed128,
+  };
+
+  /// <summary>
   /// 128-bit fixed point arithmetic
   /// </summary>
   /// <remarks><para>You get 32 bits of integer part and 96 bit of fractional part.</para></remarks>
@@ -85,7 +96,7 @@ namespace uk.org.greenend.mandy
 
     #endregion
 
-    #region Operations
+    #region Arithmetic Operations
 
     public static Fixed128 operator +(Fixed128 a, Fixed128 b)
     {
@@ -161,6 +172,17 @@ namespace uk.org.greenend.mandy
 
     #endregion
 
+    #region Algorithms
+
+    public static double iterate(Fixed128 zx, Fixed128 zy,
+                                 Fixed128 cx, Fixed128 cy,
+                                 int maxiters, Precision precision)
+    {
+      return iterate_cs(ref zx, ref zy, ref cx, ref cy, maxiters, (int)precision);
+    }
+
+    #endregion
+
     #region Unmanaged code
 
     [DllImport("libmandy.dll")]
@@ -211,6 +233,11 @@ namespace uk.org.greenend.mandy
 
     [DllImport("libmandy.dll")]
     private static extern double Fixed128_2double(ref Fixed128 a);
+
+    [DllImport("libmandy.dll")]
+    private static extern double iterate_cs(ref Fixed128 zx, ref Fixed128 zy,
+                                            ref Fixed128 cx, ref Fixed128 cy,
+                                            int maxiters, int arith); 
 
     #endregion
 

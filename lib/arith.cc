@@ -49,3 +49,11 @@ count_t iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy,
     abort();
   }
 }
+
+count_t iterate_cs(const Fixed128 *zx, const Fixed128 *zy,
+                   const Fixed128 *cx, const Fixed128 *cy,
+                   int maxiters, int arith) {
+  return iterate(fixed128(*zx), fixed128(*zy),
+                 fixed128(*cx), fixed128(*cy),
+                 maxiters, (arith_type)arith);
+}
