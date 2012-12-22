@@ -4,14 +4,14 @@ using uk.org.greenend.mandy;
 
 namespace tests
 {
+  /// <summary>
+  /// Test for C# exposure of the underlying iteration function.
+  /// </summary>
+  /// <remarks>
+  /// <para>Only the 64-bit configuration is testable.</para></remarks>
   [TestClass]
   public class IterationTest
   {
-    /// <summary>
-    /// Tests for Fix128
-    /// </summary>
-    /// <remarks>
-    /// <para>Only the 64-bit configuration is testable.</para></remarks>
     [TestMethod]
     [DeploymentItem(@"..\..\..\..\x64\Debug\libmandy.dll")]
     public void IterateTest()
