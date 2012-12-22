@@ -23,7 +23,7 @@ static void printFixed(Fixed64 f, const char *expect) {
 int main() {
   Fixed64 a, b, c;
   double x;
-#if HAVE_ASM_AMD64_64
+#if HAVE_ASM_64
   double r2;
   int count;
   Fixed64 cx, cy;
@@ -154,7 +154,7 @@ int main() {
   Fixed64_str2(&a, "-127.00000000000000001387778780781445675529539585113525390625", NULL);
   printf("-(127+2⁻⁵⁶):"); printFixed(a, "-127.00000000000000001387778780781445675529539585113525390625"); putchar('\n');
 
-#if HAVE_ASM_AMD64_64
+#if HAVE_ASM_64
   // Mandelbrot computation
   cx = 0x00a6aaaaaaaaaaab;
   cy = 0xfffd555555555555;
@@ -163,15 +163,16 @@ int main() {
   printf("cy:      "); printFixed(cy, "-0.01041666666666667129259593593815225176513195037841796875"); putchar('\n');
   count = Fixed64_iterate(0, 0, cx, cy,
                           &r2, 255);
-  printf("iterate: %d   r2: %g\n", count, r2);
+  printf("iterate: %d   r2: %.32g\n", count, r2);
   assert(count == 5);
+  assert(r2 ==  255.08471462316811);
 
   cx = Fixed64_int2(-1);
   cy = Fixed64_int2(-1);
   printf("cx:      "); printFixed(cx, "-1"); putchar('\n');
   printf("cy:      "); printFixed(cy, "-1"); putchar('\n');
   count = Fixed64_iterate(0, 0, cx, cy, &r2, 255);
-  printf("iterate: %d   r2: %g\n", count, r2);
+  printf("iterate: %d   r2: %.32g\n", count, r2);
   if(count != 4) {
     printf("-- EXPECTED iterate 4\n");
     ++errors;

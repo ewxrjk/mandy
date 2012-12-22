@@ -23,7 +23,7 @@ static void printFixed128(const struct Fixed128 *f, const char *expect) {
 int main() {
   struct Fixed128 a, b, c, d;
   double x;
-#if HAVE_ASM_AMD64_128
+#if HAVE_ASM_128
   int count;
 #endif
 
@@ -210,7 +210,7 @@ int main() {
   Fixed128_str2(&a, "-2147483647.000000000000000000000000000012621774483536188886587657044524579674771302961744368076324462890625", NULL);
   printf("-(2³¹-1+2⁻⁹⁶):"); printFixed128(&a, "-2147483647.000000000000000000000000000012621774483536188886587657044524579674771302961744368076324462890625"); putchar('\n');
 
-#if HAVE_ASM_AMD64_128
+#if HAVE_ASM_128
   // Mandelbrot computation
   Fixed128_int2(&a, 0);
   Fixed128_int2(&b, 0);
@@ -229,6 +229,7 @@ int main() {
   count = Fixed128_iterate(&a, &b, &c, &d, 255);
   printf("iterate: %d\n", count);
   assert(count == 5);
+  printf("r2:      "); printFixed128(&a, "255.084714623168092182249097929488373379693706291486597300711969271702628248021937906742095947265625"); putchar('\n');
 
   Fixed128_int2(&a, 0);
   Fixed128_int2(&b, 0);
