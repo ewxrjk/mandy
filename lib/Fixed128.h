@@ -87,6 +87,11 @@ extern "C" {
                                    int base);
   LIBMANDY_API int Fixed128_str2(struct Fixed128 *r, const char *s, char **endptr);
 
+  LIBMANDY_API int Fixed128_str2_cs(struct Fixed128 *r, const char *s);
+#define FIXED128_STR_OK 0
+#define FIXED128_STR_RANGE 1
+#define FIXED128_STR_FORMAT 2
+
   LIBMANDY_API void Fixed128_double2(struct Fixed128 *r, double n);
   LIBMANDY_API double Fixed128_2double(const struct Fixed128 *a);
   LIBMANDY_API long double Fixed128_2longdouble(const struct Fixed128 *a);

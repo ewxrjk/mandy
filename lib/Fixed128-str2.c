@@ -291,6 +291,18 @@ done:
   return error;
 }
 
+int Fixed128_str2_cs(struct Fixed128 *r, const char *s) {
+  char *endptr;
+  int rc = Fixed128_str2(r, s, &endptr);
+  if(rc == 0) {
+    if(endptr == s || *endptr)
+      return FIXED128_STR_FORMAT;
+    else
+      return FIXED128_STR_OK;
+  } else
+    return FIXED128_STR_RANGE;
+}
+
 /*
 Local Variables:
 mode:c
