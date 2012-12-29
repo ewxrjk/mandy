@@ -97,25 +97,20 @@ namespace uk.org.greenend.mandy
     static private void Worker()
     {
       Monitor.Enter(jobsPending);
-      while (true)
-      {
-        if (jobsPending.Count > 0)
-        {
+      while (true) {
+        if (jobsPending.Count > 0) {
           // There is work to be done
           Job j = jobsPending.First.Value;
           jobsPending.RemoveFirst();
           jobsWorking.Add(j);
           Monitor.Exit(jobsPending);
-          try
-          {
+          try {
             j.Run();
           }
-          catch (Exception)
-          {
+          catch (Exception) {
             // Jobs that throw exceptions just lose them.
           }
-          lock (jobsComplete)
-          {
+          lock (jobsComplete) {
             jobsComplete.AddLast(j);
             Monitor.PulseAll(jobsComplete);
           }
@@ -137,8 +132,7 @@ namespace uk.org.greenend.mandy
     /// <remarks><para>Called with lock held.</para></remarks>
     static private void CreateWorkers()
     {
-      for (int n = 0; n < Workers; ++n)
-      {
+      for (int n = 0; n < Workers; ++n) {
         Thread newThread = new Thread(new ThreadStart(Worker))
         {
           IsBackground = true
@@ -147,7 +141,7 @@ namespace uk.org.greenend.mandy
       }
       workersCreated = true;
     }
-    
+
     /// <summary>
     /// Add a job to the queue
     /// </summary>
@@ -155,10 +149,8 @@ namespace uk.org.greenend.mandy
     /// <param name="context">Context information</param>
     public static void Add(Job job, object context)
     {
-      lock (jobsPending)
-      {
-        if (!workersCreated)
-        {
+      lock (jobsPending) {
+        if (!workersCreated) {
           CreateWorkers();
         }
         job.context = context;
@@ -178,13 +170,10 @@ namespace uk.org.greenend.mandy
     public static void Cancel(object context)
     {
       List<Job> cancelled = new List<Job>();
-      lock (jobsPending)
-      {
-        for (var node = jobsPending.First; node != null; )
-        {
+      lock (jobsPending) {
+        for (var node = jobsPending.First; node != null; ) {
           var next = node.Next;
-          if (node.Value.context == context)
-          {
+          if (node.Value.context == context) {
             jobsPending.Remove(node);
             // The cancel callback had better be issued outside the lock
             cancelled.Add(node.Value);
@@ -192,8 +181,7 @@ namespace uk.org.greenend.mandy
           node = next;
         }
       }
-      foreach (var job in cancelled)
-      {
+      foreach (var job in cancelled) {
         job.Cancel();
       }
     }
@@ -213,20 +201,16 @@ namespace uk.org.greenend.mandy
     {
       // Special case a count of 0 - it's a stupid value to pass
       // but it shouldn't cause a hang.
-      if (count == 0)
-      {
+      if (count == 0) {
         return 0;
       }
       int completed = 0;
       Monitor.Enter(jobsComplete);
-      while (true)
-      {
+      while (true) {
         int completedThisTime = 0;
-        for (var node = jobsComplete.First; count > 0 && node != null; )
-        {
+        for (var node = jobsComplete.First; count > 0 && node != null; ) {
           var next = node.Next;
-          if (context == null || node.Value.context == context)
-          {
+          if (context == null || node.Value.context == context) {
             // Found a suitable job.  Remove it from the list
             // and then call Complete() on it.
             jobsComplete.Remove(node);
@@ -239,20 +223,17 @@ namespace uk.org.greenend.mandy
           node = next;
         }
         completed += completedThisTime;
-        if (count == 0)
-        {
+        if (count == 0) {
           // We've done as much work as we were asked to do.
           break;
         }
-        if (completedThisTime > 0)
-        {
+        if (completedThisTime > 0) {
           // If we did any work we'll have released the lock, so it's
           // possible that more work arrived in the meantime.  Go back
           // and check.
           continue;
         }
-        if (!block)
-        {
+        if (!block) {
           // We didn't find any work to do.  If we were asked not to block,
           // exit now.
           break;
