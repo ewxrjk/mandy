@@ -98,8 +98,7 @@ namespace uk.org.greenend.mandy
     {
       Fixed128 r = 0;
       int error = Fixed128_str2_cs(ref r, s);
-      switch(error)
-      {
+      switch (error) {
         case 0: // FIXED128_STR_OK
           break;
         case 1: // FIXED128_STR_RANGE
@@ -148,7 +147,7 @@ namespace uk.org.greenend.mandy
     #endregion
 
     #region Arithmetic Operations
-    
+
     /// <summary>
     /// Add fixed-point values
     /// </summary>
@@ -357,7 +356,7 @@ namespace uk.org.greenend.mandy
     private static extern int Fixed128_str2_cs(ref Fixed128 r, string s);
 
     [DllImport("libmandy.dll")]
-    private unsafe static extern IntPtr Fixed128_2str(byte *buffer, IntPtr bufsize,
+    private unsafe static extern IntPtr Fixed128_2str(byte* buffer, IntPtr bufsize,
                                                       ref Fixed128 a, int radix);
 
     [DllImport("libmandy.dll")]
@@ -369,7 +368,7 @@ namespace uk.org.greenend.mandy
     [DllImport("libmandy.dll")]
     private static extern double iterate_cs(ref Fixed128 zx, ref Fixed128 zy,
                                             ref Fixed128 cx, ref Fixed128 cy,
-                                            int maxiters, int arith); 
+                                            int maxiters, int arith);
 
     #endregion
 
