@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AC_INIT([mandy], [0.0.WIP], [rjk@greenend.org.uk])
 AC_CONFIG_AUX_DIR([config.aux])
-AM_INIT_AUTOMAKE([mandy], [0.0.WIP])
+AM_INIT_AUTOMAKE([foreign])
 AC_CONFIG_SRCDIR([lib/MandelbrotJob.cc])
 AM_CONFIG_HEADER([config.h])
 AC_CANONICAL_HOST
