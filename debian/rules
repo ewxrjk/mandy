@@ -52,10 +52,7 @@ build:
 	  echo ./autogen.sh ;\
 	  ./autogen.sh ;\
 	fi
-	@if test ! -e config.status; then \
-	  echo ./configure ${CONFIGURE} ${CONFIGURE_EXTRA} ;\
-	  ./configure ${CONFIGURE} ${CONFIGURE_EXTRA} ;\
-	fi
+	./configure ${CONFIGURE} ${CONFIGURE_EXTRA}
 	$(MAKE)
 
 binary: binary-arch binary-indep
