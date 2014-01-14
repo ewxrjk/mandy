@@ -15,3 +15,7 @@ Depends: ${shlibs:Depends}
 Description: GTK+ program to draw images of the Mandelbrot set
  Use this program to navigate around the Mandelbrot set (or strictly
  speaking, its complement) and to view the corresponding Julia sets.
+ .
+ Multiple different arithmetic precisions are supported.
+ .
+ On some platforms assembler optimization is included.
