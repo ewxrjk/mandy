@@ -1,4 +1,4 @@
-?package(disobedience):\
+?package(mandy):\
 	needs="x11" \
 	section="Applications/Science/Mathematics" \
 	title="Mandy" \
