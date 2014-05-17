@@ -231,10 +231,6 @@ static inline int Fixed128_le_unsigned(const struct Fixed128 *a, const struct Fi
   return !Fixed128_gt_unsigned(a, b);
 }
 
-static inline int Fixed128_ge_unsigned(const struct Fixed128 *a, const struct Fixed128 *b) {
-  return !Fixed128_lt_unsigned(a, b);
-}
-
 int Fixed128_eq(const struct Fixed128 *a, const struct Fixed128 *b) {
   int n;
   for(n = 0; n < NFIXED128; ++n)
