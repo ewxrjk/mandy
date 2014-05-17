@@ -38,3 +38,5 @@ GSYMS
 GTAGS
 ipch
 TestResults
+*.log
+*.trs
