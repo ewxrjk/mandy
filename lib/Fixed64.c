@@ -138,7 +138,7 @@ void Fixed64_to_Fixed128(struct Fixed128 *r, Fixed64 a) {
   memset(r, 0, sizeof *r);
   r->word[NFIXED128 - 1] = a >> 56;
   r->word[NFIXED128 - 2] = (uint32_t)(a >> 24);
-  r->word[NFIXED128 - 3] = (uint32_t)(a << 8);
+  r->word[NFIXED128 - 3] = (uint32_t)((uint64_t)a << 8);
 }
 
 /* For string conversions we re-use the full-width code - the result is not as

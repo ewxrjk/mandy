@@ -234,7 +234,7 @@ int Fixed128_str2(struct Fixed128 *r, const char *start, char **endptr) {
     while(bit >= 0 && !isZero(value)) {
       if(le(divisor, value)) {
 	sub(value, value, divisor);
-	r->word[bit / 32] |= (1 << (bit & 31));
+	r->word[bit / 32] |= ((uint32_t)1 << (bit & 31));
       }
       /* Halve the divisor (by doubling the remainder if the divisor
        * is now odd) */

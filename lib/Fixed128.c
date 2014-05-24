@@ -264,7 +264,7 @@ void Fixed128_setbit(struct Fixed128 *a, int bit) {
     // bits -1..-32 are te first word; -33..-64 the second; etc.
     int word = NFIXED128 - 2 - -(bit+1) / 32;
     bit = bit & 31;
-    a->word[word] |= 1 << bit;
+    a->word[word] |= (uint32_t)1 << bit;
   }
 }
 
@@ -319,7 +319,7 @@ void Fixed128_sqrt(struct Fixed128 *r, const struct Fixed128 *a) {
   uint32_t bit;
   Fixed128_int2(&result, 0);
   for(n = NFIXED128 - 1; n >= 0; --n) {
-    for(bit = 1 << 31; bit > 0; bit >>= 1) {
+    for(bit = (uint32_t)1 << 31; bit > 0; bit >>= 1) {
       result.word[n] |= bit;
       overflow = Fixed128_mul(&product, &result, &result);
       /*
