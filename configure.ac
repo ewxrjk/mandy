@@ -1,4 +1,4 @@
-# Copyright © 2010 Richard Kettlewell.
+# Copyright © 2010, 2015 Richard Kettlewell.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ AC_PROG_CC
 AC_PROG_CXX
 AM_PROG_AS
 AC_PROG_RANLIB
+AM_PROG_AR
 AC_SET_MAKE
 PKG_CHECK_MODULES([gtkmm], [gtkmm-2.4])
 AC_CHECK_HEADERS([unistd.h inttypes.h getopt.h])
