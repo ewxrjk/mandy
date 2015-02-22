@@ -116,13 +116,22 @@ function render(ccx, ccy) {
 function annotate() {
     uctx.font="12px serif";
     uctx.fillStyle = '#ffffff';
-    uctx.fillRect(w - 128,
-                  h - 64,
+    uctx.fillRect(w - 128 - 0.5,
+                  h - 64 - 0.5,
                   128, 64);
     uctx.fillStyle = '#000000';
-    uctx.fillText("x: " + x, w - 128 + 4, h - 64 + 4 + 16);
-    uctx.fillText("y: " + y, w - 128 + 4, h - 64 + 4 + 32);
-    uctx.fillText("s: " + s, w - 128 + 4, h - 64 + 4 + 48);
+    uctx.textAlign = 'end';
+    uctx.fillText("x:", w - 128 + 4 + 16, h - 64 + 4 + 16);
+    uctx.fillText("y:", w - 128 + 4 + 16, h - 64 + 4 + 32);
+    uctx.fillText("s:", w - 128 + 4 + 16, h - 64 + 4 + 48);
+    uctx.textAlign = 'start';
+    uctx.fillText(x, w - 128 + 4 + 20, h - 64 + 4 + 16);
+    uctx.fillText(y, w - 128 + 4 + 20, h - 64 + 4 + 32);
+    uctx.fillText(s, w - 128 + 4 + 20, h - 64 + 4 + 48);
+    uctx.strokeStyle = '#000000';
+    uctx.strokeRect(w - 128 - 0.5, h - 64 - 0.5, 128, 64);
+    uctx.strokeStyle = '#ffffff';
+    uctx.strokeRect(w - 127 - 0.5, h - 63 - 0.5, 126, 62);
 }
 
 // Run the queue
