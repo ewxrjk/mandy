@@ -23,13 +23,13 @@ Threading-glib.cc Threading-glib.h Threading-pthreads.cc		\
 Threading-pthreads.h Threading.h arith.cc arith.h fatal.cc mandy.h	\
 cgi.cc cgi.h
 fixed128_test_SOURCES=fixed128-test.c
-fixed128_test_LDADD=../lib/libmandy.a -lm
+fixed128_test_LDADD=libmandy.a -lm
 fixed64_test_SOURCES=fixed64-test.c
-fixed64_test_LDADD=../lib/libmandy.a -lm
+fixed64_test_LDADD=libmandy.a -lm
 speedtest_SOURCES=speedtest.cc
-speedtest_LDADD=../lib/libmandy.a -lm
+speedtest_LDADD=libmandy.a -lm
 cgitest_SOURCES=cgitest.cc
-cgitest_LDADD=../lib/libmandy.a
+cgitest_LDADD=libmandy.a
 AM_CXXFLAGS=$(gtkmm_CFLAGS)
 EXTRA_DIST=ansidecl.h getopt1.c getopt.c getopt.h
 TESTS=fixed64-test fixed128-test cgitest
