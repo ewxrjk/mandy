@@ -1,4 +1,4 @@
-# Copyright © 2010, 2015 Richard Kettlewell.
+# Copyright © 2015 Richard Kettlewell.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,10 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-SUBDIRS=lib images web gtkui
-EXTRA_DIST=debian/rules debian/control debian/changelog		\
-	debian/copyright projects/fixedtest/fixedtest.vcproj	\
-	projects/external/gtkmm-vc90-2_4.vsprops		\
-	projects/external/gtkmm-vc90-d-2_4.vsprops		\
-	projects/mandy/mandy.vcproj				\
-	projects/fixed64test/fixed64test.vcproj mandy.sln
+noinst_PROGRAMS=mandy.fcgi
+mandy_fcgi_SOURCES=mfcgi.cc mfcgi.h process.cc
+AM_CPPFLAGS=-I${top_srcdir}/lib
+AM_CXXFLAGS=$(gdkpixbuf_CFLAGS)
+LDADD=../lib/libmandy.a $(gdkpixbuf_LIBS)

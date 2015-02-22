@@ -26,6 +26,8 @@ AC_PROG_RANLIB
 AM_PROG_AR
 AC_SET_MAKE
 PKG_CHECK_MODULES([gtkmm], [gtkmm-2.4])
+PKG_CHECK_MODULES([gdkpixbuf], [gdk-pixbuf-2.0])
+AC_CHECK_LIB([fcgi],[FCGX_Init])
 AC_CHECK_HEADERS([unistd.h inttypes.h getopt.h])
 AC_CHECK_FUNCS([sysconf strtold])
 AC_DEFINE([_GNU_SOURCE], [1], [use GNU extensions])
@@ -88,5 +90,5 @@ AH_BOTTOM([#ifdef __GNUC__
 # define attribute(x)
 #endif])
 
-AC_CONFIG_FILES([Makefile lib/Makefile images/Makefile gtkui/Makefile])
+AC_CONFIG_FILES([Makefile lib/Makefile images/Makefile web/Makefile gtkui/Makefile])
 AC_OUTPUT

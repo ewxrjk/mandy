@@ -41,3 +41,4 @@ ipch
 TestResults
 *.log
 *.trs
+web/mandy.fcgi
