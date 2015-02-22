@@ -17,3 +17,4 @@ mandy_fcgi_SOURCES=mfcgi.cc mfcgi.h process.cc
 AM_CPPFLAGS=-I${top_srcdir}/lib
 AM_CXXFLAGS=$(gdkpixbuf_CFLAGS)
 LDADD=../lib/libmandy.a $(gdkpixbuf_LIBS)
+EXTRA_DIST=mandy.html mandy.css mandy.js
