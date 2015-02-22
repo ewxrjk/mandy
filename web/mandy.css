@@ -5,3 +5,17 @@ html, body {
     height: 100%;
     overflow: hidden;
 }
+
+canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+#m {
+    z-index: 0;
+}
+
+#u {
+    z-index: 1;
+}

@@ -11,38 +11,39 @@ window.onload = function() {
 
     dragging=false;
     generation=0;
-    canvas = document.getElementById('m');
+    mcanvas = document.getElementById('m');
+    ucanvas = document.getElementById('u');
     cache={};
     queue=[];
-    ctx = canvas.getContext('2d');
-    ctx.font='12px serif';
+    mctx = mcanvas.getContext('2d');
+    uctx = ucanvas.getContext('2d');
 
     resize();
     compute();
     render(x, y);
     run_queue(16);
 
-    canvas.addEventListener("mousedown", mousedown);
-    canvas.addEventListener("mouseup", mouseup);
-    canvas.addEventListener("mousemove", mousemove);
-    canvas.addEventListener("mouseleave", mouseleave);
-    canvas.addEventListener("dblclick", dblclick);
-    canvas.addEventListener("wheel", wheel);
+    ucanvas.addEventListener("mousedown", mousedown);
+    ucanvas.addEventListener("mouseup", mouseup);
+    ucanvas.addEventListener("mousemove", mousemove);
+    ucanvas.addEventListener("mouseleave", mouseleave);
+    ucanvas.addEventListener("dblclick", dblclick);
+    ucanvas.addEventListener("wheel", wheel);
     window.onresize = window_resized;
     window.setInterval(prune, prune_interval * 1000)
 }
 
 // Adjust the canvas to match the containing window
 function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    ucanvas.width = mcanvas.width = window.innerWidth;
+    ucanvas.height = mcanvas.height = window.innerHeight;
 }
 
 // Compute useful things
 function compute() {
     // Find the canvas size
-    w = canvas.width;
-    h = canvas.height;
+    w = mcanvas.width;
+    h = mcanvas.height;
     // Find the size in complex plane units
     if(w >= h) {
         // Wider than high (or equal).  Treat s as the height.
@@ -86,8 +87,9 @@ function render(ccx, ccy) {
     // Start a new generation
     ++generation;
     if(debug > 1) {
-        ctx.fillStyle='#00ffff';
-        ctx.fillRect(0, 0, w, h);
+        mctx.fillStyle='#00ffff';
+        mctx.fillRect(0, 0, w, h);
+        mctx.font="12px serif";
     }
     // Visit every square in the grid in any old order
     jobs = []
@@ -96,10 +98,10 @@ function render(ccx, ccy) {
             py = h - pyr - pstep;
             if(debug > 1) {
                 console.log("px: ", px, " py: ", py, " cx: ", cx, " cy: ", cy);
-                ctx.fillStyle='rgb('+n+','+n+','+n+')';
-                ctx.fillRect(px, py, pstep, pstep);
-                ctx.fillStyle='#ff0000'
-                ctx.fillText(cx + "," + cy, px + 2, py + 18);
+                mctx.fillStyle='rgb('+n+','+n+','+n+')';
+                mctx.fillRect(px, py, pstep, pstep);
+                mctx.fillStyle='#ff0000'
+                mctx.fillText(cx + "," + cy, px + 2, py + 18);
                 n = (n + 4) % 256;
             }
             job = [x,y,cx,cy,px,py,ccx,ccy,cstep,pstep,generation]
@@ -108,6 +110,19 @@ function render(ccx, ccy) {
     }
     jobs.sort(comparator)
     queue = queue.concat(jobs)
+    annotate();
+}
+
+function annotate() {
+    uctx.font="12px serif";
+    uctx.fillStyle = '#ffffff';
+    uctx.fillRect(w - 128,
+                  h - 64,
+                  128, 64);
+    uctx.fillStyle = '#000000';
+    uctx.fillText("x: " + x, w - 128 + 4, h - 64 + 4 + 16);
+    uctx.fillText("y: " + y, w - 128 + 4, h - 64 + 4 + 32);
+    uctx.fillText("s: " + s, w - 128 + 4, h - 64 + 4 + 48);
 }
 
 // Run the queue
@@ -148,12 +163,12 @@ function run(job) {
         var img = url in cache ? cache[url] : new Image();
         img.used = new Date().valueOf();
         if(img.src !== "" && img.complete)
-            ctx.drawImage(img, px, py);
+            mctx.drawImage(img, px, py);
         else {
             cache[url] = img;
             img.addEventListener("load", function() {
                 if(gen === generation) {
-                    ctx.drawImage(img, px, py);
+                    mctx.drawImage(img, px, py);
                     run_queue(1);
                 } else if(debug > 1)
                     console.log("late skip at", px, py);
