@@ -8,7 +8,6 @@ window.onload = function() {
     prune_timeout = 5 * 60;
     prune_interval = 60;
     queue_latency_ms = 10;
-    active_max = 4;
 
     dragging=false;
     generation=0;
@@ -21,7 +20,7 @@ window.onload = function() {
     resize();
     compute();
     render(x, y);
-    run_queue();
+    run_queue(16);
 
     canvas.addEventListener("mousedown", mousedown);
     canvas.addEventListener("mouseup", mouseup);
@@ -112,7 +111,7 @@ function render(ccx, ccy) {
 }
 
 // Run the queue
-function run_queue() {
+function run_queue(active_max) {
     var job;
     if(queue.length > 0) {
         active = 0;
@@ -125,7 +124,6 @@ function run_queue() {
         }
         if(debug && early_skip > 0)
             console.log("early skip", early_skip);
-        run_queue_soon();
     }
 }
 
@@ -134,7 +132,9 @@ function run_queue_soon() {
     if(queue.length > 0) {
         if(debug)
             console.log("deferring queue run", queue.length);
-        window.setTimeout(run_queue, queue_latency_ms);
+        window.setTimeout(function() {
+            run_queue(16);
+        }, queue_latency_ms);
     }
 }
 
@@ -154,6 +154,7 @@ function run(job) {
             img.addEventListener("load", function() {
                 if(gen === generation) {
                     ctx.drawImage(img, px, py);
+                    run_queue(1);
                 } else if(debug > 1)
                     console.log("late skip at", px, py);
             }, false);
