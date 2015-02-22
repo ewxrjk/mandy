@@ -201,10 +201,10 @@ int Fixed128_str2(struct Fixed128 *r, const char *start, char **endptr) {
       ++s;
       expsign = 1;
     }
-    if(isdigit((unsigned char)*s))
+    if(!isdigit((unsigned char)*s))
       goto noconversion;                /* must be at least 1 digit */
     while(isdigit((unsigned char)*s))
-      exponent = 10 * exponent + *s - '0';
+      exponent = 10 * exponent + *s++ - '0';
     if(expsign)
       exponent = -exponent;
     scale += exponent;
