@@ -20,6 +20,11 @@
 
 #if !HAVE_ASM_128
 void Fixed128_add(struct Fixed128 *r, const struct Fixed128 *a, const struct Fixed128 *b) {
+#if HAVE___INT128
+  unsigned __int128 aa = *(unsigned __int128 *)a;
+  unsigned __int128 bb = *(unsigned __int128 *)b;
+  *(unsigned __int128 *)r = aa + bb;
+#else
   uint64_t s = 0;
   int n;
 
@@ -28,9 +33,15 @@ void Fixed128_add(struct Fixed128 *r, const struct Fixed128 *a, const struct Fix
     r->word[n] = (uint32_t)s;
     s >>= 32;
   }
+#endif
 }
 
 void Fixed128_sub(struct Fixed128 *r, const struct Fixed128 *a, const struct Fixed128 *b) {
+#if HAVE___INT128
+  unsigned __int128 aa = *(unsigned __int128 *)a;
+  unsigned __int128 bb = *(unsigned __int128 *)b;
+  *(unsigned __int128 *)r = aa - bb;
+#else
   uint64_t s = 1;
   int n;
 
@@ -39,18 +50,23 @@ void Fixed128_sub(struct Fixed128 *r, const struct Fixed128 *a, const struct Fix
     r->word[n] = (uint32_t)s;
     s >>= 32;
   }
+#endif
 }
 
 int Fixed128_neg(struct Fixed128 *r, const struct Fixed128 *a) {
+  uint32_t sign = a->word[NFIXED128 - 1] & 0x80000000;
+#if HAVE___INT128
+  *(unsigned __int128 *)r = -*(unsigned __int128 *)a;
+#else
   uint64_t s = 1;
   int n;
-  uint32_t sign = a->word[NFIXED128 - 1] & 0x80000000;
 
   for(n = 0; n < NFIXED128; ++n) {
     s = s + (a->word[n] ^ 0xFFFFFFFF);
     r->word[n] = (uint32_t)s;
     s >>= 32;
   }
+#endif
   if(sign && (r->word[NFIXED128 - 1] & 0x80000000))
     return 1;
   else
