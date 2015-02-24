@@ -54,7 +54,9 @@ int main(int argc, char **argv) {
   FCGX_ParamArray envp;
   int count = 1;
 
+#ifndef GLIB_VERSION_2_36       // deprecation warning from then on
   g_type_init();
+#endif
   
   try {
     while((n = getopt_long(argc, argv, "hVt:Hn:", options, NULL)) >= 0) {
