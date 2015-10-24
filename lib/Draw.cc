@@ -272,7 +272,7 @@ int dive(const char *wstr,
   }
   std::string command;
   command += shellQuote(get_default("FFMPEG", ffmpegDefault()));
-  command += " -f image2 -i "TMP_PATTERN;
+  command += " -f image2 -i " TMP_PATTERN;
   command += " -vcodec ";
   command += get_default("CODEC", "mpeg4"); 
   command += " -r ";
