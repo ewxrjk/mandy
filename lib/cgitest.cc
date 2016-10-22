@@ -17,6 +17,7 @@
 #include "cgi.h"
 #include <cstdio>
 #include <stdexcept>
+#include <climits>
 
 static int errors;
 
@@ -52,9 +53,14 @@ int main() {
   ASSERT_THROWS(unhex('f'+1));
   ASSERT_THROWS(unhex('A'-1));
   ASSERT_THROWS(unhex('F'+1));
-  ASSERT_THROWS(unhex(128));
-  ASSERT_THROWS(unhex('0'|128));
-  ASSERT_THROWS(unhex('a'|128));
+#if CHAR_MIN==0                 // placate picky compiler
+#define ONE_TWO_EIGHT 128
+#else
+#define ONE_TWO_EIGHT (-128)
+#endif
+  ASSERT_THROWS(unhex(ONE_TWO_EIGHT));
+  ASSERT_THROWS(unhex('0'|ONE_TWO_EIGHT));
+  ASSERT_THROWS(unhex('a'|ONE_TWO_EIGHT));
 
   //TODO more needed here
 
