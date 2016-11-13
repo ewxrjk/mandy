@@ -35,14 +35,11 @@ AC_CHECK_FUNCS([sysconf strtold])
 AC_CHECK_TYPES([__int128])
 AC_DEFINE([_GNU_SOURCE], [1], [use GNU extensions])
 if test "x$GXX" = xyes; then
-  CXX="$CXX -Wall -W -Werror -Wpointer-arith -Wwrite-strings"
-  # gtkmm pkg-config forces C++11, and you can't compile C++11/C++3
-  # together if LTO (and possibly can't mix them safely even
-  # without?), so force C++11 throughout.
-  CXX="$CXX -std=c++11"
+  CXXFLAGS="$CXXFLAGS -Wall -W -Werror -Wpointer-arith -Wwrite-strings"
+  CXXFLAGS="$CXXFLAGS -std=c++11"
 fi
 if test "x$GCC" = xyes; then
-  CC="$CC -Wall -W -Werror -Wpointer-arith -Wwrite-strings"
+  CFLAGS="$CFLAGS -Wall -W -Werror -Wpointer-arith -Wwrite-strings"
 fi
 
 AC_DEFINE_UNQUOTED([ARITH_DEFAULT],[arith_double],[default precision])
