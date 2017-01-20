@@ -257,7 +257,7 @@ iterloop:
 	// Compute zx^2
 	mov	r14,r8
 	mov	r15,r9
-	mov	rbp,0x4000000000
+	movabs	rbp,0x4000000000
 	call	square
 	// Compute zy^2
 	mov	r14,r10

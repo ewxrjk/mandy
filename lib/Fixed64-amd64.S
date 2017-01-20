@@ -100,7 +100,7 @@ SYMBOL(Fixed64_iterate):
 	push	r15
 	mov	r14,rdx
 	mov	rbx,0
-	mov	r15,0x0040000000000000
+	movabs	r15,0x0040000000000000
 	.align	4
 1:
 	// We keep z^2 in 16.112 format, since it may overflow 8.56
@@ -137,15 +137,15 @@ SYMBOL(Fixed64_iterate):
 	cvtsi2sd	xmm1,rax
 	// rdx had units at bit 2*56-64=48, so it needs to be
 	// "shifted right" by 48 bits.
-	mov	r15,0x3CF0000000000000
-	movd	xmm2,r15
+	movabs	r15,0x3CF0000000000000
+	movq	xmm2,r15
 	mulsd	xmm0,xmm2
 	// rax is a further 64 bits down
-	mov	r15,0x38F0000000000000
-	movd	xmm2,r15
+	movabs	r15,0x38F0000000000000
+	movq	xmm2,r15
 	mulsd	xmm1,xmm2
 	addsd	xmm0,xmm1
-	movd	qword ptr [r8],xmm0
+	movq	qword ptr [r8],xmm0
 6:
 	mov	rax,rbx		// Return iteration count
 	pop	r15
