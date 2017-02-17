@@ -26,25 +26,6 @@ INSTALL_PROGRAM=$(INSTALL) -p -o root -g root -m 755
 INSTALL_SCRIPT=$(INSTALL) -p -o root -g root -m 755
 MKDIR=mkdir -p -m 755
 
-# Set DEB_BUILD_OPTIONS=noopt to produce a non-optimized build.
-ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
-CXXFLAGS=-O0 -g
-else
-CXXFLAGS=-O2 -g
-endif
-export CXXFLAGS
-
-# Set DEB_BUILD_OPTIONS=nostrip to install debuggable executables.
-ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
-INSTALL_PROGRAM += -s
-endif
-
-# Set DEB_BUILD_OPTIONS=parallel=N to do make -jN
-ifneq (,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
-NUMJOBS = $(patsubst parallel=%,%,$(filter parallel=%,$(DEB_BUILD_OPTIONS)))
-PARALLEL = -j$(NUMJOBS)
-endif
-
 export INSTALL_DATA
 export INSTALL_SCRIPT
 export INSTALL_PROGRAM
@@ -64,7 +45,7 @@ binary-arch: pkg-mandy
 binary-indep:
 
 clean:
-	test -f Makefile && $(MAKE) distclean
+	-test -f Makefile && $(MAKE) distclean
 	rm -f config.cache
 	rm -f debian/files
 	rm -f debian/substvars.*
