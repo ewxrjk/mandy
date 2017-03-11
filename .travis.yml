@@ -1,0 +1,22 @@
+dist: trusty
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - gcc-6
+    - g++-6
+    - libgtkmm-2.4-dev
+    - libglibmm-2.4-dev
+    - libgtk2.0-dev
+    - pkg-config
+language: cpp
+compiler:
+- gcc
+
+# glibmm currently uses deprecated std::auto_ptr<>, hence flags.
+script:
+- ./autogen.sh
+- ./configure CC=gcc-6 CXX=g++-6 CXXFLAGS="-Wno-error=deprecated-declarations"
+- make
+- VERBOSE=true make check
