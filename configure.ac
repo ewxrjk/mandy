@@ -35,11 +35,11 @@ AC_CHECK_FUNCS([sysconf strtold])
 AC_CHECK_TYPES([__int128])
 AC_DEFINE([_GNU_SOURCE], [1], [use GNU extensions])
 if test "x$GXX" = xyes; then
-  CXXFLAGS="$CXXFLAGS -Wall -W -Werror -Wpointer-arith -Wwrite-strings"
-  CXXFLAGS="$CXXFLAGS -std=c++11"
+  CXXFLAGS="-Wall -W -Werror -Wpointer-arith -Wwrite-strings $CXXFLAGS"
+  CXXFLAGS="-std=c++11 $CXXFLAGS"
 fi
 if test "x$GCC" = xyes; then
-  CFLAGS="$CFLAGS -Wall -W -Werror -Wpointer-arith -Wwrite-strings"
+  CFLAGS="-Wall -W -Werror -Wpointer-arith -Wwrite-strings $CFLAGS"
 fi
 
 AC_DEFINE_UNQUOTED([ARITH_DEFAULT],[arith_double],[default precision])
