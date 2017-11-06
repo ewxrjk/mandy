@@ -37,7 +37,7 @@ AC_CHECK_TYPES([__int128])
 AC_DEFINE([_GNU_SOURCE], [1], [use GNU extensions])
 if test "x$GXX" = xyes; then
   CXXFLAGS="-Wall -W -Werror -Wpointer-arith -Wwrite-strings $CXXFLAGS"
-  CXXFLAGS="-std=c++11 $CXXFLAGS"
+  CXXFLAGS="-std=c++11 -Wno-c++14-extensions $CXXFLAGS"
 fi
 if test "x$GCC" = xyes; then
   CFLAGS="-Wall -W -Werror -Wpointer-arith -Wwrite-strings $CFLAGS"
