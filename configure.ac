@@ -15,6 +15,7 @@
 AC_INIT([mandy], [0.0.WIP], [rjk@greenend.org.uk])
 AC_CONFIG_AUX_DIR([config.aux])
 AM_INIT_AUTOMAKE([foreign])
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AC_CONFIG_SRCDIR([lib/MandelbrotJob.cc])
 AM_CONFIG_HEADER([config.h])
 AC_CANONICAL_HOST
