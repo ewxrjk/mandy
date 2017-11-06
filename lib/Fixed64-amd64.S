@@ -102,7 +102,7 @@ SYMBOL(Fixed64_iterate):
 	mov	rbx,0
 	movabs	r15,0x0040000000000000
 	.align	4
-1:
+iter1:
 	// We keep z^2 in 16.112 format, since it may overflow 8.56
 	mov	rax,rdi
 	imul	rdi		// rdx:rax = zx^2
@@ -126,7 +126,7 @@ SYMBOL(Fixed64_iterate):
 	lea	rdi,[r11+r14]	// zx = zx^2 - zy^2 + cx
 	inc	rbx
 	cmp	rbx,r9
-	jb	1b
+	jb	iter1
 	// Breached iteration limit
 	jmp	6f
 2:
