@@ -17,8 +17,11 @@
 #ifndef MENU_H
 #define MENU_H
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wparentheses"
 #include <gtkmm/menubar.h>
 #include <gtkmm/menuitem.h>
+#pragma GCC diagnostic pop
 
 namespace mmui {
 

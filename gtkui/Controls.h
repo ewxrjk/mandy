@@ -16,11 +16,14 @@
 #ifndef CONTROLS_H
 #define CONTROLS_H
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wparentheses"
 #include <gtkmm/label.h>
 #include <gtkmm/entry.h>
 #include <gtkmm/table.h>
 #include <gtkmm/filechooserbutton.h>
 #include <gtkmm/comboboxtext.h>
+#pragma GCC diagnostic pop
 
 namespace mmui {
 

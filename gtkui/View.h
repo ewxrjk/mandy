@@ -17,7 +17,10 @@
 #ifndef VIEW_H
 #define VIEW_H
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wparentheses"
 #include <gtkmm/drawingarea.h>
+#pragma GCC diagnostic pop
 #include "arith.h"
 
 class IterBuffer;
