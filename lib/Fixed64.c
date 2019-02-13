@@ -136,7 +136,7 @@ int Fixed128_to_Fixed64(Fixed64 *r, const struct Fixed128 *a) {
 
 void Fixed64_to_Fixed128(struct Fixed128 *r, Fixed64 a) {
   memset(r, 0, sizeof *r);
-  r->word[NFIXED128 - 1] = a >> 56;
+  r->word[NFIXED128 - 1] = (uint32_t)(a >> 56);
   r->word[NFIXED128 - 2] = (uint32_t)(a >> 24);
   r->word[NFIXED128 - 3] = (uint32_t)((uint64_t)a << 8);
 }
