@@ -39,9 +39,11 @@ if test "x$GXX" = xyes; then
   CXXFLAGS="-Wall -W -Werror -Wpointer-arith -Wwrite-strings $CXXFLAGS"
   CXXFLAGS="-std=c++11 -Wno-c++14-extensions $CXXFLAGS"
 fi
+CXXFLAGS="${CXXFLAGS} ${CXXFLAGS_EXTRA}"
 if test "x$GCC" = xyes; then
   CFLAGS="-Wall -W -Werror -Wpointer-arith -Wwrite-strings $CFLAGS"
 fi
+CFLAGS="${CFLAGS} ${CFLAGS_EXTRA}"
 
 AC_DEFINE_UNQUOTED([ARITH_DEFAULT],[arith_double],[default precision])
 

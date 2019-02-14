@@ -17,6 +17,6 @@ compiler:
 # glibmm currently uses deprecated std::auto_ptr<>, hence flags.
 script:
 - ./autogen.sh
-- ./configure CC=gcc-6 CXX=g++-6 CXXFLAGS="-Wno-error=deprecated-declarations"
+- CXXFLAGS_EXTRA="-Wno-error=deprecated-declarations" ./configure CC=gcc-6 CXX=g++-6
 - make
 - VERBOSE=true make check
