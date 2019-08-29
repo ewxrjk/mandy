@@ -94,7 +94,7 @@ void draw(int width, int height, arith_t x, arith_t y, arith_t radius,
 	  int maxiters, arith_type arith, const char *path) {
   const char *ext = strchr(path, '.');
   if(!ext)
-    fatal(0, "cannot figure out extension of '%s'", ext);
+    fatal(0, "cannot figure out extension of '%s'", path);
   const char *fileType = NULL;
   if(!strcasecmp(ext, ".png"))
     fileType = "png";
