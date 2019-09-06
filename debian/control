@@ -10,7 +10,7 @@ Homepage: http://www.greenend.org.uk/rjk/mandy/
 Package: mandy
 Architecture: any
 Section: graphics
-Priority: extra
+Priority: optional
 Depends: ${shlibs:Depends}
 Description: GTK+ program to draw images of the Mandelbrot set
  Use this program to navigate around the Mandelbrot set (or strictly
