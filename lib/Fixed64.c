@@ -117,7 +117,7 @@ Fixed64 Fixed64_sqrt(Fixed64 a) {
 }
 
 int Fixed128_to_Fixed64(Fixed64 *r, const struct Fixed128 *a) {
-  int32_t intpart = a->word[NFIXED128 - 1];
+  int32_t intpart = (int32_t)(a->word[NFIXED128 - 1]);
   uint64_t result;
   if(intpart > 127 || intpart < -128)
     return ERANGE;
@@ -130,7 +130,7 @@ int Fixed128_to_Fixed64(Fixed64 *r, const struct Fixed128 *a) {
       return ERANGE;
     ++result;
   }
-  *r = result;
+  *r = (Fixed64)result;
   return 0;
 }
 

@@ -29,7 +29,7 @@ typedef int64_t Fixed64;
   LIBMANDY_API Fixed64 Fixed64_sqrt(Fixed64 a);
 
   static inline Fixed64 Fixed64_int2(int i) {
-    return (uint64_t)i << 56;
+    return (Fixed64)((uint64_t)i << 56);
   }
 
   LIBMANDY_API char *Fixed64_2str(char buffer[], unsigned bufsize, Fixed64 a, int base);

@@ -54,7 +54,7 @@ extern "C" {
   LIBMANDY_API void Fixed128_shr_unsigned(struct Fixed128 *a);
 
   static inline int Fixed128_lt0(const struct Fixed128 *a) {
-    return a->word[NFIXED128 - 1] & 0x80000000;
+    return !!(a->word[NFIXED128 - 1] & 0x80000000);
   }
 
   static inline int Fixed128_ge0(const struct Fixed128 *a) {

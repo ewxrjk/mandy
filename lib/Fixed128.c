@@ -166,7 +166,7 @@ void Fixed128_divu(struct Fixed128 *r, const struct Fixed128 *a, unsigned u) {
 
 void Fixed128_int2(struct Fixed128 *r, int i) {
   int n;
-  r->word[NFIXED128 - 1] = i;
+  r->word[NFIXED128 - 1] = (uint32_t)i;
   for(n = NFIXED128 - 2; n >= 0; --n)
     r->word[n] = 0;
 }

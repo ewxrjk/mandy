@@ -172,7 +172,7 @@ int main() {
 #if HAVE_ASM_64
   // Mandelbrot computation
   cx = 0x00a6aaaaaaaaaaab;
-  cy = 0xfffd555555555555;
+  cy = (Fixed64)0xfffd555555555555;
 
   printf("cx:      "); printFixed(cx, "0.65104166666666667129259593593815225176513195037841796875"); putchar('\n');
   printf("cy:      "); printFixed(cy, "-0.01041666666666667129259593593815225176513195037841796875"); putchar('\n');
