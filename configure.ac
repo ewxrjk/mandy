@@ -38,7 +38,8 @@ AC_DEFINE([_GNU_SOURCE], [1], [use GNU extensions])
 if test "x$GXX" = xyes; then
   CXXFLAGS="-Wall -W -Werror -Wpointer-arith -Wwrite-strings $CXXFLAGS"
   CXXFLAGS="-std=c++11 -Wno-c++14-extensions $CXXFLAGS"
-  case "$CXX" in
+  compiler="$($CXX --version)"
+  case "$compiler" in
   *clang* )
     ;;
   * )
