@@ -377,6 +377,7 @@ namespace mmui {
     Gtk::Window *parent;
     do {
       w = w->get_parent();
+      assert(w);
     } while((parent = dynamic_cast<Gtk::Window *>(w)) == NULL);
     Gtk::FileChooserDialog chooser(*parent,
                                    "Save image",
