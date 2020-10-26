@@ -28,7 +28,7 @@
  * Some possibly-relevant rules:
  * - %rsp+8 points at arguments
  * - %rsp+8 mod 16 = 0
- * - %rsp-128 up to %rsp (red zone) is safe to use for temporaries
+ * - %rsp-128 up to %rsp (red zone) is safe to use for temporaries in leaf functions
  * - pointer arguments count as class INTEGER
  * - INTEGER arguments are passed in %rdi %rsi %rdx %rcx %r8 %r9
  *   (other classes get other registers)
@@ -212,14 +212,14 @@ SYMBOL(Fixed128_mul):
  * Outline register allocation (see code for more detail):
  *  rax, rdx       - destination for mul instruction
  *  rbx, rcx, rdi  - accumulator for multiplication
- *  [rsp-128]      - cx
- *  [rsp-112]      - cy
+ *  [rsp+0]      - cx
+ *  [rsp+16]      - cy
  *  r8,r9          - zx
  *  r10,r11        - zy
  *  r12,r13        - zx^2
  *  r14,r15        - zy^2 + input to square routine
  *  rsi            - iterations
- *  [rsp-88]       - maxiters
+ *  [rsp+32]       - maxiters
  *  rbp            - sign of zx*zy
  */
 	.align	4
@@ -234,17 +234,18 @@ SYMBOL(Fixed128_iterate):
 	push	r15
 	push	rsi
 	push	rdi
+	sub		rsp,48
 	// Store maxiters in the red zone
-	mov	[rsp-88],r8
+	mov	[rsp+32],r8
 	// Ditto cx/cy
 	mov	rax,[rdx]
-	mov	[rsp-128],rax
+	mov	[rsp+0],rax
 	mov	rax,[rdx+8]
-	mov	[rsp-120],rax	// [rsp-128] = cx
+	mov	[rsp+8],rax	// [rsp+0] = cx
 	mov	rax,[rcx]
-	mov	[rsp-112],rax
+	mov	[rsp+16],rax
 	mov	rax,[rcx+8]
-	mov	[rsp-104],rax	// [rsp-112] = cy
+	mov	[rsp+24],rax	// [rsp+16] = cy
 	// Load initial zx/zy
 	mov	r9,[rdi]
 	mov	r8,[rdi+8]
@@ -332,13 +333,13 @@ iterloop:
 3:
 	// Now we have rbx,rcx = 2.zx.zy
 	// Let zy=r10,r11=2.zx.zy+cy
-	mov	r11,[rsp-112]
-	mov	r10,[rsp-104]
+	mov	r11,[rsp+16]
+	mov	r10,[rsp+24]
 	add	r11,rcx
 	adc	r10,rbx
 	// Let zy=r8,r9=zx^2-zy^2+cx
-        mov     r9,[rsp-128]
-        mov     r8,[rsp-120]
+        mov     r9,[rsp+0]
+        mov     r8,[rsp+8]
 	add	r9,r13
 	adc	r8,r12
 	sub	r9,r15
@@ -346,7 +347,7 @@ iterloop:
 	// Increment iteration count
 	inc	rsi
 	// Only go back round the loop if not too big
-	cmp	rsi,[rsp-88]
+	cmp	rsi,[rsp+32]
 	.att_syntax // hack to work around bizarre bug in apple assembler
 	jb	iterloop
 	.intel_syntax noprefix
@@ -354,6 +355,7 @@ escaped:
         // Retrieve iteration count
 	mov	rax,rsi
 	// Return r^2 in the first argument (rather idiosyncratic)
+	add rsp,48
 	pop	rdi
 	pop	rsi
 	mov	[rdi],rcx
