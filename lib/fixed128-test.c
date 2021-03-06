@@ -24,10 +24,7 @@ static int errors;
 
 static void printFixed128(const struct Fixed128 *f, const char *expect) {
   char buffer[128];
-  int n;
-  printf("%08x.%08x", f->word[NFIXED128-1], f->word[NFIXED128-2]);
-  for(n = NFIXED128-3; n >= 0; --n)
-    printf(" %08x", f->word[n]);
+  printf("%08x.%08x %08x %08x", f->word[NFIXED128-1], f->word[NFIXED128-2], f->word[NFIXED128-3], f->word[NFIXED128-4]);
   printf(" =%s", Fixed128_2str(buffer, sizeof buffer, f, 10));
   if(strcmp(buffer, expect)) {
     printf("<EXPECTED %s>", expect);

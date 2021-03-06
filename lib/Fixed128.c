@@ -275,9 +275,9 @@ void Fixed128_shr_unsigned(struct Fixed128 *a) {
 
 void Fixed128_setbit(struct Fixed128 *a, int bit) {
   if(bit >= 0)
-    a->word[NFIXED128-1] |= 1 << bit;
+    a->word[NFIXED128-1] |= (uint32_t)1 << bit;
   else {
-    // bits -1..-32 are te first word; -33..-64 the second; etc.
+    // bits -1..-32 are the first word; -33..-64 the second; etc.
     int word = NFIXED128 - 2 - -(bit+1) / 32;
     bit = bit & 31;
     a->word[word] |= (uint32_t)1 << bit;
