@@ -17,9 +17,7 @@
 #include "MandelbrotJob.h"
 #include "Color.h"
 
-void process_query(const char *query,
-                   GdkPixbufSaveFunc writer,
-                   gpointer wdata,
+void process_query(const char *query, GdkPixbufSaveFunc writer, gpointer wdata,
                    bool header) {
   IterBuffer *ib = NULL;
   GdkPixbuf *pixbuf = NULL;
@@ -29,14 +27,10 @@ void process_query(const char *query,
     int w = 64, h = 64, m = 255;
     arith_t x = -2, y = -1.25, s = 2.5;
     const struct param_def params[] = {
-      { "w", param_int_positive, &w },
-      { "h", param_int_positive, &h },
-      { "m", param_int_positive, &m },
-      { "x", param_arith, &x },
-      { "y", param_arith, &y },
-      { "s", param_arith_positive, &s },
-      { "t", param_int, &t },
-      { 0, 0, 0 },
+        {"w", param_int_positive, &w}, {"h", param_int_positive, &h},
+        {"m", param_int_positive, &m}, {"x", param_arith, &x},
+        {"y", param_arith, &y},        {"s", param_arith_positive, &s},
+        {"t", param_int, &t},          {0, 0, 0},
     };
     parse_query(query, params);
     if(t < 0 || t >= arith_limit)
@@ -59,7 +53,7 @@ void process_query(const char *query,
     mj.h = h;
     mj.arith = static_cast<arith_type>(t);
     mj.work();
-    
+
     if(!(pixbuf = gdk_pixbuf_new(GDK_COLORSPACE_RGB, FALSE, 8, w, h)))
       throw std::runtime_error("insufficient memory");
 
@@ -84,25 +78,21 @@ void process_query(const char *query,
 
     if(header) {
       static const char http_header[] =
-        "Content-Type: image/png\r\n"
-        "Cache-Control: s-maxage=3600,max-age=3600\r\n" // TODO could ask for more
-        "\r\n";
+          "Content-Type: image/png\r\n"
+          "Cache-Control: s-maxage=3600,max-age=3600\r\n" // TODO could ask for
+                                                          // more
+          "\r\n";
       writer(http_header, strlen(http_header), NULL, wdata);
     }
-    gboolean rc = gdk_pixbuf_save_to_callback(pixbuf,
-                                              writer,
-                                              wdata,
-                                              "png",
-                                              NULL,
-                                              "compression", "9",
-                                              (char *)NULL);
+    gboolean rc = gdk_pixbuf_save_to_callback(
+        pixbuf, writer, wdata, "png", NULL, "compression", "9", (char *)NULL);
     if(!rc)
       throw std::runtime_error("gdk_pixbuf_save_to_callback failed");
     ib->release();
     ib = NULL;
     g_object_unref(pixbuf);
     pixbuf = NULL;
-  
+
   } catch(std::runtime_error &e) {
     if(ib)
       ib->release();

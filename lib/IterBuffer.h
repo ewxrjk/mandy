@@ -24,6 +24,7 @@ class IterBuffer {
   ATOMIC_TYPE refs;
   void finished();
   ~IterBuffer();
+
 public:
   // Construct a new IterBuffer with a given size.  The initial refcount is 1.
   IterBuffer(int w, int h);

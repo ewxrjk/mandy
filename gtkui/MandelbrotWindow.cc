@@ -23,17 +23,17 @@
 
 namespace mmui {
 
-  MandelbrotWindow::MandelbrotWindow() {
-    Initialize(&view);
-    set_title("mandy");
-    show_all();
-  }
-
-  bool MandelbrotWindow::close() {
-    exit(0);
-  }
-
+MandelbrotWindow::MandelbrotWindow() {
+  Initialize(&view);
+  set_title("mandy");
+  show_all();
 }
+
+bool MandelbrotWindow::close() {
+  exit(0);
+}
+
+} // namespace mmui
 
 /*
 Local Variables:

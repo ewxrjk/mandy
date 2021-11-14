@@ -26,10 +26,8 @@ std::string fixed64::toString(int base) const {
 
 std::string fixed64::toHex() const {
   char buffer[32];
-  sprintf(buffer, "%02x.%06x%08x",
-          (unsigned char)(f >> 56),
-          (unsigned)(f >> 32) & 0x00FFFFFF,
-          (unsigned)f);
+  sprintf(buffer, "%02x.%06x%08x", (unsigned char)(f >> 56),
+          (unsigned)(f >> 32) & 0x00FFFFFF, (unsigned)f);
   return buffer;
 }
 

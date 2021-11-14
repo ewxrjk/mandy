@@ -31,12 +31,10 @@ struct comparator {
 };
 
 IterBuffer *FractalJob::recompute(arith_t cx, arith_t cy, arith_t r,
-				  int maxiters, int w, int h,
-                                  arith_type arith,
-				  void (*completion_callback)(Job *, void *),
-				  void *completion_data,
-				  int xpos, int ypos,
-				  const FractalJobFactory *factory) {
+                                  int maxiters, int w, int h, arith_type arith,
+                                  void (*completion_callback)(Job *, void *),
+                                  void *completion_data, int xpos, int ypos,
+                                  const FractalJobFactory *factory) {
   IterBuffer *dest = new IterBuffer(w, h);
   // Set everything to 'unknown'
   memset(dest->data, 0xFF, dest->w * dest->h * sizeof(int));

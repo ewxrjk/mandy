@@ -24,9 +24,9 @@ struct param_def {
 
 void parse_query(const char *query, const struct param_def *params);
 void parse_query_one(const char *start, const char *end,
-                            const struct param_def *params);
-const char *urldecode(const char *start, const char *end,
-                      char *v, size_t vsize, int name);
+                     const struct param_def *params);
+const char *urldecode(const char *start, const char *end, char *v, size_t vsize,
+                      int name);
 int unhex(char ch);
 void param_string(void *target, const char *value);
 void param_int(void *target, const char *value);

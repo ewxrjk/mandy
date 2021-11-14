@@ -20,22 +20,23 @@
 
 namespace mmui {
 
-  // The main window's control panel
-  class ControlPanel: public ControlContainer {
-    View *view;
-    RealControl xcenter_control, ycenter_control, radius_control;
-    IntegerControl maxiters_control;
-    RealControl xpointer_control, ypointer_control, count_control;
-    DropDownControl arith_control;
-  public:
-    ControlPanel(View *);
+// The main window's control panel
+class ControlPanel: public ControlContainer {
+  View *view;
+  RealControl xcenter_control, ycenter_control, radius_control;
+  IntegerControl maxiters_control;
+  RealControl xpointer_control, ypointer_control, count_control;
+  DropDownControl arith_control;
 
-    void Activated();                   // someone hit ENTER
+public:
+  ControlPanel(View *);
 
-    void controlChanged(Control *);     // some control changed value
-  };
+  void Activated(); // someone hit ENTER
 
-}
+  void controlChanged(Control *); // some control changed value
+};
+
+} // namespace mmui
 
 #endif /* CONTROLPANEL_H */
 

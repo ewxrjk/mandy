@@ -17,9 +17,8 @@
 #include "IterBuffer.h"
 #include <cstring>
 
-IterBuffer::IterBuffer(int w_, int h_): refs(1),
-					w(w_), h(h_),
-					data(new count_t[w * h]) {
+IterBuffer::IterBuffer(int w_, int h_):
+    refs(1), w(w_), h(h_), data(new count_t[w * h]) {
   memset(data, 0, w * h * sizeof(int));
 }
 

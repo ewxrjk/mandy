@@ -21,20 +21,21 @@
 
 static int errors;
 
-#define ASSERT(expr) (void)(expr ? 0 :                  \
-    (++errors,                                          \
-     fprintf(stderr, "%s:%d: assertion failed: %s\n",   \
-             __FILE__, __LINE__, #expr)))
+#define ASSERT(expr)                                                           \
+  (void)(expr ? 0                                                              \
+              : (++errors, fprintf(stderr, "%s:%d: assertion failed: %s\n",    \
+                                   __FILE__, __LINE__, #expr)))
 
-#define ASSERT_THROWS(expr) do {                        \
-  try {                                                 \
-    (void)(expr);                                       \
-    ++errors;                                           \
-    fprintf(stderr, "%s:%d: failed to throw: %s\n",     \
-            __FILE__, __LINE__, #expr);                 \
-  } catch(std::runtime_error &e) {                      \
-  }                                                     \
-} while(0)
+#define ASSERT_THROWS(expr)                                                    \
+  do {                                                                         \
+    try {                                                                      \
+      (void)(expr);                                                            \
+      ++errors;                                                                \
+      fprintf(stderr, "%s:%d: failed to throw: %s\n", __FILE__, __LINE__,      \
+              #expr);                                                          \
+    } catch(std::runtime_error & e) {                                          \
+    }                                                                          \
+  } while(0)
 
 int main() {
 
@@ -47,22 +48,22 @@ int main() {
 
   ASSERT_THROWS(unhex(-1));
   ASSERT_THROWS(unhex(0));
-  ASSERT_THROWS(unhex('0'-1));
-  ASSERT_THROWS(unhex('9'+1));
-  ASSERT_THROWS(unhex('a'-1));
-  ASSERT_THROWS(unhex('f'+1));
-  ASSERT_THROWS(unhex('A'-1));
-  ASSERT_THROWS(unhex('F'+1));
-#if CHAR_MIN==0                 // placate picky compiler
+  ASSERT_THROWS(unhex('0' - 1));
+  ASSERT_THROWS(unhex('9' + 1));
+  ASSERT_THROWS(unhex('a' - 1));
+  ASSERT_THROWS(unhex('f' + 1));
+  ASSERT_THROWS(unhex('A' - 1));
+  ASSERT_THROWS(unhex('F' + 1));
+#if CHAR_MIN == 0 // placate picky compiler
 #define ONE_TWO_EIGHT 128
 #else
 #define ONE_TWO_EIGHT (-128)
 #endif
   ASSERT_THROWS(unhex(ONE_TWO_EIGHT));
-  ASSERT_THROWS(unhex('0'|ONE_TWO_EIGHT));
-  ASSERT_THROWS(unhex('a'|ONE_TWO_EIGHT));
+  ASSERT_THROWS(unhex('0' | ONE_TWO_EIGHT));
+  ASSERT_THROWS(unhex('a' | ONE_TWO_EIGHT));
 
-  //TODO more needed here
+  // TODO more needed here
 
   printf("%d errors\n", errors);
   return !!errors;

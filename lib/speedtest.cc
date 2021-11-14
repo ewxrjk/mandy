@@ -35,8 +35,8 @@ int main(int argc, char **argv) {
     double seconds = (end - begin) / (double)CLOCKS_PER_SEC;
     double iterations = (double)repeats * maxiter;
     double ips = iterations / seconds;
-    printf("%12s %6gs; %g iterations; %10g iterations/second\n", 
-	   arith_names[t], seconds, iterations, ips);
+    printf("%12s %6gs; %g iterations; %10g iterations/second\n", arith_names[t],
+           seconds, iterations, ips);
   }
   return 0;
 }

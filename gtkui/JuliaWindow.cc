@@ -22,33 +22,34 @@
 
 namespace mmui {
 
-  JuliaWindow::JuliaWindow() {
-    Initialize(&view);
-    set_title("Julia Set");
-  }
+JuliaWindow::JuliaWindow() {
+  Initialize(&view);
+  set_title("Julia Set");
+}
 
-  bool JuliaWindow::close() {
-    hide();
-    return true;
-  }
+bool JuliaWindow::close() {
+  hide();
+  return true;
+}
 
-  JuliaView::JuliaView() {
-    SetJobFactory(&juliaJobFactory);
-  }
+JuliaView::JuliaView() {
+  SetJobFactory(&juliaJobFactory);
+}
 
-  void JuliaView::Update(arith_t x, arith_t y) {
-    if(juliaJobFactory.cx != x || juliaJobFactory.cy != y) {
-      juliaJobFactory.cx = x;
-      juliaJobFactory.cy = y;
-      NewLocation();
-      std::string xs = arith_traits<arith_t>::toString(x);
-      std::string ys = arith_traits<arith_t>::toString(x);
-      std::stringstream buffer;
-      buffer << "Julia set at " << xs << "+" << ys << "i";
-      dynamic_cast<Gtk::Window *>(get_parent()->get_parent())->set_title(buffer.str());
-    }
+void JuliaView::Update(arith_t x, arith_t y) {
+  if(juliaJobFactory.cx != x || juliaJobFactory.cy != y) {
+    juliaJobFactory.cx = x;
+    juliaJobFactory.cy = y;
+    NewLocation();
+    std::string xs = arith_traits<arith_t>::toString(x);
+    std::string ys = arith_traits<arith_t>::toString(x);
+    std::stringstream buffer;
+    buffer << "Julia set at " << xs << "+" << ys << "i";
+    dynamic_cast<Gtk::Window *>(get_parent()->get_parent())
+        ->set_title(buffer.str());
   }
 }
+} // namespace mmui
 
 /*
 Local Variables:

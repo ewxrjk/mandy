@@ -22,17 +22,17 @@
 
 namespace mmui {
 
-  class ControlPanel;
+class ControlPanel;
 
-  class JuliaView: public View {
-  public:
-    JuliaView();
-    JuliaJobFactory juliaJobFactory;
+class JuliaView: public View {
+public:
+  JuliaView();
+  JuliaJobFactory juliaJobFactory;
 
-    void Update(arith_t x, arith_t y);
-  };
+  void Update(arith_t x, arith_t y);
+};
 
-}
+} // namespace mmui
 
 #endif /* JULIAVIEW_H */
 

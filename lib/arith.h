@@ -44,7 +44,7 @@ extern LIBMANDY_API const char *const arith_names[];
 
 LIBMANDY_API arith_type string_to_arith(const std::string &s);
 
-template<typename T> class arith_traits {
+template <typename T> class arith_traits {
 public:
   static T maximum();
   static std::string toString(const T &n);
@@ -54,13 +54,13 @@ public:
   static count_t iterate(T zx, T zy, T cx, T cy, int maxiters);
 };
 
-template<typename T>
+template <typename T>
 count_t defaultIterate(T zx, T zy, T cx, T cy, int maxiters) {
   T r2, zx2, zy2;
   int iterations = 0;
   while(((r2 = (zx2 = zx * zx) + (zy2 = zy * zy)) < T(64))
         && iterations < maxiters) {
-    zy = T(2) * zx * zy  + cy;
+    zy = T(2) * zx * zy + cy;
     zx = zx2 - zy2 + cx;
     ++iterations;
   }
@@ -70,8 +70,7 @@ count_t defaultIterate(T zx, T zy, T cx, T cy, int maxiters) {
     return 1 + iterations - log2(log2(arith_traits<T>::toDouble(r2)));
 }
 
-template<>
-class arith_traits<double> {
+template <> class arith_traits<double> {
 public:
   static inline double maximum() {
     return HUGE_VAL;
@@ -97,18 +96,14 @@ public:
     return n;
   }
 
-  static count_t iterate(arith_t zx, arith_t zy,
-                         arith_t cx, arith_t cy, int maxiters) {
-    return defaultIterate(zx.toDouble(),
-                          zy.toDouble(),
-                          cx.toDouble(),
+  static count_t iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy,
+                         int maxiters) {
+    return defaultIterate(zx.toDouble(), zy.toDouble(), cx.toDouble(),
                           cy.toDouble(), maxiters);
   }
-
 };
 
-template<>
-class arith_traits<long double> {
+template <> class arith_traits<long double> {
 public:
   static inline long double maximum() {
 #ifdef HUGE_VALL
@@ -139,24 +134,19 @@ public:
     return n;
   }
 
-  static count_t iterate(arith_t zx, arith_t zy,
-                         arith_t cx, arith_t cy, int maxiters) {
-    return defaultIterate(zx.toLongDouble(), 
-                          zy.toLongDouble(),
-                          cx.toLongDouble(),
-                          cy.toLongDouble(),
-                          maxiters);
+  static count_t iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy,
+                         int maxiters) {
+    return defaultIterate(zx.toLongDouble(), zy.toLongDouble(),
+                          cx.toLongDouble(), cy.toLongDouble(), maxiters);
   }
-
 };
 
-template<>
-class arith_traits<fixed128> {
+template <> class arith_traits<fixed128> {
 public:
   static inline fixed128 maximum() {
     Fixed128 f;
     memset(f.word, 0xFF, sizeof f.word);
-    f.word[NFIXED128-1] = 0x7FFFFFFF;
+    f.word[NFIXED128 - 1] = 0x7FFFFFFF;
     return fixed128(f);
   }
 
@@ -176,7 +166,8 @@ public:
     return n.toDouble();
   }
 
-  static count_t iterate(fixed128 zx, fixed128 zy, fixed128 cx, fixed128 cy, int maxiters) {
+  static count_t iterate(fixed128 zx, fixed128 zy, fixed128 cx, fixed128 cy,
+                         int maxiters) {
 #if HAVE_ASM_128 && NFIXED128 == 4
     int rawCount = Fixed128_iterate(&zx.f, &zy.f, &cx.f, &cy.f, maxiters);
     if(rawCount == maxiters)
@@ -191,8 +182,7 @@ public:
   }
 };
 
-template<>
-class arith_traits<fixed64> {
+template <> class arith_traits<fixed64> {
 public:
   static inline fixed64 maximum() {
     fixed64 n;
@@ -237,9 +227,9 @@ LIBMANDY_API count_t iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy,
 
 // C#-friendly interface
 extern "C" {
-  LIBMANDY_API count_t iterate_cs(const Fixed128 *zx, const Fixed128 *zy,
-                                  const Fixed128 *cx, const Fixed128 *cy,
-                                  int maxiters, int arith);
+LIBMANDY_API count_t iterate_cs(const Fixed128 *zx, const Fixed128 *zy,
+                                const Fixed128 *cx, const Fixed128 *cy,
+                                int maxiters, int arith);
 }
 
 #endif /* ARITH_H */

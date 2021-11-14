@@ -27,233 +27,228 @@
 
 namespace mmui {
 
-  class ControlContainer;
-  class View;
+class ControlContainer;
+class View;
 
-  // A labelled item in a control container
+// A labelled item in a control container
+//
+// Every item has two associated mutable values:
+//   - The underlying value.  This is an object somewhere in the program.
+//   - The display value.  This is what the widget currently displays.
+//
+// The base class has no idea what types either of these values have (they
+// don't have to be the same).
+class Control {
+  // Caption
+  Gtk::Label label;
+
+public:
+  inline Control(ControlContainer *p): parent(p) {}
+
+  // Attach to parent container, with a caption
+  void Attach(int x, int y, const char *caption, int width = 1);
+
+  // Return true if the current setting is valid
+  // Default is to return true, i.e. all settings are valid
+  virtual bool DisplayIsValid() const;
+
+  // Update the display value
+  // Default is to do nothing(!)
+  virtual void UpdateDisplay();
+
+  // Update the underlying value
+  // Default is to do nothing(!)
+  virtual void UpdateUnderlying();
+
+  // Return the item widget
   //
-  // Every item has two associated mutable values:
-  //   - The underlying value.  This is an object somewhere in the program.
-  //   - The display value.  This is what the widget currently displays.
-  //
-  // The base class has no idea what types either of these values have (they
-  // don't have to be the same).
-  class Control {
-    // Caption
-    Gtk::Label label;
+  // (The implementations multiply inherit from the item widget to make it
+  // easy to supply virtual method overrides, but the base doesn't know about
+  // this.)
+  virtual Gtk::Widget *widget() = 0;
 
-  public:
-    inline Control(ControlContainer *p): parent(p) {}
+protected:
+  ControlContainer *parent;
+};
 
-    // Attach to parent container, with a caption
-    void Attach(int x, int y, const char *caption, int width = 1);
+// Drop-down in a control container
+class DropDownControl: public Control, public Gtk::ComboBoxText {
+  Gtk::Widget *widget();
 
-    // Return true if the current setting is valid
-    // Default is to return true, i.e. all settings are valid
-    virtual bool DisplayIsValid() const;
+  std::string *m_value;
 
-    // Update the display value
-    // Default is to do nothing(!)
-    virtual void UpdateDisplay();
-
-    // Update the underlying value
-    // Default is to do nothing(!)
-    virtual void UpdateUnderlying();
-
-    // Return the item widget
-    //
-    // (The implementations multiply inherit from the item widget to make it
-    // easy to supply virtual method overrides, but the base doesn't know about
-    // this.)
-    virtual Gtk::Widget *widget() = 0;
-  protected:
-    ControlContainer *parent;
-  };
-
-  // Drop-down in a control container
-  class DropDownControl: public Control, public Gtk::ComboBoxText {
-    Gtk::Widget *widget();
-
-    std::string *m_value;
-  public:
-    template<typename T>
-    DropDownControl(ControlContainer *p,
-                    std::string *value,
-                    const T &s, const T &e):
+public:
+  template <typename T>
+  DropDownControl(ControlContainer *p, std::string *value, const T &s,
+                  const T &e):
       Control(p),
       m_value(value) {
-      for(T it = s; it != e; ++it)
-        append_text(*it);
-      set_active_text(*value);
-    }
+    for(T it = s; it != e; ++it)
+      append_text(*it);
+    set_active_text(*value);
+  }
 
-    DropDownControl(ControlContainer *p,
-                    std::string *value):
-      Control(p),
-      m_value(value) {
-    }
+  DropDownControl(ControlContainer *p, std::string *value):
+      Control(p), m_value(value) {}
 
-    // Update the display value
-    void UpdateDisplay();
+  // Update the display value
+  void UpdateDisplay();
 
-    // Update the underlying value
-    void UpdateUnderlying();
+  // Update the underlying value
+  void UpdateUnderlying();
 
-    // Called when the contents changes.  Calls the parent's ControlChanged()
-    // method.
-    void on_changed();
+  // Called when the contents changes.  Calls the parent's ControlChanged()
+  // method.
+  void on_changed();
 
-    // Update contents
-    template<typename T>
-    void UpdateChoices(const T &s, const T &e) {
-      std::string setting = get_active_text();
-      clear();
-      for(T it = s; it != e; ++it)
-        append_text(*it);
-      set_active_text(setting);
-    }
-  };
+  // Update contents
+  template <typename T> void UpdateChoices(const T &s, const T &e) {
+    std::string setting = get_active_text();
+    clear();
+    for(T it = s; it != e; ++it)
+      append_text(*it);
+    set_active_text(setting);
+  }
+};
 
-  // Filename selector in a control container
-  class FileSelectionControl: public Control, public Gtk::FileChooserButton {
-    Gtk::Widget *widget();
+// Filename selector in a control container
+class FileSelectionControl: public Control, public Gtk::FileChooserButton {
+  Gtk::Widget *widget();
 
-    std::string *m_path;
-  public:
-    FileSelectionControl(ControlContainer *p,
-                         std::string *path,
-                         const Glib::ustring &title,
-                         Gtk::FileChooserAction action = Gtk::FILE_CHOOSER_ACTION_OPEN);
+  std::string *m_path;
 
-    // Update the display value
-    void UpdateDisplay();
+public:
+  FileSelectionControl(
+      ControlContainer *p, std::string *path, const Glib::ustring &title,
+      Gtk::FileChooserAction action = Gtk::FILE_CHOOSER_ACTION_OPEN);
 
-    // Update the underlying value
-    void UpdateUnderlying();
+  // Update the display value
+  void UpdateDisplay();
 
-    void on_file_set();
+  // Update the underlying value
+  void UpdateUnderlying();
 
-  };
+  void on_file_set();
+};
 
-  // Text edit/display entry in a control container
-  class TextEntryControl: public Control, public Gtk::Entry {
-    Gtk::Widget *widget();
-  public:
-    TextEntryControl(ControlContainer *p,
-                     bool editable_);
+// Text edit/display entry in a control container
+class TextEntryControl: public Control, public Gtk::Entry {
+  Gtk::Widget *widget();
 
-    // Overrides
+public:
+  TextEntryControl(ControlContainer *p, bool editable_);
 
-    // Called when user presses RETURN.  Calls the parent's
-    // ContainerActivated() method.
-    void on_activate();
+  // Overrides
 
-    // Called when the contents changes.  Calls the parent's ControlChanged()
-    // method.
-    void on_changed();
+  // Called when user presses RETURN.  Calls the parent's
+  // ContainerActivated() method.
+  void on_activate();
 
-    // Return true if current setting is valid
-    bool DisplayIsValid() const;
+  // Called when the contents changes.  Calls the parent's ControlChanged()
+  // method.
+  void on_changed();
 
-    // Update the display value.  Uses Render() to extract the new value and
-    // updates the Gtk::Entry.
-    void UpdateDisplay();
+  // Return true if current setting is valid
+  bool DisplayIsValid() const;
 
-    // Update the underlying value.
-    virtual void UpdateUnderlying();
+  // Update the display value.  Uses Render() to extract the new value and
+  // updates the Gtk::Entry.
+  void UpdateDisplay();
 
-    // Methods
+  // Update the underlying value.
+  virtual void UpdateUnderlying();
 
-    // Verify whether a proposed display value is good.
-    // Return true if S is valid, else false
-    virtual bool DisplayIsValid(const char *s) const = 0;
+  // Methods
 
-    // Set underlying value control from string S (which will be valid)
-    virtual void SetUnderlying(const char *s) = 0;
+  // Verify whether a proposed display value is good.
+  // Return true if S is valid, else false
+  virtual bool DisplayIsValid(const char *s) const = 0;
 
-    // Render the underlying value to string V in display format
-    virtual void Render(Glib::ustring &v) const = 0;
+  // Set underlying value control from string S (which will be valid)
+  virtual void SetUnderlying(const char *s) = 0;
 
-  };
+  // Render the underlying value to string V in display format
+  virtual void Render(Glib::ustring &v) const = 0;
+};
 
-  // Control which displays/accepts an integer within some range
-  class IntegerControl: public TextEntryControl {
-    int *value;
-    int min, max;
-  public:
-    IntegerControl(ControlContainer *p, int *v, int min_, int max_,
-                   bool editable_ = true):
+// Control which displays/accepts an integer within some range
+class IntegerControl: public TextEntryControl {
+  int *value;
+  int min, max;
+
+public:
+  IntegerControl(ControlContainer *p, int *v, int min_, int max_,
+                 bool editable_ = true):
       TextEntryControl(p, editable_),
-      value(v), min(min_), max(max_) {
-    }
-    bool DisplayIsValid(const char *s) const;
-    void SetUnderlying(const char *s);
-    void Render(Glib::ustring &) const;
-  };
+      value(v), min(min_), max(max_) {}
+  bool DisplayIsValid(const char *s) const;
+  void SetUnderlying(const char *s);
+  void Render(Glib::ustring &) const;
+};
 
-  // Control which displays/accepts a real within some range.
-  class RealControl: public TextEntryControl {
-    arith_t *value;
-    arith_t min, max;
-  public:
-    RealControl(ControlContainer *p, arith_t *v, arith_t min_, arith_t max_,
-                bool editable_ = true):
+// Control which displays/accepts a real within some range.
+class RealControl: public TextEntryControl {
+  arith_t *value;
+  arith_t min, max;
+
+public:
+  RealControl(ControlContainer *p, arith_t *v, arith_t min_, arith_t max_,
+              bool editable_ = true):
       TextEntryControl(p, editable_),
-      value(v), min(min_), max(max_) {
-    }
-    bool DisplayIsValid(const char *s) const;
-    void SetUnderlying(const char *);
-    void Render(Glib::ustring &) const;
-  };
+      value(v), min(min_), max(max_) {}
+  bool DisplayIsValid(const char *s) const;
+  void SetUnderlying(const char *);
+  void Render(Glib::ustring &) const;
+};
 
-  // Control which displays/accepts a string.
-  class StringControl: public TextEntryControl {
-    std::string *value;
-  public:
-    StringControl(ControlContainer *p, std::string *v, bool editable_ = true):
-      TextEntryControl(p, editable_), value(v) {
-    }
-    bool DisplayIsValid(const char *s) const;
-    void SetUnderlying(const char *);
-    void Render(Glib::ustring &) const;
-  };    
+// Control which displays/accepts a string.
+class StringControl: public TextEntryControl {
+  std::string *value;
 
-  // Container of controls
-  class ControlContainer: public Gtk::Table {
-  public:
-    // Collection of child controls
-    std::vector<Control *> controls;
+public:
+  StringControl(ControlContainer *p, std::string *v, bool editable_ = true):
+      TextEntryControl(p, editable_), value(v) {}
+  bool DisplayIsValid(const char *s) const;
+  void SetUnderlying(const char *);
+  void Render(Glib::ustring &) const;
+};
 
-    // Called when the user presses ENTER.  The underlying values will have
-    // been set to their displayed values.  The default does nothing.
-    virtual void Activated();
+// Container of controls
+class ControlContainer: public Gtk::Table {
+public:
+  // Collection of child controls
+  std::vector<Control *> controls;
 
-    // Called when the user presses ENTER.  If all displayed values are valid
-    // the sets the underlying values and calls Activated().  Otherwise beeps
-    // and returns.
-    void ContainerActivated();
+  // Called when the user presses ENTER.  The underlying values will have
+  // been set to their displayed values.  The default does nothing.
+  virtual void Activated();
 
-    // Called when at least one underlying value has been changed.  Calls the
-    // UPdate methods on the child controls.
-    void UpdateDisplay();
+  // Called when the user presses ENTER.  If all displayed values are valid
+  // the sets the underlying values and calls Activated().  Otherwise beeps
+  // and returns.
+  void ContainerActivated();
 
-    // Attach a child control to this container.
-    void Attach(TextEntryControl *c) {
-      controls.push_back(c);
-    }
+  // Called when at least one underlying value has been changed.  Calls the
+  // UPdate methods on the child controls.
+  void UpdateDisplay();
 
-    // Return true if all displayed values are valid
-    bool allDisplaysValid() const;
+  // Attach a child control to this container.
+  void Attach(TextEntryControl *c) {
+    controls.push_back(c);
+  }
 
-    // Called when a child control's displayed value changes.  The underlying
-    // value will not have been set and the displayed value may be invalid!
-    virtual void controlChanged(Control *);
+  // Return true if all displayed values are valid
+  bool allDisplaysValid() const;
 
-    // Set the input-sensitivity of all controls.
-    void SetSensitivity(bool sensitivity);
-  };
+  // Called when a child control's displayed value changes.  The underlying
+  // value will not have been set and the displayed value may be invalid!
+  virtual void controlChanged(Control *);
 
-}
+  // Set the input-sensitivity of all controls.
+  void SetSensitivity(bool sensitivity);
+};
+
+} // namespace mmui
 
 #endif /* CONTROLS_H */
 

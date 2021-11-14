@@ -55,34 +55,34 @@ typedef unsigned long long uint64_t;
 #define LIBMANDY_API __declspec(dllimport)
 #endif
 // On Windows: use assembler if possible
-# if _M_AMD64
-#  define HAVE_ASM_64 1
-#  define HAVE_ASM_128 1
-# endif
+#if _M_AMD64
+#define HAVE_ASM_64 1
+#define HAVE_ASM_128 1
+#endif
 #endif
 
 // On Unix: use assembler if requested to by configure script
 #if HAVE_ASM
-# define HAVE_ASM_64 1
-# define HAVE_ASM_128 1
+#define HAVE_ASM_64 1
+#define HAVE_ASM_128 1
 #endif
 
 #ifndef LIBMANDY_API
-# define LIBMANDY_API
+#define LIBMANDY_API
 #endif
 
 #ifndef PATHSEP
-# define PATHSEP ':'
+#define PATHSEP ':'
 #endif
 #ifndef EXEEXT
-# define EXEEXT ""
+#define EXEEXT ""
 #endif
 #ifndef DIRSEP
-# define DIRSEP "/"
+#define DIRSEP "/"
 #endif
 
 #if !HAVE_STRTOLD
-# define strtold(s,e) (long double)strtod(s, e)
+#define strtold(s, e) (long double)strtod(s, e)
 #endif
 
 #ifndef ATOMIC_TYPE
@@ -99,8 +99,7 @@ typedef unsigned long long uint64_t;
 typedef double count_t;
 
 void fatal(int errno_value, const char *fmt, ...)
-  attribute((format(printf,2,3)))
-  attribute((noreturn));
+    attribute((format(printf, 2, 3))) attribute((noreturn));
 
 #endif /* MANDY_H */
 

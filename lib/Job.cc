@@ -31,9 +31,7 @@ void Job::submit(void (*completion_callback_)(Job *, void *),
 
 void Job::cancel(void *completion_data) {
   LockAcquire(lock);
-  for(std::list<Job *>::iterator it = queue.begin();
-      it != queue.end();
-      ) {
+  for(std::list<Job *>::iterator it = queue.begin(); it != queue.end();) {
     std::list<Job *>::iterator here = it;
     ++it;
     Job *j = *here;
@@ -43,8 +41,7 @@ void Job::cancel(void *completion_data) {
     }
   }
   for(std::list<Job *>::iterator it = completed.begin();
-      it != completed.end();
-      ) {
+      it != completed.end();) {
     std::list<Job *>::iterator here = it;
     ++it;
     Job *j = *here;
@@ -155,8 +152,7 @@ void *Job::worker(void *) {
   return NULL;
 }
 
-Job::~Job() {
-}
+Job::~Job() {}
 
 bool Job::pending() {
   LockAcquire(lock);
@@ -178,8 +174,7 @@ bool Job::pendingLocked(void *completion_data) {
           || find_jobs(working, completion_data));
 }
 
-void Job::work() {
-}
+void Job::work() {}
 
 std::list<Job *> Job::queue;
 std::list<Job *> Job::completed;

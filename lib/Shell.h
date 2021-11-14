@@ -25,4 +25,3 @@ std::string ffmpegDefault();
 bool Capture(const std::string &cmd, std::vector<std::string> &output);
 
 #endif /* SHELL_H */
-

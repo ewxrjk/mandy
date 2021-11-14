@@ -17,10 +17,10 @@
 #include "arith.h"
 
 const char *const arith_names[] = {
-  "double",
-  "long double",
-  "fixed64",
-  "fixed128",
+    "double",
+    "long double",
+    "fixed64",
+    "fixed128",
 };
 
 arith_type string_to_arith(const std::string &s) {
@@ -30,8 +30,8 @@ arith_type string_to_arith(const std::string &s) {
   abort();
 }
 
-count_t iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy,
-                int maxiters, arith_type arith) {
+count_t iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy, int maxiters,
+                arith_type arith) {
   switch(arith) {
   case arith_double:
     return arith_traits<double>::iterate(zx, zy, cx, cy, maxiters);
@@ -45,15 +45,12 @@ count_t iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy,
   case arith_fixed128:
     return arith_traits<fixed128>::iterate(zx, zy, cx, cy, maxiters);
     break;
-  default:
-    abort();
+  default: abort();
   }
 }
 
-count_t iterate_cs(const Fixed128 *zx, const Fixed128 *zy,
-                   const Fixed128 *cx, const Fixed128 *cy,
-                   int maxiters, int arith) {
-  return iterate(fixed128(*zx), fixed128(*zy),
-                 fixed128(*cx), fixed128(*cy),
+count_t iterate_cs(const Fixed128 *zx, const Fixed128 *zy, const Fixed128 *cx,
+                   const Fixed128 *cy, int maxiters, int arith) {
+  return iterate(fixed128(*zx), fixed128(*zy), fixed128(*cx), fixed128(*cy),
                  maxiters, (arith_type)arith);
 }

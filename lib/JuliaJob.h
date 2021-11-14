@@ -20,9 +20,9 @@
 
 class JuliaJob: public FractalJob {
   arith_t cx, cy;
+
 public:
-  JuliaJob(arith_t cx_, arith_t cy_): cx(cx_), cy(cy_) {
-  }
+  JuliaJob(arith_t cx_, arith_t cy_): cx(cx_), cy(cy_) {}
 
   // Do the computation (called in background thread)
   void work();
@@ -30,8 +30,7 @@ public:
 
 class JuliaJobFactory: public FractalJobFactory {
 public:
-  JuliaJobFactory(): cx(0), cy(0) {
-  }
+  JuliaJobFactory(): cx(0), cy(0) {}
   arith_t cx, cy;
   FractalJob *create() const;
 };

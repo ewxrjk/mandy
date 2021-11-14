@@ -26,8 +26,8 @@ std::string fixed128::toString(int base) const {
 
 std::string fixed128::toHex() const {
   char buffer[10 * NFIXED128 + 10];
-  sprintf(buffer, "%08x.%08x", f.word[NFIXED128-1], f.word[NFIXED128-2]);
-  for(int n = NFIXED128-3; n >= 0; --n)
+  sprintf(buffer, "%08x.%08x", f.word[NFIXED128 - 1], f.word[NFIXED128 - 2]);
+  for(int n = NFIXED128 - 3; n >= 0; --n)
     sprintf(buffer + strlen(buffer), " %08x", f.word[n]);
   return buffer;
 }

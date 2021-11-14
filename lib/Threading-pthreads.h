@@ -17,8 +17,7 @@
 #define THREADING_PTHREADS_H
 
 #if USE_PTHREADS
-inline void ThreadInit() {
-}
+inline void ThreadInit() {}
 #endif
 #endif /* THREADING_PTHREADS_H */
 

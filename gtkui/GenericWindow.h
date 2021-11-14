@@ -22,21 +22,21 @@
 
 namespace mmui {
 
-  class GenericWindow: public Gtk::Window {
-  public:
-    GenericWindow();
-    void Initialize(View *view_);
-    virtual bool on_key_release_event(GdkEventKey *);
-    virtual bool on_delete_event(GdkEventAny *);
+class GenericWindow: public Gtk::Window {
+public:
+  GenericWindow();
+  void Initialize(View *view_);
+  virtual bool on_key_release_event(GdkEventKey *);
+  virtual bool on_delete_event(GdkEventAny *);
 
-    virtual bool close() = 0;
+  virtual bool close() = 0;
 
-    // Sub-widgets
-    View *view;
-    ControlPanel *controls;
-  };
+  // Sub-widgets
+  View *view;
+  ControlPanel *controls;
+};
 
-}
+} // namespace mmui
 
 #endif /* GENERICWINDOW_H */
 

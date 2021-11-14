@@ -68,9 +68,7 @@ void CondBroadcast(cond_t *c) {
     fatal(rc, "pthread_cond_broadcast");
 }
 
-void ThreadCreate(threadid_t &id, 
-                  void *(*threadfn)(void *arg),
-                  void *arg) {
+void ThreadCreate(threadid_t &id, void *(*threadfn)(void *arg), void *arg) {
   int rc;
 
   if((rc = pthread_create(&id, NULL, threadfn, arg)))

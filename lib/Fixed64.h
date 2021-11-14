@@ -24,32 +24,31 @@ extern "C" {
 
 typedef int64_t Fixed64;
 
-  LIBMANDY_API Fixed64 Fixed64_mul(Fixed64 a, Fixed64 b);
-  LIBMANDY_API Fixed64 Fixed64_div(Fixed64 a, Fixed64 b);
-  LIBMANDY_API Fixed64 Fixed64_sqrt(Fixed64 a);
+LIBMANDY_API Fixed64 Fixed64_mul(Fixed64 a, Fixed64 b);
+LIBMANDY_API Fixed64 Fixed64_div(Fixed64 a, Fixed64 b);
+LIBMANDY_API Fixed64 Fixed64_sqrt(Fixed64 a);
 
-  static inline Fixed64 Fixed64_int2(int i) {
-    return (Fixed64)((uint64_t)i << 56);
-  }
+static inline Fixed64 Fixed64_int2(int i) {
+  return (Fixed64)((uint64_t)i << 56);
+}
 
-  LIBMANDY_API char *Fixed64_2str(char buffer[], unsigned bufsize, Fixed64 a, int base);
-  LIBMANDY_API int Fixed64_str2(Fixed64 *r, const char *s, char **endptr);
+LIBMANDY_API char *Fixed64_2str(char buffer[], unsigned bufsize, Fixed64 a,
+                                int base);
+LIBMANDY_API int Fixed64_str2(Fixed64 *r, const char *s, char **endptr);
 
-  static inline Fixed64 Fixed64_double2(double n) {
-    return (Fixed64)(n* 72057594037927936.0);
-  }
+static inline Fixed64 Fixed64_double2(double n) {
+  return (Fixed64)(n * 72057594037927936.0);
+}
 
-  static inline double Fixed64_2double(Fixed64 a) {
-    return (double)a / 72057594037927936.0;
-  }
+static inline double Fixed64_2double(Fixed64 a) {
+  return (double)a / 72057594037927936.0;
+}
 
-  LIBMANDY_API int Fixed128_to_Fixed64(Fixed64 *r, const struct Fixed128 *a);
-  LIBMANDY_API void Fixed64_to_Fixed(struct Fixed128 *r, Fixed64 a);
+LIBMANDY_API int Fixed128_to_Fixed64(Fixed64 *r, const struct Fixed128 *a);
+LIBMANDY_API void Fixed64_to_Fixed(struct Fixed128 *r, Fixed64 a);
 
-  LIBMANDY_API int Fixed64_iterate(Fixed64 zx, Fixed64 zy,
-                                   Fixed64 cx, Fixed64 cy,
-                                   double *r2p,
-                                   int maxiters);
+LIBMANDY_API int Fixed64_iterate(Fixed64 zx, Fixed64 zy, Fixed64 cx, Fixed64 cy,
+                                 double *r2p, int maxiters);
 
 #ifdef __cplusplus
 }
@@ -60,10 +59,18 @@ class fixed64 {
 public:
   Fixed64 f;
 
-  fixed64(int i) { f = Fixed64_int2(i); }
-  fixed64(double n) { f = Fixed64_double2(n); }
-  fixed64() { f = 0; }
-  fixed64(fixed128 ff) { Fixed128_to_Fixed64(&f, &ff.f); }
+  fixed64(int i) {
+    f = Fixed64_int2(i);
+  }
+  fixed64(double n) {
+    f = Fixed64_double2(n);
+  }
+  fixed64() {
+    f = 0;
+  }
+  fixed64(fixed128 ff) {
+    Fixed128_to_Fixed64(&f, &ff.f);
+  }
 
   // Assignment
 
@@ -137,12 +144,24 @@ public:
 
   // Comparison
 
-  bool operator<(const fixed64 &that) const { return f < that.f; }
-  bool operator>(const fixed64 &that) const { return f > that.f; }
-  bool operator<=(const fixed64 &that) const { return f <= that.f; }
-  bool operator>=(const fixed64 &that) const { return f >= that.f; }
-  bool operator==(const fixed64 &that) const { return f == that.f; }
-  bool operator!=(const fixed64 &that) const { return f != that.f; }
+  bool operator<(const fixed64 &that) const {
+    return f < that.f;
+  }
+  bool operator>(const fixed64 &that) const {
+    return f > that.f;
+  }
+  bool operator<=(const fixed64 &that) const {
+    return f <= that.f;
+  }
+  bool operator>=(const fixed64 &that) const {
+    return f >= that.f;
+  }
+  bool operator==(const fixed64 &that) const {
+    return f == that.f;
+  }
+  bool operator!=(const fixed64 &that) const {
+    return f != that.f;
+  }
 
   // Conversions
   std::string toString(int base = 10) const;
@@ -159,7 +178,6 @@ public:
   double toDouble() const {
     return Fixed64_2double(f);
   }
-
 };
 
 inline fixed64 sqrt(const fixed64 &a) {

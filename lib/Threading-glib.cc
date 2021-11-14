@@ -17,13 +17,10 @@
 #include "Threading.h"
 
 #if USE_GTHREADS
-void ThreadCreate(threadid_t &id, 
-                  void *(*threadfn)(void *arg),
-                  void *arg) {
-  id = Glib::Thread::create
-    (sigc::bind(sigc::hide_return(sigc::ptr_fun(threadfn)),
-                arg),
-     true/*joinable*/);
+void ThreadCreate(threadid_t &id, void *(*threadfn)(void *arg), void *arg) {
+  id = Glib::Thread::create(
+      sigc::bind(sigc::hide_return(sigc::ptr_fun(threadfn)), arg),
+      true /*joinable*/);
 }
 
 void ThreadJoin(threadid_t &id) {

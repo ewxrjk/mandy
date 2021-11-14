@@ -50,24 +50,21 @@ void parse_query_one(const char *start, const char *end,
   throw std::runtime_error("unrecognized parameter");
 }
 
-const char *urldecode(const char *start, const char *end,
-                      char *v, size_t vsize, int name) {
+const char *urldecode(const char *start, const char *end, char *v, size_t vsize,
+                      int name) {
   size_t pos = 0;
-  --vsize;                      // leave room for the final 0
+  --vsize; // leave room for the final 0
   while(start < end) {
     char ch = *start++;
     switch(ch) {
-    default:
-      break;
+    default: break;
     case '=':
       if(name) {
         v[pos] = 0;
         return start;
       } else
         break;
-    case '+':
-      ch = ' ';
-      break;
+    case '+': ch = ' '; break;
     case '%':
       if(end - start < 2)
         throw std::runtime_error("truncated urlencode");
@@ -90,7 +87,7 @@ int unhex(char ch) {
       return ch - '0';
     ch |= 0x20;
     if(ch >= 'a' and ch <= 'f')
-        return ch - ('a' - 10);
+      return ch - ('a' - 10);
   }
   throw std::runtime_error("invalid hex");
 }

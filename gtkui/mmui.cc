@@ -33,18 +33,17 @@ static bool pollAgainHandler() {
 static bool periodic() {
   bool more = Job::poll(1);
   if(more && !pollAgainConnection.connected())
-    pollAgainConnection = Glib::signal_idle().connect
-      (sigc::ptr_fun(pollAgainHandler));
+    pollAgainConnection =
+        Glib::signal_idle().connect(sigc::ptr_fun(pollAgainHandler));
   return true;
 }
 
 static const struct option options[] = {
-  { "help", no_argument, NULL, 'h' },
-  { "threads", required_argument, NULL, 't' },
-  { "draw", no_argument, NULL, 'd' },
-  { "dive", no_argument, NULL, 'D' },
-  { NULL, 0, NULL, 0 }
-};
+    {"help", no_argument, NULL, 'h'},
+    {"threads", required_argument, NULL, 't'},
+    {"draw", no_argument, NULL, 'd'},
+    {"dive", no_argument, NULL, 'D'},
+    {NULL, 0, NULL, 0}};
 
 int main(int argc, char **argv) {
   ThreadInit();
@@ -58,22 +57,18 @@ int main(int argc, char **argv) {
       printf("Usage:\n"
              "  mandy [OPTIONS]\n"
              "  mandy [OPTIONS] --draw WIDTH HEIGHT X Y RADIUS MAXITERS PATH\n"
-             "  mandy [OPTIONS] --dive WIDTH HEIGHT START-{X Y RADIUS} END-{X Y RADIUS} MAXITERS FRAMES PATH\n"
+             "  mandy [OPTIONS] --dive WIDTH HEIGHT START-{X Y RADIUS} END-{X "
+             "Y RADIUS} MAXITERS FRAMES PATH\n"
              "Options:\n"
              "  --help, -h        Display help message\n"
              "  --draw, -d        Draw one image and terminate\n"
              "  --dive, -D        Create a video and terminate\n"
              "  --threads, -t N   Set maximum number of threads\n");
       return 0;
-    case 't':
-      nthreads = atoi(optarg);
-      break;
+    case 't': nthreads = atoi(optarg); break;
     case 'd':
-    case 'D':
-      mode = n;
-      break;
-    default:
-      exit(1);
+    case 'D': mode = n; break;
+    default: exit(1);
     }
   }
 
@@ -82,37 +77,27 @@ int main(int argc, char **argv) {
   switch(mode) {
   case 'd':
     if(optind + 7 != argc)
-      fatal(0, "Usage: %s --draw WIDTH HEIGHT X Y RADIUS MAXITERS PATH", argv[0]);
-    draw(argv[optind],
-         argv[optind + 1],
-         argv[optind + 2],
-         argv[optind + 3],
-         argv[optind + 4],
-         argv[optind + 5],
-         argv[optind + 6]);
+      fatal(0, "Usage: %s --draw WIDTH HEIGHT X Y RADIUS MAXITERS PATH",
+            argv[0]);
+    draw(argv[optind], argv[optind + 1], argv[optind + 2], argv[optind + 3],
+         argv[optind + 4], argv[optind + 5], argv[optind + 6]);
     return 0;
   case 'D':
     if(optind + 11 != argc)
-      fatal(0, "Usage: %s --dive WIDTH HEIGHT START-{X Y RADIUS} END-{X Y RADIUS} MAXITERS FRAMES PATH", argv[0]);
-    return dive(argv[optind],
-                argv[optind + 1],
-                argv[optind + 2],
-                argv[optind + 3],
-                argv[optind + 4],
-                argv[optind + 5],
-                argv[optind + 6],
-                argv[optind + 7],
-                argv[optind + 8],
-                argv[optind + 9],
-                argv[optind + 10]);
-  default:
-    break;
+      fatal(0,
+            "Usage: %s --dive WIDTH HEIGHT START-{X Y RADIUS} END-{X Y RADIUS} "
+            "MAXITERS FRAMES PATH",
+            argv[0]);
+    return dive(argv[optind], argv[optind + 1], argv[optind + 2],
+                argv[optind + 3], argv[optind + 4], argv[optind + 5],
+                argv[optind + 6], argv[optind + 7], argv[optind + 8],
+                argv[optind + 9], argv[optind + 10]);
+  default: break;
   }
   if(optind != argc)
     fatal(0, "invalid argument '%s'", argv[optind]);
 
-  Glib::signal_timeout().connect
-    (sigc::ptr_fun(periodic), 10);
+  Glib::signal_timeout().connect(sigc::ptr_fun(periodic), 10);
 
   mmui::mandelbrot = new mmui::MandelbrotWindow();
   mmui::julia = new mmui::JuliaWindow();

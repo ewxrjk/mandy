@@ -21,15 +21,15 @@
 
 namespace mmui {
 
-  class MandelbrotWindow;
-  class ControlPanel;
-  class JuliaWindow;
-  class JuliaView;
+class MandelbrotWindow;
+class ControlPanel;
+class JuliaWindow;
+class JuliaView;
 
-  extern MandelbrotWindow *mandelbrot;
-  extern JuliaWindow *julia;
+extern MandelbrotWindow *mandelbrot;
+extern JuliaWindow *julia;
 
-}
+} // namespace mmui
 
 #endif /* MMUI_H */
 

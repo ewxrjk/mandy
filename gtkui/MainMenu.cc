@@ -28,158 +28,150 @@
 
 namespace mmui {
 
-  static GenericWindow *FindParent(Gtk::Menu *menu) {
-    GenericWindow *parent = NULL;
-    Gtk::Widget *attached = menu->get_attach_widget();
-    Gtk::Container *w = attached->get_parent();
-    while(w && (parent = dynamic_cast<GenericWindow *>(w)) == NULL)
-      w = w->get_parent();
-    return parent;
-  }
+static GenericWindow *FindParent(Gtk::Menu *menu) {
+  GenericWindow *parent = NULL;
+  Gtk::Widget *attached = menu->get_attach_widget();
+  Gtk::Container *w = attached->get_parent();
+  while(w && (parent = dynamic_cast<GenericWindow *>(w)) == NULL)
+    w = w->get_parent();
+  return parent;
+}
 
-  // File menu ----------------------------------------------------------------
+// File menu ----------------------------------------------------------------
 
-  class FileMenu: public Gtk::Menu {
-  public:
-    FileMenu():
+class FileMenu: public Gtk::Menu {
+public:
+  FileMenu():
       saveMandelbrotImageItem("Save Mandelbrot set image"),
       saveMandelbrotMovieItem("Save Mandelbrot set movie"),
-      saveJuliaImageItem("Save Julia set image"),
-      closeItem(Gtk::Stock::CLOSE),
-      quitItem(Gtk::Stock::QUIT)
-    {
-      append(saveMandelbrotImageItem);
-      saveMandelbrotImageItem.signal_activate().connect
-        (sigc::ptr_fun(SaveMandelbrotImageActivated));
+      saveJuliaImageItem("Save Julia set image"), closeItem(Gtk::Stock::CLOSE),
+      quitItem(Gtk::Stock::QUIT) {
+    append(saveMandelbrotImageItem);
+    saveMandelbrotImageItem.signal_activate().connect(
+        sigc::ptr_fun(SaveMandelbrotImageActivated));
 
-      append(saveMandelbrotMovieItem);
-      saveMandelbrotMovieItem.signal_activate().connect
-        (sigc::ptr_fun(SaveMandelbrotMovieActivated));
+    append(saveMandelbrotMovieItem);
+    saveMandelbrotMovieItem.signal_activate().connect(
+        sigc::ptr_fun(SaveMandelbrotMovieActivated));
 
-      append(saveJuliaImageItem);
-      saveJuliaImageItem.signal_activate().connect
-        (sigc::ptr_fun(SaveJuliaImageActivated));
+    append(saveJuliaImageItem);
+    saveJuliaImageItem.signal_activate().connect(
+        sigc::ptr_fun(SaveJuliaImageActivated));
 
-      append(closeItem);
-      closeItem.signal_activate().connect(sigc::mem_fun(*this,
-                                                        &FileMenu::CloseActivated));
+    append(closeItem);
+    closeItem.signal_activate().connect(
+        sigc::mem_fun(*this, &FileMenu::CloseActivated));
 
-      append(quitItem);
-      quitItem.signal_activate().connect(sigc::ptr_fun(QuitActivated));
-    }
-
-    Gtk::MenuItem saveMandelbrotImageItem;
-    static void SaveMandelbrotImageActivated() {
-      mandelbrot->view.Save();
-    }
-
-    Gtk::MenuItem saveMandelbrotMovieItem;
-    static void SaveMandelbrotMovieActivated() {
-      mandelbrot->view.Movie();
-    }
-
-    Gtk::MenuItem saveJuliaImageItem;
-    static void SaveJuliaImageActivated() {
-      julia->view.Save();
-    }
-
-    Gtk::ImageMenuItem closeItem;
-    void CloseActivated() {
-      GenericWindow *parent = FindParent(this);
-      if(parent)
-        parent->close();
-    }
-
-    Gtk::ImageMenuItem quitItem;
-    static void QuitActivated() {
-      exit(0);
-    }
-
-    virtual void on_show() {
-      saveJuliaImageItem.set_sensitive(julia && julia->property_visible());
-      Gtk::Menu::on_show();
-    }
-  };
-
-  // Windows menu -------------------------------------------------------------
-
-  class WindowsMenu: public Gtk::Menu {
-  public:
-    WindowsMenu(): juliaItem("Julia set") {
-      append(juliaItem);
-      juliaItem.signal_toggled().connect(sigc::mem_fun(*this,
-                                                       &WindowsMenu::JuliaToggled));
-    }
-
-    Gtk::CheckMenuItem juliaItem;
-
-    virtual void on_show() {
-      juliaItem.set_active(julia && julia->property_visible());
-      Gtk::Menu::on_show();
-    }
-
-    void JuliaToggled() {
-      if(julia && juliaItem.get_active() != julia->property_visible()) {
-        if(juliaItem.get_active())
-          julia->show_all();
-        else
-          julia->hide();
-      }
-    }
-
-  };
-
-  // Help menu ----------------------------------------------------------------
-
-  class HelpMenu: public Gtk::Menu {
-  public:
-    HelpMenu(): aboutItem(Gtk::Stock::ABOUT) {
-      append(aboutItem);
-      aboutItem.signal_activate().connect(sigc::mem_fun(*this,
-                                                        &HelpMenu::AboutActivated));
-    }
-    Gtk::ImageMenuItem aboutItem;
-
-    void AboutActivated() {
-      Gtk::Dialog about("About Mandy",
-                        FindParent(this),
-                        true/*modal*/);
-      Gtk::Label name;
-      name.set_markup("<span font_desc=\"Sans 36\">Mandy</span>");
-      Gtk::Label description("Mandelbrot/Julia Set Generator");
-      Gtk::Label copyright("Version " VERSION " \xC2\xA9 2010 Richard Kettlewell");
-      about.get_vbox()->pack_start(name, Gtk::PACK_SHRINK);
-      about.get_vbox()->pack_start(description, Gtk::PACK_SHRINK);
-      Glib::RefPtr<Gdk::Pixbuf> logo_pixbuf
-        = Gdk::Pixbuf::create_from_inline(sizeof logodata, logodata, true);
-      Gtk::Image logo_image(logo_pixbuf);
-      about.get_vbox()->pack_start(logo_image, Gtk::PACK_SHRINK);
-      about.get_vbox()->pack_start(copyright, Gtk::PACK_SHRINK);
-      about.add_button("OK", 0);
-      about.show_all();
-      about.run();
-    }
-
-  };
-
-  // Menu bar -----------------------------------------------------------------
-
-  Menubar::Menubar(): fileItem("File"),
-                      windowsItem("Windows"),
-                      helpItem("Help") {
-
-    append(fileItem);
-    fileItem.set_submenu(*manage(new FileMenu()));
-
-    append(windowsItem);
-    windowsItem.set_submenu(*manage(new WindowsMenu()));
-
-    append(helpItem);
-    helpItem.set_submenu(*manage(new HelpMenu()));
+    append(quitItem);
+    quitItem.signal_activate().connect(sigc::ptr_fun(QuitActivated));
   }
 
+  Gtk::MenuItem saveMandelbrotImageItem;
+  static void SaveMandelbrotImageActivated() {
+    mandelbrot->view.Save();
+  }
 
+  Gtk::MenuItem saveMandelbrotMovieItem;
+  static void SaveMandelbrotMovieActivated() {
+    mandelbrot->view.Movie();
+  }
+
+  Gtk::MenuItem saveJuliaImageItem;
+  static void SaveJuliaImageActivated() {
+    julia->view.Save();
+  }
+
+  Gtk::ImageMenuItem closeItem;
+  void CloseActivated() {
+    GenericWindow *parent = FindParent(this);
+    if(parent)
+      parent->close();
+  }
+
+  Gtk::ImageMenuItem quitItem;
+  static void QuitActivated() {
+    exit(0);
+  }
+
+  virtual void on_show() {
+    saveJuliaImageItem.set_sensitive(julia && julia->property_visible());
+    Gtk::Menu::on_show();
+  }
+};
+
+// Windows menu -------------------------------------------------------------
+
+class WindowsMenu: public Gtk::Menu {
+public:
+  WindowsMenu(): juliaItem("Julia set") {
+    append(juliaItem);
+    juliaItem.signal_toggled().connect(
+        sigc::mem_fun(*this, &WindowsMenu::JuliaToggled));
+  }
+
+  Gtk::CheckMenuItem juliaItem;
+
+  virtual void on_show() {
+    juliaItem.set_active(julia && julia->property_visible());
+    Gtk::Menu::on_show();
+  }
+
+  void JuliaToggled() {
+    if(julia && juliaItem.get_active() != julia->property_visible()) {
+      if(juliaItem.get_active())
+        julia->show_all();
+      else
+        julia->hide();
+    }
+  }
+};
+
+// Help menu ----------------------------------------------------------------
+
+class HelpMenu: public Gtk::Menu {
+public:
+  HelpMenu(): aboutItem(Gtk::Stock::ABOUT) {
+    append(aboutItem);
+    aboutItem.signal_activate().connect(
+        sigc::mem_fun(*this, &HelpMenu::AboutActivated));
+  }
+  Gtk::ImageMenuItem aboutItem;
+
+  void AboutActivated() {
+    Gtk::Dialog about("About Mandy", FindParent(this), true /*modal*/);
+    Gtk::Label name;
+    name.set_markup("<span font_desc=\"Sans 36\">Mandy</span>");
+    Gtk::Label description("Mandelbrot/Julia Set Generator");
+    Gtk::Label copyright("Version " VERSION
+                         " \xC2\xA9 2010 Richard Kettlewell");
+    about.get_vbox()->pack_start(name, Gtk::PACK_SHRINK);
+    about.get_vbox()->pack_start(description, Gtk::PACK_SHRINK);
+    Glib::RefPtr<Gdk::Pixbuf> logo_pixbuf =
+        Gdk::Pixbuf::create_from_inline(sizeof logodata, logodata, true);
+    Gtk::Image logo_image(logo_pixbuf);
+    about.get_vbox()->pack_start(logo_image, Gtk::PACK_SHRINK);
+    about.get_vbox()->pack_start(copyright, Gtk::PACK_SHRINK);
+    about.add_button("OK", 0);
+    about.show_all();
+    about.run();
+  }
+};
+
+// Menu bar -----------------------------------------------------------------
+
+Menubar::Menubar(): fileItem("File"), windowsItem("Windows"), helpItem("Help") {
+
+  append(fileItem);
+  fileItem.set_submenu(*manage(new FileMenu()));
+
+  append(windowsItem);
+  windowsItem.set_submenu(*manage(new WindowsMenu()));
+
+  append(helpItem);
+  helpItem.set_submenu(*manage(new HelpMenu()));
 }
+
+} // namespace mmui
 
 /*
 Local Variables:

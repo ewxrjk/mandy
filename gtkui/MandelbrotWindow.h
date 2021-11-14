@@ -22,14 +22,14 @@
 
 namespace mmui {
 
-  class MandelbrotWindow: public GenericWindow {
-  public:
-    MandelbrotWindow();
-    MandelbrotView view;
-    bool close();
-  };
+class MandelbrotWindow: public GenericWindow {
+public:
+  MandelbrotWindow();
+  MandelbrotView view;
+  bool close();
+};
 
-}
+} // namespace mmui
 
 #endif /* MANDELBROTWINDOW_H */
 

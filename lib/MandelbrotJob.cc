@@ -39,16 +39,17 @@ void MandelbrotJob::work() {
       count_t iterations = 0;
       arith_t zx = 0, zy = 0;
       // Optimizations as described in WP
-      const arith_t cxq = (cx-0.25);
+      const arith_t cxq = (cx - 0.25);
       const arith_t cy2 = cy * cy;
       const arith_t q = cxq * cxq + cy2;
       if(arith_t(4) * q * (q + cxq) < cy2) { // Main cardioid
-	iterations = maxiters;
-	goto done;
+        iterations = maxiters;
+        goto done;
       }
-      if(cx * cx + arith_t(2) * cx + 1 + cy2 < arith_t(1)/arith_t(16)) { // Period-2 bulb
-      	iterations = maxiters;
-      	goto done;
+      if(cx * cx + arith_t(2) * cx + 1 + cy2
+         < arith_t(1) / arith_t(16)) { // Period-2 bulb
+        iterations = maxiters;
+        goto done;
       }
       // TODO if the whole square is outside both regions, we could
       // skip these tests.

@@ -25,16 +25,16 @@
 
 namespace mmui {
 
-  class Menubar: public Gtk::MenuBar {
-  public:
-    Menubar();
+class Menubar: public Gtk::MenuBar {
+public:
+  Menubar();
 
-    Gtk::MenuItem fileItem;
-    Gtk::MenuItem windowsItem;
-    Gtk::MenuItem helpItem;
-  };
+  Gtk::MenuItem fileItem;
+  Gtk::MenuItem windowsItem;
+  Gtk::MenuItem helpItem;
+};
 
-}
+} // namespace mmui
 
 #endif /* MENU_H */
 

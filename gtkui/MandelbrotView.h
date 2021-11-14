@@ -22,24 +22,25 @@
 
 namespace mmui {
 
-  class MandelbrotView: public View {
-  public:
-    MandelbrotView();
-    MandelbrotJobFactory mandelbrotJobFactory;
+class MandelbrotView: public View {
+public:
+  MandelbrotView();
+  MandelbrotJobFactory mandelbrotJobFactory;
 
-    JuliaView *juliaView;
+  JuliaView *juliaView;
 
-    inline void SetJuliaView(JuliaView *v) { juliaView = v; }
-    void NewJulia(arith_t x, arith_t y);
-    virtual bool on_button_press_event(GdkEventButton *);
-    virtual bool on_button_release_event(GdkEventButton *);
-    virtual bool on_motion_notify_event(GdkEventMotion *);
+  inline void SetJuliaView(JuliaView *v) {
+    juliaView = v;
+  }
+  void NewJulia(arith_t x, arith_t y);
+  virtual bool on_button_press_event(GdkEventButton *);
+  virtual bool on_button_release_event(GdkEventButton *);
+  virtual bool on_motion_notify_event(GdkEventMotion *);
 
-    void Movie();
-  };
+  void Movie();
+};
 
-
-}
+} // namespace mmui
 
 #endif /* MANDELBROTVIEW_H */
 

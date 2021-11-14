@@ -22,17 +22,13 @@
 #include <gdkmm/pixbuf.h>
 
 #ifndef DEFAULT_FFMPEG
-# define DEFAULT_FFMPEG "ffmpeg"
+#define DEFAULT_FFMPEG "ffmpeg"
 #endif
 
 #define TMP_PATTERN "tmp%d.png"
 
-void draw(const char *wstr,
-	  const char *hstr,
-	  const char *xstr,
-          const char *ystr,
-          const char *rstr,
-          const char *mistr,
+void draw(const char *wstr, const char *hstr, const char *xstr,
+          const char *ystr, const char *rstr, const char *mistr,
           const char *path) {
   arith_t x, y, radius;
   long width, height, maxiters;
@@ -91,7 +87,7 @@ static void completed(Job *, void *) {
 }
 
 void draw(int width, int height, arith_t x, arith_t y, arith_t radius,
-	  int maxiters, arith_type arith, const char *path) {
+          int maxiters, arith_type arith, const char *path) {
   const char *ext = strchr(path, '.');
   if(!ext)
     fatal(0, "cannot figure out extension of '%s'", path);
@@ -105,12 +101,8 @@ void draw(int width, int height, arith_t x, arith_t y, arith_t radius,
   else
     fatal(0, "unknown file tyep '%s'", ext);
   MandelbrotJobFactory jf;
-  IterBuffer *dest = FractalJob::recompute(x, y, radius, maxiters,
-					   width, height,
-                                           arith,
-					   completed,
-					   &jf,
-					   0, 0, &jf);
+  IterBuffer *dest = FractalJob::recompute(
+      x, y, radius, maxiters, width, height, arith, completed, &jf, 0, 0, &jf);
   Job::poll(&jf);
   // Write to a file
   if(!strcmp(fileType, "ppm")) {
@@ -140,7 +132,8 @@ void draw(int width, int height, arith_t x, arith_t y, arith_t radius,
   } else {
     // Convert to a pixbuf
     // TODO de-dupe with View::Completed
-    Glib::RefPtr<Gdk::Pixbuf> pixbuf = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, false, 8, width, height);
+    Glib::RefPtr<Gdk::Pixbuf> pixbuf =
+        Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, false, 8, width, height);
     const int rowstride = pixbuf->get_rowstride();
     guint8 *pixels = pixbuf->get_pixels();
     for(int py = 0; py < height; ++py) {
@@ -164,23 +157,16 @@ void draw(int width, int height, arith_t x, arith_t y, arith_t radius,
   dest->release();
 }
 
-static std::string get_default(const char *name, 
+static std::string get_default(const char *name,
                                const std::string &default_value) {
   const char *value = getenv(name);
   return value ? value : default_value;
 }
 
-int dive(const char *wstr,
-         const char *hstr,
-         const char *sxstr,
-         const char *systr,
-         const char *srstr,
-         const char *exstr,
-         const char *eystr,
-         const char *erstr,
-         const char *mistr,
-         const char *frstr,
-         const char *path) {
+int dive(const char *wstr, const char *hstr, const char *sxstr,
+         const char *systr, const char *srstr, const char *exstr,
+         const char *eystr, const char *erstr, const char *mistr,
+         const char *frstr, const char *path) {
   arith_t sx, sy, ex, ey, sr, er;
   long width, height, maxiters, frames;
   char *eptr;
@@ -256,14 +242,13 @@ int dive(const char *wstr,
   if(frames > INT_MAX || frames <= 0)
     fatal(0, "cannot convert '%s': out of range", frstr);
 
-  double rk = pow(arith_traits<arith_t>::toDouble(er / sr), 1.0/(frames - 1));
+  double rk = pow(arith_traits<arith_t>::toDouble(er / sr), 1.0 / (frames - 1));
   for(int frame = 0; frame < frames; ++frame) {
     arith_t radius = sr * pow(rk, frame);
     arith_t x = sx + arith_t(frame) * (ex - sx) / (frames - 1);
     arith_t y = sy + arith_t(frame) * (ey - sy) / (frames - 1);
-    fprintf(stderr, "frame %d/%ld centre %s x %s radius %s\n",
-            frame + 1, frames,
-            arith_traits<arith_t>::toString(x).c_str(),
+    fprintf(stderr, "frame %d/%ld centre %s x %s radius %s\n", frame + 1,
+            frames, arith_traits<arith_t>::toString(x).c_str(),
             arith_traits<arith_t>::toString(y).c_str(),
             arith_traits<arith_t>::toString(radius).c_str());
     char tmp[1024];
@@ -274,7 +259,7 @@ int dive(const char *wstr,
   command += shellQuote(get_default("FFMPEG", ffmpegDefault()));
   command += " -f image2 -i " TMP_PATTERN;
   command += " -vcodec ";
-  command += get_default("CODEC", "mpeg4"); 
+  command += get_default("CODEC", "mpeg4");
   command += " -r ";
   command += get_default("FRAME_RATE", "25");
   command += " -b ";

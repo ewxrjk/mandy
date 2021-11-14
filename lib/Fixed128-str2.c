@@ -49,7 +49,7 @@
  * As with the main fixed-point representation the word order is
  * little-endian, the first words is units, the second is 2^32s, etc.
  */
-#define NINTWORDS ((3 * (10+NFRACBITS) + 32)/32 + 1)
+#define NINTWORDS ((3 * (10 + NFRACBITS) + 32) / 32 + 1)
 
 static const char digits[] = "0123456789abcdefghijklmnopqrstuvwxyz";
 
@@ -78,7 +78,7 @@ static int sl(uint32_t value[NINTWORDS]) {
   int overflow = !!(value[NINTWORDS - 1] & 0x80000000);
   int n;
   for(n = NINTWORDS - 1; n > 0; --n)
-    value[n] = (value[n] << 1) + !!(value[n-1] & 0x80000000);
+    value[n] = (value[n] << 1) + !!(value[n - 1] & 0x80000000);
   value[0] <<= 1;
   return overflow;
 }
@@ -86,7 +86,7 @@ static int sl(uint32_t value[NINTWORDS]) {
 static void sr(uint32_t value[NINTWORDS]) {
   int n;
   for(n = 0; n < NINTWORDS - 1; ++n)
-    value[n] = (value[n] >> 1) + ((value[n+1] & 1) ? 0x80000000 : 0);
+    value[n] = (value[n] >> 1) + ((value[n + 1] & 1) ? 0x80000000 : 0);
   value[NINTWORDS - 1] >>= 1;
 }
 
@@ -110,9 +110,8 @@ static int isZero(const uint32_t value[NINTWORDS]) {
   return 1;
 }
 
-static void sub(uint32_t r[NINTWORDS],
-		const uint32_t a[NINTWORDS],
-		const uint32_t b[NINTWORDS]) {
+static void sub(uint32_t r[NINTWORDS], const uint32_t a[NINTWORDS],
+                const uint32_t b[NINTWORDS]) {
   uint64_t s = 1;
   int n;
 
@@ -167,7 +166,7 @@ int Fixed128_str2(struct Fixed128 *r, const char *start, char **endptr) {
   memset(value, 0, sizeof value);
   // Integer part
   while((digit = c2digit(*s, base)) >= 0) {
-    if(!value[NINTWORDS-1])
+    if(!value[NINTWORDS - 1])
       mla(value, base, digit);
     else
       /* If the integer part would overflow we just bump the scale
@@ -181,11 +180,11 @@ int Fixed128_str2(struct Fixed128 *r, const char *start, char **endptr) {
     // Fractional part
     ++s;
     while((digit = c2digit(*s, base)) >= 0) {
-      if(!value[NINTWORDS-1]) {
-	/* If the fractional part would overflow we just ditch the
-	 * extra digits.  We only lose precision thereby. */
-	mla(value, base, digit);
-	--scale;
+      if(!value[NINTWORDS - 1]) {
+        /* If the fractional part would overflow we just ditch the
+         * extra digits.  We only lose precision thereby. */
+        mla(value, base, digit);
+        --scale;
       }
       ++s;
     }
@@ -202,7 +201,7 @@ int Fixed128_str2(struct Fixed128 *r, const char *start, char **endptr) {
       expsign = 1;
     }
     if(!isdigit((unsigned char)*s))
-      goto noconversion;                /* must be at least 1 digit */
+      goto noconversion; /* must be at least 1 digit */
     while(isdigit((unsigned char)*s))
       exponent = 10 * exponent + *s++ - '0';
     if(expsign)
@@ -224,24 +223,27 @@ int Fixed128_str2(struct Fixed128 *r, const char *start, char **endptr) {
     /* Shift the divisor up until it exceeds or equals the dividend,
      * keeping track of the bit number. */
     while(lt(divisor, value)) {
-      if(sl(divisor)) { error = ERANGE; goto done; }
+      if(sl(divisor)) {
+        error = ERANGE;
+        goto done;
+      }
       ++bit;
       if(bit > NFIXED128 * 32)
-	return -1;
+        return -1;
     }
     /* Now we can start extracting bits.  The dividend will be the
      * remainder at each step. */
     while(bit >= 0 && !isZero(value)) {
       if(le(divisor, value)) {
-	sub(value, value, divisor);
-	r->word[bit / 32] |= ((uint32_t)1 << (bit & 31));
+        sub(value, value, divisor);
+        r->word[bit / 32] |= ((uint32_t)1 << (bit & 31));
       }
       /* Halve the divisor (by doubling the remainder if the divisor
        * is now odd) */
       if(divisor[0] & 1)
-	sl(value);
+        sl(value);
       else
-	sr(divisor);
+        sr(divisor);
       --bit;
     }
     if(bit == -1 && le(divisor, value)) {
@@ -258,7 +260,10 @@ int Fixed128_str2(struct Fixed128 *r, const char *start, char **endptr) {
     uint64_t n;
     uint32_t limit = sign ? 0x80000000 : 0x7FFFFFFF;
     for(i = 1; i < NINTWORDS; ++i)
-      if(value[i]) { error = ERANGE; goto done; }
+      if(value[i]) {
+        error = ERANGE;
+        goto done;
+      }
     n = value[0];
     if(n >= limit) {
       error = ERANGE;
@@ -266,7 +271,10 @@ int Fixed128_str2(struct Fixed128 *r, const char *start, char **endptr) {
     }
     while(scale > 0) {
       n *= base;
-      if(n >= limit) { error = ERANGE; goto done; }
+      if(n >= limit) {
+        error = ERANGE;
+        goto done;
+      }
       --scale;
     }
     Fixed128_int2(r, (int)n);

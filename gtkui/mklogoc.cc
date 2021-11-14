@@ -27,15 +27,21 @@ int main() {
   printf("#if _WIN32\n"
          "__declspec(align(4))\n"
          "#endif\n"
-         "static const unsigned char logodata[]\n"
+         "    static const unsigned char logodata[]\n"
          "#if __GNUC__\n"
-         "__attribute__((__aligned__ (4)))\n"
+         "    __attribute__((__aligned__(4)))\n"
          "#endif\n"
-         "= {\n");
+         "    = {\n");
   for(n = 0; n < sizeof logodata; ++n) {
+    if(n % 14 == 0)
+      printf("        ");
+    int b = logodata[n];
+    int padding = (b < 10) + (b < 100) + 1;
     printf("%d,", logodata[n]);
-    if(n % 8 == 7)
+    if(n % 14 == 13 || n + 1 == sizeof logodata)
       printf("\n");
+    else
+      printf("%*s", padding, "");
   }
   printf("};\n");
   if(ferror(stdout) || fclose(stdout) < 0) {

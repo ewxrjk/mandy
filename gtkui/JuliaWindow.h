@@ -21,14 +21,14 @@
 
 namespace mmui {
 
-  class JuliaWindow: public GenericWindow {
-  public:
-    JuliaWindow();
-    JuliaView view;
-    bool close();
-  };
+class JuliaWindow: public GenericWindow {
+public:
+  JuliaWindow();
+  JuliaView view;
+  bool close();
+};
 
-}
+} // namespace mmui
 
 #endif /* MMUI_H */
 

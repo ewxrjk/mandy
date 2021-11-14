@@ -21,27 +21,20 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
-
 static const struct option options[] = {
-  { "help", no_argument, NULL, 'h' },
-  { "version", no_argument, NULL, 'V' },
-  { "test", required_argument, NULL, 't' },
-  { "count", required_argument, NULL, 'n' },
-  { "no-header", required_argument, NULL, 'H' },
-  { NULL, 0, NULL, 0 }
-};
+    {"help", no_argument, NULL, 'h'},
+    {"version", no_argument, NULL, 'V'},
+    {"test", required_argument, NULL, 't'},
+    {"count", required_argument, NULL, 'n'},
+    {"no-header", required_argument, NULL, 'H'},
+    {NULL, 0, NULL, 0}};
 
-static void process_request(FCGX_Stream *out,
-                            FCGX_ParamArray envp,
+static void process_request(FCGX_Stream *out, FCGX_ParamArray envp,
                             bool header);
 static std::string format(int rc);
-static gboolean pixbuf_save_callback(const gchar *buf,
-                                     gsize count,
-                                     GError **error,
-                                     gpointer data);
-static gboolean stdio_save_callback(const gchar *buf,
-                                    gsize count,
-                                    GError **,
+static gboolean pixbuf_save_callback(const gchar *buf, gsize count,
+                                     GError **error, gpointer data);
+static gboolean stdio_save_callback(const gchar *buf, gsize count, GError **,
                                     gpointer data);
 static void test(const char *query, bool header);
 
@@ -54,10 +47,10 @@ int main(int argc, char **argv) {
   FCGX_ParamArray envp;
   int count = 1;
 
-#ifndef GLIB_VERSION_2_36       // deprecation warning from then on
+#ifndef GLIB_VERSION_2_36 // deprecation warning from then on
   g_type_init();
 #endif
-  
+
   try {
     while((n = getopt_long(argc, argv, "hVt:Hn:", options, NULL)) >= 0) {
       switch(n) {
@@ -68,21 +61,14 @@ int main(int argc, char **argv) {
                "  --help, -h        Display help message\n"
                "  --version, -V     Display version number\n");
         return 0;
-      case 'V':
-        puts(PACKAGE_VERSION);
-        return 0;
-      case 'n':
-        count = atoi(optarg);
-        break;
+      case 'V': puts(PACKAGE_VERSION); return 0;
+      case 'n': count = atoi(optarg); break;
       case 't':
         for(n = 1; n <= count; ++n)
           test(optarg, header);
         return 0;
-      case 'H':
-        header = false;
-        break;
-      default:
-        return 1;
+      case 'H': header = false; break;
+      default: return 1;
       }
     }
     if((rc = FCGX_Init()) != 0)
@@ -113,16 +99,12 @@ int main(int argc, char **argv) {
   return 0;
 }
 
-static void process_request(FCGX_Stream *out,
-                            FCGX_ParamArray envp,
+static void process_request(FCGX_Stream *out, FCGX_ParamArray envp,
                             bool header) {
   while(*envp) {
     static const char prefix[] = "QUERY_STRING=";
     if(!strncmp(*envp, prefix, strlen(prefix))) {
-      process_query(*envp + strlen(prefix),
-                    pixbuf_save_callback,
-                    out,
-                    header);
+      process_query(*envp + strlen(prefix), pixbuf_save_callback, out, header);
       return;
     }
     ++envp;
@@ -130,9 +112,7 @@ static void process_request(FCGX_Stream *out,
   FCGX_FPrintF(out, "No query string found\n");
 }
 
-static gboolean pixbuf_save_callback(const gchar *buf,
-                                     gsize count,
-                                     GError **,
+static gboolean pixbuf_save_callback(const gchar *buf, gsize count, GError **,
                                      gpointer data) {
   FCGX_Stream *out = (FCGX_Stream *)data;
   FCGX_PutStr(buf, count, out);
@@ -144,9 +124,7 @@ static void test(const char *query, bool header) {
   fflush(stdout);
 }
 
-static gboolean stdio_save_callback(const gchar *buf,
-                                    gsize count,
-                                    GError **,
+static gboolean stdio_save_callback(const gchar *buf, gsize count, GError **,
                                     gpointer data) {
   FILE *out = (FILE *)data;
   fwrite(buf, 1, count, out);
@@ -160,8 +138,6 @@ static std::string format(int rc) {
   case FCGX_PROTOCOL_ERROR: return "FCGX_PROTOCOL_ERROR";
   case FCGX_PARAMS_ERROR: return "FCGX_PARAMS_ERROR";
   case FCGX_CALL_SEQ_ERROR: return "FCGX_CALL_SEQ_ERROR";
-  default:
-    snprintf(buffer, sizeof buffer, "%d", rc);
-    return buffer;
+  default: snprintf(buffer, sizeof buffer, "%d", rc); return buffer;
   }
 }

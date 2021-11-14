@@ -28,21 +28,22 @@
  * context switching. */
 class Job {
 public:
-  void (*completion_callback)(Job *, void *);   // called upon completion
-  void *completion_data;                        // passed to callback
+  void (*completion_callback)(Job *, void *); // called upon completion
+  void *completion_data;                      // passed to callback
 
 private:
-  static std::list<Job *> queue;        // job queue
-  static std::set<Job *> working;       // jobs being processed
-  static std::list<Job *> completed;    // completed jobs
-  static cond_t *queued_cond;           // signaled when a job is queued
-  static cond_t *completed_cond;        // signaled when a job is completed
-  static mutex_t *lock;                 // lock protecting jobs
+  static std::list<Job *> queue;          // job queue
+  static std::set<Job *> working;         // jobs being processed
+  static std::list<Job *> completed;      // completed jobs
+  static cond_t *queued_cond;             // signaled when a job is queued
+  static cond_t *completed_cond;          // signaled when a job is completed
+  static mutex_t *lock;                   // lock protecting jobs
   static std::vector<threadid_t> workers; // worker thread IDs
-  static bool shutdown;                  // shutdown flag
-  static void *worker(void *);           // work thread
+  static bool shutdown;                   // shutdown flag
+  static void *worker(void *);            // work thread
   static void dequeue();
   static bool dequeue(void *completion_data);
+
 public:
   virtual ~Job();
 
@@ -72,7 +73,7 @@ public:
   // that the matched jobs will accept being run in.
   static void poll(void *completion_data);
 
-  static bool pending();               // any work left?
+  static bool pending();                      // any work left?
   static bool pending(void *completion_data); // any work left with matching
                                               // completion_data?
   static bool pendingLocked(void *completion_data); // any work left with
@@ -80,14 +81,13 @@ public:
                                                     // completion_data?
                                                     // (Caller must hold lock)
 
-  static void init(int nthreads=-1);    // initialize thread pool
-  static void destroy();                // destroy thread pool
+  static void init(int nthreads = -1); // initialize thread pool
+  static void destroy();               // destroy thread pool
 
-  template<class T>
+  template <class T>
   static bool find_jobs(const T &collection, void *completion_data) {
     for(typename T::const_iterator it = collection.begin();
-        it != collection.end();
-        ++it) {
+        it != collection.end(); ++it) {
       const Job *j = *it;
       if(j->completion_data == completion_data)
         return true;

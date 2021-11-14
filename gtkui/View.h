@@ -29,63 +29,67 @@ class Job;
 
 namespace mmui {
 
-  class ControlPanel;
+class ControlPanel;
 
-  class View: public Gtk::DrawingArea {
-  public:
-    View();
-    virtual bool on_button_press_event(GdkEventButton *);
-    virtual bool on_button_release_event(GdkEventButton *);
-    virtual bool on_motion_notify_event(GdkEventMotion *);
-    virtual bool on_expose_event(GdkEventExpose *);
+class View: public Gtk::DrawingArea {
+public:
+  View();
+  virtual bool on_button_press_event(GdkEventButton *);
+  virtual bool on_button_release_event(GdkEventButton *);
+  virtual bool on_motion_notify_event(GdkEventMotion *);
+  virtual bool on_expose_event(GdkEventExpose *);
 
-    void NewPointer(int xpos, int ypos);
-    void NewLocation(int xpos = -1, int ypos = -1);
-    void NewSize();
-    void Drag(int deltax, int deltay);
-    void Zoom(arith_t x, arith_t y, arith_t scale);
-    inline void SetControlPanel(ControlPanel *p) { controls = p; }
-    inline void SetJobFactory(FractalJobFactory *jf) { jobFactory = jf; }
+  void NewPointer(int xpos, int ypos);
+  void NewLocation(int xpos = -1, int ypos = -1);
+  void NewSize();
+  void Drag(int deltax, int deltay);
+  void Zoom(arith_t x, arith_t y, arith_t scale);
+  inline void SetControlPanel(ControlPanel *p) {
+    controls = p;
+  }
+  inline void SetJobFactory(FractalJobFactory *jf) {
+    jobFactory = jf;
+  }
 
-    void GetCoordinates(arith_t &x, arith_t &y, int xpos, int tpos);
+  void GetCoordinates(arith_t &x, arith_t &y, int xpos, int tpos);
 
-    void Save();
+  void Save();
 
-    // Parameters
-    arith_t xcenter, ycenter, radius;
-    int maxiters;
-    arith_type arith;
-    std::string arith_string;
+  // Parameters
+  arith_t xcenter, ycenter, radius;
+  int maxiters;
+  arith_type arith;
+  std::string arith_string;
 
-    // Results
-    arith_t xpointer, ypointer, count;
+  // Results
+  arith_t xpointer, ypointer, count;
 
-  private:
-    // Iteration count and pixel data
-    IterBuffer *dest;
-    Glib::RefPtr<Gdk::Pixbuf> pixbuf;
+private:
+  // Iteration count and pixel data
+  IterBuffer *dest;
+  Glib::RefPtr<Gdk::Pixbuf> pixbuf;
 
-    void Redraw(int x, int y, int w, int h);
-    void NewPixels(int x, int y, int w, int h);
-    void NewPixels();
-    static void Completed(Job *generic_job, void *completion_data);
+  void Redraw(int x, int y, int w, int h);
+  void NewPixels(int x, int y, int w, int h);
+  void NewPixels();
+  static void Completed(Job *generic_job, void *completion_data);
 
-    // Dragging support
-    bool dragging;
-    double dragFromX, dragFromY;
-    double dragToX, dragToY;
-    sigc::connection dragIdleConnection;
+  // Dragging support
+  bool dragging;
+  double dragFromX, dragFromY;
+  double dragToX, dragToY;
+  sigc::connection dragIdleConnection;
 
-    void DragComplete();
-    bool DragIdle();
+  void DragComplete();
+  bool DragIdle();
 
-    // Control panel interface
-    ControlPanel *controls;
+  // Control panel interface
+  ControlPanel *controls;
 
-    const FractalJobFactory *jobFactory;
-  };
+  const FractalJobFactory *jobFactory;
+};
 
-}
+} // namespace mmui
 
 #endif /* VIEW_H */
 
