@@ -133,7 +133,7 @@ static int Fixed128_mul_unsigned(struct Fixed128 *r, const struct Fixed128 *a,
 
 int Fixed128_mul(struct Fixed128 *r, const struct Fixed128 *a,
                  const struct Fixed128 *b) {
-  struct Fixed128 aa, bb;
+  struct Fixed128 aa = {0}, bb = {0};
   int sign = 0, overflow = 0;
   /* Sort out sign */
   if(Fixed128_lt0(a)) {
