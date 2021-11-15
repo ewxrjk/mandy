@@ -1,51 +1,49 @@
-	mandy - display the Mandelbrot set and its complement
-	=====================================================
-
-		  *** THIS IS A WORK IN PROGRESS ***
+#	mandy - display the Mandelbrot set and its complement
 
 This is a simple GTK+ program that lets you zoom in on the Mandelbrot
 set.
 
-Installation
-============
+## Installation
 
-You will need gtkmm and either GNU C++ or Clang.
+You will need [gtkmm](https://www.gtkmm.org) and either GNU C++ or Clang.
 
-  ./autogen.sh          # only if building from git
-  ./configure
-  make
-  sudo make install
+```
+./autogen.sh          # only if building from git
+./configure
+make
+sudo make install
+```
 
-If you want to compile with Clang (recommended on OSX):
+If you want to compile with Clang :
 
-  ./configure CC=clang CXX=clang++ CCAS=gcc
+```
+./configure CC=clang CXX=clang++ CCAS=gcc
+```
 
-See 'man mandy' for documentation.
+See `man mandy` for documentation.
 
-Arithmetic Type
-===============
+## Arithmetic Type
 
 You can select at runtime the arithmetic type used to compute the images.
 
-'double' gives you about 53 bits of precision.  'long double' gives
+`double` gives you about 53 bits of precision.  `long double` gives
 you 64 bits of precision.  Both are floating point types and are
 (probably) directly supported by your hardware, so should be fast.
 
-'fixed64' gives you 56 bits of precision after the point.  It has had
+`fixed64` gives you 56 bits of precision after the point.  It has had
 some optimization effort but is nevertheless a bit slower than using
 'double' on an x86-64 CPU.
 
-'fix128' gives you 96 bits of precision after the point.  It's
+`fixed128` gives you 96 bits of precision after the point.  It's
 relatively slow.
 
 On x86-64 CPUs the fixed point types are implemented in hand-written
 assembly language.  On other CPUs they are implemented in C and are
 likely to be very slow.
 
-Copyright
-=========
+## Copyright
 
-Copyright © 2010, 2012 Richard Kettlewell.
+Copyright © Richard Kettlewell.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
