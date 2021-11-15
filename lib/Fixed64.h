@@ -44,8 +44,8 @@ static inline double Fixed64_2double(Fixed64 a) {
   return (double)a / 72057594037927936.0;
 }
 
-LIBMANDY_API int Fixed128_to_Fixed64(Fixed64 *r, const struct Fixed128 *a);
-LIBMANDY_API void Fixed64_to_Fixed(struct Fixed128 *r, Fixed64 a);
+LIBMANDY_API int Fixed128_to_Fixed64(Fixed64 *r, const union Fixed128 *a);
+LIBMANDY_API void Fixed64_to_Fixed(union Fixed128 *r, Fixed64 a);
 
 LIBMANDY_API int Fixed64_iterate(Fixed64 zx, Fixed64 zy, Fixed64 cx, Fixed64 cy,
                                  double *r2p, int maxiters);

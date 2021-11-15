@@ -18,32 +18,9 @@
 #include <stdio.h>
 #include <math.h>
 
-void Fixed128_add(struct Fixed128 *r, const struct Fixed128 *a,
-                  const struct Fixed128 *b) {
-  unsigned __int128 aa = *(unsigned __int128 *)a;
-  unsigned __int128 bb = *(unsigned __int128 *)b;
-  *(unsigned __int128 *)r = aa + bb;
-}
-
-void Fixed128_sub(struct Fixed128 *r, const struct Fixed128 *a,
-                  const struct Fixed128 *b) {
-  unsigned __int128 aa = *(unsigned __int128 *)a;
-  unsigned __int128 bb = *(unsigned __int128 *)b;
-  *(unsigned __int128 *)r = aa - bb;
-}
-
-int Fixed128_neg(struct Fixed128 *r, const struct Fixed128 *a) {
-  uint32_t sign = a->word[NFIXED128 - 1] & 0x80000000;
-  *(unsigned __int128 *)r = -*(unsigned __int128 *)a;
-  if(sign && (r->word[NFIXED128 - 1] & 0x80000000))
-    return 1;
-  else
-    return 0;
-}
-
 #if !HAVE_ASM_128
-static int Fixed128_mul_unsigned(struct Fixed128 *r, const struct Fixed128 *a,
-                                 const struct Fixed128 *b) {
+static int Fixed128_mul_unsigned(union Fixed128 *r, const union Fixed128 *a,
+                                 const union Fixed128 *b) {
   int n, m, i;
   /* Clear result accumulator */
   int overflow = 0;
@@ -98,9 +75,9 @@ static int Fixed128_mul_unsigned(struct Fixed128 *r, const struct Fixed128 *a,
   return overflow;
 }
 
-int Fixed128_mul(struct Fixed128 *r, const struct Fixed128 *a,
-                 const struct Fixed128 *b) {
-  struct Fixed128 aa = {0}, bb = {0};
+int Fixed128_mul(union Fixed128 *r, const union Fixed128 *a,
+                 const union Fixed128 *b) {
+  union Fixed128 aa = {0}, bb = {0};
   int sign = 0, overflow = 0;
   /* Sort out sign */
   if(Fixed128_lt0(a)) {
@@ -120,12 +97,12 @@ int Fixed128_mul(struct Fixed128 *r, const struct Fixed128 *a,
 }
 #endif
 
-void Fixed128_divu(struct Fixed128 *r, const struct Fixed128 *a, unsigned u) {
+void Fixed128_divu(union Fixed128 *r, const union Fixed128 *a, unsigned u) {
   uint64_t quot, rem = 0, d;
   int n;
 
   if(Fixed128_lt0(a)) {
-    struct Fixed128 aa;
+    union Fixed128 aa;
     Fixed128_neg(&aa, a);
     Fixed128_divu(r, &aa, u);
     Fixed128_neg(r, r);
@@ -139,23 +116,7 @@ void Fixed128_divu(struct Fixed128 *r, const struct Fixed128 *a, unsigned u) {
   }
 }
 
-void Fixed128_int2(struct Fixed128 *r, int i) {
-  int n;
-  r->word[NFIXED128 - 1] = (uint32_t)i;
-  for(n = NFIXED128 - 2; n >= 0; --n)
-    r->word[n] = 0;
-}
-
-int Fixed128_eq0(const struct Fixed128 *a) {
-  int n;
-
-  for(n = 0; n < NFIXED128; ++n)
-    if(a->word[n])
-      return 0;
-  return 1;
-}
-
-char *Fixed128_2str(char buffer[], unsigned bufsize, const struct Fixed128 *a,
+char *Fixed128_2str(char buffer[], unsigned bufsize, const union Fixed128 *a,
                     int base) {
 #define ADDCHAR(C)                                                             \
   do {                                                                         \
@@ -166,8 +127,8 @@ char *Fixed128_2str(char buffer[], unsigned bufsize, const struct Fixed128 *a,
   static const char digits[] = "0123456789abcdefghijklmnopqrstuvwxyz";
 
   size_t i = 0;
-  struct Fixed128 n = *a;
-  struct Fixed128 radix;
+  union Fixed128 n = *a;
+  union Fixed128 radix;
   uint32_t u;
   char ipart[130];
   int j = sizeof ipart;
@@ -197,75 +158,9 @@ char *Fixed128_2str(char buffer[], unsigned bufsize, const struct Fixed128 *a,
   return buffer;
 }
 
-int Fixed128_lt(const struct Fixed128 *a, const struct Fixed128 *b) {
-  int n;
-  if(a->word[NFIXED128 - 1] != b->word[NFIXED128 - 1])
-    return (int32_t)a->word[NFIXED128 - 1] < (int32_t)b->word[NFIXED128 - 1];
-  for(n = NFIXED128 - 2; n >= 0; --n)
-    if(a->word[n] != b->word[n])
-      return a->word[n] < b->word[n];
-  return 0;
-}
-
-static int Fixed128_lt_unsigned(const struct Fixed128 *a,
-                                const struct Fixed128 *b) {
-  int n;
-  for(n = NFIXED128 - 1; n >= 0; --n)
-    if(a->word[n] != b->word[n])
-      return a->word[n] < b->word[n];
-  return 0;
-}
-
-static inline int Fixed128_gt_unsigned(const struct Fixed128 *a,
-                                       const struct Fixed128 *b) {
-  return Fixed128_lt_unsigned(b, a);
-}
-
-static inline int Fixed128_le_unsigned(const struct Fixed128 *a,
-                                       const struct Fixed128 *b) {
-  return !Fixed128_gt_unsigned(a, b);
-}
-
-int Fixed128_eq(const struct Fixed128 *a, const struct Fixed128 *b) {
-  int n;
-  for(n = 0; n < NFIXED128; ++n)
-    if(a->word[n] != b->word[n])
-      return 0;
-  return 1;
-}
-
-#if !HAVE_ASM_128
-void Fixed128_shl_unsigned(struct Fixed128 *a) {
-  int n;
-  for(n = NFIXED128 - 1; n > 0; --n)
-    a->word[n] = (a->word[n] << 1) + !!(a->word[n - 1] & 0x80000000);
-  a->word[0] <<= 1;
-}
-#endif
-
-#if !HAVE_ASM_128
-void Fixed128_shr_unsigned(struct Fixed128 *a) {
-  int n;
-  for(n = 0; n < NFIXED128 - 1; ++n)
-    a->word[n] = (a->word[n] >> 1) + ((a->word[n + 1] & 1) ? 0x80000000 : 0);
-  a->word[NFIXED128 - 1] >>= 1;
-}
-#endif
-
-void Fixed128_setbit(struct Fixed128 *a, int bit) {
-  if(bit >= 0)
-    a->word[NFIXED128 - 1] |= (uint32_t)1 << bit;
-  else {
-    // bits -1..-32 are the first word; -33..-64 the second; etc.
-    int word = NFIXED128 - 2 - -(bit + 1) / 32;
-    bit = bit & 31;
-    a->word[word] |= (uint32_t)1 << bit;
-  }
-}
-
-static void Fixed128_div_unsigned(struct Fixed128 *r, const struct Fixed128 *a,
-                                  const struct Fixed128 *b) {
-  struct Fixed128 rem = *a, sub = *b, quot;
+static void Fixed128_div_unsigned(union Fixed128 *r, const union Fixed128 *a,
+                                  const union Fixed128 *b) {
+  union Fixed128 rem = *a, sub = *b, quot;
   int bit;
   bit = 0;
   while(Fixed128_lt(&sub, &rem)) {
@@ -274,7 +169,7 @@ static void Fixed128_div_unsigned(struct Fixed128 *r, const struct Fixed128 *a,
   }
   Fixed128_int2(&quot, 0);
   while(bit >= -NFRACBITS) {
-    struct Fixed128 diff;
+    union Fixed128 diff;
     Fixed128_sub(&diff, &rem, &sub);
     if(Fixed128_ge0(&diff)) {
       rem = diff;
@@ -289,9 +184,9 @@ static void Fixed128_div_unsigned(struct Fixed128 *r, const struct Fixed128 *a,
   // TODO we always round down, we need another bit
 }
 
-void Fixed128_div(struct Fixed128 *r, const struct Fixed128 *a,
-                  const struct Fixed128 *b) {
-  struct Fixed128 aa, bb;
+void Fixed128_div(union Fixed128 *r, const union Fixed128 *a,
+                  const union Fixed128 *b) {
+  union Fixed128 aa = {0}, bb = {0};
   int sign = 0;
   /* Sort out sign */
   if(Fixed128_lt0(a)) {
@@ -309,9 +204,9 @@ void Fixed128_div(struct Fixed128 *r, const struct Fixed128 *a,
     Fixed128_neg(r, r);
 }
 
-void Fixed128_sqrt(struct Fixed128 *r, const struct Fixed128 *a) {
+void Fixed128_sqrt(union Fixed128 *r, const union Fixed128 *a) {
   // Slow and naive bit-by-bit algorithm
-  struct Fixed128 result, product;
+  union Fixed128 result, product;
   int n, overflow;
   uint32_t bit;
   Fixed128_int2(&result, 0);
@@ -346,7 +241,7 @@ void Fixed128_sqrt(struct Fixed128 *r, const struct Fixed128 *a) {
   // TODO we always round down, we need another bit
 }
 
-void Fixed128_double2(struct Fixed128 *r, double n) {
+void Fixed128_double2(union Fixed128 *r, double n) {
   int i = NFIXED128 - 1;
   Fixed128_int2(r, 0);
   if(n < 0) {
@@ -363,9 +258,9 @@ void Fixed128_double2(struct Fixed128 *r, double n) {
   }
 }
 
-double Fixed128_2double(const struct Fixed128 *a) {
+double Fixed128_2double(const union Fixed128 *a) {
   if(Fixed128_lt0(a)) {
-    struct Fixed128 b;
+    union Fixed128 b;
     Fixed128_neg(&b, a);
     return -Fixed128_2double(&b);
   }
@@ -374,9 +269,9 @@ double Fixed128_2double(const struct Fixed128 *a) {
           + a->word[NFIXED128 - 2] / 4294967296.0 + a->word[NFIXED128 - 1]);
 }
 
-long double Fixed128_2longdouble(const struct Fixed128 *a) {
+long double Fixed128_2longdouble(const union Fixed128 *a) {
   if(Fixed128_lt0(a)) {
-    struct Fixed128 b;
+    union Fixed128 b;
     Fixed128_neg(&b, a);
     return -Fixed128_2longdouble(&b);
   }

@@ -25,91 +25,140 @@ extern "C" {
 #define NFIXED128 4 /* == 128 bits */
 #define NFRACBITS 32 * (NFIXED128 - 1)
 
-struct Fixed128 {
+union Fixed128 {
+  // In a word-based interpreation:
+  //
   // Least significant word is first
   // Point last before last (most significant) word
   // So you get 1 sign bit, 31 integer bits, and 32 * (NFIXED128-1) fractional
   // bits.
   uint32_t word[NFIXED128];
+  // Interpreted as a 128-bit integer, we store 2^96 * the value represented.
+  unsigned __int128 u128;
+  signed __int128 s128;
+  // The combination of these two representations mean we only work on
+  // little-endian platforms.
 };
 
-LIBMANDY_API void Fixed128_add(struct Fixed128 *r, const struct Fixed128 *a,
-                               const struct Fixed128 *b);
+static inline void Fixed128_add(union Fixed128 *r, const union Fixed128 *a,
+                                const union Fixed128 *b) {
+  r->s128 = a->s128 + b->s128;
+}
 
-LIBMANDY_API void Fixed128_sub(struct Fixed128 *r, const struct Fixed128 *a,
-                               const struct Fixed128 *b);
+static inline void Fixed128_sub(union Fixed128 *r, const union Fixed128 *a,
+                                const union Fixed128 *b) {
+  r->s128 = a->s128 - b->s128;
+}
 
-LIBMANDY_API int Fixed128_neg(struct Fixed128 *r, const struct Fixed128 *a);
+static inline int Fixed128_neg(union Fixed128 *r, const union Fixed128 *a) {
+  uint32_t sign = a->word[NFIXED128 - 1] & 0x80000000;
+  r->s128 = -a->s128;
+  if(sign && (r->word[NFIXED128 - 1] & 0x80000000))
+    return 1;
+  else
+    return 0;
+}
 
-LIBMANDY_API int Fixed128_mul(struct Fixed128 *r, const struct Fixed128 *a,
-                              const struct Fixed128 *b);
+LIBMANDY_API int Fixed128_mul(union Fixed128 *r, const union Fixed128 *a,
+                              const union Fixed128 *b);
 
-LIBMANDY_API void Fixed128_divu(struct Fixed128 *r, const struct Fixed128 *a,
+LIBMANDY_API void Fixed128_divu(union Fixed128 *r, const union Fixed128 *a,
                                 unsigned u);
 
-LIBMANDY_API void Fixed128_div(struct Fixed128 *r, const struct Fixed128 *a,
-                               const struct Fixed128 *b);
+LIBMANDY_API void Fixed128_div(union Fixed128 *r, const union Fixed128 *a,
+                               const union Fixed128 *b);
 
-LIBMANDY_API void Fixed128_sqrt(struct Fixed128 *r, const struct Fixed128 *a);
+LIBMANDY_API void Fixed128_sqrt(union Fixed128 *r, const union Fixed128 *a);
 
-LIBMANDY_API void Fixed128_int2(struct Fixed128 *r, int i);
-
-LIBMANDY_API void Fixed128_shl_unsigned(struct Fixed128 *a);
-
-LIBMANDY_API void Fixed128_shr_unsigned(struct Fixed128 *a);
-
-static inline int Fixed128_lt0(const struct Fixed128 *a) {
-  return !!(a->word[NFIXED128 - 1] & 0x80000000);
+static inline void Fixed128_int2(union Fixed128 *r, int i) {
+  r->s128 = (signed __int128)i << 96;
 }
 
-static inline int Fixed128_ge0(const struct Fixed128 *a) {
-  return !(a->word[NFIXED128 - 1] & 0x80000000);
+static inline void Fixed128_shl_unsigned(union Fixed128 *a) {
+  a->u128 <<= 1;
 }
 
-int Fixed128_eq(const struct Fixed128 *a, const struct Fixed128 *b);
-
-static inline int Fixed128_ne(const struct Fixed128 *a,
-                              const struct Fixed128 *b) {
-  return !Fixed128_eq(a, b);
+static inline void Fixed128_shr_unsigned(union Fixed128 *a) {
+  a->u128 >>= 1;
 }
 
-LIBMANDY_API int Fixed128_lt(const struct Fixed128 *a,
-                             const struct Fixed128 *b);
-
-static inline int Fixed128_gt(const struct Fixed128 *a,
-                              const struct Fixed128 *b) {
-  return Fixed128_lt(b, a);
+static inline void Fixed128_setbit(union Fixed128 *a, int bit) {
+  a->u128 |= (unsigned __int128)1 << (bit + 96);
 }
 
-static inline int Fixed128_le(const struct Fixed128 *a,
-                              const struct Fixed128 *b) {
-  return !Fixed128_gt(a, b);
+static inline int Fixed128_lt0(const union Fixed128 *a) {
+  return a->s128 < 0;
 }
 
-static inline int Fixed128_ge(const struct Fixed128 *a,
-                              const struct Fixed128 *b) {
-  return !Fixed128_lt(a, b);
+static inline int Fixed128_ge0(const union Fixed128 *a) {
+  return a->s128 >= 0;
 }
 
-LIBMANDY_API int Fixed128_eq0(const struct Fixed128 *a);
+static inline int Fixed128_eq(const union Fixed128 *a,
+                              const union Fixed128 *b) {
+  return a->u128 == b->u128;
+}
+
+static inline int Fixed128_ne(const union Fixed128 *a,
+                              const union Fixed128 *b) {
+  return a->u128 != b->u128;
+}
+
+static inline int Fixed128_lt(const union Fixed128 *a,
+                              const union Fixed128 *b) {
+  return a->s128 < b->s128;
+}
+
+static inline int Fixed128_lt_unsigned(const union Fixed128 *a,
+                                       const union Fixed128 *b) {
+  return a->u128 < b->u128;
+}
+
+static inline int Fixed128_gt(const union Fixed128 *a,
+                              const union Fixed128 *b) {
+  return a->s128 > b->s128;
+}
+
+static inline int Fixed128_le(const union Fixed128 *a,
+                              const union Fixed128 *b) {
+  return a->s128 <= b->s128;
+}
+
+static inline int Fixed128_ge(const union Fixed128 *a,
+                              const union Fixed128 *b) {
+  return a->s128 >= b->s128;
+}
+
+static inline int Fixed128_gt_unsigned(const union Fixed128 *a,
+                                       const union Fixed128 *b) {
+  return a->u128 > b->u128;
+}
+
+static inline int Fixed128_le_unsigned(const union Fixed128 *a,
+                                       const union Fixed128 *b) {
+  return a->u128 <= b->u128;
+}
+
+static inline int Fixed128_eq0(const union Fixed128 *a) {
+  return a->u128 == 0;
+}
 
 LIBMANDY_API char *Fixed128_2str(char buffer[], unsigned bufsize,
-                                 const struct Fixed128 *a, int base);
-LIBMANDY_API int Fixed128_str2(struct Fixed128 *r, const char *s,
-                               char **endptr);
+                                 const union Fixed128 *a, int base);
+LIBMANDY_API int Fixed128_str2(union Fixed128 *r, const char *s, char **endptr);
 
-LIBMANDY_API int Fixed128_str2_cs(struct Fixed128 *r, const char *s);
+LIBMANDY_API int Fixed128_str2_cs(union Fixed128 *r, const char *s);
 #define FIXED128_STR_OK 0
 #define FIXED128_STR_RANGE 1
 #define FIXED128_STR_FORMAT 2
 
-LIBMANDY_API void Fixed128_double2(struct Fixed128 *r, double n);
-LIBMANDY_API double Fixed128_2double(const struct Fixed128 *a);
-LIBMANDY_API long double Fixed128_2longdouble(const struct Fixed128 *a);
+LIBMANDY_API void Fixed128_double2(union Fixed128 *r, double n);
+LIBMANDY_API double Fixed128_2double(const union Fixed128 *a);
+LIBMANDY_API long double Fixed128_2longdouble(const union Fixed128 *a);
 
-LIBMANDY_API int Fixed128_iterate(struct Fixed128 *zx, struct Fixed128 *zy,
-                                  const struct Fixed128 *cx,
-                                  const struct Fixed128 *cy, int64_t maxiters);
+LIBMANDY_API int Fixed128_iterate(union Fixed128 *zx, union Fixed128 *zy,
+                                  const union Fixed128 *cx,
+                                  const union Fixed128 *cy, int64_t maxiters);
 
 #ifdef __cplusplus
 }

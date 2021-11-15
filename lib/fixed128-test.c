@@ -22,7 +22,7 @@
 
 static int errors;
 
-static void printFixed128(const struct Fixed128 *f, const char *expect) {
+static void printFixed128(const union Fixed128 *f, const char *expect) {
   char buffer[128];
   printf("%08x.%08x %08x %08x", f->word[NFIXED128 - 1], f->word[NFIXED128 - 2],
          f->word[NFIXED128 - 3], f->word[NFIXED128 - 4]);
@@ -34,7 +34,7 @@ static void printFixed128(const struct Fixed128 *f, const char *expect) {
 }
 
 int main() {
-  struct Fixed128 a, b, c, d;
+  union Fixed128 a, b, c, d;
   double x;
 #if HAVE_ASM_128
   int count;

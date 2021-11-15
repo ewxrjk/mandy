@@ -116,7 +116,7 @@ Fixed64 Fixed64_sqrt(Fixed64 a) {
   return r;
 }
 
-int Fixed128_to_Fixed64(Fixed64 *r, const struct Fixed128 *a) {
+int Fixed128_to_Fixed64(Fixed64 *r, const union Fixed128 *a) {
   int32_t intpart = (int32_t)(a->word[NFIXED128 - 1]);
   uint64_t result;
   if(intpart > 127 || intpart < -128)
@@ -134,7 +134,7 @@ int Fixed128_to_Fixed64(Fixed64 *r, const struct Fixed128 *a) {
   return 0;
 }
 
-void Fixed64_to_Fixed128(struct Fixed128 *r, Fixed64 a) {
+void Fixed64_to_Fixed128(union Fixed128 *r, Fixed64 a) {
   memset(r, 0, sizeof *r);
   r->word[NFIXED128 - 1] = (uint32_t)(a >> 56);
   r->word[NFIXED128 - 2] = (uint32_t)(a >> 24);
@@ -145,13 +145,13 @@ void Fixed64_to_Fixed128(struct Fixed128 *r, Fixed64 a) {
  * fast, but it is easier. */
 
 char *Fixed64_2str(char buffer[], unsigned bufsize, Fixed64 a, int base) {
-  struct Fixed128 f;
+  union Fixed128 f;
   Fixed64_to_Fixed128(&f, a);
   return Fixed128_2str(buffer, bufsize, &f, base);
 }
 
 int Fixed64_str2(Fixed64 *r, const char *s, char **endptr) {
-  struct Fixed128 f;
+  union Fixed128 f;
   int rc = Fixed128_str2(&f, s, endptr);
   if(rc)
     return rc;

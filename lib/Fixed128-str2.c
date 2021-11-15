@@ -135,7 +135,7 @@ static void print(const uint32_t value[NINTWORDS]) {
 }
 #endif
 
-int Fixed128_str2(struct Fixed128 *r, const char *start, char **endptr) {
+int Fixed128_str2(union Fixed128 *r, const char *start, char **endptr) {
   int base, error = 0, sign = 0, digit, scale = 0;
   uint32_t value[NINTWORDS];
   const char *s = start;
@@ -248,7 +248,7 @@ int Fixed128_str2(struct Fixed128 *r, const char *start, char **endptr) {
     }
     if(bit == -1 && le(divisor, value)) {
       // Round up
-      struct Fixed128 round;
+      union Fixed128 round;
       memset(&round, 0, sizeof round);
       round.word[0] = 1;
       Fixed128_add(r, r, &round);
@@ -299,7 +299,7 @@ done:
   return error;
 }
 
-int Fixed128_str2_cs(struct Fixed128 *r, const char *s) {
+int Fixed128_str2_cs(union Fixed128 *r, const char *s) {
   char *endptr;
   int rc = Fixed128_str2(r, s, &endptr);
   if(rc == 0) {

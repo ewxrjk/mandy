@@ -54,23 +54,9 @@
 
 	.text
 
-/* void Fixed128_shl_unsigned(struct Fixed128 *a=rdi) */
-	.globl SYMBOL(Fixed128_shl_unsigned)
-SYMBOL(Fixed128_shl_unsigned):
-	shl	qword ptr [rdi],1
-	rcl	qword ptr [rdi+8],1
-	ret
-
-/* void Fixed128_shr_unsigned(struct Fixed128 *a=rdi) */
-	.globl SYMBOL(Fixed128_shr_unsigned)
-SYMBOL(Fixed128_shr_unsigned):
-	shr	qword ptr [rdi+8],1
-	rcr	qword ptr [rdi],1
-	ret
-
-/* int Fixed128_mul(struct Fixed128 *r=rdi,
- *               const struct Fixed128 *a=rsi,
- *               const struct Fixed128 *b=rdx) */
+/* int Fixed128_mul(union Fixed128 *r=rdi,
+ *               const union Fixed128 *a=rsi,
+ *               const union Fixed128 *b=rdx) */
 	// We have, representing each byte with a letter:
 	//
 	//        AAAA.bbbb cccc dddd
@@ -162,8 +148,8 @@ SYMBOL(Fixed128_mul):
 	pop	rbp
 	ret
 
-/* int Fixed128_iterate(struct Fixed128 *zx=rdi, struct Fixed128 *zy=rsi,
- *                   const struct Fixed128 *cx=rdx, const struct Fixed128 *cy=rcx,
+/* int Fixed128_iterate(union Fixed128 *zx=rdi, union Fixed128 *zy=rsi,
+ *                   const union Fixed128 *cx=rdx, const union Fixed128 *cy=rcx,
  *                   int maxiters=r8);
  *
  * Outline register allocation (see code for more detail):
