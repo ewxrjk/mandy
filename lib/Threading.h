@@ -16,7 +16,6 @@
 #ifndef THREADING_H
 #define THREADING_H
 
-#if USE_PTHREADS
 #include <pthread.h>
 
 typedef pthread_cond_t cond_t;
@@ -25,20 +24,7 @@ typedef pthread_t threadid_t;
 
 #define COND_INIT = PTHREAD_COND_INITIALIZER
 #define MUTEX_INIT = PTHREAD_MUTEX_INITIALIZER
-#endif
 
-#if USE_GTHREADS
-#include <glibmm/thread.h>
-
-typedef Glib::Cond cond_t;
-typedef Glib::Mutex mutex_t;
-typedef Glib::Thread *threadid_t;
-
-#define COND_INIT
-#define MUTEX_INIT
-#endif
-
-void ThreadInit();
 mutex_t *LockCreate();
 void LockAcquire(mutex_t *m);
 void LockRelease(mutex_t *m);
@@ -49,9 +35,6 @@ void CondBroadcast(cond_t *c);
 void ThreadCreate(threadid_t &id, void *(*threadfn)(void *arg),
                   void *arg = NULL);
 void ThreadJoin(threadid_t &id);
-
-#include "Threading-glib.h"
-#include "Threading-pthreads.h"
 
 #endif /* THREADING_H */
 

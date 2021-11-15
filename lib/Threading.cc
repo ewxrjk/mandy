@@ -16,7 +16,6 @@
 #include "mandy.h"
 #include "Threading.h"
 
-#if USE_PTHREADS
 mutex_t *LockCreate() {
   int rc;
   mutex_t *m = new mutex_t();
@@ -81,7 +80,6 @@ void ThreadJoin(threadid_t &id) {
   if((rc = pthread_join(id, NULL)))
     fatal(rc, "pthread_join");
 }
-#endif
 
 /*
 Local Variables:

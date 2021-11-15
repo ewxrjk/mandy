@@ -19,8 +19,7 @@ Fixed128.c Fixed128.h Fixed64-amd64.S Fixed64.c Fixed64.h Fixed64CC.cc	\
 Fixed128CC.cc FractalJob.cc FractalJob.h IterBuffer.cc IterBuffer.h	\
 Job.cc Job.h JuliaJob.cc JuliaJob.h MandelbrotJob.cc MandelbrotJob.h	\
 Shell.cc Shell.h 						\
-Threading-glib.cc Threading-glib.h Threading-pthreads.cc		\
-Threading-pthreads.h Threading.h arith.cc arith.h fatal.cc mandy.h	\
+Threading.cc Threading.h arith.cc arith.h fatal.cc mandy.h	\
 cgi.cc cgi.h
 fixed128_test_SOURCES=fixed128-test.c
 fixed128_test_LDADD=libmandy.a -lm

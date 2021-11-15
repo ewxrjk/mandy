@@ -75,28 +75,6 @@ if test "x$with_assembler" != xno; then
   esac
 fi
 
-#
-# Choose a threading API
-# If you have pthreads there is no particular advantage to using glib
-# threads.  The intent is improve support for non-POSIX platforms.
-#
-AC_MSG_CHECKING([what thread API to use])
-threading=pthreads
-AC_ARG_WITH([gthreads],
-	    [AS_HELP_STRING([--with-gthreads],
-			    [use glib thread support])],
-	    [threading=glib])
-AC_MSG_RESULT([${threading}])
-case ${threading} in
-pthreads )
-  AC_DEFINE([USE_PTHREADS],[1],[define to use pthreads])
-  ;;
-glib )
-  AC_DEFINE([USE_GTHREADS],[1],[define to use glib threads])
-  PKG_CHECK_MODULES([gthread], [gthread-2.0])
-  ;;
-esac
-
 # sigc++ is broken, but the compiler can be persuaded to ignore it.
 # https://bugzilla.redhat.com/show_bug.cgi?id=1576299
 # Annoyingly, Clang and GCC use different options for this.
