@@ -68,49 +68,6 @@ SYMBOL(Fixed128_shr_unsigned):
 	rcr	qword ptr [rdi],1
 	ret
 
-/* void Fixed128_add(struct Fixed128 *r=rdi,
- *                const struct Fixed128 *a=rsi,
- *                const struct Fixed128 *b=rdx) */
-	.globl SYMBOL(Fixed128_add)
-SYMBOL(Fixed128_add):
-	mov	rax,[rsi]
-	mov	rcx,[rsi+8]
-	add	rax,[rdx]
-	mov	[rdi],rax
-	adc	rcx,[rdx+8]
-	mov	[rdi+8],rcx
-	ret
-
-/* void Fixed128_sub(struct Fixed128 *r=rdi,
- *                const struct Fixed128 *a=rsi,
- *                const struct Fixed128 *b=rdx) */
-	.globl SYMBOL(Fixed128_sub)
-SYMBOL(Fixed128_sub):
-	mov	rax,[rsi]
-	mov	rcx,[rsi+8]
-	sub	rax,[rdx]
-	mov	[rdi],rax
-	sbb	rcx,[rdx+8]
-	mov	[rdi+8],rcx
-	ret
-
-/* int Fixed128_neg(struct Fixed128 *r=rdi, const struct Fixed128 *a=rsi) */
-	.globl SYMBOL(Fixed128_neg)
-SYMBOL(Fixed128_neg):
-	mov	rdx,[rsi]
-	mov	rax,[rsi+8]
-	mov	rcx,rax		// save for overflow detection
-	not	rdx
-	add	rdx,1		// we need the carry so we cannot use incq
-	mov	[rdi],rdx
-	not	rax
-	adc	rax,0
-	mov	[rdi+8],rax
-	xor	rax,rcx	        // yields 1... if the top bit has changed
-	not	rax		// yields 1... if the top bit has NOT changed
-	shr	rax,63		// 0 for success, 1 for overflow
-	ret
-
 /* int Fixed128_mul(struct Fixed128 *r=rdi,
  *               const struct Fixed128 *a=rsi,
  *               const struct Fixed128 *b=rdx) */

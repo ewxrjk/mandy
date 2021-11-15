@@ -32,7 +32,6 @@ AC_CHECK_LIB([fcgi],[FCGX_Init],
              [AC_SUBST([FCGI_LIBS],[-lfcgi])
               AC_SUBST([MFCGI],[mandy.fcgi])])
 AC_CHECK_FUNCS([sysconf])
-AC_CHECK_TYPES([__int128])
 AC_DEFINE([_GNU_SOURCE], [1], [use GNU extensions])
 if test "x$GXX" = xyes; then
   CXXFLAGS="-Wall -W -Werror -Wpointer-arith -Wwrite-strings $CXXFLAGS"
