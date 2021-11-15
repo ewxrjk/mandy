@@ -31,7 +31,6 @@ speedtest_LDADD=libmandy.a -lm
 cgitest_SOURCES=cgitest.cc
 cgitest_LDADD=libmandy.a
 AM_CXXFLAGS=$(gtkmm_CFLAGS)
-EXTRA_DIST=ansidecl.h getopt1.c getopt.c getopt.h
 TESTS=fixed64-test fixed128-test cgitest
 
 Fixed128-amd64.o: Fixed128-amd64.S

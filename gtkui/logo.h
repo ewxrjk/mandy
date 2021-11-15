@@ -1,7 +1,4 @@
-#if _WIN32
-__declspec(align(4))
-#endif
-    static const unsigned char logodata[]
+static const unsigned char logodata[]
 #if __GNUC__
     __attribute__((__aligned__(4)))
 #endif

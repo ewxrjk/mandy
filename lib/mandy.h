@@ -18,48 +18,8 @@
 
 /* Portability guck */
 
-#if HAVE_CONFIG_H
 #include <config.h>
-#endif
-#if HAVE_INTTYPES_H
 #include <inttypes.h>
-#endif
-
-#if _WIN32
-#include <windows.h>
-#undef max
-#undef min
-typedef int int32_t;
-typedef unsigned int uint32_t;
-typedef long long int64_t;
-typedef unsigned long long uint64_t;
-#ifndef __cplusplus
-#define inline __inline
-#endif
-#define M_PI 3.14159265358979323846
-#define M_SQRT2 1.41421356237309504880
-#define M_SQRT1_2 0.70710678118654752440
-#define ATOMIC_TYPE long
-#define ATOMIC_INC(x) InterlockedIncrement(&(x))
-#define ATOMIC_DEC(x) InterlockedDecrement(&(x))
-#define strcasecmp _stricmp
-#define log2(x) (log(x) * 1.44269504088896340737)
-#define VERSION "0.0.WIP"
-#define PATHSEP ';'
-#define EXEEXT ".exe"
-#define DIRSEP "\\"
-#define attribute(x)
-#ifdef LIBMANDY_EXPORTS
-#define LIBMANDY_API __declspec(dllexport)
-#else
-#define LIBMANDY_API __declspec(dllimport)
-#endif
-// On Windows: use assembler if possible
-#if _M_AMD64
-#define HAVE_ASM_64 1
-#define HAVE_ASM_128 1
-#endif
-#endif
 
 // On Unix: use assembler if requested to by configure script
 #if HAVE_ASM
@@ -79,10 +39,6 @@ typedef unsigned long long uint64_t;
 #endif
 #ifndef DIRSEP
 #define DIRSEP "/"
-#endif
-
-#if !HAVE_STRTOLD
-#define strtold(s, e) (long double)strtod(s, e)
 #endif
 
 #ifndef ATOMIC_TYPE

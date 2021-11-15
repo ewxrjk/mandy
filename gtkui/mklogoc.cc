@@ -24,10 +24,7 @@
 
 int main() {
   size_t n;
-  printf("#if _WIN32\n"
-         "__declspec(align(4))\n"
-         "#endif\n"
-         "    static const unsigned char logodata[]\n"
+  printf("static const unsigned char logodata[]\n"
          "#if __GNUC__\n"
          "    __attribute__((__aligned__(4)))\n"
          "#endif\n"

@@ -15,9 +15,7 @@
  */
 #include "mandy.h"
 #include "Job.h"
-#if HAVE_UNISTD_H
 #include <unistd.h>
-#endif
 
 void Job::submit(void (*completion_callback_)(Job *, void *),
                  void *completion_data_) {
@@ -57,11 +55,6 @@ void Job::init(int nthreads) {
 #if HAVE_SYSCONF && defined _SC_NPROCESSORS_ONLN
   if(nthreads == -1)
     nthreads = sysconf(_SC_NPROCESSORS_ONLN);
-#endif
-#if _WIN32
-  SYSTEM_INFO sysinfo;
-  GetSystemInfo(&sysinfo);
-  nthreads = sysinfo.dwNumberOfProcessors;
 #endif
   if(nthreads == -1)
     nthreads = 1;

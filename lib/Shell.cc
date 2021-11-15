@@ -19,13 +19,10 @@
 #include <sstream>
 #include <cstdlib>
 #include <cstdio>
-#if HAVE_UNISTD_H
 #include <unistd.h>
-#endif
 
 std::string shellQuote(const std::string &s) {
   if(s.size()) {
-    // TODO windows quoting rules!
     std::stringstream ss;
     for(size_t n = 0; n < s.size(); ++n) {
       char c = s.at(n);
@@ -53,7 +50,7 @@ std::string findOnPath(const std::string &name) {
     candidate.append(DIRSEP);
     candidate.append(name);
     candidate.append(EXEEXT);
-    if(access(candidate.c_str(), X_OK) == 0) // TODO windows
+    if(access(candidate.c_str(), X_OK) == 0)
       return candidate;
     if(sep)
       path = sep + 1;
