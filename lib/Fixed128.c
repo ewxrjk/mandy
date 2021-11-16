@@ -18,60 +18,42 @@
 #include <stdio.h>
 #include <math.h>
 
-#if !HAVE_ASM_128
+#define UINT128_MAX (-(uint128_t)1)
+#define UNDERFLOW_MASK (UINT128_MAX >> 32)
+
+static inline void add_with_overflow(int *overflow, uint128_t *r, uint128_t b) {
+  if(*r > UINT128_MAX - b)
+    *overflow |= 1;
+  *r += b;
+}
+
 static int Fixed128_mul_unsigned(union Fixed128 *r, const union Fixed128 *a,
                                  const union Fixed128 *b) {
-  int n, m, i;
-  /* Clear result accumulator */
-  int overflow = 0;
-  uint32_t result[2 * NFIXED128];
-  for(n = 0; n < NFIXED128 * 2; ++n)
-    result[n] = 0;
-  for(n = 0; n < NFIXED128; ++n) {
-    if(!a->word[NFIXED128 - 1 - n])
-      continue;
-    for(m = 0; m < NFIXED128; ++m) {
-      uint64_t p =
-          (uint64_t)a->word[NFIXED128 - 1 - n] * b->word[NFIXED128 - 1 - m];
-      /*
-      printf("  mul %d %d[%d]: %08x * %08x -> %016llx\n", n, m,
-             2 * NFIXED128 - 1 - (n + m),
-             a->word[NFIXED128 - 1 - n], b->word[NFIXED128 - 1 - m],
-             p);
-      */
-      for(i = 2 * NFIXED128 - 1 - (n + m); p && i < 2 * NFIXED128; ++i) {
-        uint64_t s = result[i] + p;
-        /*printf("    mul %d -> %08lx + %016llx = %016llx\n", i, result[i], p,
-         * s);*/
-        result[i] = (uint32_t)s;
-        p = s >> 32;
-      }
-      if(p) {
-        /*printf("    mul leftover product: %016llx
-         * *************************************\n", p);*/
-        overflow = 1;
-      }
-    }
-  }
-  /*for(n = 2 * NFIXED128-1; n >= 0; --n) {
-    printf("%08lx%c", result[n], n == 2 * NFIXED128-1 ? '.' : ' ');
-  }
-  printf("\n");*/
-  if(result[NFIXED128 - 1] > 0x80000000) {
-    uint64_t s = 1;
-    for(n = NFIXED128; n < 2 * NFIXED128; ++n) {
-      s = result[n] + s;
-      result[n] = (uint32_t)s;
-      s >>= 32;
-    }
-    if(s) {
-      overflow = 1;
-      /*printf("    mul leftover carry: %016llx
-       * *******************************\n", s);*/
-    }
-  }
-  for(n = 0; n < NFIXED128; ++n)
-    r->word[n] = result[NFIXED128 + n];
+  // Compute the four partial products. Recall representation is
+  // little-endian.
+  uint128_t hh = (uint128_t)a->u64[1] * (uint128_t)b->u64[1];
+  uint128_t hl = (uint128_t)a->u64[1] * (uint128_t)b->u64[0];
+  uint128_t lh = (uint128_t)a->u64[0] * (uint128_t)b->u64[1];
+  uint128_t ll = (uint128_t)a->u64[0] * (uint128_t)b->u64[0];
+  // Overall we have a 256-bit product.
+  //
+  // The top 32 bits are always too big; overflow is set
+  // if we impinge on them.
+  //
+  // The bottom 96 bits will accumulate in u.
+  int overflow = hh > ((uint128_t)1 << 96) - 1;
+  uint128_t result = hh << 32;
+  add_with_overflow(&overflow, &result, hl >> 32);
+  uint128_t u = (hl << 64) & UNDERFLOW_MASK;
+  add_with_overflow(&overflow, &result, lh >> 32);
+  u += (lh << 64) & UNDERFLOW_MASK;
+  add_with_overflow(&overflow, &result, ll >> 96);
+  u += ll & UNDERFLOW_MASK;
+  // If the top bit of the underflow is nonzero, round up.
+  if(u & ((uint128_t)1 << 95))
+    u += ((uint128_t)1 << 96);
+  add_with_overflow(&overflow, &result, u >> 96);
+  r->u128 = result;
   return overflow;
 }
 
@@ -95,7 +77,6 @@ int Fixed128_mul(union Fixed128 *r, const union Fixed128 *a,
     overflow |= Fixed128_neg(r, r);
   return overflow;
 }
-#endif
 
 void Fixed128_divu(union Fixed128 *r, const union Fixed128 *a, unsigned u) {
   uint64_t quot, rem = 0, d;

@@ -54,6 +54,7 @@
 
 	.text
 
+#if 0
 /* int Fixed128_mul(union Fixed128 *r=rdi,
  *               const union Fixed128 *a=rsi,
  *               const union Fixed128 *b=rdx) */
@@ -147,6 +148,7 @@ SYMBOL(Fixed128_mul):
 	pop	r12
 	pop	rbp
 	ret
+#endif
 
 /* int Fixed128_iterate(union Fixed128 *zx=rdi, union Fixed128 *zy=rsi,
  *                   const union Fixed128 *cx=rdx, const union Fixed128 *cy=rcx,

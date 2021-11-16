@@ -25,6 +25,9 @@ extern "C" {
 #define NFIXED128 4 /* == 128 bits */
 #define NFRACBITS 32 * (NFIXED128 - 1)
 
+typedef unsigned __int128 uint128_t;
+typedef __int128 int128_t;
+
 union Fixed128 {
   // In a word-based interpreation:
   //
@@ -33,10 +36,13 @@ union Fixed128 {
   // So you get 1 sign bit, 31 integer bits, and 32 * (NFIXED128-1) fractional
   // bits.
   uint32_t word[NFIXED128];
-  // Interpreted as a 128-bit integer, we store 2^96 * the value represented.
-  unsigned __int128 u128;
-  signed __int128 s128;
-  // The combination of these two representations mean we only work on
+  // Interpreted as two 64-bit integers, little-endian order
+  // i.e. qword[0] * 2^-96 * qword[1] ^ 2^-32
+  uint64_t u64[2];
+  // Interpreted as a 128-bit integer, u128 * 2^-96 or s128 * 2^-96
+  uint128_t u128;
+  int128_t s128;
+  // The combination of these representations mean we only work on
   // little-endian platforms.
 };
 
@@ -70,7 +76,7 @@ void Fixed128_div(union Fixed128 *r, const union Fixed128 *a,
 void Fixed128_sqrt(union Fixed128 *r, const union Fixed128 *a);
 
 static inline void Fixed128_int2(union Fixed128 *r, int i) {
-  r->s128 = (signed __int128)i << 96;
+  r->s128 = (int128_t)i << 96;
 }
 
 static inline void Fixed128_shl_unsigned(union Fixed128 *a) {
@@ -82,7 +88,7 @@ static inline void Fixed128_shr_unsigned(union Fixed128 *a) {
 }
 
 static inline void Fixed128_setbit(union Fixed128 *a, int bit) {
-  a->u128 |= (unsigned __int128)1 << (bit + 96);
+  a->u128 |= (uint128_t)1 << (bit + 96);
 }
 
 static inline int Fixed128_lt0(const union Fixed128 *a) {

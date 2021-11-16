@@ -3,6 +3,7 @@
 gtkui/mandy
 mandy-*.tar.gz
 .deps
+.gdb_history
 Makefile
 Makefile.in
 INSTALL
