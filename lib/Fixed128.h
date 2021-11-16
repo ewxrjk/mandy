@@ -59,16 +59,15 @@ static inline int Fixed128_neg(union Fixed128 *r, const union Fixed128 *a) {
     return 0;
 }
 
-LIBMANDY_API int Fixed128_mul(union Fixed128 *r, const union Fixed128 *a,
-                              const union Fixed128 *b);
+int Fixed128_mul(union Fixed128 *r, const union Fixed128 *a,
+                 const union Fixed128 *b);
 
-LIBMANDY_API void Fixed128_divu(union Fixed128 *r, const union Fixed128 *a,
-                                unsigned u);
+void Fixed128_divu(union Fixed128 *r, const union Fixed128 *a, unsigned u);
 
-LIBMANDY_API void Fixed128_div(union Fixed128 *r, const union Fixed128 *a,
-                               const union Fixed128 *b);
+void Fixed128_div(union Fixed128 *r, const union Fixed128 *a,
+                  const union Fixed128 *b);
 
-LIBMANDY_API void Fixed128_sqrt(union Fixed128 *r, const union Fixed128 *a);
+void Fixed128_sqrt(union Fixed128 *r, const union Fixed128 *a);
 
 static inline void Fixed128_int2(union Fixed128 *r, int i) {
   r->s128 = (signed __int128)i << 96;
@@ -143,22 +142,22 @@ static inline int Fixed128_eq0(const union Fixed128 *a) {
   return a->u128 == 0;
 }
 
-LIBMANDY_API char *Fixed128_2str(char buffer[], unsigned bufsize,
-                                 const union Fixed128 *a, int base);
-LIBMANDY_API int Fixed128_str2(union Fixed128 *r, const char *s, char **endptr);
+char *Fixed128_2str(char buffer[], unsigned bufsize, const union Fixed128 *a,
+                    int base);
+int Fixed128_str2(union Fixed128 *r, const char *s, char **endptr);
 
-LIBMANDY_API int Fixed128_str2_cs(union Fixed128 *r, const char *s);
+int Fixed128_str2_cs(union Fixed128 *r, const char *s);
 #define FIXED128_STR_OK 0
 #define FIXED128_STR_RANGE 1
 #define FIXED128_STR_FORMAT 2
 
-LIBMANDY_API void Fixed128_double2(union Fixed128 *r, double n);
-LIBMANDY_API double Fixed128_2double(const union Fixed128 *a);
-LIBMANDY_API long double Fixed128_2longdouble(const union Fixed128 *a);
+void Fixed128_double2(union Fixed128 *r, double n);
+double Fixed128_2double(const union Fixed128 *a);
+long double Fixed128_2longdouble(const union Fixed128 *a);
 
-LIBMANDY_API int Fixed128_iterate(union Fixed128 *zx, union Fixed128 *zy,
-                                  const union Fixed128 *cx,
-                                  const union Fixed128 *cy, int64_t maxiters);
+int Fixed128_iterate(union Fixed128 *zx, union Fixed128 *zy,
+                     const union Fixed128 *cx, const union Fixed128 *cy,
+                     int64_t maxiters);
 
 #ifdef __cplusplus
 }

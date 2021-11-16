@@ -41,15 +41,14 @@ std::string shellQuote(const std::string &s) {
 std::string findOnPath(const std::string &name) {
   const char *path = getenv("PATH");
   while(*path) {
-    const char *sep = strchr(path, PATHSEP);
+    const char *sep = strchr(path, ':');
     std::string candidate;
     if(sep)
       candidate.assign(path, (size_t)(sep - path));
     else
       candidate.assign(path);
-    candidate.append(DIRSEP);
+    candidate.append("/");
     candidate.append(name);
-    candidate.append(EXEEXT);
     if(access(candidate.c_str(), X_OK) == 0)
       return candidate;
     if(sep)

@@ -40,9 +40,9 @@ enum arith_type {
   arith_limit
 };
 
-extern LIBMANDY_API const char *const arith_names[];
+extern const char *const arith_names[];
 
-LIBMANDY_API arith_type string_to_arith(const std::string &s);
+arith_type string_to_arith(const std::string &s);
 
 template <typename T> class arith_traits {
 public:
@@ -222,14 +222,13 @@ public:
   }
 };
 
-LIBMANDY_API count_t iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy,
-                             int maxiters, arith_type arith);
+count_t iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy, int maxiters,
+                arith_type arith);
 
 // C#-friendly interface
 extern "C" {
-LIBMANDY_API count_t iterate_cs(const Fixed128 *zx, const Fixed128 *zy,
-                                const Fixed128 *cx, const Fixed128 *cy,
-                                int maxiters, int arith);
+count_t iterate_cs(const Fixed128 *zx, const Fixed128 *zy, const Fixed128 *cx,
+                   const Fixed128 *cy, int maxiters, int arith);
 }
 
 #endif /* ARITH_H */
