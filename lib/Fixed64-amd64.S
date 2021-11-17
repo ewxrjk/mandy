@@ -118,8 +118,8 @@ iter1:
 	jge	2f
 	shrd	r11,r10,56	// r11 = zx^2
 	mov	rax,rdi
-	shrd	r13,r12,56	// r13 = zy^2
 	imul	rsi		// rdx:rax = zx * zy
+	shrd	r13,r12,56	// r13 = zy^2
 	shrd	rax,rdx,56	// rax = zx * zy
 	lea	rsi,[rcx+rax*2]	// zy = 2 * zx * zy + cy
 	sub	r11,r13		// r11 = zx^2 - zy^2
