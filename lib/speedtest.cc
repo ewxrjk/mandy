@@ -23,14 +23,30 @@ int main(int argc, char **argv) {
     repeats = atoi(argv[1]);
   if(argc > 2)
     maxiter = atoi(argv[2]);
+  arith_t values[18], zx, zy, cx, cy;
+  for(int i = 0; i < 18; i++)
+    values[i] = i * 0.125 - 1.0;
   for(int t = 0; t < arith_limit; ++t) {
-    arith_t zx = 0;
-    arith_t zy = 0;
-    arith_t cx = 0.125;
-    arith_t cy = 0.125;
     clock_t begin = clock();
-    for(int n = 0; n < repeats; ++n)
+    int zxi = 0, zyi = 0, cxi = 0, cyi = 0;
+    for(int n = 0; n < repeats; ++n) {
+      zx = values[zxi];
+      zy = values[zyi];
+      cx = values[cxi];
+      cy = values[cyi];
+      if(++zxi >= 18) {
+        zxi = 0;
+        if(++zyi >= 18) {
+          zyi = 0;
+          if(++cxi >= 18) {
+            cxi = 0;
+            if(++cyi >= 18)
+              cyi = 0;
+          }
+        }
+      }
       iterate(zx, zy, cx, cy, maxiter, arith_type(t));
+    }
     clock_t end = clock();
     double seconds = (end - begin) / (double)CLOCKS_PER_SEC;
     double iterations = (double)repeats * maxiter;
