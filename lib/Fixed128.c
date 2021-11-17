@@ -21,6 +21,7 @@
 #define UINT128_MAX (-(uint128_t)1)
 #define UNDERFLOW_MASK (UINT128_MAX >> 32)
 
+// add b to *r, setting *overflow if the result is too large
 static inline void add_with_overflow(int *overflow, uint128_t *r, uint128_t b) {
   if(*r > UINT128_MAX - b)
     *overflow |= 1;
@@ -82,6 +83,7 @@ void Fixed128_divu(union Fixed128 *r, const union Fixed128 *a, unsigned u) {
   uint64_t quot, rem = 0, d;
   int n;
 
+  // Sort out the sign
   if(Fixed128_lt0(a)) {
     union Fixed128 aa;
     Fixed128_neg(&aa, a);
@@ -111,25 +113,32 @@ char *Fixed128_2str(char buffer[], unsigned bufsize, const union Fixed128 *a,
   union Fixed128 n = *a;
   union Fixed128 radix;
   uint32_t u;
-  char ipart[130];
-  int j = sizeof ipart;
+  char ipart[130];      // Buffer for integer part
+  int j = sizeof ipart; // Start at the least significant digit and work back
 
   Fixed128_int2(&radix, base);
+  // Sort out the sign
   if(Fixed128_lt0(&n)) {
     Fixed128_neg(&n, &n);
     ADDCHAR('-');
   }
+  // Work out the integer part
   u = n.word[NFIXED128 - 1];
   do {
     ipart[--j] = digits[u % base];
     u /= base;
   } while(u);
+  // Add it to the buffer
   while(j < (int)sizeof ipart)
     ADDCHAR(ipart[j++]);
+  // No more integer part
   n.word[NFIXED128 - 1] = 0;
   if(!Fixed128_eq0(&n)) {
+    // Non-zero fractional part
     ADDCHAR('.');
     do {
+      // Multiply by the radix so that the next digit comes into
+      // the integer part.
       Fixed128_mul(&n, &n, &radix);
       ADDCHAR(digits[n.word[NFIXED128 - 1]]);
       n.word[NFIXED128 - 1] = 0;
