@@ -157,8 +157,8 @@ SYMBOL(Fixed128_mul):
  * Outline register allocation (see code for more detail):
  *  rax, rdx       - destination for mul instruction
  *  rbx, rcx, rdi  - accumulator for multiplication
- *  [rsp+0]      - cx
- *  [rsp+16]      - cy
+ *  [rsp+0]        - cx
+ *  [rsp+16]       - cy
  *  r8,r9          - zx
  *  r10,r11        - zy
  *  r12,r13        - zx^2
@@ -183,43 +183,44 @@ SYMBOL(Fixed128_iterate):
 	// Store maxiters in the red zone
 	mov	[rsp+32],r8
 	// Ditto cx/cy
+
 	mov	rax,[rdx]
 	mov	[rsp+0],rax
 	mov	rax,[rdx+8]
-	mov	[rsp+8],rax	// [rsp+0] = cx
+	mov	[rsp+8],rax		// [rsp+0] = cx
 	mov	rax,[rcx]
 	mov	[rsp+16],rax
 	mov	rax,[rcx+8]
 	mov	[rsp+24],rax	// [rsp+16] = cy
 	// Load initial zx/zy
 	mov	r9,[rdi]
-	mov	r8,[rdi+8]
+	mov	r8,[rdi+8]		// r8,r9 = zx
 	mov	r11,[rsi]
-	mov	r10,[rsi+8]
+	mov	r10,[rsi+8]		// r10,r11 = zy
 	// Iteration count
-	xor	rsi,rsi
+	xor	rsi,rsi			// iterations = 0
 	// Main loop
 iterloop:
 	// Compute zx^2
 	mov	r14,r8
-	mov	r15,r9
-	movabs	rbp,0x4000000000
-	call	square
+	mov	r15,r9			// r14,r15 = zx
+	movabs	rbp,0x4000000000 // rbp,<missing> = 64.0
+	call	square		// rbx,rcx = zx^2
 	// Compute zy^2
 	mov	r14,r10
-	mov	r15,r11
-	mov	r12,rbx		// r12:r13 = zx^2
-	mov	r13,rcx
+	mov	r15,r11			// r14,r15 = zy
+	mov	r12,rbx
+	mov	r13,rcx			// r12,r13 = zx^2
 	.att_syntax // hack to work around bizarre bug in apple assembler
-	call	square
+	call	square		// rbx,rcx = zy^2
 	.intel_syntax noprefix
 	mov	r14,rbx
-	mov	r15,rcx
+	mov	r15,rcx			// r14,r15 = zy^2
 	// Add them up and compare against the limit
 	add	rcx,r13
-	adc	rbx,r12
+	adc	rbx,r12			// rbx,rcx = zx^2 + zy^2
 	cmp	rbx,rbp
-	jge	escaped
+	jge	escaped			// if zx^2 + zy^2 >= 64, escaped
 	// Compute zx*zy
 	// First figure out what the sign will be
 	cmp	r8,0
@@ -279,16 +280,16 @@ iterloop:
 	// Now we have rbx,rcx = 2.zx.zy
 	// Let zy=r10,r11=2.zx.zy+cy
 	mov	r11,[rsp+16]
-	mov	r10,[rsp+24]
+	mov	r10,[rsp+24]	// r10,r11 = cy
 	add	r11,rcx
-	adc	r10,rbx
+	adc	r10,rbx			// r10,r11 = 2.zx.zy+cy
 	// Let zy=r8,r9=zx^2-zy^2+cx
-        mov     r9,[rsp+0]
-        mov     r8,[rsp+8]
+    mov r9,[rsp+0]
+    mov r8,[rsp+8]		// r8,r9 = cx
 	add	r9,r13
-	adc	r8,r12
+	adc	r8,r12			// r8,r9 = zx^2 + cx
 	sub	r9,r15
-	sbb	r8,r14
+	sbb	r8,r14			// r8,r9 = zx^2 - zy^2 + cx
 	// Increment iteration count
 	inc	rsi
 	// Only go back round the loop if not too big
@@ -297,13 +298,13 @@ iterloop:
 	jb	iterloop
 	.intel_syntax noprefix
 escaped:
-        // Retrieve iteration count
+    // Retrieve iteration count
 	mov	rax,rsi
 	// Return r^2 in the first argument (rather idiosyncratic)
 	add rsp,48
 	pop	rdi
 	pop	rsi
-	mov	[rdi],rcx
+	mov	[rdi],rcx		// 'zx' = zx^2 + zy^2
 	mov	[rdi+8],rbx
 	// Restore registers
 	pop	r15
