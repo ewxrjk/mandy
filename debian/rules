@@ -59,7 +59,7 @@ pkg-mandy: build
 	$(MKDIR) debian/mandy/usr/share/menu
 	$(MKDIR) debian/mandy/usr/share/pixmaps
 	$(INSTALL_DATA) debian/changelog debian/mandy/usr/share/doc/mandy/.
-	$(INSTALL_DATA) README debian/mandy/usr/share/doc/mandy/.
+	$(INSTALL_DATA) README.md debian/mandy/usr/share/doc/mandy/.
 	gzip -9n debian/mandy/usr/share/doc/mandy/*
 	$(INSTALL_DATA) debian/copyright debian/mandy/usr/share/doc/mandy/.
 	$(INSTALL_DATA) images/$(ICON)16.xpm \

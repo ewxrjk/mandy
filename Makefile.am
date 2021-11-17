@@ -14,4 +14,4 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 SUBDIRS=lib images web gtkui
 EXTRA_DIST=debian/rules debian/control debian/changelog		\
-	debian/copyright
+	debian/copyright README.md
