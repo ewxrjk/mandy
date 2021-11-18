@@ -79,27 +79,21 @@ void draw(const char *wstr, const char *hstr, const char *xstr,
   if(maxiters > INT_MAX || maxiters <= 0)
     fatal(0, "cannot convert '%s': out of range", mistr);
 
-  draw(width, height, x, y, radius, maxiters, ARITH_DEFAULT, path);
+  FILE *fp;
+  if(!(fp = fopen(path, "wb")))
+    fatal(errno, "opening %s", path);
+  if(draw(width, height, x, y, radius, maxiters, ARITH_DEFAULT, fp))
+    fatal(errno, "writing %s", path);
+  if(fclose(fp) < 0)
+    fatal(errno, "writing %s", path);
 }
 
 static void completed(Job *, void *) {
   // do nothing
 }
 
-void draw(int width, int height, arith_t x, arith_t y, arith_t radius,
-          int maxiters, arith_type arith, const char *path) {
-  const char *ext = strchr(path, '.');
-  if(!ext)
-    fatal(0, "cannot figure out extension of '%s'", path);
-  const char *fileType = NULL;
-  if(!strcasecmp(ext, ".png"))
-    fileType = "png";
-  else if(!strcasecmp(ext, ".jpg") || !strcasecmp(ext, ".jpeg"))
-    fileType = "jpeg";
-  else if(!strcasecmp(ext, ".ppm"))
-    fileType = "ppm";
-  else
-    fatal(0, "unknown file tyep '%s'", ext);
+int draw(int width, int height, arith_t x, arith_t y, arith_t radius,
+         int maxiters, arith_type arith, FILE *fp, const char *fileType) {
   MandelbrotJobFactory jf;
   IterBuffer *dest = FractalJob::recompute(
       x, y, radius, maxiters, width, height, arith, completed, &jf, 0, 0, &jf);
@@ -107,11 +101,10 @@ void draw(int width, int height, arith_t x, arith_t y, arith_t radius,
   // Write to a file
   if(!strcmp(fileType, "ppm")) {
     /* PPMs can be written directly */
-    FILE *fp = fopen(path, "wb");
-    if(!fp)
-      fatal(errno, "opening %s", path);
-    if(fprintf(fp, "P6\n%d %d 255\n", width, height) < 0)
-      fatal(errno, "writing %s", path);
+    if(fprintf(fp, "P6\n%d %d 255\n", width, height) < 0) {
+      perror("write error");
+      return -1;
+    }
     for(int py = 0; py < height; ++py) {
       const count_t *datarow = &dest->data[py * width];
       for(int px = 0; px < width; ++px) {
@@ -123,12 +116,12 @@ void draw(int width, int height, arith_t x, arith_t y, arith_t radius,
           b = blue(count, maxiters);
         } else
           r = g = b = 0;
-        if(fprintf(fp, "%c%c%c", r, g, b) < 0)
-          fatal(errno, "writing %s", path);
+        if(fprintf(fp, "%c%c%c", r, g, b) < 0) {
+          perror("write error");
+          return -1;
+        }
       }
     }
-    if(fclose(fp) < 0)
-      fatal(errno, "closing %s", path);
   } else {
     // Convert to a pixbuf
     // TODO de-dupe with View::Completed
@@ -152,9 +145,18 @@ void draw(int width, int height, arith_t x, arith_t y, arith_t radius,
         }
       }
     }
-    pixbuf->save(path, fileType);
+    gchar *buffer;
+    gsize buffer_size;
+    pixbuf->save_to_buffer(buffer, buffer_size, fileType);
+    fwrite(buffer, 1, buffer_size, fp);
+    if(ferror(fp)) {
+      perror("write error");
+      return -1;
+    }
+    g_free(buffer);
   }
   dest->release();
+  return 0;
 }
 
 static std::string get_default(const char *name,
@@ -243,6 +245,27 @@ int dive(const char *wstr, const char *hstr, const char *sxstr,
     fatal(0, "cannot convert '%s': out of range", frstr);
 
   double rk = pow(arith_traits<arith_t>::toDouble(er / sr), 1.0 / (frames - 1));
+  // Construct the command
+  std::string command;
+  command += shellQuote(get_default("FFMPEG", ffmpegDefault()));
+  command += " -f image2pipe -i pipe:0";
+  command += " -vcodec ";
+  command += get_default("CODEC", "mpeg4");
+  command += " -r ";
+  command += get_default("FRAME_RATE", "25");
+  command += " -b:v ";
+  command += get_default("BITRATE", "2M");
+  command += " ";
+  command += shellQuote(path);
+  fprintf(stderr, "encoding with: %s\n", command.c_str());
+  // Run the command
+  remove(path);
+  FILE *fp = popen(command.c_str(), "w");
+  if(!fp) {
+    perror("popen");
+    return -1;
+  }
+  // Render frames
   for(int frame = 0; frame < frames; ++frame) {
     arith_t radius = sr * pow(rk, frame);
     arith_t x = sx + arith_t(frame) * (ex - sx) / (frames - 1);
@@ -251,28 +274,14 @@ int dive(const char *wstr, const char *hstr, const char *sxstr,
             frames, arith_traits<arith_t>::toString(x).c_str(),
             arith_traits<arith_t>::toString(y).c_str(),
             arith_traits<arith_t>::toString(radius).c_str());
-    char tmp[1024];
-    sprintf(tmp, TMP_PATTERN, frame);
-    draw(width, height, x, y, radius, maxiters, ARITH_DEFAULT, tmp);
+    if(draw(width, height, x, y, radius, maxiters, ARITH_DEFAULT, fp) < 0)
+      return -1;
   }
-  std::string command;
-  command += shellQuote(get_default("FFMPEG", ffmpegDefault()));
-  command += " -f image2 -i " TMP_PATTERN;
-  command += " -vcodec ";
-  command += get_default("CODEC", "mpeg4");
-  command += " -r ";
-  command += get_default("FRAME_RATE", "25");
-  command += " -b ";
-  command += get_default("BITRATE", "2M");
-  command += " ";
-  command += shellQuote(path);
-  fprintf(stderr, "encoding with: %s\n", command.c_str());
-  remove(path);
-  int rc = system(command.c_str());
-  for(int frame = 0; frame < frames; ++frame) {
-    char tmp[1024];
-    sprintf(tmp, TMP_PATTERN, frame);
-    remove(tmp);
+  // Close the pipe
+  int rc = pclose(fp);
+  if(rc != 0) {
+    fprintf(stderr, "pclose: %d\n", rc);
+    return -1;
   }
   return rc;
 }

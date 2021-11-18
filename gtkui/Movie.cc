@@ -157,8 +157,8 @@ public:
     delete this;
   }
 
+  // Worker thread that renders the movie
   void worker() {
-    static unsigned serial; // TODO synchronization
     const int frames = controls.m_seconds * controls.m_fps;
     const arith_t sx = controls.m_x;
     const arith_t sy = controls.m_y;
@@ -169,11 +169,35 @@ public:
     const int maxiters = controls.m_maxiters;
     const int width = 1280;
     const int height = 720; // TODO configurable
-    std::stringstream tmp_pattern_stream;
-    tmp_pattern_stream << "tmp_" << getpid() << "_" << serial++ << "_%d.ppm";
-    const std::string tmp_pattern = tmp_pattern_stream.str();
     double rk =
         pow(arith_traits<arith_t>::toDouble(er / sr), 1.0 / (frames - 1));
+    std::stringstream command, pstream;
+    // Construct the command
+    command
+        << shellQuote(controls.m_ffmpeg)
+        << " -f image2pipe" // input format is concatenated image file demuxer
+        << " -i pipe:0"     // input fil
+        << " -vcodec " << shellQuote(controls.m_codec) // output file codec
+        << " -r " << controls.m_fps                    // frame rate
+        << " -b:v " << controls.m_bitrate              // bit rate
+        << " " << shellQuote(controls.m_path);         // output file
+    // Report the encoder command
+    pstream << "Encoding with " << controls.m_ffmpeg;
+    (new Progress(this, pstream.str()))
+        ->submit(&MovieWindow::progress_callback, NULL);
+    // Run the encoder
+    ::remove(controls.m_path.c_str());
+    fprintf(stderr, "%s\n", command.str().c_str());
+    FILE *fp = popen(command.str().c_str(), "w");
+    if(!fp) {
+      perror("popen");
+      (new Progress(this, "Executing ffmpeg failed", true))
+          ->submit(&MovieWindow::progress_callback, NULL);
+      return;
+    }
+    // TODO capture ffmpeg stderr and put it somewhere useful
+    // (maybe the progress report should be a larger window)
+    // Render PNGs to the pipe
     for(int frame = 0; frame < frames; ++frame) {
       std::stringstream pstream;
       pstream << "Frame " << frame << "/" << frames;
@@ -182,32 +206,19 @@ public:
       arith_t radius = sr * pow(rk, frame);
       arith_t x = sx + arith_t(frame) * (ex - sx) / (frames - 1);
       arith_t y = sy + arith_t(frame) * (ey - sy) / (frames - 1);
-      char tmp[1024];
-      sprintf(tmp, tmp_pattern.c_str(), frame);
-      draw(width, height, x, y, radius, maxiters, controls.m_arith, tmp);
+      if(draw(width, height, x, y, radius, maxiters, controls.m_arith, fp)
+         < 0) {
+        (new Progress(this, "Encoding failed.", true))
+            ->submit(&MovieWindow::progress_callback, NULL);
+        pclose(fp);
+        ::remove(controls.m_path.c_str());
+        return;
+      }
     }
-    std::stringstream command, pstream;
-    command << shellQuote(controls.m_ffmpeg)
-            << " -f image2"          // input format is image file demuxer
-            << " -i " << tmp_pattern // input file pattern
-            << " -vcodec " << shellQuote(controls.m_codec) // output file codec
-            << " -r " << controls.m_fps                    // frame rate
-            << " -b:v " << controls.m_bitrate              // bit rate
-            << " " << shellQuote(controls.m_path);         // output file
-    pstream << "Encoding with " << controls.m_ffmpeg;
-    (new Progress(this, pstream.str()))
-        ->submit(&MovieWindow::progress_callback, NULL);
-    ::remove(controls.m_path.c_str());
-    fprintf(stderr, "%s\n", command.str().c_str());
-    int rc = system(command.str().c_str());
-    // TODO capture ffmpeg stderr and put it somewhere useful
-    // (maybe the progress report should be a larger window)
-    for(int frame = 0; frame < frames; ++frame) {
-      char tmp[1024];
-      sprintf(tmp, tmp_pattern.c_str(), frame);
-      ::remove(tmp);
-    }
+    // Finish
+    int rc = pclose(fp);
     if(rc) {
+      fprintf(stderr, "encoder: pclose: %d\n", rc);
       ::remove(controls.m_path.c_str());
       (new Progress(this, "Encoding failed.", true))
           ->submit(&MovieWindow::progress_callback, NULL);
