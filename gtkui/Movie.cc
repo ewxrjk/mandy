@@ -187,11 +187,13 @@ public:
       draw(width, height, x, y, radius, maxiters, controls.m_arith, tmp);
     }
     std::stringstream command, pstream;
-    command << shellQuote(controls.m_ffmpeg) << " -f image2"
-            << " -i " << tmp_pattern << " -vcodec "
-            << shellQuote(controls.m_codec) << " -r " << controls.m_fps
-            << " -b " << controls.m_bitrate << " "
-            << shellQuote(controls.m_path);
+    command << shellQuote(controls.m_ffmpeg)
+            << " -f image2"          // input format is image file demuxer
+            << " -i " << tmp_pattern // input file pattern
+            << " -vcodec " << shellQuote(controls.m_codec) // output file codec
+            << " -r " << controls.m_fps                    // frame rate
+            << " -b:v " << controls.m_bitrate              // bit rate
+            << " " << shellQuote(controls.m_path);         // output file
     pstream << "Encoding with " << controls.m_ffmpeg;
     (new Progress(this, pstream.str()))
         ->submit(&MovieWindow::progress_callback, NULL);
@@ -250,7 +252,7 @@ void MovieControls::GetCodecs() {
   // not work.  Really grim parsing code...
   if(Capture(shellQuote(m_ffmpeg) + " -codecs 2>/dev/null", output)) {
     size_t n = 0;
-    while(n < output.size() && output[n] != " ------\n")
+    while(n < output.size() && output[n].substr(0, 2) != " -")
       ++n;
     ++n;
     while(n < output.size() && output[n] != "\n") {
