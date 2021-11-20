@@ -152,7 +152,7 @@ The syntax is:
 .I END-Y
 .I END-RADIUS
 .I MAXITERS
-.I FRAMES
+.I SECONDS
 .I PATH
 .PP
 The radius progresses from \fISTART-RADIUS\fR to \fIEND-RADIUS\fR
@@ -173,11 +173,11 @@ The default is \fBavconf\fR if that is on the path, otherwise \fBffmpeg\fR.
 .TP
 .B FRAME_RATE
 The frame rate.
-The default is \fB2\fR.
+The default is \fB25\fR.
 .TP
 .B BITRATE
 The output bitrate.
-The default is \fB2M\fR.
+The default is \fI2097152\fR.
 .PP
 Note that this option uses a temporary file for each frame in the
 current directory.

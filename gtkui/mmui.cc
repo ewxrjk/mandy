@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
   int nthreads = -1, mode = 0;
 
   int n;
-  while((n = getopt_long(argc, argv, "ht:dD", options, NULL)) >= 0) {
+  while((n = getopt_long(argc, argv, "+ht:dD", options, NULL)) >= 0) {
     switch(n) {
     case 'h':
       printf("Usage:\n"
@@ -85,7 +85,7 @@ int main(int argc, char **argv) {
     if(optind + 11 != argc)
       fatal(0,
             "Usage: %s --dive WIDTH HEIGHT START-{X Y RADIUS} END-{X Y RADIUS} "
-            "MAXITERS FRAMES PATH",
+            "MAXITERS SECONDS PATH",
             argv[0]);
     return dive(argv[optind], argv[optind + 1], argv[optind + 2],
                 argv[optind + 3], argv[optind + 4], argv[optind + 5],

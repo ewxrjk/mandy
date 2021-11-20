@@ -109,6 +109,17 @@ public:
     bool m_completed;      // set on completion
   };
 
+  class RenderMovieThread: public RenderMovie {
+  public:
+    RenderMovieThread(MovieWindow *mw_): mw(mw_) {}
+    MovieWindow *mw = nullptr;
+
+    void Progress(const std::string &message, bool completed) {
+      auto *p = new MovieWindow::Progress(mw, message, completed);
+      p->submit(&MovieWindow::progress_callback, NULL);
+    }
+  };
+
   MovieWindow():
       controls(this), buttons(false, 0), render("Render"),
       cancel(Gtk::Stock::CANCEL), vbox(false, 0), working(false) {
@@ -159,72 +170,24 @@ public:
 
   // Worker thread that renders the movie
   void worker() {
-    const int frames = controls.m_seconds * controls.m_fps;
-    const arith_t sx = controls.m_x;
-    const arith_t sy = controls.m_y;
-    const arith_t sr = 2;
-    const arith_t ex = controls.m_x;
-    const arith_t ey = controls.m_y;
-    const arith_t er = controls.m_radius;
-    const int maxiters = controls.m_maxiters;
-    const int width = 1280;
-    const int height = 720; // TODO configurable
-    double rk =
-        pow(arith_traits<arith_t>::toDouble(er / sr), 1.0 / (frames - 1));
-    std::stringstream command, pstream;
-    // Construct the command
-    command
-        << shellQuote(controls.m_ffmpeg)
-        << " -f image2pipe" // input format is concatenated image file demuxer
-        << " -i pipe:0"     // input fil
-        << " -vcodec " << shellQuote(controls.m_codec) // output file codec
-        << " -r " << controls.m_fps                    // frame rate
-        << " -b:v " << controls.m_bitrate              // bit rate
-        << " " << shellQuote(controls.m_path);         // output file
-    // Report the encoder command
-    pstream << "Encoding with " << controls.m_ffmpeg;
-    (new Progress(this, pstream.str()))
-        ->submit(&MovieWindow::progress_callback, NULL);
-    // Run the encoder
-    ::remove(controls.m_path.c_str());
-    fprintf(stderr, "%s\n", command.str().c_str());
-    FILE *fp = popen(command.str().c_str(), "w");
-    if(!fp) {
-      perror("popen");
-      (new Progress(this, "Executing ffmpeg failed", true))
-          ->submit(&MovieWindow::progress_callback, NULL);
-      return;
-    }
-    // TODO capture ffmpeg stderr and put it somewhere useful
-    // (maybe the progress report should be a larger window)
-    // Render PNGs to the pipe
-    for(int frame = 0; frame < frames; ++frame) {
-      std::stringstream pstream;
-      pstream << "Frame " << frame << "/" << frames;
-      (new Progress(this, pstream.str()))
-          ->submit(&MovieWindow::progress_callback, NULL);
-      arith_t radius = sr * pow(rk, frame);
-      arith_t x = sx + arith_t(frame) * (ex - sx) / (frames - 1);
-      arith_t y = sy + arith_t(frame) * (ey - sy) / (frames - 1);
-      if(draw(width, height, x, y, radius, maxiters, controls.m_arith, fp)
-         < 0) {
-        (new Progress(this, "Encoding failed.", true))
-            ->submit(&MovieWindow::progress_callback, NULL);
-        pclose(fp);
-        ::remove(controls.m_path.c_str());
-        return;
-      }
-    }
-    // Finish
-    int rc = pclose(fp);
-    if(rc) {
-      fprintf(stderr, "encoder: pclose: %d\n", rc);
-      ::remove(controls.m_path.c_str());
-      (new Progress(this, "Encoding failed.", true))
-          ->submit(&MovieWindow::progress_callback, NULL);
-    } else
-      (new Progress(this, "Movie completed.", true))
-          ->submit(&MovieWindow::progress_callback, NULL);
+    RenderMovieThread rmt(this);
+    rmt.sx = controls.m_x;
+    rmt.sy = controls.m_y;
+    rmt.sr = 2;
+    rmt.ex = controls.m_x;
+    rmt.ey = controls.m_y;
+    rmt.er = controls.m_radius;
+    rmt.maxiters = controls.m_maxiters;
+    rmt.width = 1280;
+    rmt.height = 720; // TODO configurable
+    rmt.seconds = controls.m_seconds;
+    rmt.fps = controls.m_fps;
+    rmt.bitrate = controls.m_bitrate;
+    rmt.arith = controls.m_arith;
+    rmt.ffmpeg = controls.m_ffmpeg;
+    rmt.codec = controls.m_codec;
+    rmt.path = controls.m_path;
+    rmt.Render();
   }
 
   void progress(const std::string &message, bool completed) {

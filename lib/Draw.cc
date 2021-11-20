@@ -21,12 +21,6 @@
 #include "Shell.h"
 #include <gdkmm/pixbuf.h>
 
-#ifndef DEFAULT_FFMPEG
-#define DEFAULT_FFMPEG "ffmpeg"
-#endif
-
-#define TMP_PATTERN "tmp%d.png"
-
 void draw(const char *wstr, const char *hstr, const char *xstr,
           const char *ystr, const char *rstr, const char *mistr,
           const char *path) {
@@ -168,122 +162,146 @@ static std::string get_default(const char *name,
 int dive(const char *wstr, const char *hstr, const char *sxstr,
          const char *systr, const char *srstr, const char *exstr,
          const char *eystr, const char *erstr, const char *mistr,
-         const char *frstr, const char *path) {
-  arith_t sx, sy, ex, ey, sr, er;
-  long width, height, maxiters, frames;
+         const char *secstr, const char *path) {
+  RenderMovie rm;
   char *eptr;
   int error;
 
   errno = 0;
-  width = strtol(wstr, &eptr, 10);
+  rm.width = strtol(wstr, &eptr, 10);
   if(errno)
     fatal(errno, "cannot convert '%s'", wstr);
   if(eptr == wstr)
     fatal(0, "cannot convert '%s'", wstr);
-  if(width > INT_MAX || width <= 0)
+  if(rm.width > INT_MAX || rm.width <= 0)
     fatal(0, "cannot convert '%s': out of range", wstr);
 
   errno = 0;
-  height = strtol(hstr, &eptr, 10);
+  rm.height = strtol(hstr, &eptr, 10);
   if(errno)
     fatal(errno, "cannot convert '%s'", hstr);
   if(eptr == hstr)
     fatal(0, "cannot convert '%s'", hstr);
-  if(height > INT_MAX || height <= 0)
+  if(rm.height > INT_MAX || rm.height <= 0)
     fatal(0, "cannot convert '%s': out of range", hstr);
 
-  if((error = arith_traits<arith_t>::fromString(sx, sxstr, &eptr)))
+  if((error = arith_traits<arith_t>::fromString(rm.sx, sxstr, &eptr)))
     fatal(error, "cannot convert '%s'", sxstr);
   if(eptr == sxstr)
     fatal(0, "cannot convert '%s'", sxstr);
 
-  if((error = arith_traits<arith_t>::fromString(sy, systr, &eptr)))
+  if((error = arith_traits<arith_t>::fromString(rm.sy, systr, &eptr)))
     fatal(error, "cannot convert '%s'", systr);
   if(eptr == systr)
     fatal(0, "cannot convert '%s'", systr);
 
-  if((error = arith_traits<arith_t>::fromString(sr, srstr, &eptr)))
+  if((error = arith_traits<arith_t>::fromString(rm.sr, srstr, &eptr)))
     fatal(error, "cannot convert '%s'", srstr);
   if(eptr == srstr)
     fatal(0, "cannot convert '%s'", srstr);
-  if(sr <= arith_t(0))
+  if(rm.sr <= arith_t(0))
     fatal(0, "cannot convert '%s': too small", erstr);
 
-  if((error = arith_traits<arith_t>::fromString(ex, exstr, &eptr)))
+  if((error = arith_traits<arith_t>::fromString(rm.ex, exstr, &eptr)))
     fatal(error, "cannot convert '%s'", exstr);
   if(eptr == exstr)
     fatal(0, "cannot convert '%s'", exstr);
 
-  if((error = arith_traits<arith_t>::fromString(ey, eystr, &eptr)))
+  if((error = arith_traits<arith_t>::fromString(rm.ey, eystr, &eptr)))
     fatal(error, "cannot convert '%s'", eystr);
   if(eptr == eystr)
     fatal(0, "cannot convert '%s'", eystr);
 
-  if((error = arith_traits<arith_t>::fromString(er, erstr, &eptr)))
+  if((error = arith_traits<arith_t>::fromString(rm.er, erstr, &eptr)))
     fatal(error, "cannot convert '%s'", erstr);
   if(eptr == erstr)
     fatal(0, "cannot convert '%s'", erstr);
-  if(er <= arith_t(0))
+  if(rm.er <= arith_t(0))
     fatal(0, "cannot convert '%s': too small", erstr);
 
   errno = 0;
-  maxiters = strtol(mistr, &eptr, 10);
+  rm.maxiters = strtol(mistr, &eptr, 10);
   if(errno)
     fatal(errno, "cannot convert '%s'", mistr);
   if(eptr == mistr)
     fatal(0, "cannot convert '%s'", mistr);
-  if(maxiters > INT_MAX || maxiters <= 0)
+  if(rm.maxiters > INT_MAX || rm.maxiters <= 0)
     fatal(0, "cannot convert '%s': out of range", mistr);
 
   errno = 0;
-  frames = strtol(frstr, &eptr, 10);
+  rm.seconds = strtol(secstr, &eptr, 10);
   if(errno)
-    fatal(errno, "cannot convert '%s'", frstr);
-  if(eptr == frstr)
-    fatal(0, "cannot convert '%s'", frstr);
-  if(frames > INT_MAX || frames <= 0)
-    fatal(0, "cannot convert '%s': out of range", frstr);
+    fatal(errno, "cannot convert '%s'", secstr);
+  if(eptr == secstr)
+    fatal(0, "cannot convert '%s'", secstr);
+  if(rm.seconds > INT_MAX || rm.seconds <= 0)
+    fatal(0, "cannot convert '%s': out of range", secstr);
 
+  rm.ffmpeg = get_default("FFMPEG", ffmpegDefault());
+  rm.codec = get_default("CODEC", "mpeg4");
+  rm.fps = atoi(get_default("FRAME_RATE", "25").c_str());
+  rm.bitrate = atoi(get_default("BITRATE", "2097152").c_str());
+  rm.path = path;
+
+  return rm.Render();
+}
+
+int RenderMovie::Render() {
+  const int frames = seconds * fps;
   double rk = pow(arith_traits<arith_t>::toDouble(er / sr), 1.0 / (frames - 1));
+  std::stringstream command, pstream;
   // Construct the command
-  std::string command;
-  command += shellQuote(get_default("FFMPEG", ffmpegDefault()));
-  command += " -f image2pipe -i pipe:0";
-  command += " -vcodec ";
-  command += get_default("CODEC", "mpeg4");
-  command += " -r ";
-  command += get_default("FRAME_RATE", "25");
-  command += " -b:v ";
-  command += get_default("BITRATE", "2M");
-  command += " ";
-  command += shellQuote(path);
-  fprintf(stderr, "encoding with: %s\n", command.c_str());
-  // Run the command
-  remove(path);
-  FILE *fp = popen(command.c_str(), "w");
+  command << shellQuote(ffmpeg)
+          << " -f image2pipe" // input format is concatenated image file demuxer
+          << " -i pipe:0"     // input fil
+          << " -vcodec " << shellQuote(codec) // output file codec
+          << " -r " << fps                    // frame rate
+          << " -b:v " << bitrate              // bit rate
+          << " " << shellQuote(path);         // output file
+  // Report the encoder command
+  pstream << "Encoding with " << ffmpeg;
+  Progress(pstream.str());
+  // Run the encoder
+  ::remove(path.c_str());
+  fprintf(stderr, "%s\n", command.str().c_str());
+  FILE *fp = popen(command.str().c_str(), "w");
   if(!fp) {
     perror("popen");
+    Progress("Executing ffmpeg failed");
     return -1;
   }
-  // Render frames
+  // TODO capture ffmpeg stderr and put it somewhere useful
+  // (maybe the progress report should be a larger window)
+  // Render PNGs to the pipe
   for(int frame = 0; frame < frames; ++frame) {
+    std::stringstream pstream;
+    pstream << "Frame " << frame << "/" << frames;
+    Progress(pstream.str());
     arith_t radius = sr * pow(rk, frame);
     arith_t x = sx + arith_t(frame) * (ex - sx) / (frames - 1);
     arith_t y = sy + arith_t(frame) * (ey - sy) / (frames - 1);
-    fprintf(stderr, "frame %d/%ld centre %s x %s radius %s\n", frame + 1,
-            frames, arith_traits<arith_t>::toString(x).c_str(),
-            arith_traits<arith_t>::toString(y).c_str(),
-            arith_traits<arith_t>::toString(radius).c_str());
-    if(draw(width, height, x, y, radius, maxiters, ARITH_DEFAULT, fp) < 0)
+    if(draw(width, height, x, y, radius, maxiters, arith, fp) < 0) {
+      Progress("Encoding failed");
+      pclose(fp);
+      ::remove(path.c_str());
       return -1;
+    }
   }
-  // Close the pipe
+  // Finish
   int rc = pclose(fp);
-  if(rc != 0) {
-    fprintf(stderr, "pclose: %d\n", rc);
+  if(rc) {
+    fprintf(stderr, "encoder: pclose: %d\n", rc);
+    ::remove(path.c_str());
+    Progress("Encoding failed", true);
     return -1;
+  } else {
+    Progress("Encoding complete", true);
+    return 0;
   }
-  return rc;
+}
+
+void RenderMovie::Progress(const std::string &msg, bool) {
+  fprintf(stderr, "%s\n", msg.c_str());
 }
 
 /*
