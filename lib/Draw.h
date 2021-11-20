@@ -48,8 +48,8 @@ public:
   int bitrate = 8 * 1024 * 1024;
   arith_type arith = ARITH_DEFAULT;
   std::string ffmpeg = DEFAULT_FFMPEG;
-  std::string codec = "mpeg4";
-  std::string path = "mandy.avi";
+  std::string codec = "libx264";
+  std::string path = "mandy.mp4";
 
   int Render();
 

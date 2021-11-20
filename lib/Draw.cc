@@ -238,7 +238,7 @@ int dive(const char *wstr, const char *hstr, const char *sxstr,
     fatal(0, "cannot convert '%s': out of range", secstr);
 
   rm.ffmpeg = get_default("FFMPEG", ffmpegDefault());
-  rm.codec = get_default("CODEC", "mpeg4");
+  rm.codec = get_default("CODEC", "libx264");
   rm.fps = atoi(get_default("FRAME_RATE", "25").c_str());
   rm.bitrate = atoi(get_default("BITRATE", "2097152").c_str());
   rm.path = path;
@@ -251,12 +251,18 @@ int RenderMovie::Render() {
   double rk = pow(arith_traits<arith_t>::toDouble(er / sr), 1.0 / (frames - 1));
   std::stringstream command, pstream;
   // Construct the command
+  std::string extras;
+  if(codec.find("264") != std::string::npos) {
+    // see e.g. https://bugzilla.mozilla.org/show_bug.cgi?id=1368063
+    extras = "-pix_fmt yuv420p";
+  }
   command << shellQuote(ffmpeg)
           << " -f image2pipe" // input format is concatenated image file demuxer
           << " -i pipe:0"     // input fil
           << " -vcodec " << shellQuote(codec) // output file codec
           << " -r " << fps                    // frame rate
           << " -b:v " << bitrate              // bit rate
+          << " " << extras                    // extra options
           << " " << shellQuote(path);         // output file
   // Report the encoder command
   pstream << "Encoding with " << ffmpeg;

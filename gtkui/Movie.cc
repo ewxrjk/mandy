@@ -38,21 +38,21 @@ public:
   arith_type m_arith;
   int m_maxiters, m_seconds, m_fps;
   int m_bitrate;
-  std::string m_codec;
+  std::string m_codec = "libx264";
   std::string m_ffmpeg;
   std::string m_path;
 
   RealControl m_x_control, m_y_control, m_radius_control;
   IntegerControl m_maxiters_control, m_seconds_control, m_fps_control,
       m_bitrate_control;
-  DropDownControl m_codec_control;
+  StringControl m_codec_control;
   FileSelectionControl m_ffmpeg_control;
   StringControl m_path_control; // TODO use a file chooser
 
   MovieControls(MovieWindow *window):
       m_window(window), m_x(0), m_y(0), m_radius(2), m_arith(ARITH_DEFAULT),
       m_maxiters(255), m_seconds(10), m_fps(25), m_bitrate(8 * 1024 * 1024),
-      m_ffmpeg(ffmpegDefault()), m_path("mandy.avi"),
+      m_ffmpeg(ffmpegDefault()), m_path("mandy.mp4"),
       m_x_control(this, &m_x, -arith_traits<arith_t>::maximum(),
                   arith_traits<arith_t>::maximum()),
       m_y_control(this, &m_y, -arith_traits<arith_t>::maximum(),
@@ -81,8 +81,6 @@ public:
   }
 
   void controlChanged(Control *);
-
-  void GetCodecs();
 };
 
 class MovieWindow: public Gtk::Window {
@@ -214,53 +212,6 @@ void MovieControls::controlChanged(Control *c) {
   m_window->controlChanged();
   if(c == &m_ffmpeg_control) {
     c->UpdateUnderlying();
-    GetCodecs();
-  }
-}
-
-void MovieControls::GetCodecs() {
-  // Get a list of codecs
-  std::vector<std::string> output;
-  std::set<std::string> codecs;
-  // Try the -codecs option first; back off to -formats if it does
-  // not work.  Really grim parsing code...
-  if(Capture(shellQuote(m_ffmpeg) + " -codecs 2>/dev/null", output)) {
-    size_t n = 0;
-    while(n < output.size() && output[n].substr(0, 2) != " -")
-      ++n;
-    ++n;
-    while(n < output.size() && output[n] != "\n") {
-      if(output[n].size() >= 8 && output[n][2] == 'E' && output[n][3] == 'V')
-        codecs.insert(output[n].substr(8, output[n].find(' ', 8) - 8));
-      ++n;
-    }
-  } else if(Capture(shellQuote(m_ffmpeg) + " -formats 2>/dev/null", output)) {
-    size_t n = 0;
-    while(n < output.size() && output[n] != "Codecs:\n")
-      ++n;
-    ++n;
-    while(n < output.size() && output[n] != "\n") {
-      if(output[n].size() >= 8 && output[n][2] == 'E' && output[n][3] == 'V')
-        codecs.insert(output[n].substr(8, output[n].find(' ', 8) - 8));
-      ++n;
-    }
-  }
-  m_codec_control.UpdateChoices(codecs.begin(), codecs.end());
-  m_codec_control.UpdateUnderlying();
-  // If we haven't got a selected codec try to pick a tolerable one
-  if(m_codec == "") {
-    static const char *const codec_choices[] = {
-        "libx264",
-        "mpeg4",
-        "mjpeg",
-    };
-    for(size_t n = 0; n < sizeof codec_choices / sizeof *codec_choices; ++n) {
-      if(codecs.find(codec_choices[n]) != codecs.end()) {
-        m_codec = codec_choices[n];
-        m_codec_control.UpdateDisplay();
-        break;
-      }
-    }
   }
 }
 
@@ -272,9 +223,7 @@ void Movie(arith_t x, arith_t y, arith_t radius, int maxiters,
   w->controls.m_radius = radius;
   w->controls.m_maxiters = maxiters;
   w->controls.m_arith = arith;
-  w->controls.GetCodecs();
   w->controls.UpdateDisplay();
   w->show_all();
 }
-
 }; // namespace mmui
