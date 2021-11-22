@@ -58,7 +58,7 @@ static inline void Fixed128_sub(union Fixed128 *r, const union Fixed128 *a,
 
 static inline int Fixed128_neg(union Fixed128 *r, const union Fixed128 *a) {
   uint32_t sign = a->word[NFIXED128 - 1] & 0x80000000;
-  r->s128 = -a->s128;
+  r->u128 = -a->u128;
   if(sign && (r->word[NFIXED128 - 1] & 0x80000000))
     return 1;
   else
@@ -76,7 +76,12 @@ void Fixed128_div(union Fixed128 *r, const union Fixed128 *a,
 void Fixed128_sqrt(union Fixed128 *r, const union Fixed128 *a);
 
 static inline void Fixed128_int2(union Fixed128 *r, int i) {
-  r->s128 = (int128_t)i << 96;
+  if(i >= 0)
+    r->s128 = (int128_t)i << 96;
+  else {
+    r->u128 = (uint128_t)(-i) << 96;
+    r->s128 = -r->s128;
+  }
 }
 
 static inline void Fixed128_shl_unsigned(union Fixed128 *a) {

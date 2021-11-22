@@ -18,7 +18,8 @@
 #include <stdio.h>
 #include <math.h>
 
-#define UINT128_MAX (-(uint128_t)1)
+#define UINT128_MAX                                                            \
+  ((uint128_t)0xFFFFFFFFFFFFFFFF + ((uint128_t)0xFFFFFFFFFFFFFFFF << 64))
 #define UNDERFLOW_MASK (UINT128_MAX >> 32)
 
 // add b to *r, setting *overflow if the result is too large
