@@ -20,6 +20,13 @@
 #include "arith.h"
 
 void MandelbrotJob::work() {
+  // TODO SIMD support
+  arith_type a;
+  switch(arith) {
+  case arith_simd2:
+  case arith_simd4: a = arith_double; break;
+  default: a = arith;
+  }
   // Compute the pixel limits
   const int lx = x + w, ly = y + h;
   // Iterate over rows
@@ -53,7 +60,7 @@ void MandelbrotJob::work() {
       }
       // TODO if the whole square is outside both regions, we could
       // skip these tests.
-      iterations = iterate(zx, zy, cx, cy, maxiters, arith);
+      iterations = iterate(zx, zy, cx, cy, maxiters, a);
     done:
       *res++ = iterations;
     }

@@ -20,7 +20,8 @@ Fixed128CC.cc FractalJob.cc FractalJob.h IterBuffer.cc IterBuffer.h	\
 Job.cc Job.h JuliaJob.cc JuliaJob.h MandelbrotJob.cc MandelbrotJob.h	\
 Shell.cc Shell.h 						\
 Threading.cc Threading.h arith.cc arith.h fatal.cc mandy.h	\
-cgi.cc cgi.h
+cgi.cc cgi.h \
+simdarith.h simdarith.cc
 fixed128_test_SOURCES=fixed128-test.c
 fixed128_test_LDADD=libmandy.a -lm
 fixed64_test_SOURCES=fixed64-test.c

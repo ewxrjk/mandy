@@ -17,10 +17,7 @@
 #include "arith.h"
 
 const char *const arith_names[] = {
-    "double",
-    "long double",
-    "fixed64",
-    "fixed128",
+    "double", "simd2", "simd4", "long double", "fixed64", "fixed128",
 };
 
 arith_type string_to_arith(const std::string &s) {
@@ -36,6 +33,8 @@ count_t iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy, int maxiters,
   case arith_double:
     return arith_traits<double>::iterate(zx, zy, cx, cy, maxiters);
     break;
+  case arith_simd2:
+  case arith_simd4: throw std::logic_error("iterate with SIMD arithmetic type");
   case arith_long_double:
     return arith_traits<long double>::iterate(zx, zy, cx, cy, maxiters);
     break;

@@ -20,6 +20,13 @@
 #include "arith.h"
 
 void JuliaJob::work() {
+  // TODO SIMD support
+  arith_type a;
+  switch(arith) {
+  case arith_simd2:
+  case arith_simd4: a = arith_double; break;
+  default: a = arith;
+  }
   const int lx = x + w, ly = y + h;
   for(int py = y; py < ly; ++py) {
     count_t *res = dest->data + py * dest->w + x;
@@ -28,7 +35,7 @@ void JuliaJob::work() {
       arith_t izx = xleft + arith_t(px) * xsize / dest->w;
       count_t iterations = 0;
       arith_t zx = izx, zy = izy;
-      iterations = iterate(zx, zy, cx, cy, maxiters, arith);
+      iterations = iterate(zx, zy, cx, cy, maxiters, a);
       *res++ = iterations;
     }
   }

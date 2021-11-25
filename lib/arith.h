@@ -33,6 +33,8 @@ typedef fixed128 arith_t;
 
 enum arith_type {
   arith_double,
+  arith_simd2,
+  arith_simd4,
   arith_long_double,
   arith_fixed64,
   arith_fixed128,
