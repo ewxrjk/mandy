@@ -56,6 +56,14 @@ public:
   static count_t iterate(T zx, T zy, T cx, T cy, int maxiters);
 };
 
+static inline count_t transform_iterations(int iterations, double r2,
+                                           int maxiters) {
+  if(iterations == maxiters)
+    return maxiters;
+  else
+    return 1 + iterations - log2(log2(r2));
+}
+
 template <typename T>
 count_t defaultIterate(T zx, T zy, T cx, T cy, int maxiters) {
   T r2, zx2, zy2;
@@ -66,10 +74,8 @@ count_t defaultIterate(T zx, T zy, T cx, T cy, int maxiters) {
     zx = zx2 - zy2 + cx;
     ++iterations;
   }
-  if(iterations == maxiters)
-    return maxiters;
-  else
-    return 1 + iterations - log2(log2(arith_traits<T>::toDouble(r2)));
+  return transform_iterations(iterations, arith_traits<T>::toDouble(r2),
+                              maxiters);
 }
 
 template <> class arith_traits<double> {

@@ -56,11 +56,13 @@ void simd_iterate2(double *zvalues, const double *cvalues, int maxiters,
       break;
 #endif
     vector2 Zxnew = Zx2 - Zy2 + Cx;
-    vector2 Zynew = Zx * Zy + Cy;
+    vector2 Zynew = 2 * Zx * Zy + Cy;
     Zx = escaped ? Zx : Zxnew;
     Zy = escaped ? Zy : Zynew;
     iterations++;
   }
+  ivector2 maxiters_vector = {maxiters, maxiters};
+  escape_iters |= maxiters_vector & ~escaped_already;
   zvalues[0] = Zx[0];
   zvalues[1] = Zy[0];
   zvalues[2] = Zx[1];
@@ -98,12 +100,14 @@ void simd_iterate4(double *zvalues, const double *cvalues, int maxiters,
       break;
 #endif
     vector4 Zxnew = Zx2 - Zy2 + Cx;
-    vector4 Zynew = Zx * Zy + Cy;
+    vector4 Zynew = 2 * Zx * Zy + Cy;
     Zx = escaped ? Zx : Zxnew;
     Zy = escaped ? Zy : Zynew;
     iterations++;
     // TODO stop if everything has escaped
   }
+  ivector4 maxiters_vector = {maxiters, maxiters, maxiters, maxiters};
+  escape_iters |= maxiters_vector & ~escaped_already;
   zvalues[0] = Zx[0];
   zvalues[1] = Zy[0];
   zvalues[2] = Zx[1];
