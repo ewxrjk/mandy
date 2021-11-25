@@ -83,17 +83,14 @@ void MandelbrotJob::simd2() {
       // Complex-plane location of this column
       const double cx0 = (xleft + arith_t(px) * xsize / dest->w).toDouble();
       const double cx1 = (xleft + arith_t(px + 1) * xsize / dest->w).toDouble();
-      double zvalues[4] = {0, 0, 0, 0};
-      double cvalues[4] = {cx0, cy, cx1, cy};
+      const double zvalues[4] = {0, 0, 0, 0};
+      const double cvalues[4] = {cx0, cy, cx1, cy};
+      double r2values[2];
       int iterations[2];
-      simd_iterate2(zvalues, cvalues, maxiters, iterations);
-      *res++ = transform_iterations(
-          iterations[0], zvalues[0] * zvalues[0] + zvalues[1] * zvalues[1],
-          maxiters);
+      simd_iterate2(zvalues, cvalues, maxiters, iterations, r2values);
+      *res++ = transform_iterations(iterations[0], r2values[0], maxiters);
       if(px + 1 < lx)
-        *res++ = transform_iterations(
-            iterations[1], zvalues[2] * zvalues[2] + zvalues[3] * zvalues[3],
-            maxiters);
+        *res++ = transform_iterations(iterations[1], r2values[1], maxiters);
     }
   }
 }

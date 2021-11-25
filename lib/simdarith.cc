@@ -20,18 +20,19 @@
 typedef double vector2 __attribute__((vector_size(16)));
 typedef long long ivector2 __attribute__((vector_size(16)));
 
-void simd_iterate2(double *zvalues, const double *cvalues, int maxiters,
-                   int *iters) {
+void simd_iterate2(const double *zvalues, const double *cvalues, int maxiters,
+                   int *iters, double *r2values) {
   const vector2 Cx = {cvalues[0], cvalues[2]};
   const vector2 Cy = {cvalues[1], cvalues[3]};
   vector2 Zx = {zvalues[0], zvalues[2]};
   vector2 Zy = {zvalues[1], zvalues[3]};
+  vector2 r2 = {0, 0};
   ivector2 escape_iters = {0, 0}, escaped_already = {0, 0};
   int iterations = 0;
   while(iterations < maxiters) {
     vector2 Zx2 = Zx * Zx;
     vector2 Zy2 = Zy * Zy;
-    vector2 r2 = Zx2 + Zy2;
+    r2 = Zx2 + Zy2;
     ivector2 escaped = r2 >= 64.0;
     ivector2 escaped_this_time = escaped & ~escaped_already;
     ivector2 iters_vector = {iterations, iterations};
@@ -63,10 +64,8 @@ void simd_iterate2(double *zvalues, const double *cvalues, int maxiters,
   }
   ivector2 maxiters_vector = {maxiters, maxiters};
   escape_iters |= maxiters_vector & ~escaped_already;
-  zvalues[0] = Zx[0];
-  zvalues[1] = Zy[0];
-  zvalues[2] = Zx[1];
-  zvalues[3] = Zy[1];
+  r2values[0] = r2[0];
+  r2values[1] = r2[1];
   iters[0] = escape_iters[0];
   iters[1] = escape_iters[1];
 }
@@ -74,18 +73,19 @@ void simd_iterate2(double *zvalues, const double *cvalues, int maxiters,
 typedef double vector4 __attribute__((vector_size(32)));
 typedef long long ivector4 __attribute__((vector_size(32)));
 
-void simd_iterate4(double *zvalues, const double *cvalues, int maxiters,
-                   int *iters) {
+void simd_iterate4(const double *zvalues, const double *cvalues, int maxiters,
+                   int *iters, double *r2values) {
   const vector4 Cx = {cvalues[0], cvalues[2], cvalues[4], cvalues[6]};
   const vector4 Cy = {cvalues[1], cvalues[3], cvalues[5], cvalues[7]};
   vector4 Zx = {zvalues[0], zvalues[2], zvalues[4], zvalues[6]};
   vector4 Zy = {zvalues[1], zvalues[3], zvalues[5], zvalues[7]};
+  vector4 r2 = {0, 0, 0, 0};
   ivector4 escape_iters = {0, 0, 0, 0}, escaped_already = {0, 0, 0, 0};
   int iterations = 0;
   while(iterations < maxiters) {
     vector4 Zx2 = Zx * Zx;
     vector4 Zy2 = Zy * Zy;
-    vector4 r2 = Zx2 + Zy2;
+    r2 = Zx2 + Zy2;
     ivector4 escaped = r2 >= 64.0;
     ivector4 escaped_this_time = escaped & ~escaped_already;
     ivector4 iters_vector = {iterations, iterations, iterations, iterations};
@@ -107,14 +107,10 @@ void simd_iterate4(double *zvalues, const double *cvalues, int maxiters,
   }
   ivector4 maxiters_vector = {maxiters, maxiters, maxiters, maxiters};
   escape_iters |= maxiters_vector & ~escaped_already;
-  zvalues[0] = Zx[0];
-  zvalues[1] = Zy[0];
-  zvalues[2] = Zx[1];
-  zvalues[3] = Zy[1];
-  zvalues[4] = Zx[2];
-  zvalues[5] = Zy[2];
-  zvalues[6] = Zx[3];
-  zvalues[7] = Zy[3];
+  r2values[0] = r2[0];
+  r2values[1] = r2[1];
+  r2values[2] = r2[2];
+  r2values[3] = r2[3];
   iters[0] = escape_iters[0];
   iters[1] = escape_iters[1];
   iters[2] = escape_iters[2];
