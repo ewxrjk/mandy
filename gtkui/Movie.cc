@@ -34,13 +34,13 @@ class MovieWindow;
 class MovieControls: public ControlContainer {
 public:
   MovieWindow *m_window;
-  arith_t m_x, m_y, m_radius;
-  arith_type m_arith;
-  int m_maxiters, m_seconds, m_fps;
-  int m_bitrate;
+  arith_t m_x = 0, m_y = 0, m_radius = 2;
+  arith_type m_arith = ARITH_DEFAULT;
+  int m_maxiters = 255, m_seconds = 10, m_fps = 25;
+  int m_bitrate = 8 * 1024 * 1024;
   std::string m_codec = "libx264";
-  std::string m_ffmpeg;
-  std::string m_path;
+  std::string m_ffmpeg = ffmpegDefault();
+  std::string m_path = "mandy.mp4";
 
   RealControl m_x_control, m_y_control, m_radius_control;
   IntegerControl m_maxiters_control, m_seconds_control, m_fps_control,
@@ -50,9 +50,7 @@ public:
   StringControl m_path_control; // TODO use a file chooser
 
   MovieControls(MovieWindow *window):
-      m_window(window), m_x(0), m_y(0), m_radius(2), m_arith(ARITH_DEFAULT),
-      m_maxiters(255), m_seconds(10), m_fps(25), m_bitrate(8 * 1024 * 1024),
-      m_ffmpeg(ffmpegDefault()), m_path("mandy.mp4"),
+      m_window(window),
       m_x_control(this, &m_x, -arith_traits<arith_t>::maximum(),
                   arith_traits<arith_t>::maximum()),
       m_y_control(this, &m_y, -arith_traits<arith_t>::maximum(),
