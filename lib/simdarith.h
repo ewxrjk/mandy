@@ -18,7 +18,7 @@
 
 void simd_iterate2(const double *zvalues, const double *cvalues, int maxiters,
                    int *iters, double *r2values);
-void simd_iterate4(double *zvalues, const double *cvalues, int maxiters,
-                   const int *iters, double *r2values);
+void simd_iterate4(const double *zvalues, const double *cvalues, int maxiters,
+                   int *iters, double *r2values);
 
 #endif /* SIMDARITH_H */

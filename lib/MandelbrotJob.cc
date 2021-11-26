@@ -25,7 +25,7 @@ void MandelbrotJob::work() {
   arith_type a;
   switch(arith) {
   case arith_simd2: simd2(); return;
-  case arith_simd4: a = arith_double; break;
+  case arith_simd4: simd4(); return;
   default: a = arith;
   }
   // Compute the pixel limits
@@ -91,6 +91,36 @@ void MandelbrotJob::simd2() {
       *res++ = transform_iterations(iterations[0], r2values[0], maxiters);
       if(px + 1 < lx)
         *res++ = transform_iterations(iterations[1], r2values[1], maxiters);
+    }
+  }
+}
+
+void MandelbrotJob::simd4() {
+  // Compute the pixel limits
+  const int lx = x + w, ly = y + h;
+  // Iterate over rows
+  for(int py = y; py < ly; ++py) {
+    // Starting point for this row's results
+    count_t *res = dest->data + py * dest->w + x;
+    // Complex-plane location of this row
+    const double cy =
+        (ybottom + arith_t(dest->h - 1 - py) * xsize / dest->w).toDouble();
+    // Iterate over columns
+    for(int px = x; px < lx; px += 4) {
+      // Complex-plane location of this column
+      const double cx0 = (xleft + arith_t(px) * xsize / dest->w).toDouble();
+      const double cx1 = (xleft + arith_t(px + 1) * xsize / dest->w).toDouble();
+      const double cx2 = (xleft + arith_t(px + 2) * xsize / dest->w).toDouble();
+      const double cx3 = (xleft + arith_t(px + 3) * xsize / dest->w).toDouble();
+      const double zvalues[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+      const double cvalues[8] = {cx0, cy, cx1, cy, cx2, cy, cx3, cy};
+      double r2values[4];
+      int iterations[4];
+      simd_iterate4(zvalues, cvalues, maxiters, iterations, r2values);
+      for(int i = 0; i < 4; i++) {
+        if(px + i < lx)
+          *res++ = transform_iterations(iterations[i], r2values[i], maxiters);
+      }
     }
   }
 }
