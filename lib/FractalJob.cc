@@ -41,6 +41,9 @@ IterBuffer *FractalJob::recompute(arith_t cx, arith_t cy, arith_t r,
   // Chunks need to be large enough that the overhead of jobs doesn't
   // add up to much but small enough that stale jobs don't hog the CPU
   // much.
+  //
+  // Chunk widths should normally be powers of 2, so that SIMD implementations
+  // don't waste columns.
   const int chunk = 32;
   std::vector<FractalJob *> jobs;
   for(int px = 0; px < dest->w; px += chunk) {
