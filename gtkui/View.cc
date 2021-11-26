@@ -193,6 +193,8 @@ void View::NewPixels(int px, int py, int pw, int ph) {
 
 // Job completion callback
 void View::Completed(Job *generic_job, void *data) {
+  struct timespec finished;
+  clock_gettime(CLOCK_REALTIME, &finished);
   View *v = (View *)data;
   FractalJob *j = dynamic_cast<FractalJob *>(generic_job);
   // Ignore stale jobs
@@ -200,6 +202,14 @@ void View::Completed(Job *generic_job, void *data) {
     return;
   v->NewPixels(j->x, j->y, j->w, j->h);
   v->Redraw(j->x, j->y, j->w, j->h);
+  double elapsed_time =
+      finished.tv_sec - v->started.tv_sec
+      + (finished.tv_nsec - v->started.tv_nsec) / 1000000000.0;
+  char buffer[64];
+  snprintf(buffer, sizeof buffer, "%gs", elapsed_time);
+  v->elapsed = buffer;
+  if(v->controls)
+    v->controls->UpdateDisplay();
 }
 
 // Called to set a new location, scale or maxiters
@@ -220,6 +230,7 @@ void View::NewLocation(int xpos, int ypos) {
     get_pointer(xpos, ypos);
   // Discard stale work
   Job::cancel(this);
+  clock_gettime(CLOCK_REALTIME, &started);
   dest = FractalJob::recompute(xcenter, ycenter, radius, maxiters, w, h, arith,
                                Completed, this, xpos, ypos, jobFactory);
 }

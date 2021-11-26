@@ -38,11 +38,13 @@ ControlPanel::ControlPanel(View *v):
     count_control(this, &view->count, 0, arith_traits<arith_t>::maximum(),
                   false),
     arith_control(this, &view->arith_string, &arith_names[0],
-                  &arith_names[arith_limit]) {
+                  &arith_names[arith_limit]),
+    elapsed_control(this, &view->elapsed, false) {
   xcenter_control.Attach(0, 0, "X center");
   ycenter_control.Attach(0, 1, "Y center");
   radius_control.Attach(0, 2, "Radius");
   maxiters_control.Attach(0, 3, "Iterations");
+  elapsed_control.Attach(0, 4, "Elapsed");
 
   xpointer_control.Attach(1, 0, "X position");
   ypointer_control.Attach(1, 1, "Y position");
