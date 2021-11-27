@@ -51,7 +51,7 @@ public:
   std::string codec = "libx264";
   std::string path = "mandy.mp4";
 
-  int Render();
+  int Render(int *cancel = nullptr);
 
   virtual void Progress(const std::string &msg, bool completed = false);
 };

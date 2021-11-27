@@ -52,6 +52,8 @@
 #if __GNUC__ && !defined ATOMIC_INC
 #define ATOMIC_INC(x) __sync_add_and_fetch(&(x), 1)
 #define ATOMIC_DEC(x) __sync_sub_and_fetch(&(x), 1)
+#define ATOMIC_SET(x) __sync_or_and_fetch(&(x), 1)
+#define ATOMIC_GET(x) __sync_fetch_and_or(&(x), 0)
 #endif
 
 #include "Fixed128.h"

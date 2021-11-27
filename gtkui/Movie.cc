@@ -57,8 +57,9 @@ public:
   Gtk::Entry report;
   Gtk::VBox vbox;
 
-  bool working;
+  bool working = false;
   threadid_t thread;
+  int cancel_rendering = 0;
 
   // Parameters
   arith_t m_x = 0, m_y = 0, m_radius = 2;
@@ -96,7 +97,7 @@ public:
 
   MovieWindow():
       buttons(false, 0), render("Render"), cancel(Gtk::Stock::CANCEL),
-      vbox(false, 0), working(false) {}
+      vbox(false, 0) {}
 
   ~MovieWindow() {}
 
@@ -133,23 +134,28 @@ public:
     render.set_sensitive(configurationValid());
   }
 
+  // Called when Render button is clicked
   void Render() {
     assert(configurationValid());
     render.set_sensitive(false);
     controls->ContainerActivated(); // TODO a misnamed now?
     controls->SetSensitivity(false);
     working = true;
-    ThreadCreate(thread, MovieWindow::worker, this);
+    cancel_rendering = 0;
+    ThreadCreate(thread, MovieWindow::worker_shim, this);
   }
 
+  // Called when Cancel button is clicked
   void Cancel() {
     if(working) {
-      return; // TODO cancel movie renderer
+      progress("Cancelling", false);
+      ATOMIC_SET(cancel_rendering);
+      return;
     }
     delete this;
   }
 
-  // Worker thread that renders the movie
+  // Worker thread that renders the movie, triggered by Render()
   void worker() {
     RenderMovieThread rmt(this);
     rmt.sx = m_x;
@@ -168,7 +174,7 @@ public:
     rmt.ffmpeg = m_ffmpeg;
     rmt.codec = m_codec;
     rmt.path = m_path;
-    rmt.Render();
+    rmt.Render(&cancel_rendering);
   }
 
   void progress(const std::string &message, bool completed) {
@@ -180,7 +186,8 @@ public:
     }
   }
 
-  static void *worker(void *arg) {
+  // Called in thread created by Render
+  static void *worker_shim(void *arg) {
     static_cast<MovieWindow *>(arg)->worker();
     return NULL;
   }

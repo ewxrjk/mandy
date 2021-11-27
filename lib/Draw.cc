@@ -246,7 +246,7 @@ int dive(const char *wstr, const char *hstr, const char *sxstr,
   return rm.Render();
 }
 
-int RenderMovie::Render() {
+int RenderMovie::Render(int *cancel) {
   const int frames = seconds * fps;
   double rk = pow(arith_traits<arith_t>::toDouble(er / sr), 1.0 / (frames - 1));
   std::stringstream command, pstream;
@@ -279,7 +279,8 @@ int RenderMovie::Render() {
   // TODO capture ffmpeg stderr and put it somewhere useful
   // (maybe the progress report should be a larger window)
   // Render PNGs to the pipe
-  for(int frame = 0; frame < frames; ++frame) {
+  for(int frame = 0; frame < frames && (!cancel || !ATOMIC_GET(*cancel));
+      ++frame) {
     std::stringstream pstream;
     pstream << "Frame " << frame << "/" << frames;
     Progress(pstream.str());
@@ -295,11 +296,15 @@ int RenderMovie::Render() {
   }
   // Finish
   int rc = pclose(fp);
+  fprintf(stderr, "encoder: pclose: %d\n", rc);
   if(rc) {
-    fprintf(stderr, "encoder: pclose: %d\n", rc);
     ::remove(path.c_str());
     Progress("Encoding failed", true);
     return -1;
+  } else if(cancel && ATOMIC_GET(*cancel)) {
+    Progress("Encoding cancelled", true);
+    ::remove(path.c_str());
+    return 0;
   } else {
     Progress("Encoding complete", true);
     return 0;
