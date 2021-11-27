@@ -183,6 +183,7 @@ public:
       ThreadJoin(thread);
       working = false;
       render.set_sensitive(configurationValid());
+      controls->SetSensitivity(true);
     }
   }
 
