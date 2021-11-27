@@ -29,6 +29,26 @@
 #define ATOMIC_TYPE int
 #endif
 
+// Select SIMD implementations
+#if __amd64__
+#define SIMD2 1
+#if __AVX__
+#define SIMD4 1
+#endif
+#endif
+
+#if __aarch64__
+#define SIMD2 1
+#endif
+
+#if SIMD4
+#define ARITH_DEFAULT arith_simd4
+#elif SIMD2
+#define ARITH_DEFAULT arith_simd2
+#else
+#define ARITH_DEFAULT arith_double
+#endif
+
 #if __GNUC__ && !defined ATOMIC_INC
 #define ATOMIC_INC(x) __sync_add_and_fetch(&(x), 1)
 #define ATOMIC_DEC(x) __sync_sub_and_fetch(&(x), 1)

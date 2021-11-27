@@ -25,6 +25,12 @@ class IterBuffer {
   void finished();
   ~IterBuffer();
 
+  // The buffer size. xw is the width rounded up to a multiple of 8
+  // (for the benefit of SIMD implementations.)
+  int xw, w, h;
+  // The actual data.
+  count_t *data;
+
 public:
   // Construct a new IterBuffer with a given size.  The initial refcount is 1.
   IterBuffer(int w, int h);
@@ -38,10 +44,21 @@ public:
     if(ATOMIC_DEC(refs) == 0)
       finished();
   }
-  // The buffer size.
-  int w, h;
-  // The actual data.
-  count_t *data;
+
+  inline count_t &pixel(int x, int y) {
+    return data[y * xw + x];
+  }
+
+  inline int width() const {
+    return w;
+  }
+  inline int height() const {
+    return h;
+  }
+
+  void clear() {
+    memset(data, 0xFF, xw * h * sizeof(count_t));
+  }
 };
 
 #endif /* ITERBUFFER_H */

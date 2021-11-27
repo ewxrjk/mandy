@@ -27,6 +27,7 @@ class ControlPanel: public ControlContainer {
   IntegerControl maxiters_control;
   RealControl xpointer_control, ypointer_control, count_control;
   DropDownControl arith_control;
+  StringControl elapsed_control;
 
 public:
   ControlPanel(View *);

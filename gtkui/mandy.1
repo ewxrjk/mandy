@@ -57,8 +57,14 @@ the following:
 .TP
 .B double
 Native floating point type.
-Usually this will be the fastest option, but it will also run out of
-precision first.
+.TP
+.B simd2
+Native floating point type, 2-way SIMD.
+Availability depends on platform.
+.TP
+.B simd4
+Native floating point type, 4-way SIMD.
+Availability depends on platform.
 .TP
 .B "long double"
 Native floating point type.

@@ -41,11 +41,17 @@ public:
            arith_t radius_, int maxiters_, int x_, int y_, int w_, int h_,
            arith_type arith_) {
     dest = dest_;
-    xleft =
-        xcenter_ - (dest->w > dest->h ? radius_ * dest->w / dest->h : radius_);
-    ybottom =
-        ycenter_ - (dest->w > dest->h ? radius_ : radius_ * dest->h / dest->w);
-    xsize = (dest->w > dest->h ? radius_ * 2 * dest->w / dest->h : radius_ * 2);
+    xleft = xcenter_
+            - (dest->width() > dest->height()
+                   ? radius_ * dest->width() / dest->height()
+                   : radius_);
+    ybottom = ycenter_
+              - (dest->width() > dest->height()
+                     ? radius_
+                     : radius_ * dest->height() / dest->width());
+    xsize = (dest->width() > dest->height()
+                 ? radius_ * 2 * dest->width() / dest->height()
+                 : radius_ * 2);
     maxiters = maxiters_;
     x = x_;
     y = y_;

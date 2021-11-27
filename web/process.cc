@@ -60,7 +60,7 @@ void process_query(const char *query, GdkPixbufSaveFunc writer, gpointer wdata,
     guchar *pixels = gdk_pixbuf_get_pixels(pixbuf);
     for(int yy = 0; yy < h; ++yy) {
       for(int xx = 0; xx < w; ++xx) {
-        count_t c = ib->data[yy * w + xx];
+        count_t c = ib->pixel(xx, yy);
         int r, g, b;
         if(c < m) {
           r = red(c, m);

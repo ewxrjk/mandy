@@ -18,9 +18,13 @@
 
 const char *const arith_names[] = {
     "double",
-    "long double",
-    "fixed64",
-    "fixed128",
+#if SIMD2
+    "simd2",
+#endif
+#if SIMD4
+    "simd4",
+#endif
+    "long double", "fixed64", "fixed128",
 };
 
 arith_type string_to_arith(const std::string &s) {
@@ -36,6 +40,12 @@ count_t iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy, int maxiters,
   case arith_double:
     return arith_traits<double>::iterate(zx, zy, cx, cy, maxiters);
     break;
+#if SIMD2
+  case arith_simd2: throw std::logic_error("iterate arith_simd2");
+#endif
+#if SIMD4
+  case arith_simd4: throw std::logic_error("iterate  arith_simd4");
+#endif
   case arith_long_double:
     return arith_traits<long double>::iterate(zx, zy, cx, cy, maxiters);
     break;

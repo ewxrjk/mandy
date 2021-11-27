@@ -33,6 +33,12 @@ typedef fixed128 arith_t;
 
 enum arith_type {
   arith_double,
+#if SIMD2
+  arith_simd2,
+#endif
+#if SIMD4
+  arith_simd4,
+#endif
   arith_long_double,
   arith_fixed64,
   arith_fixed128,
@@ -54,6 +60,14 @@ public:
   static count_t iterate(T zx, T zy, T cx, T cy, int maxiters);
 };
 
+static inline count_t transform_iterations(int iterations, double r2,
+                                           int maxiters) {
+  if(iterations == maxiters)
+    return maxiters;
+  else
+    return 1 + iterations - log2(log2(r2));
+}
+
 template <typename T>
 count_t defaultIterate(T zx, T zy, T cx, T cy, int maxiters) {
   T r2, zx2, zy2;
@@ -64,10 +78,8 @@ count_t defaultIterate(T zx, T zy, T cx, T cy, int maxiters) {
     zx = zx2 - zy2 + cx;
     ++iterations;
   }
-  if(iterations == maxiters)
-    return maxiters;
-  else
-    return 1 + iterations - log2(log2(arith_traits<T>::toDouble(r2)));
+  return transform_iterations(iterations, arith_traits<T>::toDouble(r2),
+                              maxiters);
 }
 
 template <> class arith_traits<double> {
@@ -170,12 +182,9 @@ public:
                          int maxiters) {
 #if HAVE_ASM_128 && NFIXED128 == 4
     int rawCount = Fixed128_iterate(&zx.f, &zy.f, &cx.f, &cy.f, maxiters);
-    if(rawCount == maxiters)
-      return rawCount;
-    else {
-      // r2 is returned in zx (rather oddly)
-      return 1 + rawCount - log2(log2(zx.toDouble()));
-    }
+    // r2 is returned in zx (rather oddly)
+    double r2 = zx.toDouble();
+    return transform_iterations(rawCount, r2, maxiters);
 #else
     return defaultIterate(zx, zy, cx, cy, maxiters);
 #endif
@@ -212,10 +221,7 @@ public:
 #if HAVE_ASM_64
     double r2;
     int rawCount = Fixed64_iterate(zx.f, zy.f, cx.f, cy.f, &r2, maxiters);
-    if(rawCount == maxiters)
-      return rawCount;
-    else
-      return 1 + rawCount - log2(log2(r2));
+    return transform_iterations(rawCount, r2, maxiters);
 #else
     return defaultIterate(zx, zy, cx, cy, maxiters);
 #endif

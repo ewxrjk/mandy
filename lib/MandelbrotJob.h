@@ -22,6 +22,10 @@ class MandelbrotJob: public FractalJob {
 public:
   // Do the computation (called in background thread)
   void work();
+
+  // SIMD implementations
+  void simd2();
+  void simd4();
 };
 
 class MandelbrotJobFactory: public FractalJobFactory {

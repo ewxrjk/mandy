@@ -100,7 +100,7 @@ int draw(int width, int height, arith_t x, arith_t y, arith_t radius,
       return -1;
     }
     for(int py = 0; py < height; ++py) {
-      const count_t *datarow = &dest->data[py * width];
+      const count_t *datarow = &dest->pixel(0, py);
       for(int px = 0; px < width; ++px) {
         const count_t count = *datarow++;
         int r, g, b;
@@ -124,7 +124,7 @@ int draw(int width, int height, arith_t x, arith_t y, arith_t radius,
     const int rowstride = pixbuf->get_rowstride();
     guint8 *pixels = pixbuf->get_pixels();
     for(int py = 0; py < height; ++py) {
-      const count_t *datarow = &dest->data[py * width];
+      const count_t *datarow = &dest->pixel(0, py);
       guchar *pixelrow = pixels + py * rowstride;
       for(int px = 0; px < width; ++px) {
         const count_t count = *datarow++;

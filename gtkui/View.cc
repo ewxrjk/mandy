@@ -87,8 +87,8 @@ bool View::on_button_release_event(GdkEventButton *event) {
 
 void View::NewPointer(int xpos, int ypos) {
   GetCoordinates(xpointer, ypointer, xpos, ypos);
-  if(xpos >= 0 && ypos >= 0 && xpos < dest->w && ypos < dest->h) {
-    count = dest->data[ypos * dest->w + xpos];
+  if(xpos >= 0 && ypos >= 0 && xpos < dest->width() && ypos < dest->height()) {
+    count = dest->pixel(xpos, ypos);
     if(controls)
       controls->UpdateDisplay();
   }
@@ -168,13 +168,12 @@ void View::NewPixels() {
 
 // Recolor a region of the view
 void View::NewPixels(int px, int py, int pw, int ph) {
-  const int w = dest->w;
   guint8 *pixels = pixbuf->get_pixels();
   const int rowstride = pixbuf->get_rowstride();
   const int lx = px + pw;
   const int ly = py + ph;
   for(int y = py; y < ly; ++y) {
-    count_t *datarow = &dest->data[y * w + px];
+    count_t *datarow = &dest->pixel(px, y);
     guchar *pixelrow = pixels + y * rowstride + px * 3;
     for(int x = px; x < lx; ++x) {
       const count_t count = *datarow++;
@@ -193,6 +192,8 @@ void View::NewPixels(int px, int py, int pw, int ph) {
 
 // Job completion callback
 void View::Completed(Job *generic_job, void *data) {
+  struct timespec finished;
+  clock_gettime(CLOCK_REALTIME, &finished);
   View *v = (View *)data;
   FractalJob *j = dynamic_cast<FractalJob *>(generic_job);
   // Ignore stale jobs
@@ -200,6 +201,14 @@ void View::Completed(Job *generic_job, void *data) {
     return;
   v->NewPixels(j->x, j->y, j->w, j->h);
   v->Redraw(j->x, j->y, j->w, j->h);
+  double elapsed_time =
+      finished.tv_sec - v->started.tv_sec
+      + (finished.tv_nsec - v->started.tv_nsec) / 1000000000.0;
+  char buffer[64];
+  snprintf(buffer, sizeof buffer, "%gs", elapsed_time);
+  v->elapsed = buffer;
+  if(v->controls)
+    v->controls->UpdateDisplay();
 }
 
 // Called to set a new location, scale or maxiters
@@ -220,6 +229,7 @@ void View::NewLocation(int xpos, int ypos) {
     get_pointer(xpos, ypos);
   // Discard stale work
   Job::cancel(this);
+  clock_gettime(CLOCK_REALTIME, &started);
   dest = FractalJob::recompute(xcenter, ycenter, radius, maxiters, w, h, arith,
                                Completed, this, xpos, ypos, jobFactory);
 }

@@ -36,17 +36,20 @@ IterBuffer *FractalJob::recompute(arith_t cx, arith_t cy, arith_t r,
                                   void *completion_data, int xpos, int ypos,
                                   const FractalJobFactory *factory) {
   IterBuffer *dest = new IterBuffer(w, h);
-  // Set everything to 'unknown'
-  memset(dest->data, 0xFF, dest->w * dest->h * sizeof(int));
+  // Set everything to 'unknown'#
+  dest->clear();
   // Chunks need to be large enough that the overhead of jobs doesn't
   // add up to much but small enough that stale jobs don't hog the CPU
   // much.
+  //
+  // Chunk widths should normally be powers of 2, so that SIMD implementations
+  // don't waste columns.
   const int chunk = 32;
   std::vector<FractalJob *> jobs;
-  for(int px = 0; px < dest->w; px += chunk) {
-    const int pw = std::min(chunk, dest->w - px);
-    for(int py = 0; py < dest->h; py += chunk) {
-      const int ph = std::min(chunk, dest->h - py);
+  for(int px = 0; px < dest->width(); px += chunk) {
+    const int pw = std::min(chunk, dest->width() - px);
+    for(int py = 0; py < dest->height(); py += chunk) {
+      const int ph = std::min(chunk, dest->height() - py);
       FractalJob *j = factory->create();
       j->set(dest, cx, cy, r, maxiters, px, py, pw, ph, arith);
       jobs.push_back(j);

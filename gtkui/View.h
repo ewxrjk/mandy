@@ -63,6 +63,7 @@ public:
 
   // Results
   arith_t xpointer = 0, ypointer = 0, count = 0;
+  std::string elapsed;
 
 private:
   // Iteration count and pixel data
@@ -73,6 +74,7 @@ private:
   void NewPixels(int x, int y, int w, int h);
   void NewPixels();
   static void Completed(Job *generic_job, void *completion_data);
+  struct timespec started;
 
   // Dragging support
   bool dragging = false;

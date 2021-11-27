@@ -26,6 +26,8 @@ public:
 
   // Do the computation (called in background thread)
   void work();
+  void simd2();
+  void simd4();
 };
 
 class JuliaJobFactory: public FractalJobFactory {

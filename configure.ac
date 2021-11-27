@@ -51,8 +51,6 @@ if test "x$GCC" = xyes; then
 fi
 CFLAGS="${CFLAGS} ${CFLAGS_EXTRA}"
 
-AC_DEFINE_UNQUOTED([ARITH_DEFAULT],[arith_double],[default precision])
-
 #
 # Assembler support
 #

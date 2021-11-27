@@ -18,8 +18,8 @@
 #include <cstring>
 
 IterBuffer::IterBuffer(int w_, int h_):
-    refs(1), w(w_), h(h_), data(new count_t[w * h]) {
-  memset(data, 0, w * h * sizeof(int));
+    refs(1), xw((w_ + 7) & -8), w(w_), h(h_), data(new count_t[xw * h]) {
+  clear();
 }
 
 void IterBuffer::finished() {
