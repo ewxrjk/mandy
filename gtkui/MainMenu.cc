@@ -142,8 +142,7 @@ public:
     Gtk::Label name;
     name.set_markup("<span font_desc=\"Sans 36\">Mandy</span>");
     Gtk::Label description("Mandelbrot/Julia Set Generator");
-    Gtk::Label copyright("Version " VERSION
-                         " \xC2\xA9 2010 Richard Kettlewell");
+    Gtk::Label copyright("Version " VERSION " \xC2\xA9 Richard Kettlewell");
     about.get_vbox()->pack_start(name, Gtk::PACK_SHRINK);
     about.get_vbox()->pack_start(description, Gtk::PACK_SHRINK);
     Glib::RefPtr<Gdk::Pixbuf> logo_pixbuf =
