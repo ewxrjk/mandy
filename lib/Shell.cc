@@ -60,9 +60,7 @@ std::string findOnPath(const std::string &name) {
 }
 
 std::string ffmpegDefault() {
-  std::string path = findOnPath("avconv");
-  if(!path.size())
-    path = findOnPath("ffmpeg");
+  std::string path = findOnPath("ffmpeg");
   return path;
 }
 
