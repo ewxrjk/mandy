@@ -34,7 +34,7 @@ AC_CHECK_LIB([fcgi],[FCGX_Init],
 AC_CHECK_FUNCS([sysconf])
 AC_DEFINE([_GNU_SOURCE], [1], [use GNU extensions])
 if test "x$GXX" = xyes; then
-  CXXFLAGS="-Wall -W -Werror -Wpointer-arith -Wwrite-strings $CXXFLAGS"
+  CXXFLAGS="-march=native -Wall -W -Werror -Wpointer-arith -Wwrite-strings $CXXFLAGS"
   CXXFLAGS="-std=c++11 -Wno-c++14-extensions -Wno-deprecated-declarations $CXXFLAGS"
   compiler="$($CXX --version)"
   case "$compiler" in
@@ -47,7 +47,7 @@ if test "x$GXX" = xyes; then
 fi
 CXXFLAGS="${CXXFLAGS} ${CXXFLAGS_EXTRA}"
 if test "x$GCC" = xyes; then
-  CFLAGS="-Wall -W -Werror -Wpointer-arith -Wwrite-strings $CFLAGS"
+  CFLAGS="-march=native -Wall -W -Werror -Wpointer-arith -Wwrite-strings $CFLAGS"
 fi
 CFLAGS="${CFLAGS} ${CFLAGS_EXTRA}"
 

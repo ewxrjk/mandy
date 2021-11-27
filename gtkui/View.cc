@@ -26,10 +26,7 @@
 #include "arith.h"
 
 namespace mmui {
-View::View():
-    xcenter(0), ycenter(0), radius(2), maxiters(255), arith(ARITH_DEFAULT),
-    arith_string(arith_names[arith]), xpointer(0), ypointer(0), count(0),
-    dest(NULL), dragging(false), controls(NULL), jobFactory(NULL) {
+View::View() {
   set_size_request(384, 384);
   add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK
              | Gdk::POINTER_MOTION_MASK);

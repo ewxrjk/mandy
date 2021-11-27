@@ -23,15 +23,15 @@ class FractalJobFactory;
 
 class FractalJob: public Job {
 public:
-  IterBuffer *dest;       // buffer to store results in
-  arith_t xleft, ybottom; // complex-plane location
-  arith_t xsize;          // complex-plane size
-  int maxiters;           // maximum iterations
-  int x, y;               // pixel location
-  int w, h;               // pixel dimensions
-  arith_type arith;       // arithmetic type to use
+  IterBuffer *dest = nullptr; // buffer to store results in
+  arith_t xleft, ybottom;     // complex-plane location
+  arith_t xsize;              // complex-plane size
+  int maxiters;               // maximum iterations
+  int x, y;                   // pixel location
+  int w, h;                   // pixel dimensions
+  arith_type arith;           // arithmetic type to use
 
-  FractalJob(): dest(NULL) {}
+  FractalJob() {}
   ~FractalJob() {
     if(dest)
       dest->release();

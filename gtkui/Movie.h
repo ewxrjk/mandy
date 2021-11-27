@@ -14,8 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MOVIEPARAMETERS_H
-#define MOVIEPARAMETERS_H
+#ifndef MOVIE_H
+#define MOVIE_H
 
 #include "Controls.h"
 
@@ -26,7 +26,7 @@ void Movie(arith_t x, arith_t y, arith_t radius, int maxiters,
 
 }
 
-#endif /* MOVIEPARAMETERS_H */
+#endif /* MOVIE_H */
 
 /*
 Local Variables:

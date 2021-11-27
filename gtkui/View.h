@@ -56,17 +56,17 @@ public:
   void Save();
 
   // Parameters
-  arith_t xcenter, ycenter, radius;
-  int maxiters;
-  arith_type arith;
-  std::string arith_string;
+  arith_t xcenter = 0, ycenter = 0, radius = 2;
+  int maxiters = 255;
+  arith_type arith = ARITH_DEFAULT;
+  std::string arith_string = arith_names[ARITH_DEFAULT];
 
   // Results
-  arith_t xpointer, ypointer, count;
+  arith_t xpointer = 0, ypointer = 0, count = 0;
 
 private:
   // Iteration count and pixel data
-  IterBuffer *dest;
+  IterBuffer *dest = nullptr;
   Glib::RefPtr<Gdk::Pixbuf> pixbuf;
 
   void Redraw(int x, int y, int w, int h);
@@ -75,18 +75,18 @@ private:
   static void Completed(Job *generic_job, void *completion_data);
 
   // Dragging support
-  bool dragging;
-  double dragFromX, dragFromY;
-  double dragToX, dragToY;
+  bool dragging = false;
+  double dragFromX = 0, dragFromY = 0;
+  double dragToX = 0, dragToY = 0;
   sigc::connection dragIdleConnection;
 
   void DragComplete();
   bool DragIdle();
 
   // Control panel interface
-  ControlPanel *controls;
+  ControlPanel *controls = nullptr;
 
-  const FractalJobFactory *jobFactory;
+  const FractalJobFactory *jobFactory = nullptr;
 };
 
 } // namespace mmui
