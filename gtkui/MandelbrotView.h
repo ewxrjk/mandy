@@ -28,9 +28,11 @@ public:
   MandelbrotJobFactory mandelbrotJobFactory;
 
   JuliaView *juliaView;
+  JuliaWindow *juliaWindow;
 
-  inline void SetJuliaView(JuliaView *v) {
+  inline void SetJulia(JuliaView *v, JuliaWindow *w) {
     juliaView = v;
+    juliaWindow = w;
   }
   void NewJulia(arith_t x, arith_t y);
   virtual bool on_button_press_event(GdkEventButton *);

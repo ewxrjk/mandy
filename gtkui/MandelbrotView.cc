@@ -15,6 +15,7 @@
  */
 #include "mmui.h"
 #include "JuliaView.h"
+#include "JuliaWindow.h"
 #include "MandelbrotView.h"
 #include "Movie.h"
 
@@ -78,6 +79,7 @@ void MandelbrotView::NewJulia(arith_t xpos, arith_t ypos) {
       y = ycenter + radius * (ypos * 2.0 - h) / w;
     }
     juliaView->Update(x, y);
+    juliaWindow->show_all();
   }
 }
 } // namespace mmui

@@ -101,7 +101,7 @@ int main(int argc, char **argv) {
   mmui::mandelbrot = new mmui::MandelbrotWindow();
   mmui::julia = new mmui::JuliaWindow();
   mmui::mandelbrot->view.NewSize();
-  mmui::mandelbrot->view.SetJuliaView(&mmui::julia->view);
+  mmui::mandelbrot->view.SetJulia(&mmui::julia->view, mmui::julia);
   mmui::julia->view.NewSize();
 
   Gtk::Main::run(*mmui::mandelbrot);
