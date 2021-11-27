@@ -32,9 +32,10 @@ AC_CHECK_LIB([fcgi],[FCGX_Init],
              [AC_SUBST([FCGI_LIBS],[-lfcgi])
               AC_SUBST([MFCGI],[mandy.fcgi])])
 AC_CHECK_FUNCS([sysconf])
+AC_ARG_WITH([arch],[architecture to request],[ARCH=${withval}],[ARCH=native])
 AC_DEFINE([_GNU_SOURCE], [1], [use GNU extensions])
 if test "x$GXX" = xyes; then
-  CXXFLAGS="-march=native -Wall -W -Werror -Wpointer-arith -Wwrite-strings $CXXFLAGS"
+  CXXFLAGS="-march=${ARCH} -Wall -W -Werror -Wpointer-arith -Wwrite-strings $CXXFLAGS"
   CXXFLAGS="-std=c++11 -Wno-c++14-extensions -Wno-deprecated-declarations $CXXFLAGS"
   compiler="$($CXX --version)"
   case "$compiler" in
@@ -47,7 +48,7 @@ if test "x$GXX" = xyes; then
 fi
 CXXFLAGS="${CXXFLAGS} ${CXXFLAGS_EXTRA}"
 if test "x$GCC" = xyes; then
-  CFLAGS="-march=native -Wall -W -Werror -Wpointer-arith -Wwrite-strings $CFLAGS"
+  CFLAGS="-march=${ARCH} -Wall -W -Werror -Wpointer-arith -Wwrite-strings $CFLAGS"
 fi
 CFLAGS="${CFLAGS} ${CFLAGS_EXTRA}"
 

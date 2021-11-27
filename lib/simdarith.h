@@ -19,7 +19,7 @@
 #if SIMD2
 #define NAME simd_iterate2
 #define BYTES 16
-#if __amd64__
+#if __SSE4_1__
 // xmm0=escaped
 // xmm7=(all 1s)
 //   vptest xmm0,xmm7
@@ -56,7 +56,7 @@
 #if SIMD4
 #define NAME simd_iterate4
 #define BYTES 32
-#if __amd64__
+#if __AVX__
 #define NONZERO(v) __builtin_ia32_ptestc256(v, ivector{REP(-1)})
 #else
 #define NONZERO(v) v[0] & v[1] & v[2] & v[3]
