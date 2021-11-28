@@ -33,8 +33,7 @@
 #define NONZERO(v) v[0] & v[1]
 #endif
 #define REP(v) v, v
-#define XVALUES(v) v[0], v[1]
-#define YVALUES(v) v[2], v[3]
+#define VALUES(v) v[0], v[1]
 #define ASSIGN(d, s)                                                           \
   do {                                                                         \
     d[0] = s[0];                                                               \
@@ -47,8 +46,7 @@
 #undef BYTES
 #undef PTESTC
 #undef REP
-#undef XVALUES
-#undef YVALUES
+#undef VALUES
 #undef NONZERO
 #undef ASSIGN
 #endif
@@ -62,8 +60,7 @@
 #define NONZERO(v) v[0] & v[1] & v[2] & v[3]
 #endif
 #define REP(v) v, v, v, v
-#define XVALUES(v) v[0], v[1], v[2], v[3]
-#define YVALUES(v) v[4], v[5], v[6], v[7]
+#define VALUES(v) v[0], v[1], v[2], v[3]
 #define ASSIGN(d, s)                                                           \
   do {                                                                         \
     d[0] = s[0];                                                               \
@@ -78,8 +75,7 @@
 #undef BYTES
 #undef PTESTC
 #undef REP
-#undef XVALUES
-#undef YVALUES
+#undef VALUES
 #undef NONZERO
 #undef ASSIGN
 #endif

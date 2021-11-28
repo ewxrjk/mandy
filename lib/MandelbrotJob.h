@@ -24,8 +24,7 @@ public:
   void work();
 
   // SIMD implementations
-  void simd2();
-  void simd4();
+  void simd();
 };
 
 class MandelbrotJobFactory: public FractalJobFactory {

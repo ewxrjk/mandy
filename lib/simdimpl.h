@@ -14,14 +14,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-static inline void NAME(const double *zvalues, const double *cvalues,
+static inline void NAME(const double *zxvalues, const double *zyvalues,
+                        const double *cxvalues, const double *cyvalues,
                         int maxiters, int *iters, double *r2values) {
   typedef double vector __attribute__((vector_size(BYTES)));
   typedef long long ivector __attribute__((vector_size(BYTES)));
-  const vector Cx = {XVALUES(cvalues)};
-  const vector Cy = {YVALUES(cvalues)};
-  vector Zx = {XVALUES(zvalues)};
-  vector Zy = {YVALUES(zvalues)};
+  const vector Cx = {VALUES(cxvalues)};
+  const vector Cy = {VALUES(cyvalues)};
+  vector Zx = {VALUES(zxvalues)};
+  vector Zy = {VALUES(zyvalues)};
   vector r2 = {REP(0)};
   ivector escape_iters = {REP(0)}, escaped_already = {REP(0)};
   int iterations = 0;

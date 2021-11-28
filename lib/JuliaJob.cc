@@ -24,10 +24,10 @@ void JuliaJob::work() {
   arith_type a;
   switch(arith) {
 #if SIMD2
-  case arith_simd2: simd2(); return;
+  case arith_simd2: simd(); return;
 #endif
 #if SIMD4
-  case arith_simd4: simd4(); return;
+  case arith_simd4: simd(); return;
 #endif
   default: a = arith;
   }
@@ -46,37 +46,12 @@ void JuliaJob::work() {
   }
 }
 
-#if SIMD2
-void JuliaJob::simd2() {
+#if SIMD2 || SIMD4
+void JuliaJob::simd() {
   const int lx = x + w, ly = y + h;
   double cxd = cx.toDouble(), cyd = cy.toDouble();
-  const double cvalues[4] = {cxd, cxd, cyd, cyd};
-  for(int py = y; py < ly; ++py) {
-    count_t *res = &dest->pixel(x, py);
-    const double izy =
-        (ybottom + arith_t(dest->height() - 1 - py) * xsize / dest->width())
-            .toDouble();
-    for(int px = x; px < lx; px += 2) {
-      const double izx0 =
-          (xleft + arith_t(px) * xsize / dest->width()).toDouble();
-      const double izx1 =
-          (xleft + arith_t(px + 1) * xsize / dest->width()).toDouble();
-      const double zvalues[4] = {izx0, izx1, izy, izy};
-      double r2values[2];
-      int iterations[2];
-      simd_iterate2(zvalues, cvalues, maxiters, iterations, r2values);
-      *res++ = transform_iterations(iterations[0], r2values[0], maxiters);
-      *res++ = transform_iterations(iterations[1], r2values[1], maxiters);
-    }
-  }
-}
-#endif
-
-#if SIMD4
-void JuliaJob::simd4() {
-  const int lx = x + w, ly = y + h;
-  double cxd = cx.toDouble(), cyd = cy.toDouble();
-  const double cvalues[8] = {cxd, cxd, cxd, cxd, cyd, cyd, cyd, cyd};
+  const double cxvalues[8] = {cxd, cxd, cxd, cxd};
+  const double cyvalues[8] = {cyd, cyd, cyd, cyd};
   for(int py = y; py < ly; ++py) {
     count_t *res = &dest->pixel(x, py);
     const double izy =
@@ -91,10 +66,27 @@ void JuliaJob::simd4() {
           (xleft + arith_t(px + 2) * xsize / dest->width()).toDouble();
       const double izx3 =
           (xleft + arith_t(px + 3) * xsize / dest->width()).toDouble();
-      const double zvalues[8] = {izx0, izx1, izx2, izx3, izy, izy, izy, izy};
+      const double zxvalues[8] = {izx0, izx1, izx2, izx3};
+      const double zyvalues[8] = {izy, izy, izy, izy};
       double r2values[4];
       int iterations[4];
-      simd_iterate4(zvalues, cvalues, maxiters, iterations, r2values);
+      switch(arith) {
+#if SIMD2
+      case arith_simd2:
+        simd_iterate2(zxvalues, zyvalues, cxvalues, cyvalues, maxiters,
+                      iterations, r2values);
+        simd_iterate2(zxvalues + 2, zyvalues + 2, cxvalues + 2, cyvalues + 2,
+                      maxiters, iterations + 2, r2values + 2);
+        break;
+#endif
+#if SIMD4
+      case arith_simd4:
+        simd_iterate4(zxvalues, zyvalues, cxvalues, cyvalues, maxiters,
+                      iterations, r2values);
+        break;
+#endif
+      default: throw std::logic_error("unhandled arith_type");
+      }
       *res++ = transform_iterations(iterations[0], r2values[0], maxiters);
       *res++ = transform_iterations(iterations[1], r2values[1], maxiters);
       *res++ = transform_iterations(iterations[2], r2values[2], maxiters);

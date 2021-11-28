@@ -24,10 +24,10 @@ void MandelbrotJob::work() {
   arith_type a;
   switch(arith) {
 #if SIMD2
-  case arith_simd2: simd2(); return;
+  case arith_simd2: simd(); return;
 #endif
 #if SIMD4
-  case arith_simd4: simd4(); return;
+  case arith_simd4: simd(); return;
 #endif
   default: a = arith;
   }
@@ -72,39 +72,8 @@ void MandelbrotJob::work() {
   }
 }
 
-#if SIMD2
-void MandelbrotJob::simd2() {
-  // Compute the pixel limits
-  const int lx = x + w, ly = y + h;
-  // Iterate over rows
-  for(int py = y; py < ly; ++py) {
-    // Starting point for this row's results
-    count_t *res = &dest->pixel(x, py);
-    // Complex-plane location of this row
-    const double cy =
-        (ybottom + arith_t(dest->height() - 1 - py) * xsize / dest->width())
-            .toDouble();
-    // Iterate over columns
-    for(int px = x; px < lx; px += 2) {
-      // Complex-plane location of this column
-      const double cx0 =
-          (xleft + arith_t(px) * xsize / dest->width()).toDouble();
-      const double cx1 =
-          (xleft + arith_t(px + 1) * xsize / dest->width()).toDouble();
-      const double zvalues[4] = {0, 0, 0, 0};
-      const double cvalues[4] = {cx0, cx1, cy, cy};
-      double r2values[2];
-      int iterations[2];
-      simd_iterate2(zvalues, cvalues, maxiters, iterations, r2values);
-      *res++ = transform_iterations(iterations[0], r2values[0], maxiters);
-      *res++ = transform_iterations(iterations[1], r2values[1], maxiters);
-    }
-  }
-}
-#endif
-
-#if SIMD4
-void MandelbrotJob::simd4() {
+#if SIMD2 || SIMD4
+void MandelbrotJob::simd() {
   // Compute the pixel limits
   const int lx = x + w, ly = y + h;
   // Iterate over rows
@@ -126,11 +95,29 @@ void MandelbrotJob::simd4() {
           (xleft + arith_t(px + 2) * xsize / dest->width()).toDouble();
       const double cx3 =
           (xleft + arith_t(px + 3) * xsize / dest->width()).toDouble();
-      const double zvalues[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-      const double cvalues[8] = {cx0, cx1, cx2, cx3, cy, cy, cy, cy};
+      const double zxvalues[4] = {0, 0, 0, 0};
+      const double zyvalues[4] = {0, 0, 0, 0};
+      const double cxvalues[4] = {cx0, cx1, cx2, cx3};
+      const double cyvalues[4] = {cy, cy, cy, cy};
       double r2values[4];
       int iterations[4];
-      simd_iterate4(zvalues, cvalues, maxiters, iterations, r2values);
+      switch(arith) {
+#if SIMD2
+      case arith_simd2:
+        simd_iterate2(zxvalues, zyvalues, cxvalues, cyvalues, maxiters,
+                      iterations, r2values);
+        simd_iterate2(zxvalues + 2, zyvalues + 2, cxvalues + 2, cyvalues + 2,
+                      maxiters, iterations + 2, r2values + 2);
+        break;
+#endif
+#if SIMD4
+      case arith_simd4:
+        simd_iterate4(zxvalues, zyvalues, cxvalues, cyvalues, maxiters,
+                      iterations, r2values);
+        break;
+#endif
+      default: throw std::logic_error("unhandled arith_type");
+      }
       for(int i = 0; i < 4; i++)
         *res++ = transform_iterations(iterations[i], r2values[i], maxiters);
     }
