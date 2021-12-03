@@ -76,13 +76,22 @@ void MandelbrotJob::work() {
 #if SIMD2 || SIMD4
 void MandelbrotJob::simd() {
   int px[4], py[4];
-
-  PixelStreamRectangle pixels(x, y, w, h);
-  while(pixels.morepixels(4, px, py))
-    plot(px, py);
+  PixelStreamEdge edge_pixels(x, y, w, h);
+  bool escaped = false;
+  while(edge_pixels.morepixels(4, px, py))
+    escaped |= plot(px, py);
+  PixelStreamRectangle fill_pixels(x + 1, y + 1, w - 1, h - 1);
+  if(escaped) {
+    while(fill_pixels.morepixels(4, px, py))
+      plot(px, py);
+  } else {
+    while(fill_pixels.morepixels(4, px, py))
+      for(int i = 0; i < 4; i++)
+        dest->pixel(px[i], py[i]) = transform_iterations(maxiters, 0, maxiters);
+  }
 }
 
-void MandelbrotJob::plot(int *px, int *py) {
+bool MandelbrotJob::plot(int *px, int *py) {
   const double zxvalues[4] = {0, 0, 0, 0};
   const double zyvalues[4] = {0, 0, 0, 0};
   double cxvalues[4];
@@ -97,9 +106,13 @@ void MandelbrotJob::plot(int *px, int *py) {
   int iterations[4];
   simd_iterate(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations,
                r2values);
-  for(int i = 0; i < 4; i++)
+  bool escaped = false;
+  for(int i = 0; i < 4; i++) {
     dest->pixel(px[i], py[i]) =
         transform_iterations(iterations[i], r2values[i], maxiters);
+    escaped |= (iterations[i] != maxiters);
+  }
+  return escaped;
 }
 
 inline void MandelbrotJob::simd_iterate(const double *zxvalues,
