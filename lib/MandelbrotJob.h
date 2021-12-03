@@ -25,6 +25,13 @@ public:
 
   // SIMD implementations
   void simd();
+
+  // SIMD plot some pixels
+  void plot(int *px, int *py);
+
+  inline void simd_iterate(const double *zxvalues, const double *zyvalues,
+                           const double *cxvalues, const double *cyvalues,
+                           int maxiters, int *iterations, double *r2values);
 };
 
 class MandelbrotJobFactory: public FractalJobFactory {

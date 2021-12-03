@@ -19,6 +19,7 @@
 #include <cstring>
 #include "arith.h"
 #include "simdarith.h"
+#include "PixelStream.h"
 
 void MandelbrotJob::work() {
   arith_type a;
@@ -74,53 +75,54 @@ void MandelbrotJob::work() {
 
 #if SIMD2 || SIMD4
 void MandelbrotJob::simd() {
-  // Compute the pixel limits
-  const int lx = x + w, ly = y + h;
-  // Iterate over rows
-  for(int py = y; py < ly; ++py) {
-    // Starting point for this row's results
-    count_t *res = &dest->pixel(x, py);
-    // Complex-plane location of this row
-    const double cy =
-        (ybottom + arith_t(dest->height() - 1 - py) * xsize / dest->width())
+  int px[4], py[4];
+
+  PixelStreamRectangle pixels(x, y, w, h);
+  while(pixels.morepixels(4, px, py))
+    plot(px, py);
+}
+
+void MandelbrotJob::plot(int *px, int *py) {
+  const double zxvalues[4] = {0, 0, 0, 0};
+  const double zyvalues[4] = {0, 0, 0, 0};
+  double cxvalues[4];
+  double cyvalues[4];
+  for(int i = 0; i < 4; i++) {
+    cxvalues[i] = (xleft + arith_t(px[i]) * xsize / dest->width()).toDouble();
+    cyvalues[i] =
+        (ybottom + arith_t(dest->height() - 1 - py[i]) * xsize / dest->width())
             .toDouble();
-    // Iterate over columns
-    for(int px = x; px < lx; px += 4) {
-      // Complex-plane location of this column
-      const double cx0 =
-          (xleft + arith_t(px) * xsize / dest->width()).toDouble();
-      const double cx1 =
-          (xleft + arith_t(px + 1) * xsize / dest->width()).toDouble();
-      const double cx2 =
-          (xleft + arith_t(px + 2) * xsize / dest->width()).toDouble();
-      const double cx3 =
-          (xleft + arith_t(px + 3) * xsize / dest->width()).toDouble();
-      const double zxvalues[4] = {0, 0, 0, 0};
-      const double zyvalues[4] = {0, 0, 0, 0};
-      const double cxvalues[4] = {cx0, cx1, cx2, cx3};
-      const double cyvalues[4] = {cy, cy, cy, cy};
-      double r2values[4];
-      int iterations[4];
-      switch(arith) {
+  }
+  double r2values[4];
+  int iterations[4];
+  simd_iterate(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations,
+               r2values);
+  for(int i = 0; i < 4; i++)
+    dest->pixel(px[i], py[i]) =
+        transform_iterations(iterations[i], r2values[i], maxiters);
+}
+
+inline void MandelbrotJob::simd_iterate(const double *zxvalues,
+                                        const double *zyvalues,
+                                        const double *cxvalues,
+                                        const double *cyvalues, int maxiters,
+                                        int *iterations, double *r2values) {
+  switch(arith) {
 #if SIMD2
-      case arith_simd2:
-        simd_iterate2(zxvalues, zyvalues, cxvalues, cyvalues, maxiters,
-                      iterations, r2values);
-        simd_iterate2(zxvalues + 2, zyvalues + 2, cxvalues + 2, cyvalues + 2,
-                      maxiters, iterations + 2, r2values + 2);
-        break;
+  case arith_simd2:
+    simd_iterate2(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations,
+                  r2values);
+    simd_iterate2(zxvalues + 2, zyvalues + 2, cxvalues + 2, cyvalues + 2,
+                  maxiters, iterations + 2, r2values + 2);
+    break;
 #endif
 #if SIMD4
-      case arith_simd4:
-        simd_iterate4(zxvalues, zyvalues, cxvalues, cyvalues, maxiters,
-                      iterations, r2values);
-        break;
+  case arith_simd4:
+    simd_iterate4(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations,
+                  r2values);
+    break;
 #endif
-      default: throw std::logic_error("unhandled arith_type");
-      }
-      for(int i = 0; i < 4; i++)
-        *res++ = transform_iterations(iterations[i], r2values[i], maxiters);
-    }
+  default: throw std::logic_error("unhandled arith_type");
   }
 }
 #endif
