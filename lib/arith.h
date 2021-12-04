@@ -55,8 +55,6 @@ public:
   static T maximum();
   static std::string toString(const T &n);
   static int fromString(T &n, const char *s, char **end);
-  static int toInt(const T &n);
-  static double toDouble(const T &n);
   static count_t iterate(T zx, T zy, T cx, T cy, int maxiters);
 };
 
@@ -78,8 +76,7 @@ count_t defaultIterate(T zx, T zy, T cx, T cy, int maxiters) {
     zx = zx2 - zy2 + cx;
     ++iterations;
   }
-  return transform_iterations(iterations, arith_traits<T>::toDouble(r2),
-                              maxiters);
+  return transform_iterations(iterations, (double)(r2), maxiters);
 }
 
 template <> class arith_traits<double> {
@@ -94,24 +91,16 @@ public:
     return buffer;
   }
 
-  static int toInt(const double &n) {
-    return (int)floor(n);
-  }
-
   static int fromString(double &n, const char *s, char **end) {
     errno = 0;
     n = strtod(s, end);
     return errno;
   }
 
-  static double toDouble(const double &n) {
-    return n;
-  }
-
   static count_t iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy,
                          int maxiters) {
-    return defaultIterate(zx.toDouble(), zy.toDouble(), cx.toDouble(),
-                          cy.toDouble(), maxiters);
+    return defaultIterate((double)zx, (double)zy, (double)cx, (double)cy,
+                          maxiters);
   }
 };
 
@@ -132,24 +121,16 @@ public:
     return s.str();
   }
 
-  static int toInt(const long double &n) {
-    return (int)floorl(n);
-  }
-
   static int fromString(long double &n, const char *s, char **end) {
     errno = 0;
     n = strtold(s, end);
     return errno;
   }
 
-  static double toDouble(const long double &n) {
-    return n;
-  }
-
   static count_t iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy,
                          int maxiters) {
-    return defaultIterate(zx.toLongDouble(), zy.toLongDouble(),
-                          cx.toLongDouble(), cy.toLongDouble(), maxiters);
+    return defaultIterate((long double)zx, (long double)zy, (long double)cx,
+                          (long double)cy, maxiters);
   }
 };
 
@@ -166,16 +147,8 @@ public:
     return n.toString();
   }
 
-  static int toInt(const fixed128 &n) {
-    return n.toInt();
-  }
-
   static int fromString(fixed128 &n, const char *s, char **endptr) {
     return n.fromString(s, endptr);
-  }
-
-  static double toDouble(const fixed128 &n) {
-    return n.toDouble();
   }
 
   static count_t iterate(fixed128 zx, fixed128 zy, fixed128 cx, fixed128 cy,
@@ -183,7 +156,7 @@ public:
 #if HAVE_ASM_128 && NFIXED128 == 4
     int rawCount = Fixed128_iterate(&zx.f, &zy.f, &cx.f, &cy.f, maxiters);
     // r2 is returned in zx (rather oddly)
-    double r2 = zx.toDouble();
+    double r2 = (double)zx;
     return transform_iterations(rawCount, r2, maxiters);
 #else
     return defaultIterate(zx, zy, cx, cy, maxiters);
@@ -203,16 +176,8 @@ public:
     return n.toString();
   }
 
-  static int toInt(const fixed64 &n) {
-    return n.toInt();
-  }
-
   static int fromString(fixed64 n, const char *s, char **endptr) {
     return n.fromString(s, endptr);
-  }
-
-  static double toDouble(const fixed64 &n) {
-    return n.toDouble();
   }
 
   static count_t iterate(arith_t zxa, arith_t zya, arith_t cxa, arith_t cya,

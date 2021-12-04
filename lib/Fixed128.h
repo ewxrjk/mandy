@@ -301,15 +301,15 @@ public:
     return Fixed128_str2(&f, s, endptr);
   }
 
-  int toInt() const {
+  explicit operator int() const {
     return f.word[NFIXED128 - 1];
   }
 
-  double toDouble() const {
+  explicit operator double() const {
     return Fixed128_2double(&f);
   }
 
-  long double toLongDouble() const {
+  explicit operator long double() const {
     return Fixed128_2longdouble(&f);
   }
 };

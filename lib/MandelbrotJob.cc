@@ -97,10 +97,10 @@ bool MandelbrotJob::plot(int *px, int *py) {
   double cxvalues[4];
   double cyvalues[4];
   for(int i = 0; i < 4; i++) {
-    cxvalues[i] = (xleft + arith_t(px[i]) * xsize / dest->width()).toDouble();
+    cxvalues[i] = (double)(xleft + arith_t(px[i]) * xsize / dest->width());
     cyvalues[i] =
-        (ybottom + arith_t(dest->height() - 1 - py[i]) * xsize / dest->width())
-            .toDouble();
+        (double)(ybottom
+                 + arith_t(dest->height() - 1 - py[i]) * xsize / dest->width());
   }
   double r2values[4];
   int iterations[4];

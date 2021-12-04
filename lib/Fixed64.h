@@ -170,11 +170,11 @@ public:
     return Fixed64_str2(&f, s, endptr);
   }
 
-  int toInt() const {
+  explicit operator int() const {
     return f >> 56;
   }
 
-  double toDouble() const {
+  explicit operator double() const {
     return Fixed64_2double(f);
   }
 };

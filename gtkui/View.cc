@@ -250,8 +250,8 @@ void View::NewSize() {
     arith_t xpixelNew = xsizeNew / wNew;
     arith_t scale = xpixelOld / xpixelNew;
     // The size of the rescaled image
-    int wScaled = arith_traits<arith_t>::toInt(arith_t(wOld) * scale);
-    int hScaled = arith_traits<arith_t>::toInt(arith_t(hOld) * scale);
+    int wScaled = floor((double)(arith_t(wOld) * scale));
+    int hScaled = floor((double)(arith_t(hOld) * scale));
     // The rescaling parameters.  If the rescaled image is narrower than the
     // new window then it will be offset into it, otherwise it will up at the
     // edge.
@@ -269,14 +269,10 @@ void View::NewSize() {
     // Areas outside the rescaled image will be mid-grey
     memset(newPixbuf->get_pixels(), 0x80, newPixbuf->get_rowstride() * hNew);
     // Do the scale
-    pixbuf->scale(newPixbuf, arith_traits<arith_t>::toInt(dest_x),
-                  arith_traits<arith_t>::toInt(dest_y),
-                  arith_traits<arith_t>::toInt(dest_w),
-                  arith_traits<arith_t>::toInt(dest_h),
-                  arith_traits<arith_t>::toDouble(offset_x),
-                  arith_traits<arith_t>::toDouble(offset_y),
-                  arith_traits<arith_t>::toDouble(scale),
-                  arith_traits<arith_t>::toDouble(scale), Gdk::INTERP_NEAREST);
+    pixbuf->scale(newPixbuf, floor((double)dest_x), floor((double)dest_y),
+                  floor((double)dest_w), floor((double)dest_h),
+                  (double)(offset_x), (double)(offset_y), (double)(scale),
+                  (double)(scale), Gdk::INTERP_NEAREST);
     // Use the new pixbuf henceforth
     pixbuf = newPixbuf;
     Redraw(0, 0, pixbuf->get_width(), pixbuf->get_height());

@@ -49,23 +49,22 @@ void JuliaJob::work() {
 #if SIMD2 || SIMD4
 void JuliaJob::simd() {
   const int lx = x + w, ly = y + h;
-  double cxd = cx.toDouble(), cyd = cy.toDouble();
+  double cxd = (double)cx, cyd = (double)y;
   const double cxvalues[8] = {cxd, cxd, cxd, cxd};
   const double cyvalues[8] = {cyd, cyd, cyd, cyd};
   for(int py = y; py < ly; ++py) {
     count_t *res = &dest->pixel(x, py);
     const double izy =
-        (ybottom + arith_t(dest->height() - 1 - py) * xsize / dest->width())
-            .toDouble();
+        (double)(ybottom
+                 + arith_t(dest->height() - 1 - py) * xsize / dest->width());
     for(int px = x; px < lx; px += 4) {
-      const double izx0 =
-          (xleft + arith_t(px) * xsize / dest->width()).toDouble();
+      const double izx0 = (double)(xleft + arith_t(px) * xsize / dest->width());
       const double izx1 =
-          (xleft + arith_t(px + 1) * xsize / dest->width()).toDouble();
+          (double)(xleft + arith_t(px + 1) * xsize / dest->width());
       const double izx2 =
-          (xleft + arith_t(px + 2) * xsize / dest->width()).toDouble();
+          (double)(xleft + arith_t(px + 2) * xsize / dest->width());
       const double izx3 =
-          (xleft + arith_t(px + 3) * xsize / dest->width()).toDouble();
+          (double)(xleft + arith_t(px + 3) * xsize / dest->width());
       const double zxvalues[8] = {izx0, izx1, izx2, izx3};
       const double zyvalues[8] = {izy, izy, izy, izy};
       double r2values[4];

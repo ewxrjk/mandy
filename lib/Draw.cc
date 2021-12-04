@@ -248,7 +248,7 @@ int dive(const char *wstr, const char *hstr, const char *sxstr,
 
 int RenderMovie::Render(int *cancel) {
   const int frames = seconds * fps;
-  double rk = pow(arith_traits<arith_t>::toDouble(er / sr), 1.0 / (frames - 1));
+  double rk = pow((double)(er / sr), 1.0 / (frames - 1));
   std::stringstream command, pstream;
   // Construct the command
   std::string extras;
