@@ -75,12 +75,18 @@ void MandelbrotJob::work() {
 
 #if SIMD2 || SIMD4
 void MandelbrotJob::simd() {
-  int px[4], py[4];
-  PixelStreamEdge edge_pixels(x, y, w, h);
+  int px[4], py[4], d;
   bool escaped = false;
-  while(edge_pixels.morepixels(4, px, py))
-    escaped |= plot(px, py);
-  PixelStreamRectangle fill_pixels(x + 1, y + 1, w - 1, h - 1);
+  if(w > 2 && h > 2) {
+    PixelStreamEdge edge_pixels(x, y, w, h);
+    while(edge_pixels.morepixels(4, px, py))
+      escaped |= plot(px, py);
+    d = 1;
+  } else {
+    escaped = true;
+    d = 0;
+  }
+  PixelStreamRectangle fill_pixels(x + d, y + d, w - d, h - d);
   if(escaped) {
     while(fill_pixels.morepixels(4, px, py))
       plot(px, py);
