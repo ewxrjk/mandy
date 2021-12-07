@@ -23,15 +23,9 @@ public:
   // Do the computation (called in background thread)
   void work();
 
-  // SIMD implementations
-  void simd();
-
-  // SIMD plot some pixels
-  bool plot(int *px, int *py);
-
-  inline void simd_iterate(const double *zxvalues, const double *zyvalues,
-                           const double *cxvalues, const double *cyvalues,
-                           int maxiters, int *iterations, double *r2values);
+  // Calculate and plot the 4 points px, py
+  // Return true if any of them escape
+  bool simd_calculate(int px[4], int py[4]) override;
 };
 
 class MandelbrotJobFactory: public FractalJobFactory {

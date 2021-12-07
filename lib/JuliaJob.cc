@@ -24,10 +24,10 @@ void JuliaJob::work() {
   arith_type a;
   switch(arith) {
 #if SIMD2
-  case arith_simd2: simd(); return;
+  case arith_simd2: simd_work(); return;
 #endif
 #if SIMD4
-  case arith_simd4: simd(); return;
+  case arith_simd4: simd_work(); return;
 #endif
   default: a = arith;
   }
@@ -47,51 +47,29 @@ void JuliaJob::work() {
 }
 
 #if SIMD2 || SIMD4
-void JuliaJob::simd() {
-  const int lx = x + w, ly = y + h;
-  double cxd = (double)cx, cyd = (double)y;
-  const double cxvalues[8] = {cxd, cxd, cxd, cxd};
-  const double cyvalues[8] = {cyd, cyd, cyd, cyd};
-  for(int py = y; py < ly; ++py) {
-    count_t *res = &dest->pixel(x, py);
-    const double izy =
+bool JuliaJob::simd_calculate(int px[4], int py[4]) {
+  const double cxd = (double)cx, cyd = (double)cy;
+  double zxvalues[4];
+  double zyvalues[4];
+  const double cxvalues[4] = {cxd, cxd, cxd, cxd};
+  const double cyvalues[4] = {cyd, cyd, cyd, cyd};
+  for(int i = 0; i < 4; i++) {
+    zxvalues[i] = (double)(xleft + arith_t(px[i]) * xsize / dest->width());
+    zyvalues[i] =
         (double)(ybottom
-                 + arith_t(dest->height() - 1 - py) * xsize / dest->width());
-    for(int px = x; px < lx; px += 4) {
-      const double izx0 = (double)(xleft + arith_t(px) * xsize / dest->width());
-      const double izx1 =
-          (double)(xleft + arith_t(px + 1) * xsize / dest->width());
-      const double izx2 =
-          (double)(xleft + arith_t(px + 2) * xsize / dest->width());
-      const double izx3 =
-          (double)(xleft + arith_t(px + 3) * xsize / dest->width());
-      const double zxvalues[8] = {izx0, izx1, izx2, izx3};
-      const double zyvalues[8] = {izy, izy, izy, izy};
-      double r2values[4];
-      int iterations[4];
-      switch(arith) {
-#if SIMD2
-      case arith_simd2:
-        simd_iterate2(zxvalues, zyvalues, cxvalues, cyvalues, maxiters,
-                      iterations, r2values);
-        simd_iterate2(zxvalues + 2, zyvalues + 2, cxvalues + 2, cyvalues + 2,
-                      maxiters, iterations + 2, r2values + 2);
-        break;
-#endif
-#if SIMD4
-      case arith_simd4:
-        simd_iterate4(zxvalues, zyvalues, cxvalues, cyvalues, maxiters,
-                      iterations, r2values);
-        break;
-#endif
-      default: throw std::logic_error("unhandled arith_type");
-      }
-      *res++ = transform_iterations(iterations[0], r2values[0], maxiters);
-      *res++ = transform_iterations(iterations[1], r2values[1], maxiters);
-      *res++ = transform_iterations(iterations[2], r2values[2], maxiters);
-      *res++ = transform_iterations(iterations[3], r2values[3], maxiters);
-    }
+                 + arith_t(dest->height() - 1 - py[i]) * xsize / dest->width());
   }
+  double r2values[4];
+  int iterations[4];
+  simd_iterate(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations,
+               r2values);
+  bool escaped = false;
+  for(int i = 0; i < 4; i++) {
+    dest->pixel(px[i], py[i]) =
+        transform_iterations(iterations[i], r2values[i], maxiters);
+    escaped |= (iterations[i] != maxiters);
+  }
+  return escaped;
 }
 #endif
 

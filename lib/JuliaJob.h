@@ -26,7 +26,8 @@ public:
 
   // Do the computation (called in background thread)
   void work();
-  void simd();
+
+  bool simd_calculate(int px[4], int py[4]) override;
 };
 
 class JuliaJobFactory: public FractalJobFactory {

@@ -18,17 +18,15 @@
 #include <algorithm>
 #include <cstring>
 #include "arith.h"
-#include "simdarith.h"
-#include "PixelStream.h"
 
 void MandelbrotJob::work() {
   arith_type a;
   switch(arith) {
 #if SIMD2
-  case arith_simd2: simd(); return;
+  case arith_simd2: simd_work(); return;
 #endif
 #if SIMD4
-  case arith_simd4: simd(); return;
+  case arith_simd4: simd_work(); return;
 #endif
   default: a = arith;
   }
@@ -74,30 +72,7 @@ void MandelbrotJob::work() {
 }
 
 #if SIMD2 || SIMD4
-void MandelbrotJob::simd() {
-  int px[4], py[4], d;
-  bool escaped = false;
-  if(w > 2 && h > 2) {
-    PixelStreamEdge edge_pixels(x, y, w, h);
-    while(edge_pixels.morepixels(4, px, py))
-      escaped |= plot(px, py);
-    d = 1;
-  } else {
-    escaped = true;
-    d = 0;
-  }
-  PixelStreamRectangle fill_pixels(x + d, y + d, w - d, h - d);
-  if(escaped) {
-    while(fill_pixels.morepixels(4, px, py))
-      plot(px, py);
-  } else {
-    while(fill_pixels.morepixels(4, px, py))
-      for(int i = 0; i < 4; i++)
-        dest->pixel(px[i], py[i]) = transform_iterations(maxiters, 0, maxiters);
-  }
-}
-
-bool MandelbrotJob::plot(int *px, int *py) {
+bool MandelbrotJob::simd_calculate(int px[4], int py[4]) {
   const double zxvalues[4] = {0, 0, 0, 0};
   const double zyvalues[4] = {0, 0, 0, 0};
   double cxvalues[4];
@@ -119,30 +94,6 @@ bool MandelbrotJob::plot(int *px, int *py) {
     escaped |= (iterations[i] != maxiters);
   }
   return escaped;
-}
-
-inline void MandelbrotJob::simd_iterate(const double *zxvalues,
-                                        const double *zyvalues,
-                                        const double *cxvalues,
-                                        const double *cyvalues, int maxiters,
-                                        int *iterations, double *r2values) {
-  switch(arith) {
-#if SIMD2
-  case arith_simd2:
-    simd_iterate2(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations,
-                  r2values);
-    simd_iterate2(zxvalues + 2, zyvalues + 2, cxvalues + 2, cyvalues + 2,
-                  maxiters, iterations + 2, r2values + 2);
-    break;
-#endif
-#if SIMD4
-  case arith_simd4:
-    simd_iterate4(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations,
-                  r2values);
-    break;
-#endif
-  default: throw std::logic_error("unhandled arith_type");
-  }
 }
 #endif
 

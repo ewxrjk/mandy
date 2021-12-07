@@ -17,6 +17,7 @@
 #include "FractalJob.h"
 #include <algorithm>
 #include <cstring>
+#include "PixelStream.h"
 
 struct comparator {
   int cx, cy;
@@ -61,6 +62,31 @@ IterBuffer *FractalJob::recompute(arith_t cx, arith_t cy, arith_t r,
     jobs[n]->submit(completion_callback, completion_data);
   return dest;
 }
+
+#if SIMD2 || SIMD4
+void FractalJob::simd_work() {
+  int px[4], py[4], d;
+  bool escaped = false;
+  if(w > 2 && h > 2) {
+    PixelStreamEdge edge_pixels(x, y, w, h);
+    while(edge_pixels.morepixels(4, px, py))
+      escaped |= simd_calculate(px, py);
+    d = 1;
+  } else {
+    escaped = true;
+    d = 0;
+  }
+  PixelStreamRectangle fill_pixels(x + d, y + d, w - d, h - d);
+  if(escaped) {
+    while(fill_pixels.morepixels(4, px, py))
+      simd_calculate(px, py);
+  } else {
+    while(fill_pixels.morepixels(4, px, py))
+      for(int i = 0; i < 4; i++)
+        dest->pixel(px[i], py[i]) = transform_iterations(maxiters, 0, maxiters);
+  }
+}
+#endif
 
 /*
 Local Variables:
