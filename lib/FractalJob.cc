@@ -76,12 +76,25 @@ void FractalJob::work() {
 }
 
 void FractalJob::sisd_work() {
-  // Compute the pixel limits
-  const int lx = x + w, ly = y + h;
-  // Iterate over points
-  for(int py = y; py < ly; ++py) {
-    for(int px = x; px < lx; ++px)
+  int px, py, d;
+  bool escaped = false;
+  if(w > 2 && h > 2) {
+    PixelStreamEdge edge_pixels(x, y, w, h);
+    while(edge_pixels.next(px, py))
+      escaped |= sisd_calculate(px, py);
+    d = 1;
+  } else {
+    escaped = true;
+    d = 0;
+  }
+  PixelStreamRectangle fill_pixels(x + d, y + d, w - d, h - d);
+  if(escaped) {
+    while(fill_pixels.next(px, py))
       sisd_calculate(px, py);
+  } else {
+    while(fill_pixels.next(px, py))
+      for(int i = 0; i < 4; i++)
+        dest->pixel(px, py) = transform_iterations(maxiters, 0, maxiters);
   }
 }
 
