@@ -55,7 +55,7 @@ public:
   static T maximum();
   static std::string toString(const T &n);
   static int fromString(T &n, const char *s, char **end);
-  static count_t iterate(T zx, T zy, T cx, T cy, int maxiters);
+  static int iterate(T zx, T zy, T cx, T cy, int maxiters, double &r2);
 };
 
 static inline count_t transform_iterations(int iterations, double r2,
@@ -67,7 +67,7 @@ static inline count_t transform_iterations(int iterations, double r2,
 }
 
 template <typename T>
-count_t defaultIterate(T zx, T zy, T cx, T cy, int maxiters) {
+int defaultIterate(T zx, T zy, T cx, T cy, int maxiters, double &r2_out) {
   T r2, zx2, zy2;
   int iterations = 0;
   while(((r2 = (zx2 = zx * zx) + (zy2 = zy * zy)) < T(64))
@@ -76,7 +76,8 @@ count_t defaultIterate(T zx, T zy, T cx, T cy, int maxiters) {
     zx = zx2 - zy2 + cx;
     ++iterations;
   }
-  return transform_iterations(iterations, (double)(r2), maxiters);
+  r2_out = (double)r2;
+  return iterations;
 }
 
 template <> class arith_traits<double> {
@@ -97,10 +98,10 @@ public:
     return errno;
   }
 
-  static count_t iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy,
-                         int maxiters) {
+  static int iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy,
+                     int maxiters, double &r2) {
     return defaultIterate((double)zx, (double)zy, (double)cx, (double)cy,
-                          maxiters);
+                          maxiters, r2);
   }
 };
 
@@ -127,10 +128,10 @@ public:
     return errno;
   }
 
-  static count_t iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy,
-                         int maxiters) {
+  static int iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy,
+                     int maxiters, double &r2) {
     return defaultIterate((long double)zx, (long double)zy, (long double)cx,
-                          (long double)cy, maxiters);
+                          (long double)cy, maxiters, r2);
   }
 };
 
@@ -151,15 +152,15 @@ public:
     return n.fromString(s, endptr);
   }
 
-  static count_t iterate(fixed128 zx, fixed128 zy, fixed128 cx, fixed128 cy,
-                         int maxiters) {
+  static int iterate(fixed128 zx, fixed128 zy, fixed128 cx, fixed128 cy,
+                     int maxiters, double &r2) {
 #if HAVE_ASM_128 && NFIXED128 == 4
     int rawCount = Fixed128_iterate(&zx.f, &zy.f, &cx.f, &cy.f, maxiters);
     // r2 is returned in zx (rather oddly)
-    double r2 = (double)zx;
-    return transform_iterations(rawCount, r2, maxiters);
+    r2 = (double)zx;
+    return rawCount;
 #else
-    return defaultIterate(zx, zy, cx, cy, maxiters);
+    return defaultIterate(zx, zy, cx, cy, maxiters, r2);
 #endif
   }
 };
@@ -180,27 +181,19 @@ public:
     return n.fromString(s, endptr);
   }
 
-  static count_t iterate(arith_t zxa, arith_t zya, arith_t cxa, arith_t cya,
-                         int maxiters) {
+  static int iterate(arith_t zxa, arith_t zya, arith_t cxa, arith_t cya,
+                     int maxiters, double &r2) {
     fixed64 zx = zxa, zy = zya, cx = cxa, cy = cya;
 #if HAVE_ASM_64
-    double r2;
-    int rawCount = Fixed64_iterate(zx.f, zy.f, cx.f, cy.f, &r2, maxiters);
-    return transform_iterations(rawCount, r2, maxiters);
+    return Fixed64_iterate(zx.f, zy.f, cx.f, cy.f, &r2, maxiters);
 #else
-    return defaultIterate(zx, zy, cx, cy, maxiters);
+    return defaultIterate(zx, zy, cx, cy, maxiters, r2);
 #endif
   }
 };
 
-count_t iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy, int maxiters,
-                arith_type arith);
-
-// C#-friendly interface
-extern "C" {
-count_t iterate_cs(const Fixed128 *zx, const Fixed128 *zy, const Fixed128 *cx,
-                   const Fixed128 *cy, int maxiters, int arith);
-}
+int iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy, int maxiters,
+            arith_type arith, double &r2);
 
 #endif /* ARITH_H */
 

@@ -19,56 +19,37 @@
 #include <cstring>
 #include "arith.h"
 
-void MandelbrotJob::work() {
-  arith_type a;
-  switch(arith) {
-#if SIMD2
-  case arith_simd2: simd_work(); return;
-#endif
-#if SIMD4
-  case arith_simd4: simd_work(); return;
-#endif
-  default: a = arith;
+bool MandelbrotJob::sisd_calculate(int px, int py) {
+  // Complex-plane location of this point
+  const arith_t cx = xleft + arith_t(px) * xsize / dest->width();
+  const arith_t cy =
+      ybottom + arith_t(dest->height() - 1 - py) * xsize / dest->width();
+  // let c = cx + icy
+  // let z = zx + izy
+  //
+  // then z^2 + c = zx^2 - zy^2 + cx + i(2zxzy+cy)
+  int iterations = 0;
+  arith_t zx = 0, zy = 0;
+  // Optimizations as described in WP
+  const arith_t cxq = (cx - 0.25);
+  const arith_t cy2 = cy * cy;
+  const arith_t q = cxq * cxq + cy2;
+  double r2;
+  if(arith_t(4) * q * (q + cxq) < cy2) { // Main cardioid
+    iterations = maxiters;
+    goto done;
   }
-  // Compute the pixel limits
-  const int lx = x + w, ly = y + h;
-  // Iterate over rows
-  for(int py = y; py < ly; ++py) {
-    // Starting point for this row's results
-    count_t *res = &dest->pixel(x, py);
-    // Complex-plane location of this row
-    const arith_t cy =
-        ybottom + arith_t(dest->height() - 1 - py) * xsize / dest->width();
-    // Iterate over columns
-    for(int px = x; px < lx; ++px) {
-      // Complex-plane location of this column
-      const arith_t cx = xleft + arith_t(px) * xsize / dest->width();
-      // let c = cx + icy
-      // let z = zx + izy
-      //
-      // then z^2 + c = zx^2 - zy^2 + cx + i(2zxzy+cy)
-      count_t iterations = 0;
-      arith_t zx = 0, zy = 0;
-      // Optimizations as described in WP
-      const arith_t cxq = (cx - 0.25);
-      const arith_t cy2 = cy * cy;
-      const arith_t q = cxq * cxq + cy2;
-      if(arith_t(4) * q * (q + cxq) < cy2) { // Main cardioid
-        iterations = maxiters;
-        goto done;
-      }
-      if(cx * cx + arith_t(2) * cx + 1 + cy2
-         < arith_t(1) / arith_t(16)) { // Period-2 bulb
-        iterations = maxiters;
-        goto done;
-      }
-      // TODO if the whole square is outside both regions, we could
-      // skip these tests.
-      iterations = iterate(zx, zy, cx, cy, maxiters, a);
-    done:
-      *res++ = iterations;
-    }
+  if(cx * cx + arith_t(2) * cx + 1 + cy2
+     < arith_t(1) / arith_t(16)) { // Period-2 bulb
+    iterations = maxiters;
+    goto done;
   }
+  // TODO if the whole square is outside both regions, we could
+  // skip these tests.
+  iterations = iterate(zx, zy, cx, cy, maxiters, arith, r2);
+done:
+  dest->pixel(px, py) = transform_iterations(iterations, r2, maxiters);
+  return iterations != maxiters;
 }
 
 #if SIMD2 || SIMD4

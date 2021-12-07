@@ -45,7 +45,8 @@ int main(int argc, char **argv) {
           }
         }
       }
-      iterate(zx, zy, cx, cy, maxiter, arith_type(t));
+      double r2;
+      iterate(zx, zy, cx, cy, maxiter, arith_type(t), r2);
     }
     clock_t end = clock();
     double seconds = (end - begin) / (double)CLOCKS_PER_SEC;

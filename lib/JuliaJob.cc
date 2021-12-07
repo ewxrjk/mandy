@@ -20,30 +20,14 @@
 #include "arith.h"
 #include "simdarith.h"
 
-void JuliaJob::work() {
-  arith_type a;
-  switch(arith) {
-#if SIMD2
-  case arith_simd2: simd_work(); return;
-#endif
-#if SIMD4
-  case arith_simd4: simd_work(); return;
-#endif
-  default: a = arith;
-  }
-  const int lx = x + w, ly = y + h;
-  for(int py = y; py < ly; ++py) {
-    count_t *res = &dest->pixel(x, py);
-    arith_t izy =
-        ybottom + arith_t(dest->height() - 1 - py) * xsize / dest->width();
-    for(int px = x; px < lx; ++px) {
-      arith_t izx = xleft + arith_t(px) * xsize / dest->width();
-      count_t iterations = 0;
-      arith_t zx = izx, zy = izy;
-      iterations = iterate(zx, zy, cx, cy, maxiters, a);
-      *res++ = iterations;
-    }
-  }
+bool JuliaJob::sisd_calculate(int px, int py) {
+  arith_t zx = xleft + arith_t(px) * xsize / dest->width();
+  arith_t zy =
+      ybottom + arith_t(dest->height() - 1 - py) * xsize / dest->width();
+  double r2;
+  int iterations = iterate(zx, zy, cx, cy, maxiters, arith, r2);
+  dest->pixel(px, py) = transform_iterations(iterations, r2, maxiters);
+  return iterations != maxiters;
 }
 
 #if SIMD2 || SIMD4

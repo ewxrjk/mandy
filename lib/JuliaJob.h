@@ -24,10 +24,10 @@ class JuliaJob: public FractalJob {
 public:
   JuliaJob(arith_t cx_, arith_t cy_): cx(cx_), cy(cy_) {}
 
-  // Do the computation (called in background thread)
-  void work();
-
+  bool sisd_calculate(int px, int py) override;
+#if SIMD2 || SIMD4
   bool simd_calculate(int px[4], int py[4]) override;
+#endif
 };
 
 class JuliaJobFactory: public FractalJobFactory {

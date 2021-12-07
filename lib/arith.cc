@@ -34,33 +34,21 @@ arith_type string_to_arith(const std::string &s) {
   abort();
 }
 
-count_t iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy, int maxiters,
-                arith_type arith) {
+int iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy, int maxiters,
+            arith_type arith, double &r2) {
   switch(arith) {
   case arith_double:
-    return arith_traits<double>::iterate(zx, zy, cx, cy, maxiters);
+    return arith_traits<double>::iterate(zx, zy, cx, cy, maxiters, r2);
     break;
-#if SIMD2
-  case arith_simd2: throw std::logic_error("iterate arith_simd2");
-#endif
-#if SIMD4
-  case arith_simd4: throw std::logic_error("iterate  arith_simd4");
-#endif
   case arith_long_double:
-    return arith_traits<long double>::iterate(zx, zy, cx, cy, maxiters);
+    return arith_traits<long double>::iterate(zx, zy, cx, cy, maxiters, r2);
     break;
   case arith_fixed64:
-    return arith_traits<fixed64>::iterate(zx, zy, cx, cy, maxiters);
+    return arith_traits<fixed64>::iterate(zx, zy, cx, cy, maxiters, r2);
     break;
   case arith_fixed128:
-    return arith_traits<fixed128>::iterate(zx, zy, cx, cy, maxiters);
+    return arith_traits<fixed128>::iterate(zx, zy, cx, cy, maxiters, r2);
     break;
-  default: abort();
+  default: throw std::logic_error("iterate unrecognized/unsuitable arith_t");
   }
-}
-
-count_t iterate_cs(const Fixed128 *zx, const Fixed128 *zy, const Fixed128 *cx,
-                   const Fixed128 *cy, int maxiters, int arith) {
-  return iterate(fixed128(*zx), fixed128(*zy), fixed128(*cx), fixed128(*cy),
-                 maxiters, (arith_type)arith);
 }

@@ -71,9 +71,15 @@ public:
                                void *completion_data, int xpos, int ypos,
                                const FractalJobFactory *factory);
 
+  // Calculate and plot px, py
+  // Return true if it escapes
+  virtual bool sisd_calculate(int px, int py) = 0;
+
+#if SIMD2 || SIMD4
   // Calculate and plot the 4 points px, py
   // Return true if any of them escape
   virtual bool simd_calculate(int px[4], int py[4]) = 0;
+#endif
 
 #if SIMD2 || SIMD4
   inline void simd_iterate(const double *zxvalues, const double *zyvalues,
@@ -99,6 +105,9 @@ public:
   }
 #endif
 
+  // Do the computation (called in background thread)
+  void work();
+  void sisd_work();
 #if SIMD2 || SIMD4
   void simd_work();
 #endif

@@ -20,12 +20,10 @@
 
 class MandelbrotJob: public FractalJob {
 public:
-  // Do the computation (called in background thread)
-  void work();
-
-  // Calculate and plot the 4 points px, py
-  // Return true if any of them escape
+  bool sisd_calculate(int px, int py) override;
+#if SIMD2 || SIMD4
   bool simd_calculate(int px[4], int py[4]) override;
+#endif
 };
 
 class MandelbrotJobFactory: public FractalJobFactory {

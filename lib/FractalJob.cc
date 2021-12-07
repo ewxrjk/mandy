@@ -63,6 +63,28 @@ IterBuffer *FractalJob::recompute(arith_t cx, arith_t cy, arith_t r,
   return dest;
 }
 
+void FractalJob::work() {
+  switch(arith) {
+#if SIMD2
+  case arith_simd2: simd_work(); break;
+#endif
+#if SIMD4
+  case arith_simd4: simd_work(); break;
+#endif
+  default: sisd_work(); break;
+  }
+}
+
+void FractalJob::sisd_work() {
+  // Compute the pixel limits
+  const int lx = x + w, ly = y + h;
+  // Iterate over points
+  for(int py = y; py < ly; ++py) {
+    for(int px = x; px < lx; ++px)
+      sisd_calculate(px, py);
+  }
+}
+
 #if SIMD2 || SIMD4
 void FractalJob::simd_work() {
   int px[4], py[4], d;
