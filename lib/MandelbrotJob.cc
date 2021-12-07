@@ -35,19 +35,15 @@ bool MandelbrotJob::sisd_calculate(int px, int py) {
   const arith_t cy2 = cy * cy;
   const arith_t q = cxq * cxq + cy2;
   double r2;
-  if(arith_t(4) * q * (q + cxq) < cy2) { // Main cardioid
-    iterations = maxiters;
-    goto done;
-  }
-  if(cx * cx + arith_t(2) * cx + 1 + cy2
-     < arith_t(1) / arith_t(16)) { // Period-2 bulb
-    iterations = maxiters;
-    goto done;
-  }
   // TODO if the whole square is outside both regions, we could
   // skip these tests.
-  iterations = iterate(zx, zy, cx, cy, maxiters, arith, r2);
-done:
+  if(arith_t(4) * q * (q + cxq) < cy2) { // Main cardioid
+    iterations = maxiters;
+  } else if(cx * cx + arith_t(2) * cx + 1 + cy2
+            < arith_t(1) / arith_t(16)) { // Period-2 bulb
+    iterations = maxiters;
+  } else
+    iterations = iterate(zx, zy, cx, cy, maxiters, arith, r2);
   dest->pixel(px, py) = transform_iterations(iterations, r2, maxiters);
   return iterations != maxiters;
 }
