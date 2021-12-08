@@ -44,23 +44,20 @@ public:
   FileMenu():
       saveMandelbrotImageItem("Save Mandelbrot set image"),
       saveMandelbrotMovieItem("Save Mandelbrot set movie"),
-      saveJuliaImageItem("Save Julia set image"), closeItem(Gtk::Stock::CLOSE),
+      saveJuliaImageItem("Save Julia set image"),
+      closeItem(Gtk::Stock::CLOSE),
       quitItem(Gtk::Stock::QUIT) {
     append(saveMandelbrotImageItem);
-    saveMandelbrotImageItem.signal_activate().connect(
-        sigc::ptr_fun(SaveMandelbrotImageActivated));
+    saveMandelbrotImageItem.signal_activate().connect(sigc::ptr_fun(SaveMandelbrotImageActivated));
 
     append(saveMandelbrotMovieItem);
-    saveMandelbrotMovieItem.signal_activate().connect(
-        sigc::ptr_fun(SaveMandelbrotMovieActivated));
+    saveMandelbrotMovieItem.signal_activate().connect(sigc::ptr_fun(SaveMandelbrotMovieActivated));
 
     append(saveJuliaImageItem);
-    saveJuliaImageItem.signal_activate().connect(
-        sigc::ptr_fun(SaveJuliaImageActivated));
+    saveJuliaImageItem.signal_activate().connect(sigc::ptr_fun(SaveJuliaImageActivated));
 
     append(closeItem);
-    closeItem.signal_activate().connect(
-        sigc::mem_fun(*this, &FileMenu::CloseActivated));
+    closeItem.signal_activate().connect(sigc::mem_fun(*this, &FileMenu::CloseActivated));
 
     append(quitItem);
     quitItem.signal_activate().connect(sigc::ptr_fun(QuitActivated));
@@ -105,8 +102,7 @@ class WindowsMenu: public Gtk::Menu {
 public:
   WindowsMenu(): juliaItem("Julia set") {
     append(juliaItem);
-    juliaItem.signal_toggled().connect(
-        sigc::mem_fun(*this, &WindowsMenu::JuliaToggled));
+    juliaItem.signal_toggled().connect(sigc::mem_fun(*this, &WindowsMenu::JuliaToggled));
   }
 
   Gtk::CheckMenuItem juliaItem;
@@ -132,8 +128,7 @@ class HelpMenu: public Gtk::Menu {
 public:
   HelpMenu(): aboutItem(Gtk::Stock::ABOUT) {
     append(aboutItem);
-    aboutItem.signal_activate().connect(
-        sigc::mem_fun(*this, &HelpMenu::AboutActivated));
+    aboutItem.signal_activate().connect(sigc::mem_fun(*this, &HelpMenu::AboutActivated));
   }
   Gtk::ImageMenuItem aboutItem;
 
@@ -145,8 +140,7 @@ public:
     Gtk::Label copyright("Version " VERSION " \xC2\xA9 Richard Kettlewell");
     about.get_vbox()->pack_start(name, Gtk::PACK_SHRINK);
     about.get_vbox()->pack_start(description, Gtk::PACK_SHRINK);
-    Glib::RefPtr<Gdk::Pixbuf> logo_pixbuf =
-        Gdk::Pixbuf::create_from_inline(sizeof logodata, logodata, true);
+    Glib::RefPtr<Gdk::Pixbuf> logo_pixbuf = Gdk::Pixbuf::create_from_inline(sizeof logodata, logodata, true);
     Gtk::Image logo_image(logo_pixbuf);
     about.get_vbox()->pack_start(logo_image, Gtk::PACK_SHRINK);
     about.get_vbox()->pack_start(copyright, Gtk::PACK_SHRINK);

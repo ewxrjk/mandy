@@ -79,17 +79,13 @@ class DropDownControl: public Control, public Gtk::ComboBoxText {
 
 public:
   template <typename T>
-  DropDownControl(ControlContainer *p, std::string *value, const T &s,
-                  const T &e):
-      Control(p),
-      m_value(value) {
+  DropDownControl(ControlContainer *p, std::string *value, const T &s, const T &e): Control(p), m_value(value) {
     for(T it = s; it != e; ++it)
       append_text(*it);
     set_active_text(*value);
   }
 
-  DropDownControl(ControlContainer *p, std::string *value):
-      Control(p), m_value(value) {}
+  DropDownControl(ControlContainer *p, std::string *value): Control(p), m_value(value) {}
 
   // Update the display value
   void UpdateDisplay();
@@ -118,9 +114,10 @@ class FileSelectionControl: public Control, public Gtk::FileChooserButton {
   std::string *m_path;
 
 public:
-  FileSelectionControl(
-      ControlContainer *p, std::string *path, const Glib::ustring &title,
-      Gtk::FileChooserAction action = Gtk::FILE_CHOOSER_ACTION_OPEN);
+  FileSelectionControl(ControlContainer *p,
+                       std::string *path,
+                       const Glib::ustring &title,
+                       Gtk::FileChooserAction action = Gtk::FILE_CHOOSER_ACTION_OPEN);
 
   // Update the display value
   void UpdateDisplay();
@@ -177,10 +174,8 @@ class IntegerControl: public TextEntryControl {
   int min, max;
 
 public:
-  IntegerControl(ControlContainer *p, int *v, int min_, int max_,
-                 bool editable_ = true):
-      TextEntryControl(p, editable_),
-      value(v), min(min_), max(max_) {}
+  IntegerControl(ControlContainer *p, int *v, int min_, int max_, bool editable_ = true):
+      TextEntryControl(p, editable_), value(v), min(min_), max(max_) {}
   bool DisplayIsValid(const char *s) const;
   void SetUnderlying(const char *s);
   void Render(Glib::ustring &) const;
@@ -192,10 +187,8 @@ class RealControl: public TextEntryControl {
   arith_t min, max;
 
 public:
-  RealControl(ControlContainer *p, arith_t *v, arith_t min_, arith_t max_,
-              bool editable_ = true):
-      TextEntryControl(p, editable_),
-      value(v), min(min_), max(max_) {}
+  RealControl(ControlContainer *p, arith_t *v, arith_t min_, arith_t max_, bool editable_ = true):
+      TextEntryControl(p, editable_), value(v), min(min_), max(max_) {}
   bool DisplayIsValid(const char *s) const;
   void SetUnderlying(const char *);
   void Render(Glib::ustring &) const;
@@ -206,8 +199,7 @@ class StringControl: public TextEntryControl {
   std::string *value;
 
 public:
-  StringControl(ControlContainer *p, std::string *v, bool editable_ = true):
-      TextEntryControl(p, editable_), value(v) {}
+  StringControl(ControlContainer *p, std::string *v, bool editable_ = true): TextEntryControl(p, editable_), value(v) {}
   bool DisplayIsValid(const char *s) const;
   void SetUnderlying(const char *);
   void Render(Glib::ustring &) const;

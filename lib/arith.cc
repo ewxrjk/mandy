@@ -24,7 +24,9 @@ const char *const arith_names[] = {
 #if SIMD4
     "simd4",
 #endif
-    "long double", "fixed64", "fixed128",
+    "long double",
+    "fixed64",
+    "fixed128",
 };
 
 arith_type string_to_arith(const std::string &s) {
@@ -34,21 +36,12 @@ arith_type string_to_arith(const std::string &s) {
   abort();
 }
 
-int iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy, int maxiters,
-            arith_type arith, double &r2) {
+int iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy, int maxiters, arith_type arith, double &r2) {
   switch(arith) {
-  case arith_double:
-    return arith_traits<double>::iterate(zx, zy, cx, cy, maxiters, r2);
-    break;
-  case arith_long_double:
-    return arith_traits<long double>::iterate(zx, zy, cx, cy, maxiters, r2);
-    break;
-  case arith_fixed64:
-    return arith_traits<fixed64>::iterate(zx, zy, cx, cy, maxiters, r2);
-    break;
-  case arith_fixed128:
-    return arith_traits<fixed128>::iterate(zx, zy, cx, cy, maxiters, r2);
-    break;
+  case arith_double: return arith_traits<double>::iterate(zx, zy, cx, cy, maxiters, r2); break;
+  case arith_long_double: return arith_traits<long double>::iterate(zx, zy, cx, cy, maxiters, r2); break;
+  case arith_fixed64: return arith_traits<fixed64>::iterate(zx, zy, cx, cy, maxiters, r2); break;
+  case arith_fixed128: return arith_traits<fixed128>::iterate(zx, zy, cx, cy, maxiters, r2); break;
   default: throw std::logic_error("iterate unrecognized/unsuitable arith_t");
   }
 }

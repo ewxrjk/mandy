@@ -22,8 +22,7 @@
 
 bool JuliaJob::sisd_calculate(int px, int py) {
   arith_t zx = xleft + arith_t(px) * xsize / dest->width();
-  arith_t zy =
-      ybottom + arith_t(dest->height() - 1 - py) * xsize / dest->width();
+  arith_t zy = ybottom + arith_t(dest->height() - 1 - py) * xsize / dest->width();
   double r2;
   int iterations = iterate(zx, zy, cx, cy, maxiters, arith, r2);
   dest->pixel(px, py) = transform_iterations(iterations, r2, maxiters);
@@ -39,18 +38,14 @@ bool JuliaJob::simd_calculate(int px[4], int py[4]) {
   const double cyvalues[4] = {cyd, cyd, cyd, cyd};
   for(int i = 0; i < 4; i++) {
     zxvalues[i] = (double)(xleft + arith_t(px[i]) * xsize / dest->width());
-    zyvalues[i] =
-        (double)(ybottom
-                 + arith_t(dest->height() - 1 - py[i]) * xsize / dest->width());
+    zyvalues[i] = (double)(ybottom + arith_t(dest->height() - 1 - py[i]) * xsize / dest->width());
   }
   double r2values[4];
   int iterations[4];
-  simd_iterate(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations,
-               r2values);
+  simd_iterate(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values);
   bool escaped = false;
   for(int i = 0; i < 4; i++) {
-    dest->pixel(px[i], py[i]) =
-        transform_iterations(iterations[i], r2values[i], maxiters);
+    dest->pixel(px[i], py[i]) = transform_iterations(iterations[i], r2values[i], maxiters);
     escaped |= (iterations[i] != maxiters);
   }
   return escaped;

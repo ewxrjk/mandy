@@ -45,8 +45,7 @@ void JuliaView::Update(arith_t x, arith_t y) {
     std::string ys = arith_traits<arith_t>::toString(x);
     std::stringstream buffer;
     buffer << "Julia set at " << xs << "+" << ys << "i";
-    dynamic_cast<Gtk::Window *>(get_parent()->get_parent())
-        ->set_title(buffer.str());
+    dynamic_cast<Gtk::Window *>(get_parent()->get_parent())->set_title(buffer.str());
   }
 }
 } // namespace mmui

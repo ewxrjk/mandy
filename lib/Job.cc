@@ -17,8 +17,7 @@
 #include "Job.h"
 #include <unistd.h>
 
-void Job::submit(void (*completion_callback_)(Job *, void *),
-                 void *completion_data_) {
+void Job::submit(void (*completion_callback_)(Job *, void *), void *completion_data_) {
   completion_callback = completion_callback_;
   completion_data = completion_data_;
   LockAcquire(lock);
@@ -38,8 +37,7 @@ void Job::cancel(void *completion_data) {
       queue.erase(here);
     }
   }
-  for(std::list<Job *>::iterator it = completed.begin();
-      it != completed.end();) {
+  for(std::list<Job *>::iterator it = completed.begin(); it != completed.end();) {
     std::list<Job *>::iterator here = it;
     ++it;
     Job *j = *here;
@@ -162,8 +160,7 @@ bool Job::pending(void *completion_data) {
 }
 
 bool Job::pendingLocked(void *completion_data) {
-  return (find_jobs(completed, completion_data)
-          || find_jobs(queue, completion_data)
+  return (find_jobs(completed, completion_data) || find_jobs(queue, completion_data)
           || find_jobs(working, completion_data));
 }
 

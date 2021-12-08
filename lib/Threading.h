@@ -32,8 +32,7 @@ cond_t *CondCreate();
 void CondWait(cond_t *c, mutex_t *m);
 void CondSignal(cond_t *c);
 void CondBroadcast(cond_t *c);
-void ThreadCreate(threadid_t &id, void *(*threadfn)(void *arg),
-                  void *arg = NULL);
+void ThreadCreate(threadid_t &id, void *(*threadfn)(void *arg), void *arg = NULL);
 void ThreadJoin(threadid_t &id);
 
 #endif /* THREADING_H */

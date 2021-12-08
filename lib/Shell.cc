@@ -26,9 +26,8 @@ std::string shellQuote(const std::string &s) {
     std::stringstream ss;
     for(size_t n = 0; n < s.size(); ++n) {
       char c = s.at(n);
-      if((c & 128) || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
-         || (c >= '0' && c <= '9') || c == '-' || c == '_' || c == '/'
-         || c == '.')
+      if((c & 128) || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '-' || c == '_'
+         || c == '/' || c == '.')
         ss << c;
       else
         ss << '\\' << c;

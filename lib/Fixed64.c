@@ -38,16 +38,16 @@ Fixed64 Fixed64_mul(Fixed64 a, Fixed64 b) {
   return sign ? -r : r;
 }
 
-#define MLA(x, y, n)                                                           \
-  do {                                                                         \
-    uint64_t r = (uint64_t)(uint32_t)(x) * (uint32_t)(y);                      \
-    int i = (n);                                                               \
-    while(i <= 3) {                                                            \
-      r += result[i];                                                          \
-      result[i] = (uint32_t)r;                                                 \
-      r >>= 32;                                                                \
-      ++i;                                                                     \
-    }                                                                          \
+#define MLA(x, y, n)                                                                                                   \
+  do {                                                                                                                 \
+    uint64_t r = (uint64_t)(uint32_t)(x) * (uint32_t)(y);                                                              \
+    int i = (n);                                                                                                       \
+    while(i <= 3) {                                                                                                    \
+      r += result[i];                                                                                                  \
+      result[i] = (uint32_t)r;                                                                                         \
+      r >>= 32;                                                                                                        \
+      ++i;                                                                                                             \
+    }                                                                                                                  \
   } while(0)
 
 uint64_t Fixed64_mul_unsigned(uint64_t a, uint64_t b) {
@@ -62,8 +62,7 @@ uint64_t Fixed64_mul_unsigned(uint64_t a, uint64_t b) {
    *
    * -> IFF.FFFF.F
    */
-  return (((uint64_t)result[3] << 40) + ((uint64_t)result[2] << 8)
-          + ((uint64_t)result[1] >> 24)
+  return (((uint64_t)result[3] << 40) + ((uint64_t)result[2] << 8) + ((uint64_t)result[1] >> 24)
           + /*rounding*/ !!(result[1] & 0x00800000));
 }
 

@@ -22,8 +22,7 @@
 bool MandelbrotJob::sisd_calculate(int px, int py) {
   // Complex-plane location of this point
   const arith_t cx = xleft + arith_t(px) * xsize / dest->width();
-  const arith_t cy =
-      ybottom + arith_t(dest->height() - 1 - py) * xsize / dest->width();
+  const arith_t cy = ybottom + arith_t(dest->height() - 1 - py) * xsize / dest->width();
   // let c = cx + icy
   // let z = zx + izy
   //
@@ -39,8 +38,7 @@ bool MandelbrotJob::sisd_calculate(int px, int py) {
   // skip these tests.
   if(arith_t(4) * q * (q + cxq) < cy2) { // Main cardioid
     iterations = maxiters;
-  } else if(cx * cx + arith_t(2) * cx + 1 + cy2
-            < arith_t(1) / arith_t(16)) { // Period-2 bulb
+  } else if(cx * cx + arith_t(2) * cx + 1 + cy2 < arith_t(1) / arith_t(16)) { // Period-2 bulb
     iterations = maxiters;
   } else
     iterations = iterate(zx, zy, cx, cy, maxiters, arith, r2);
@@ -56,18 +54,14 @@ bool MandelbrotJob::simd_calculate(int px[4], int py[4]) {
   double cyvalues[4];
   for(int i = 0; i < 4; i++) {
     cxvalues[i] = (double)(xleft + arith_t(px[i]) * xsize / dest->width());
-    cyvalues[i] =
-        (double)(ybottom
-                 + arith_t(dest->height() - 1 - py[i]) * xsize / dest->width());
+    cyvalues[i] = (double)(ybottom + arith_t(dest->height() - 1 - py[i]) * xsize / dest->width());
   }
   double r2values[4];
   int iterations[4];
-  simd_iterate(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations,
-               r2values);
+  simd_iterate(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values);
   bool escaped = false;
   for(int i = 0; i < 4; i++) {
-    dest->pixel(px[i], py[i]) =
-        transform_iterations(iterations[i], r2values[i], maxiters);
+    dest->pixel(px[i], py[i]) = transform_iterations(iterations[i], r2values[i], maxiters);
     escaped |= (iterations[i] != maxiters);
   }
   return escaped;

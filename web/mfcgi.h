@@ -21,7 +21,6 @@
 #include <stdexcept>
 #include <gdk-pixbuf/gdk-pixbuf.h>
 
-void process_query(const char *query, GdkPixbufSaveFunc writer, gpointer wdata,
-                   bool header);
+void process_query(const char *query, GdkPixbufSaveFunc writer, gpointer wdata, bool header);
 
 #endif /* MFCGI_H */

@@ -34,10 +34,10 @@
 #endif
 #define REP(v) v, v
 #define VALUES(v) v[0], v[1]
-#define ASSIGN(d, s)                                                           \
-  do {                                                                         \
-    d[0] = s[0];                                                               \
-    d[1] = s[1];                                                               \
+#define ASSIGN(d, s)                                                                                                   \
+  do {                                                                                                                 \
+    d[0] = s[0];                                                                                                       \
+    d[1] = s[1];                                                                                                       \
   } while(0)
 
 #include "simdimpl.h"
@@ -61,12 +61,12 @@
 #endif
 #define REP(v) v, v, v, v
 #define VALUES(v) v[0], v[1], v[2], v[3]
-#define ASSIGN(d, s)                                                           \
-  do {                                                                         \
-    d[0] = s[0];                                                               \
-    d[1] = s[1];                                                               \
-    d[2] = s[2];                                                               \
-    d[3] = s[3];                                                               \
+#define ASSIGN(d, s)                                                                                                   \
+  do {                                                                                                                 \
+    d[0] = s[0];                                                                                                       \
+    d[1] = s[1];                                                                                                       \
+    d[2] = s[2];                                                                                                       \
+    d[3] = s[3];                                                                                                       \
   } while(0)
 
 #include "simdimpl.h"

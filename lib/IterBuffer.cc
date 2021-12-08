@@ -17,8 +17,7 @@
 #include "IterBuffer.h"
 #include <cstring>
 
-IterBuffer::IterBuffer(int w_, int h_):
-    refs(1), xw((w_ + 7) & -8), w(w_), h(h_), data(new count_t[xw * h]) {
+IterBuffer::IterBuffer(int w_, int h_): refs(1), xw((w_ + 7) & -8), w(w_), h(h_), data(new count_t[xw * h]) {
   clear();
 }
 

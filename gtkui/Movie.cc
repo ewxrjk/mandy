@@ -36,8 +36,8 @@ public:
   MovieWindow *m_window;
 
   RealControl m_x_control, m_y_control, m_radius_control;
-  IntegerControl m_maxiters_control, m_seconds_control, m_fps_control,
-      m_bitrate_control, m_width_control, m_height_control;
+  IntegerControl m_maxiters_control, m_seconds_control, m_fps_control, m_bitrate_control, m_width_control,
+      m_height_control;
   StringControl m_codec_control;
   FileSelectionControl m_ffmpeg_control;
   StringControl m_path_control; // TODO use a file chooser
@@ -75,10 +75,8 @@ public:
   // Progress report form the worker
   class Progress: public Job {
   public:
-    Progress(MovieWindow *window, const std::string &message,
-             bool completed = false):
-        m_window(window),
-        m_message(message), m_completed(completed) {}
+    Progress(MovieWindow *window, const std::string &message, bool completed = false):
+        m_window(window), m_message(message), m_completed(completed) {}
     MovieWindow *m_window;
     std::string m_message; // progress message
     bool m_completed;      // set on completion
@@ -95,9 +93,7 @@ public:
     }
   };
 
-  MovieWindow():
-      buttons(false, 0), render("Render"), cancel(Gtk::Stock::CANCEL),
-      vbox(false, 0) {}
+  MovieWindow(): buttons(false, 0), render("Render"), cancel(Gtk::Stock::CANCEL), vbox(false, 0) {}
 
   ~MovieWindow() {}
 
@@ -201,12 +197,9 @@ public:
 
 MovieControls::MovieControls(MovieWindow *window):
     m_window(window),
-    m_x_control(this, &m_window->m_x, -arith_traits<arith_t>::maximum(),
-                arith_traits<arith_t>::maximum()),
-    m_y_control(this, &m_window->m_y, -arith_traits<arith_t>::maximum(),
-                arith_traits<arith_t>::maximum()),
-    m_radius_control(this, &m_window->m_radius, 0,
-                     arith_traits<arith_t>::maximum()),
+    m_x_control(this, &m_window->m_x, -arith_traits<arith_t>::maximum(), arith_traits<arith_t>::maximum()),
+    m_y_control(this, &m_window->m_y, -arith_traits<arith_t>::maximum(), arith_traits<arith_t>::maximum()),
+    m_radius_control(this, &m_window->m_radius, 0, arith_traits<arith_t>::maximum()),
     m_maxiters_control(this, &m_window->m_maxiters, 1, INT_MAX - 1),
     m_seconds_control(this, &m_window->m_seconds, 1, INT_MAX - 1),
     m_fps_control(this, &m_window->m_fps, 1, INT_MAX - 1),
@@ -216,8 +209,7 @@ MovieControls::MovieControls(MovieWindow *window):
     m_codec_control(this, &m_window->m_codec),
     m_ffmpeg_control(this, &m_window->m_ffmpeg, "Select Encoder"),
     m_path_control(this, &m_window->m_path),
-    m_arith_control(this, &m_window->m_arith_string, &arith_names[0],
-                    &arith_names[arith_limit]) {
+    m_arith_control(this, &m_window->m_arith_string, &arith_names[0], &arith_names[arith_limit]) {
 
   m_x_control.Attach(0, 0, "X center");
   m_y_control.Attach(0, 1, "Y center");
@@ -248,8 +240,7 @@ void MovieControls::controlChanged(Control *c) {
   }
 }
 
-void Movie(arith_t x, arith_t y, arith_t radius, int maxiters,
-           arith_type arith) {
+void Movie(arith_t x, arith_t y, arith_t radius, int maxiters, arith_type arith) {
   MovieWindow *w = new MovieWindow();
   w->m_x = x;
   w->m_y = y;

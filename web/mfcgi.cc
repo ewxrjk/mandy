@@ -21,21 +21,17 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
-static const struct option options[] = {
-    {"help", no_argument, NULL, 'h'},
-    {"version", no_argument, NULL, 'V'},
-    {"test", required_argument, NULL, 't'},
-    {"count", required_argument, NULL, 'n'},
-    {"no-header", required_argument, NULL, 'H'},
-    {NULL, 0, NULL, 0}};
+static const struct option options[] = {{"help", no_argument, NULL, 'h'},
+                                        {"version", no_argument, NULL, 'V'},
+                                        {"test", required_argument, NULL, 't'},
+                                        {"count", required_argument, NULL, 'n'},
+                                        {"no-header", required_argument, NULL, 'H'},
+                                        {NULL, 0, NULL, 0}};
 
-static void process_request(FCGX_Stream *out, FCGX_ParamArray envp,
-                            bool header);
+static void process_request(FCGX_Stream *out, FCGX_ParamArray envp, bool header);
 static std::string format(int rc);
-static gboolean pixbuf_save_callback(const gchar *buf, gsize count,
-                                     GError **error, gpointer data);
-static gboolean stdio_save_callback(const gchar *buf, gsize count, GError **,
-                                    gpointer data);
+static gboolean pixbuf_save_callback(const gchar *buf, gsize count, GError **error, gpointer data);
+static gboolean stdio_save_callback(const gchar *buf, gsize count, GError **, gpointer data);
 static void test(const char *query, bool header);
 
 int main(int argc, char **argv) {
@@ -99,8 +95,7 @@ int main(int argc, char **argv) {
   return 0;
 }
 
-static void process_request(FCGX_Stream *out, FCGX_ParamArray envp,
-                            bool header) {
+static void process_request(FCGX_Stream *out, FCGX_ParamArray envp, bool header) {
   while(*envp) {
     static const char prefix[] = "QUERY_STRING=";
     if(!strncmp(*envp, prefix, strlen(prefix))) {
@@ -112,8 +107,7 @@ static void process_request(FCGX_Stream *out, FCGX_ParamArray envp,
   FCGX_FPrintF(out, "No query string found\n");
 }
 
-static gboolean pixbuf_save_callback(const gchar *buf, gsize count, GError **,
-                                     gpointer data) {
+static gboolean pixbuf_save_callback(const gchar *buf, gsize count, GError **, gpointer data) {
   FCGX_Stream *out = (FCGX_Stream *)data;
   FCGX_PutStr(buf, count, out);
   return TRUE;
@@ -124,8 +118,7 @@ static void test(const char *query, bool header) {
   fflush(stdout);
 }
 
-static gboolean stdio_save_callback(const gchar *buf, gsize count, GError **,
-                                    gpointer data) {
+static gboolean stdio_save_callback(const gchar *buf, gsize count, GError **, gpointer data) {
   FILE *out = (FILE *)data;
   fwrite(buf, 1, count, out);
   return TRUE;

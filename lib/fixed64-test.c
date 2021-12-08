@@ -24,8 +24,7 @@ static int errors;
 
 static void printFixed(Fixed64 f, const char *expect) {
   char buffer[128];
-  printf("%02x.%06x%08x", (unsigned char)(f >> 56),
-         (unsigned)(f >> 32) & 0x00FFFFFF, (unsigned)f);
+  printf("%02x.%06x%08x", (unsigned char)(f >> 56), (unsigned)(f >> 32) & 0x00FFFFFF, (unsigned)f);
   printf(" =%s", Fixed64_2str(buffer, sizeof buffer, f, 10));
   if(strcmp(buffer, expect)) {
     printf("<EXPECTED %s>", expect);
@@ -220,22 +219,17 @@ int main() {
   printf("-1.1:    ");
   printFixed(a, "-1.1000000000000000055511151231257827021181583404541015625");
   putchar('\n');
-  Fixed64_str2(&a, "0.00000000000000001387778780781445675529539585113525390625",
-               NULL);
+  Fixed64_str2(&a, "0.00000000000000001387778780781445675529539585113525390625", NULL);
   printf("2⁻⁵⁶:    ");
   printFixed(a, "0.00000000000000001387778780781445675529539585113525390625");
   putchar('\n');
-  Fixed64_str2(
-      &a, "127.00000000000000001387778780781445675529539585113525390625", NULL);
+  Fixed64_str2(&a, "127.00000000000000001387778780781445675529539585113525390625", NULL);
   printf("127+2⁻⁵⁶:");
   printFixed(a, "127.00000000000000001387778780781445675529539585113525390625");
   putchar('\n');
-  Fixed64_str2(&a,
-               "-127.00000000000000001387778780781445675529539585113525390625",
-               NULL);
+  Fixed64_str2(&a, "-127.00000000000000001387778780781445675529539585113525390625", NULL);
   printf("-(127+2⁻⁵⁶):");
-  printFixed(a,
-             "-127.00000000000000001387778780781445675529539585113525390625");
+  printFixed(a, "-127.00000000000000001387778780781445675529539585113525390625");
   putchar('\n');
 
 #if HAVE_ASM_64

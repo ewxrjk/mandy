@@ -64,10 +64,8 @@ void ControlContainer::SetSensitivity(bool sensitivity) {
 void Control::Attach(int x, int y, const char *caption, int width) {
   label.set_text(caption);
   label.set_alignment(1.0, 0.0);
-  parent->attach(label, 2 * x, 2 * x + 1, y, y + 1, Gtk::FILL, Gtk::SHRINK, 1,
-                 1);
-  parent->attach(*widget(), 2 * x + 1, 2 * (x + width), y, y + 1, Gtk::FILL,
-                 Gtk::SHRINK, 1, 1);
+  parent->attach(label, 2 * x, 2 * x + 1, y, y + 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
+  parent->attach(*widget(), 2 * x + 1, 2 * (x + width), y, y + 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
 }
 
 bool Control::DisplayIsValid() const {
@@ -102,11 +100,9 @@ FileSelectionControl::FileSelectionControl(ControlContainer *p,
                                            std::string *path,
                                            const Glib::ustring &title,
                                            Gtk::FileChooserAction action):
-    Control(p),
-    Gtk::FileChooserButton(title, action), m_path(path) {
+    Control(p), Gtk::FileChooserButton(title, action), m_path(path) {
   select_filename(*m_path);
-  signal_file_set().connect(
-      sigc::mem_fun(*this, &FileSelectionControl::on_file_set));
+  signal_file_set().connect(sigc::mem_fun(*this, &FileSelectionControl::on_file_set));
 }
 
 void FileSelectionControl::UpdateDisplay() {
@@ -127,8 +123,7 @@ Gtk::Widget *FileSelectionControl::widget() {
 
 // Text entry widget --------------------------------------------------------
 
-TextEntryControl::TextEntryControl(ControlContainer *p, bool editable_):
-    Control(p) {
+TextEntryControl::TextEntryControl(ControlContainer *p, bool editable_): Control(p) {
   p->Attach(this);
   set_editable(editable_);
 }

@@ -110,8 +110,7 @@ static int isZero(const uint32_t value[NINTWORDS]) {
   return 1;
 }
 
-static void sub(uint32_t r[NINTWORDS], const uint32_t a[NINTWORDS],
-                const uint32_t b[NINTWORDS]) {
+static void sub(uint32_t r[NINTWORDS], const uint32_t a[NINTWORDS], const uint32_t b[NINTWORDS]) {
   uint64_t s = 1;
   int n;
 

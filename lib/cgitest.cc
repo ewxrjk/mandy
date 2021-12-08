@@ -21,20 +21,17 @@
 
 static int errors;
 
-#define ASSERT(expr)                                                           \
-  (void)(expr ? 0                                                              \
-              : (++errors, fprintf(stderr, "%s:%d: assertion failed: %s\n",    \
-                                   __FILE__, __LINE__, #expr)))
+#define ASSERT(expr)                                                                                                   \
+  (void)(expr ? 0 : (++errors, fprintf(stderr, "%s:%d: assertion failed: %s\n", __FILE__, __LINE__, #expr)))
 
-#define ASSERT_THROWS(expr)                                                    \
-  do {                                                                         \
-    try {                                                                      \
-      (void)(expr);                                                            \
-      ++errors;                                                                \
-      fprintf(stderr, "%s:%d: failed to throw: %s\n", __FILE__, __LINE__,      \
-              #expr);                                                          \
-    } catch(std::runtime_error & e) {                                          \
-    }                                                                          \
+#define ASSERT_THROWS(expr)                                                                                            \
+  do {                                                                                                                 \
+    try {                                                                                                              \
+      (void)(expr);                                                                                                    \
+      ++errors;                                                                                                        \
+      fprintf(stderr, "%s:%d: failed to throw: %s\n", __FILE__, __LINE__, #expr);                                      \
+    } catch(std::runtime_error & e) {                                                                                  \
+    }                                                                                                                  \
   } while(0)
 
 int main() {

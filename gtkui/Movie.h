@@ -21,8 +21,7 @@
 
 namespace mmui {
 
-void Movie(arith_t x, arith_t y, arith_t radius, int maxiters,
-           arith_type arith);
+void Movie(arith_t x, arith_t y, arith_t radius, int maxiters, arith_type arith);
 
 }
 

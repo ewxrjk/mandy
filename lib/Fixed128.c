@@ -18,8 +18,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#define UINT128_MAX                                                            \
-  ((uint128_t)0xFFFFFFFFFFFFFFFF + ((uint128_t)0xFFFFFFFFFFFFFFFF << 64))
+#define UINT128_MAX ((uint128_t)0xFFFFFFFFFFFFFFFF + ((uint128_t)0xFFFFFFFFFFFFFFFF << 64))
 #define UNDERFLOW_MASK (UINT128_MAX >> 32)
 
 // add b to *r, setting *overflow if the result is too large
@@ -29,8 +28,7 @@ static inline void add_with_overflow(int *overflow, uint128_t *r, uint128_t b) {
   *r += b;
 }
 
-static int Fixed128_mul_unsigned(union Fixed128 *r, const union Fixed128 *a,
-                                 const union Fixed128 *b) {
+static int Fixed128_mul_unsigned(union Fixed128 *r, const union Fixed128 *a, const union Fixed128 *b) {
   // Compute the four partial products. Recall representation is
   // little-endian.
   uint128_t hh = (uint128_t)a->u64[1] * (uint128_t)b->u64[1];
@@ -59,8 +57,7 @@ static int Fixed128_mul_unsigned(union Fixed128 *r, const union Fixed128 *a,
   return overflow;
 }
 
-int Fixed128_mul(union Fixed128 *r, const union Fixed128 *a,
-                 const union Fixed128 *b) {
+int Fixed128_mul(union Fixed128 *r, const union Fixed128 *a, const union Fixed128 *b) {
   union Fixed128 aa = {0}, bb = {0};
   int sign = 0, overflow = 0;
   /* Sort out sign */
@@ -100,12 +97,11 @@ void Fixed128_divu(union Fixed128 *r, const union Fixed128 *a, unsigned u) {
   }
 }
 
-char *Fixed128_2str(char buffer[], unsigned bufsize, const union Fixed128 *a,
-                    int base) {
-#define ADDCHAR(C)                                                             \
-  do {                                                                         \
-    if(i < bufsize - 1)                                                        \
-      buffer[i++] = (C);                                                       \
+char *Fixed128_2str(char buffer[], unsigned bufsize, const union Fixed128 *a, int base) {
+#define ADDCHAR(C)                                                                                                     \
+  do {                                                                                                                 \
+    if(i < bufsize - 1)                                                                                                \
+      buffer[i++] = (C);                                                                                               \
   } while(0)
 
   static const char digits[] = "0123456789abcdefghijklmnopqrstuvwxyz";
@@ -149,8 +145,7 @@ char *Fixed128_2str(char buffer[], unsigned bufsize, const union Fixed128 *a,
   return buffer;
 }
 
-static void Fixed128_div_unsigned(union Fixed128 *r, const union Fixed128 *a,
-                                  const union Fixed128 *b) {
+static void Fixed128_div_unsigned(union Fixed128 *r, const union Fixed128 *a, const union Fixed128 *b) {
   union Fixed128 rem = *a, sub = *b, quot;
   int bit;
   bit = 0;
@@ -175,8 +170,7 @@ static void Fixed128_div_unsigned(union Fixed128 *r, const union Fixed128 *a,
   // TODO we always round down, we need another bit
 }
 
-void Fixed128_div(union Fixed128 *r, const union Fixed128 *a,
-                  const union Fixed128 *b) {
+void Fixed128_div(union Fixed128 *r, const union Fixed128 *a, const union Fixed128 *b) {
   union Fixed128 aa = {0}, bb = {0};
   int sign = 0;
   /* Sort out sign */
@@ -255,8 +249,7 @@ double Fixed128_2double(const union Fixed128 *a) {
     Fixed128_neg(&b, a);
     return -Fixed128_2double(&b);
   }
-  return (a->word[NFIXED128 - 4] / 79228162514264337593543950336.0
-          + a->word[NFIXED128 - 3] / 18446744073709551616.0
+  return (a->word[NFIXED128 - 4] / 79228162514264337593543950336.0 + a->word[NFIXED128 - 3] / 18446744073709551616.0
           + a->word[NFIXED128 - 2] / 4294967296.0 + a->word[NFIXED128 - 1]);
 }
 
@@ -266,8 +259,7 @@ long double Fixed128_2longdouble(const union Fixed128 *a) {
     Fixed128_neg(&b, a);
     return -Fixed128_2longdouble(&b);
   }
-  return (a->word[NFIXED128 - 4] / 79228162514264337593543950336.0L
-          + a->word[NFIXED128 - 3] / 18446744073709551616.0L
+  return (a->word[NFIXED128 - 4] / 79228162514264337593543950336.0L + a->word[NFIXED128 - 3] / 18446744073709551616.0L
           + a->word[NFIXED128 - 2] / 4294967296.0L + a->word[NFIXED128 - 1]);
 }
 

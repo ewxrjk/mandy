@@ -40,8 +40,7 @@ void GenericWindow::Initialize(View *view_) {
 }
 
 bool GenericWindow::on_key_release_event(GdkEventKey *event) {
-  if((event->state & (Gdk::SHIFT_MASK | Gdk::CONTROL_MASK))
-     == Gdk::CONTROL_MASK) {
+  if((event->state & (Gdk::SHIFT_MASK | Gdk::CONTROL_MASK)) == Gdk::CONTROL_MASK) {
     switch(event->keyval) {
     case GDK_equal:
     case GDK_minus:

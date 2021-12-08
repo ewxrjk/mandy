@@ -25,20 +25,14 @@ namespace mmui {
 
 ControlPanel::ControlPanel(View *v):
     view(v),
-    xcenter_control(this, &view->xcenter, -arith_traits<arith_t>::maximum(),
-                    arith_traits<arith_t>::maximum()),
-    ycenter_control(this, &view->ycenter, -arith_traits<arith_t>::maximum(),
-                    arith_traits<arith_t>::maximum()),
+    xcenter_control(this, &view->xcenter, -arith_traits<arith_t>::maximum(), arith_traits<arith_t>::maximum()),
+    ycenter_control(this, &view->ycenter, -arith_traits<arith_t>::maximum(), arith_traits<arith_t>::maximum()),
     radius_control(this, &view->radius, 0, arith_traits<arith_t>::maximum()),
     maxiters_control(this, &view->maxiters, 1, INT_MAX - 1),
-    xpointer_control(this, &view->xpointer, -arith_traits<arith_t>::maximum(),
-                     arith_traits<arith_t>::maximum(), false),
-    ypointer_control(this, &view->ypointer, -arith_traits<arith_t>::maximum(),
-                     arith_traits<arith_t>::maximum(), false),
-    count_control(this, &view->count, 0, arith_traits<arith_t>::maximum(),
-                  false),
-    arith_control(this, &view->arith_string, &arith_names[0],
-                  &arith_names[arith_limit]),
+    xpointer_control(this, &view->xpointer, -arith_traits<arith_t>::maximum(), arith_traits<arith_t>::maximum(), false),
+    ypointer_control(this, &view->ypointer, -arith_traits<arith_t>::maximum(), arith_traits<arith_t>::maximum(), false),
+    count_control(this, &view->count, 0, arith_traits<arith_t>::maximum(), false),
+    arith_control(this, &view->arith_string, &arith_names[0], &arith_names[arith_limit]),
     elapsed_control(this, &view->elapsed, false) {
   xcenter_control.Attach(0, 0, "X center");
   ycenter_control.Attach(0, 1, "Y center");

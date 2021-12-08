@@ -46,8 +46,7 @@ static inline double Fixed64_2double(Fixed64 a) {
 int Fixed128_to_Fixed64(Fixed64 *r, const union Fixed128 *a);
 void Fixed64_to_Fixed(union Fixed128 *r, Fixed64 a);
 
-int Fixed64_iterate(Fixed64 zx, Fixed64 zy, Fixed64 cx, Fixed64 cy, double *r2p,
-                    int maxiters);
+int Fixed64_iterate(Fixed64 zx, Fixed64 zy, Fixed64 cx, Fixed64 cy, double *r2p, int maxiters);
 
 #ifdef __cplusplus
 }

@@ -46,13 +46,11 @@ union Fixed128 {
   // little-endian platforms.
 };
 
-static inline void Fixed128_add(union Fixed128 *r, const union Fixed128 *a,
-                                const union Fixed128 *b) {
+static inline void Fixed128_add(union Fixed128 *r, const union Fixed128 *a, const union Fixed128 *b) {
   r->s128 = a->s128 + b->s128;
 }
 
-static inline void Fixed128_sub(union Fixed128 *r, const union Fixed128 *a,
-                                const union Fixed128 *b) {
+static inline void Fixed128_sub(union Fixed128 *r, const union Fixed128 *a, const union Fixed128 *b) {
   r->s128 = a->s128 - b->s128;
 }
 
@@ -65,13 +63,11 @@ static inline int Fixed128_neg(union Fixed128 *r, const union Fixed128 *a) {
     return 0;
 }
 
-int Fixed128_mul(union Fixed128 *r, const union Fixed128 *a,
-                 const union Fixed128 *b);
+int Fixed128_mul(union Fixed128 *r, const union Fixed128 *a, const union Fixed128 *b);
 
 void Fixed128_divu(union Fixed128 *r, const union Fixed128 *a, unsigned u);
 
-void Fixed128_div(union Fixed128 *r, const union Fixed128 *a,
-                  const union Fixed128 *b);
+void Fixed128_div(union Fixed128 *r, const union Fixed128 *a, const union Fixed128 *b);
 
 void Fixed128_sqrt(union Fixed128 *r, const union Fixed128 *a);
 
@@ -104,48 +100,39 @@ static inline int Fixed128_ge0(const union Fixed128 *a) {
   return a->s128 >= 0;
 }
 
-static inline int Fixed128_eq(const union Fixed128 *a,
-                              const union Fixed128 *b) {
+static inline int Fixed128_eq(const union Fixed128 *a, const union Fixed128 *b) {
   return a->u128 == b->u128;
 }
 
-static inline int Fixed128_ne(const union Fixed128 *a,
-                              const union Fixed128 *b) {
+static inline int Fixed128_ne(const union Fixed128 *a, const union Fixed128 *b) {
   return a->u128 != b->u128;
 }
 
-static inline int Fixed128_lt(const union Fixed128 *a,
-                              const union Fixed128 *b) {
+static inline int Fixed128_lt(const union Fixed128 *a, const union Fixed128 *b) {
   return a->s128 < b->s128;
 }
 
-static inline int Fixed128_lt_unsigned(const union Fixed128 *a,
-                                       const union Fixed128 *b) {
+static inline int Fixed128_lt_unsigned(const union Fixed128 *a, const union Fixed128 *b) {
   return a->u128 < b->u128;
 }
 
-static inline int Fixed128_gt(const union Fixed128 *a,
-                              const union Fixed128 *b) {
+static inline int Fixed128_gt(const union Fixed128 *a, const union Fixed128 *b) {
   return a->s128 > b->s128;
 }
 
-static inline int Fixed128_le(const union Fixed128 *a,
-                              const union Fixed128 *b) {
+static inline int Fixed128_le(const union Fixed128 *a, const union Fixed128 *b) {
   return a->s128 <= b->s128;
 }
 
-static inline int Fixed128_ge(const union Fixed128 *a,
-                              const union Fixed128 *b) {
+static inline int Fixed128_ge(const union Fixed128 *a, const union Fixed128 *b) {
   return a->s128 >= b->s128;
 }
 
-static inline int Fixed128_gt_unsigned(const union Fixed128 *a,
-                                       const union Fixed128 *b) {
+static inline int Fixed128_gt_unsigned(const union Fixed128 *a, const union Fixed128 *b) {
   return a->u128 > b->u128;
 }
 
-static inline int Fixed128_le_unsigned(const union Fixed128 *a,
-                                       const union Fixed128 *b) {
+static inline int Fixed128_le_unsigned(const union Fixed128 *a, const union Fixed128 *b) {
   return a->u128 <= b->u128;
 }
 
@@ -153,8 +140,7 @@ static inline int Fixed128_eq0(const union Fixed128 *a) {
   return a->u128 == 0;
 }
 
-char *Fixed128_2str(char buffer[], unsigned bufsize, const union Fixed128 *a,
-                    int base);
+char *Fixed128_2str(char buffer[], unsigned bufsize, const union Fixed128 *a, int base);
 int Fixed128_str2(union Fixed128 *r, const char *s, char **endptr);
 
 int Fixed128_str2_cs(union Fixed128 *r, const char *s);
@@ -166,9 +152,8 @@ void Fixed128_double2(union Fixed128 *r, double n);
 double Fixed128_2double(const union Fixed128 *a);
 long double Fixed128_2longdouble(const union Fixed128 *a);
 
-int Fixed128_iterate(union Fixed128 *zx, union Fixed128 *zy,
-                     const union Fixed128 *cx, const union Fixed128 *cy,
-                     int64_t maxiters);
+int Fixed128_iterate(
+    union Fixed128 *zx, union Fixed128 *zy, const union Fixed128 *cx, const union Fixed128 *cy, int64_t maxiters);
 
 #ifdef __cplusplus
 }

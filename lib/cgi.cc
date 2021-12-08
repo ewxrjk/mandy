@@ -33,8 +33,7 @@ void parse_query(const char *query, const struct param_def *params) {
   }
 }
 
-void parse_query_one(const char *start, const char *end,
-                     const struct param_def *params) {
+void parse_query_one(const char *start, const char *end, const struct param_def *params) {
   char name[64], value[1024];
   start = urldecode(start, end, name, sizeof name, 1);
   if(start >= end)
@@ -50,8 +49,7 @@ void parse_query_one(const char *start, const char *end,
   throw std::runtime_error("unrecognized parameter");
 }
 
-const char *urldecode(const char *start, const char *end, char *v, size_t vsize,
-                      int name) {
+const char *urldecode(const char *start, const char *end, char *v, size_t vsize, int name) {
   size_t pos = 0;
   --vsize; // leave room for the final 0
   while(start < end) {

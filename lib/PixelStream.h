@@ -33,8 +33,7 @@ public:
 class PixelStreamRectangle: public PixelStream {
 public:
   PixelStreamRectangle(int x, int y, int w, int h):
-      m_min_x(x), m_min_y(y), m_limit_x(x + w), m_limit_y(y + h), m_px(x),
-      m_py(y) {}
+      m_min_x(x), m_min_y(y), m_limit_x(x + w), m_limit_y(y + h), m_px(x), m_py(y) {}
   bool next(int &px, int &py) override {
     if(m_py >= m_limit_y) {
       px = m_min_x;
@@ -59,8 +58,7 @@ private:
 class PixelStreamEdge: public PixelStream {
 public:
   PixelStreamEdge(int x, int y, int w, int h):
-      m_min_x(x), m_min_y(y), m_limit_x(x + w - 1), m_limit_y(y + h - 1),
-      m_px(x), m_py(y) {}
+      m_min_x(x), m_min_y(y), m_limit_x(x + w - 1), m_limit_y(y + h - 1), m_px(x), m_py(y) {}
   bool next(int &px, int &py) override {
     if(m_edge >= 4) {
       px = m_min_x;

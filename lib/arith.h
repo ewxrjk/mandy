@@ -58,20 +58,17 @@ public:
   static int iterate(T zx, T zy, T cx, T cy, int maxiters, double &r2);
 };
 
-static inline count_t transform_iterations(int iterations, double r2,
-                                           int maxiters) {
+static inline count_t transform_iterations(int iterations, double r2, int maxiters) {
   if(iterations == maxiters)
     return maxiters;
   else
     return 1 + iterations - log2(log2(r2));
 }
 
-template <typename T>
-int defaultIterate(T zx, T zy, T cx, T cy, int maxiters, double &r2_out) {
+template <typename T> int defaultIterate(T zx, T zy, T cx, T cy, int maxiters, double &r2_out) {
   T r2, zx2, zy2;
   int iterations = 0;
-  while(((r2 = (zx2 = zx * zx) + (zy2 = zy * zy)) < T(64))
-        && iterations < maxiters) {
+  while(((r2 = (zx2 = zx * zx) + (zy2 = zy * zy)) < T(64)) && iterations < maxiters) {
     zy = T(2) * zx * zy + cy;
     zx = zx2 - zy2 + cx;
     ++iterations;
@@ -98,10 +95,8 @@ public:
     return errno;
   }
 
-  static int iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy,
-                     int maxiters, double &r2) {
-    return defaultIterate((double)zx, (double)zy, (double)cx, (double)cy,
-                          maxiters, r2);
+  static int iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy, int maxiters, double &r2) {
+    return defaultIterate((double)zx, (double)zy, (double)cx, (double)cy, maxiters, r2);
   }
 };
 
@@ -128,10 +123,8 @@ public:
     return errno;
   }
 
-  static int iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy,
-                     int maxiters, double &r2) {
-    return defaultIterate((long double)zx, (long double)zy, (long double)cx,
-                          (long double)cy, maxiters, r2);
+  static int iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy, int maxiters, double &r2) {
+    return defaultIterate((long double)zx, (long double)zy, (long double)cx, (long double)cy, maxiters, r2);
   }
 };
 
@@ -152,8 +145,7 @@ public:
     return n.fromString(s, endptr);
   }
 
-  static int iterate(fixed128 zx, fixed128 zy, fixed128 cx, fixed128 cy,
-                     int maxiters, double &r2) {
+  static int iterate(fixed128 zx, fixed128 zy, fixed128 cx, fixed128 cy, int maxiters, double &r2) {
 #if HAVE_ASM_128 && NFIXED128 == 4
     int rawCount = Fixed128_iterate(&zx.f, &zy.f, &cx.f, &cy.f, maxiters);
     // r2 is returned in zx (rather oddly)
@@ -181,8 +173,7 @@ public:
     return n.fromString(s, endptr);
   }
 
-  static int iterate(arith_t zxa, arith_t zya, arith_t cxa, arith_t cya,
-                     int maxiters, double &r2) {
+  static int iterate(arith_t zxa, arith_t zya, arith_t cxa, arith_t cya, int maxiters, double &r2) {
     fixed64 zx = zxa, zy = zya, cx = cxa, cy = cya;
 #if HAVE_ASM_64
     return Fixed64_iterate(zx.f, zy.f, cx.f, cy.f, &r2, maxiters);
@@ -192,8 +183,7 @@ public:
   }
 };
 
-int iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy, int maxiters,
-            arith_type arith, double &r2);
+int iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy, int maxiters, arith_type arith, double &r2);
 
 #endif /* ARITH_H */
 

@@ -38,21 +38,20 @@ public:
       dest->release();
   }
 
-  void set(IterBuffer *dest_, arith_t xcenter_, arith_t ycenter_,
-           arith_t radius_, int maxiters_, int x_, int y_, int w_, int h_,
+  void set(IterBuffer *dest_,
+           arith_t xcenter_,
+           arith_t ycenter_,
+           arith_t radius_,
+           int maxiters_,
+           int x_,
+           int y_,
+           int w_,
+           int h_,
            arith_type arith_) {
     dest = dest_;
-    xleft = xcenter_
-            - (dest->width() > dest->height()
-                   ? radius_ * dest->width() / dest->height()
-                   : radius_);
-    ybottom = ycenter_
-              - (dest->width() > dest->height()
-                     ? radius_
-                     : radius_ * dest->height() / dest->width());
-    xsize = (dest->width() > dest->height()
-                 ? radius_ * 2 * dest->width() / dest->height()
-                 : radius_ * 2);
+    xleft = xcenter_ - (dest->width() > dest->height() ? radius_ * dest->width() / dest->height() : radius_);
+    ybottom = ycenter_ - (dest->width() > dest->height() ? radius_ : radius_ * dest->height() / dest->width());
+    xsize = (dest->width() > dest->height() ? radius_ * 2 * dest->width() / dest->height() : radius_ * 2);
     maxiters = maxiters_;
     x = x_;
     y = y_;
@@ -65,10 +64,17 @@ public:
   // Create a new IterBuffer and start to asynchronously populate it.  It will
   // be returned with one ref owned by the caller (and many by the background
   // jobs).  Uncomputed locations are set to -1.
-  static IterBuffer *recompute(arith_t cx, arith_t cy, arith_t r, int maxiters,
-                               int w, int h, arith_type arith,
+  static IterBuffer *recompute(arith_t cx,
+                               arith_t cy,
+                               arith_t r,
+                               int maxiters,
+                               int w,
+                               int h,
+                               arith_type arith,
                                void (*completion_callback)(Job *, void *),
-                               void *completion_data, int xpos, int ypos,
+                               void *completion_data,
+                               int xpos,
+                               int ypos,
                                const FractalJobFactory *factory);
 
   // Calculate and plot px, py
@@ -82,23 +88,22 @@ public:
 #endif
 
 #if SIMD2 || SIMD4
-  inline void simd_iterate(const double *zxvalues, const double *zyvalues,
-                           const double *cxvalues, const double *cyvalues,
-                           int maxiters, int *iterations, double *r2values) {
+  inline void simd_iterate(const double *zxvalues,
+                           const double *zyvalues,
+                           const double *cxvalues,
+                           const double *cyvalues,
+                           int maxiters,
+                           int *iterations,
+                           double *r2values) {
     switch(arith) {
 #if SIMD2
     case arith_simd2:
-      simd_iterate2(zxvalues, zyvalues, cxvalues, cyvalues, maxiters,
-                    iterations, r2values);
-      simd_iterate2(zxvalues + 2, zyvalues + 2, cxvalues + 2, cyvalues + 2,
-                    maxiters, iterations + 2, r2values + 2);
+      simd_iterate2(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values);
+      simd_iterate2(zxvalues + 2, zyvalues + 2, cxvalues + 2, cyvalues + 2, maxiters, iterations + 2, r2values + 2);
       break;
 #endif
 #if SIMD4
-    case arith_simd4:
-      simd_iterate4(zxvalues, zyvalues, cxvalues, cyvalues, maxiters,
-                    iterations, r2values);
-      break;
+    case arith_simd4: simd_iterate4(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values); break;
 #endif
     default: throw std::logic_error("unhandled arith_type");
     }

@@ -21,8 +21,12 @@
 #include "Shell.h"
 #include <gdkmm/pixbuf.h>
 
-void draw(const char *wstr, const char *hstr, const char *xstr,
-          const char *ystr, const char *rstr, const char *mistr,
+void draw(const char *wstr,
+          const char *hstr,
+          const char *xstr,
+          const char *ystr,
+          const char *rstr,
+          const char *mistr,
           const char *path) {
   arith_t x, y, radius;
   long width, height, maxiters;
@@ -86,11 +90,17 @@ static void completed(Job *, void *) {
   // do nothing
 }
 
-int draw(int width, int height, arith_t x, arith_t y, arith_t radius,
-         int maxiters, arith_type arith, FILE *fp, const char *fileType) {
+int draw(int width,
+         int height,
+         arith_t x,
+         arith_t y,
+         arith_t radius,
+         int maxiters,
+         arith_type arith,
+         FILE *fp,
+         const char *fileType) {
   MandelbrotJobFactory jf;
-  IterBuffer *dest = FractalJob::recompute(
-      x, y, radius, maxiters, width, height, arith, completed, &jf, 0, 0, &jf);
+  IterBuffer *dest = FractalJob::recompute(x, y, radius, maxiters, width, height, arith, completed, &jf, 0, 0, &jf);
   Job::poll(&jf);
   // Write to a file
   if(!strcmp(fileType, "ppm")) {
@@ -119,8 +129,7 @@ int draw(int width, int height, arith_t x, arith_t y, arith_t radius,
   } else {
     // Convert to a pixbuf
     // TODO de-dupe with View::Completed
-    Glib::RefPtr<Gdk::Pixbuf> pixbuf =
-        Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, false, 8, width, height);
+    Glib::RefPtr<Gdk::Pixbuf> pixbuf = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, false, 8, width, height);
     const int rowstride = pixbuf->get_rowstride();
     guint8 *pixels = pixbuf->get_pixels();
     for(int py = 0; py < height; ++py) {
@@ -153,16 +162,22 @@ int draw(int width, int height, arith_t x, arith_t y, arith_t radius,
   return 0;
 }
 
-static std::string get_default(const char *name,
-                               const std::string &default_value) {
+static std::string get_default(const char *name, const std::string &default_value) {
   const char *value = getenv(name);
   return value ? value : default_value;
 }
 
-int dive(const char *wstr, const char *hstr, const char *sxstr,
-         const char *systr, const char *srstr, const char *exstr,
-         const char *eystr, const char *erstr, const char *mistr,
-         const char *secstr, const char *path) {
+int dive(const char *wstr,
+         const char *hstr,
+         const char *sxstr,
+         const char *systr,
+         const char *srstr,
+         const char *exstr,
+         const char *eystr,
+         const char *erstr,
+         const char *mistr,
+         const char *secstr,
+         const char *path) {
   RenderMovie rm;
   char *eptr;
   int error;
@@ -256,14 +271,13 @@ int RenderMovie::Render(int *cancel) {
     // see e.g. https://bugzilla.mozilla.org/show_bug.cgi?id=1368063
     extras = "-pix_fmt yuv420p";
   }
-  command << shellQuote(ffmpeg)
-          << " -f image2pipe" // input format is concatenated image file demuxer
-          << " -i pipe:0"     // input fil
-          << " -vcodec " << shellQuote(codec) // output file codec
-          << " -r " << fps                    // frame rate
-          << " -b:v " << bitrate              // bit rate
-          << " " << extras                    // extra options
-          << " " << shellQuote(path);         // output file
+  command << shellQuote(ffmpeg) << " -f image2pipe" // input format is concatenated image file demuxer
+          << " -i pipe:0"                           // input fil
+          << " -vcodec " << shellQuote(codec)       // output file codec
+          << " -r " << fps                          // frame rate
+          << " -b:v " << bitrate                    // bit rate
+          << " " << extras                          // extra options
+          << " " << shellQuote(path);               // output file
   // Report the encoder command
   pstream << "Encoding with " << ffmpeg;
   Progress(pstream.str());
@@ -279,8 +293,7 @@ int RenderMovie::Render(int *cancel) {
   // TODO capture ffmpeg stderr and put it somewhere useful
   // (maybe the progress report should be a larger window)
   // Render PNGs to the pipe
-  for(int frame = 0; frame < frames && (!cancel || !ATOMIC_GET(*cancel));
-      ++frame) {
+  for(int frame = 0; frame < frames && (!cancel || !ATOMIC_GET(*cancel)); ++frame) {
     std::stringstream pstream;
     pstream << "Frame " << frame << "/" << frames;
     Progress(pstream.str());

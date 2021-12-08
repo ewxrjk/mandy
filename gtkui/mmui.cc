@@ -33,17 +33,15 @@ static bool pollAgainHandler() {
 static bool periodic() {
   bool more = Job::poll(1);
   if(more && !pollAgainConnection.connected())
-    pollAgainConnection =
-        Glib::signal_idle().connect(sigc::ptr_fun(pollAgainHandler));
+    pollAgainConnection = Glib::signal_idle().connect(sigc::ptr_fun(pollAgainHandler));
   return true;
 }
 
-static const struct option options[] = {
-    {"help", no_argument, NULL, 'h'},
-    {"threads", required_argument, NULL, 't'},
-    {"draw", no_argument, NULL, 'd'},
-    {"dive", no_argument, NULL, 'D'},
-    {NULL, 0, NULL, 0}};
+static const struct option options[] = {{"help", no_argument, NULL, 'h'},
+                                        {"threads", required_argument, NULL, 't'},
+                                        {"draw", no_argument, NULL, 'd'},
+                                        {"dive", no_argument, NULL, 'D'},
+                                        {NULL, 0, NULL, 0}};
 
 int main(int argc, char **argv) {
   Gtk::Main kit(argc, argv);
@@ -76,10 +74,14 @@ int main(int argc, char **argv) {
   switch(mode) {
   case 'd':
     if(optind + 7 != argc)
-      fatal(0, "Usage: %s --draw WIDTH HEIGHT X Y RADIUS MAXITERS PATH",
-            argv[0]);
-    draw(argv[optind], argv[optind + 1], argv[optind + 2], argv[optind + 3],
-         argv[optind + 4], argv[optind + 5], argv[optind + 6]);
+      fatal(0, "Usage: %s --draw WIDTH HEIGHT X Y RADIUS MAXITERS PATH", argv[0]);
+    draw(argv[optind],
+         argv[optind + 1],
+         argv[optind + 2],
+         argv[optind + 3],
+         argv[optind + 4],
+         argv[optind + 5],
+         argv[optind + 6]);
     return 0;
   case 'D':
     if(optind + 11 != argc)
@@ -87,10 +89,17 @@ int main(int argc, char **argv) {
             "Usage: %s --dive WIDTH HEIGHT START-{X Y RADIUS} END-{X Y RADIUS} "
             "MAXITERS SECONDS PATH",
             argv[0]);
-    return dive(argv[optind], argv[optind + 1], argv[optind + 2],
-                argv[optind + 3], argv[optind + 4], argv[optind + 5],
-                argv[optind + 6], argv[optind + 7], argv[optind + 8],
-                argv[optind + 9], argv[optind + 10]);
+    return dive(argv[optind],
+                argv[optind + 1],
+                argv[optind + 2],
+                argv[optind + 3],
+                argv[optind + 4],
+                argv[optind + 5],
+                argv[optind + 6],
+                argv[optind + 7],
+                argv[optind + 8],
+                argv[optind + 9],
+                argv[optind + 10]);
   default: break;
   }
   if(optind != argc)

@@ -57,8 +57,7 @@ public:
   // held while it's being called, making it safe to invoke Job::submit(),
   // Job::cancel() and even Job::poll().  After the completion callback returns
   // the job will be deleted.
-  void submit(void (*completion_callback)(Job *, void *),
-              void *completion_data = NULL);
+  void submit(void (*completion_callback)(Job *, void *), void *completion_data = NULL);
 
   // Cancel outstanding jobs with matching completion_data.
   // Jobs already in progress will still complete.
@@ -73,9 +72,9 @@ public:
   // that the matched jobs will accept being run in.
   static void poll(void *completion_data);
 
-  static bool pending();                      // any work left?
-  static bool pending(void *completion_data); // any work left with matching
-                                              // completion_data?
+  static bool pending();                            // any work left?
+  static bool pending(void *completion_data);       // any work left with matching
+                                                    // completion_data?
   static bool pendingLocked(void *completion_data); // any work left with
                                                     // matching
                                                     // completion_data?
@@ -84,10 +83,8 @@ public:
   static void init(int nthreads = -1); // initialize thread pool
   static void destroy();               // destroy thread pool
 
-  template <class T>
-  static bool find_jobs(const T &collection, void *completion_data) {
-    for(typename T::const_iterator it = collection.begin();
-        it != collection.end(); ++it) {
+  template <class T> static bool find_jobs(const T &collection, void *completion_data) {
+    for(typename T::const_iterator it = collection.begin(); it != collection.end(); ++it) {
       const Job *j = *it;
       if(j->completion_data == completion_data)
         return true;

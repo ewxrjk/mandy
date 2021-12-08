@@ -22,6 +22,8 @@
  * cope with string literals in excess of 64k.  Therefore it is
  * necessary to rewrite it as a char array. */
 
+#define COLUMNS 22
+
 int main() {
   size_t n;
   printf("static const unsigned char logodata[]\n"
@@ -30,12 +32,12 @@ int main() {
          "#endif\n"
          "    = {\n");
   for(n = 0; n < sizeof logodata; ++n) {
-    if(n % 14 == 0)
+    if(n % COLUMNS == 0)
       printf("        ");
     int b = logodata[n];
     int padding = (b < 10) + (b < 100) + 1;
     printf("%d,", logodata[n]);
-    if(n % 14 == 13 || n + 1 == sizeof logodata)
+    if(n % COLUMNS == (COLUMNS - 1) || n + 1 == sizeof logodata)
       printf("\n");
     else
       printf("%*s", padding, "");

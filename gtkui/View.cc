@@ -28,8 +28,7 @@
 namespace mmui {
 View::View() {
   set_size_request(384, 384);
-  add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK
-             | Gdk::POINTER_MOTION_MASK);
+  add_events(Gdk::BUTTON_PRESS_MASK | Gdk::BUTTON_RELEASE_MASK | Gdk::POINTER_MOTION_MASK);
 }
 
 // Mouse movement -----------------------------------------------------------
@@ -46,13 +45,9 @@ bool View::on_button_press_event(GdkEventButton *event) {
   }
   // Double-click right button zooms out; control-double-click left also works.
   if(event->type == GDK_2BUTTON_PRESS
-     && ((event->button == 3
-          && !(event->state
-               & (GDK_SHIFT_MASK | GDK_CONTROL_MASK | GDK_LOCK_MASK)))
+     && ((event->button == 3 && !(event->state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK | GDK_LOCK_MASK)))
          || ((event->button == 1
-              && (event->state
-                  & (GDK_SHIFT_MASK | GDK_CONTROL_MASK | GDK_LOCK_MASK))
-                     == GDK_CONTROL_MASK)))) {
+              && (event->state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK | GDK_LOCK_MASK)) == GDK_CONTROL_MASK)))) {
     Zoom(event->x, event->y, M_SQRT2);
     if(controls)
       controls->UpdateDisplay();
@@ -101,8 +96,7 @@ bool View::on_motion_notify_event(GdkEventMotion *event) {
   dragToX = event->x;
   dragToY = event->y;
   if(!dragIdleConnection.connected())
-    dragIdleConnection =
-        Glib::signal_idle().connect(sigc::mem_fun(*this, &View::DragIdle));
+    dragIdleConnection = Glib::signal_idle().connect(sigc::mem_fun(*this, &View::DragIdle));
   return true;
 }
 
@@ -155,8 +149,8 @@ bool View::on_expose_event(GdkEventExpose *) {
 }
 
 void View::Redraw(int x, int y, int w, int h) {
-  get_window()->draw_pixbuf(get_style()->get_fg_gc(Gtk::STATE_NORMAL), pixbuf,
-                            x, y, x, y, w, h, Gdk::RGB_DITHER_NONE, 0, 0);
+  get_window()->draw_pixbuf(
+      get_style()->get_fg_gc(Gtk::STATE_NORMAL), pixbuf, x, y, x, y, w, h, Gdk::RGB_DITHER_NONE, 0, 0);
 }
 
 // Recolor the entire view
@@ -201,9 +195,7 @@ void View::Completed(Job *generic_job, void *data) {
     return;
   v->NewPixels(j->x, j->y, j->w, j->h);
   v->Redraw(j->x, j->y, j->w, j->h);
-  double elapsed_time =
-      finished.tv_sec - v->started.tv_sec
-      + (finished.tv_nsec - v->started.tv_nsec) / 1000000000.0;
+  double elapsed_time = finished.tv_sec - v->started.tv_sec + (finished.tv_nsec - v->started.tv_nsec) / 1000000000.0;
   char buffer[64];
   snprintf(buffer, sizeof buffer, "%gs", elapsed_time);
   v->elapsed = buffer;
@@ -230,8 +222,8 @@ void View::NewLocation(int xpos, int ypos) {
   // Discard stale work
   Job::cancel(this);
   clock_gettime(CLOCK_REALTIME, &started);
-  dest = FractalJob::recompute(xcenter, ycenter, radius, maxiters, w, h, arith,
-                               Completed, this, xpos, ypos, jobFactory);
+  dest =
+      FractalJob::recompute(xcenter, ycenter, radius, maxiters, w, h, arith, Completed, this, xpos, ypos, jobFactory);
 }
 
 void View::NewSize() {
@@ -264,15 +256,20 @@ void View::NewSize() {
     arith_t offset_x = (wNew - wScaled) / 2;
     arith_t offset_y = (hNew - hScaled) / 2;
     // Create the new pixbuf
-    Glib::RefPtr<Gdk::Pixbuf> newPixbuf =
-        Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, false, 8, wNew, hNew);
+    Glib::RefPtr<Gdk::Pixbuf> newPixbuf = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, false, 8, wNew, hNew);
     // Areas outside the rescaled image will be mid-grey
     memset(newPixbuf->get_pixels(), 0x80, newPixbuf->get_rowstride() * hNew);
     // Do the scale
-    pixbuf->scale(newPixbuf, floor((double)dest_x), floor((double)dest_y),
-                  floor((double)dest_w), floor((double)dest_h),
-                  (double)(offset_x), (double)(offset_y), (double)(scale),
-                  (double)(scale), Gdk::INTERP_NEAREST);
+    pixbuf->scale(newPixbuf,
+                  floor((double)dest_x),
+                  floor((double)dest_y),
+                  floor((double)dest_w),
+                  floor((double)dest_h),
+                  (double)(offset_x),
+                  (double)(offset_y),
+                  (double)(scale),
+                  (double)(scale),
+                  Gdk::INTERP_NEAREST);
     // Use the new pixbuf henceforth
     pixbuf = newPixbuf;
     Redraw(0, 0, pixbuf->get_width(), pixbuf->get_height());
@@ -353,8 +350,7 @@ void View::Save() {
     w = w->get_parent();
     assert(w);
   } while((parent = dynamic_cast<Gtk::Window *>(w)) == NULL);
-  Gtk::FileChooserDialog chooser(*parent, "Save image",
-                                 Gtk::FILE_CHOOSER_ACTION_SAVE);
+  Gtk::FileChooserDialog chooser(*parent, "Save image", Gtk::FILE_CHOOSER_ACTION_SAVE);
   chooser.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
   chooser.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_ACCEPT);
   if(chooser.run() != Gtk::RESPONSE_ACCEPT)

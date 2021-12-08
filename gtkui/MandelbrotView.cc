@@ -29,8 +29,7 @@ bool MandelbrotView::on_button_press_event(GdkEventButton *event) {
 
   // Shifted left button draws the corresponding Julia set
   if(event->type == GDK_BUTTON_PRESS && event->button == 1
-     && (event->state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK | GDK_LOCK_MASK))
-            == GDK_SHIFT_MASK) {
+     && (event->state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK | GDK_LOCK_MASK)) == GDK_SHIFT_MASK) {
     NewJulia(event->x, event->y);
     return true;
   }
@@ -41,8 +40,7 @@ bool MandelbrotView::on_button_press_event(GdkEventButton *event) {
 bool MandelbrotView::on_button_release_event(GdkEventButton *event) {
   // Release shifted left button draws the corresponding Julia set
   if(event->type == GDK_BUTTON_RELEASE && event->button == 1
-     && (event->state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK | GDK_LOCK_MASK))
-            == GDK_SHIFT_MASK) {
+     && (event->state & (GDK_SHIFT_MASK | GDK_CONTROL_MASK | GDK_LOCK_MASK)) == GDK_SHIFT_MASK) {
     NewJulia(event->x, event->y);
     return true;
   }
@@ -51,8 +49,7 @@ bool MandelbrotView::on_button_release_event(GdkEventButton *event) {
 
 bool MandelbrotView::on_motion_notify_event(GdkEventMotion *event) {
   // Drag with shifted left button draws the corresponding Julia set
-  if((event->state
-      & (GDK_BUTTON1_MASK | GDK_SHIFT_MASK | GDK_CONTROL_MASK | GDK_LOCK_MASK))
+  if((event->state & (GDK_BUTTON1_MASK | GDK_SHIFT_MASK | GDK_CONTROL_MASK | GDK_LOCK_MASK))
      == (GDK_BUTTON1_MASK | GDK_SHIFT_MASK)) {
     NewJulia(event->x, event->y);
     return true;

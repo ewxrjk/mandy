@@ -14,9 +14,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-static inline void NAME(const double *zxvalues, const double *zyvalues,
-                        const double *cxvalues, const double *cyvalues,
-                        int maxiters, int *iters, double *r2values) {
+static inline void NAME(const double *zxvalues,
+                        const double *zyvalues,
+                        const double *cxvalues,
+                        const double *cyvalues,
+                        int maxiters,
+                        int *iters,
+                        double *r2values) {
   typedef double vector __attribute__((vector_size(BYTES)));
   typedef long long ivector __attribute__((vector_size(BYTES)));
   const vector Cx = {VALUES(cxvalues)};
