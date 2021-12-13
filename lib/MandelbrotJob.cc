@@ -33,7 +33,7 @@ bool MandelbrotJob::sisd_calculate(int px, int py) {
   const arith_t cxq = (cx - 0.25);
   const arith_t cy2 = cy * cy;
   const arith_t q = cxq * cxq + cy2;
-  double r2;
+  double r2 = 0.0;
   // TODO if the whole square is outside both regions, we could
   // skip these tests.
   if(arith_t(4) * q * (q + cxq) < cy2) { // Main cardioid
