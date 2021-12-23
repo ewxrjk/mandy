@@ -27,6 +27,8 @@ int main(int argc, char **argv) {
   for(int i = 0; i < 18; i++)
     values[i] = i * 0.125 - 1.0;
   for(int t = 0; t < arith_limit; ++t) {
+    if(t == arith_simd2 || t == arith_simd4)
+      continue; // not supported by iterate()
     clock_t begin = clock();
     int zxi = 0, zyi = 0, cxi = 0, cyi = 0;
     for(int n = 0; n < repeats; ++n) {
