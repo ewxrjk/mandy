@@ -53,6 +53,8 @@ int Fixed64_iterate(Fixed64 zx, Fixed64 zy, Fixed64 cx, Fixed64 cy, double *r2p,
 #endif
 
 #ifdef __cplusplus
+#include <stdexcept>
+
 class fixed64 {
 public:
   Fixed64 f;
@@ -67,7 +69,9 @@ public:
     f = 0;
   }
   fixed64(fixed128 ff) {
-    Fixed128_to_Fixed64(&f, &ff.f);
+    int err = Fixed128_to_Fixed64(&f, &ff.f);
+    if(err)
+      throw std::runtime_error("fixed128 to fixed128 conversion failed");
   }
 
   // Assignment
