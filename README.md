@@ -8,8 +8,9 @@ set.
 You will need [gtkmm](https://www.gtkmm.org) and either GNU C++ or Clang.
 
 ```
-./autogen.sh          # only if building from git
-./configure
+apt install libgtkmm-2.4-dev autoconf-archive
+./autogen.sh
+./configure 
 make
 sudo make install
 ```

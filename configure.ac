@@ -20,7 +20,6 @@ AC_CONFIG_SRCDIR([lib/MandelbrotJob.cc])
 AM_CONFIG_HEADER([config.h])
 AC_CANONICAL_HOST
 AC_LANG([C++])
-AC_PROG_CC
 AC_PROG_CXX
 AM_PROG_AS
 AC_PROG_RANLIB
@@ -34,6 +33,7 @@ AC_CHECK_LIB([fcgi],[FCGX_Init],
 AC_CHECK_FUNCS([sysconf])
 AC_ARG_WITH([arch],[architecture to request],[ARCH=${withval}],[ARCH=native])
 AC_DEFINE([_GNU_SOURCE], [1], [use GNU extensions])
+AX_CHECK_COMPILE_FLAG([-march=native],[CXXFLAGS="-march=native $CXXFLAGS"])
 if test "x$GXX" = xyes; then
   CXXFLAGS="-march=${ARCH} -Wall -W -Werror -Wpointer-arith -Wwrite-strings $CXXFLAGS"
   CXXFLAGS="-std=c++11 -Wno-c++14-extensions -Wno-deprecated-declarations $CXXFLAGS"
@@ -47,6 +47,9 @@ if test "x$GXX" = xyes; then
   esac
 fi
 CXXFLAGS="${CXXFLAGS} ${CXXFLAGS_EXTRA}"
+AC_PROG_CC
+AC_LANG([C])
+AX_CHECK_COMPILE_FLAG([-march=native],[CFLAGS="-march=native $FLAGS"])
 if test "x$GCC" = xyes; then
   CFLAGS="-march=${ARCH} -Wall -W -Werror -Wpointer-arith -Wwrite-strings $CFLAGS"
 fi
