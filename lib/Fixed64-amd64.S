@@ -53,23 +53,6 @@
  */
 
 	.text
-	// Fixed64 Fixed64_mul(Fixed64 a[rdi], Fixed64 b[rsi])
-	.globl	SYMBOL(Fixed64_mul)
-SYMBOL(Fixed64_mul):
-	mov	rax,rdi
-	imul	rsi		// gives result in rdx:rax
-	shrd	rax,rdx,56
-	adc	rax,0		// round up
-	ret
-
-	// Fixed64 Fixed64_mul_unsigned(Fixed64 a[rdi], Fixed64 b[rsi])
-	.globl	SYMBOL(Fixed64_mul_unsigned)
-SYMBOL(Fixed64_mul_unsigned):
-	mov	rax,rdi
-	mul	rsi		// result in tdx:tax
-	shrd	rax,rdx,56
-	adc	rax,0		// round up
-	ret
 
 /*  int Fixed64_iterate(Fixed64 zx[rdi], Fixed64 zy[rsi],
  *                      Fixed64 cx[rdx], Fixed64 cy[rcx],

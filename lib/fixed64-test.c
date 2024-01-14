@@ -31,6 +31,46 @@ static void printFixed(Fixed64 f, const char *expect) {
     ++errors;
   }
 }
+const struct {
+  Fixed64 a, b, expect;
+} Fixed64_mul_cases[] = {
+    {(int64_t)5 << 56, (int64_t)7 << 56, (int64_t)35 << 56},
+    {(int64_t)8 << 56, (int64_t)8 << 56, (int64_t)64 << 56},
+    // Noninteger result
+    {(int64_t)1 << 56, (int64_t)1 << 55, (int64_t)1 << 55},
+    // Signs
+    {-((int64_t)10 << 56), -((int64_t)5 << 56), (int64_t)50 << 56},
+    {(int64_t)10 << 56, -((int64_t)5 << 56), -((int64_t)50 << 56)},
+    {-((int64_t)10 << 56), (int64_t)5 << 56, -((int64_t)50 << 56)},
+    // Very small
+    {(int64_t)1 << 24, (int64_t)1 << 24, 0},
+    // Underflow rounding
+    {(int64_t)1 << 55, 1, 1},
+};
+
+static void Fixed64_mul_generic_test(void) {
+  for(size_t i = 0; i < sizeof Fixed64_mul_cases / sizeof *Fixed64_mul_cases; i++) {
+    Fixed64 c = Fixed64_mul_generic(Fixed64_mul_cases[i].a, Fixed64_mul_cases[i].b);
+    printf("Fixed64_mul_generic %#lx * %#lx = %#lx (expected %#lx)%s\n",
+           Fixed64_mul_cases[i].a,
+           Fixed64_mul_cases[i].b,
+           c,
+           Fixed64_mul_cases[i].expect,
+           c == Fixed64_mul_cases[i].expect ? "" : " (MISMATCH)");
+  }
+}
+
+static void Fixed64_mul_test(void) {
+  for(size_t i = 0; i < sizeof Fixed64_mul_cases / sizeof *Fixed64_mul_cases; i++) {
+    Fixed64 c = Fixed64_mul(Fixed64_mul_cases[i].a, Fixed64_mul_cases[i].b);
+    printf("Fixed64_mul %#lx * %#lx = %#lx (expected %#lx)%s\n",
+           Fixed64_mul_cases[i].a,
+           Fixed64_mul_cases[i].b,
+           c,
+           Fixed64_mul_cases[i].expect,
+           c == Fixed64_mul_cases[i].expect ? "" : " (MISMATCH)");
+  }
+}
 
 int main() {
   Fixed64 a, b, c;
@@ -96,48 +136,8 @@ int main() {
   printFixed(c, "0.05859375");
   putchar('\n');
 
-  // Multiply
-  c = Fixed64_mul(Fixed64_int2(5), Fixed64_int2(7));
-  printf("5*7:     ");
-  printFixed(c, "35");
-  putchar('\n');
-
-  // Multiply by 0.5
-  c = Fixed64_mul(Fixed64_int2(101), Fixed64_int2(1) / 2);
-  printf("101*0.5  ");
-  printFixed(c, "50.5");
-  putchar('\n');
-
-  // Multiply with nontrivial sign
-  c = Fixed64_mul(Fixed64_int2(-10), Fixed64_int2(-5));
-  printf("-10*-5:  ");
-  printFixed(c, "50");
-  putchar('\n');
-  c = Fixed64_mul(Fixed64_int2(-10), Fixed64_int2(5));
-  printf("-10*5:   ");
-  printFixed(c, "-50");
-  putchar('\n');
-
-  c = Fixed64_mul(Fixed64_int2(8), Fixed64_int2(8));
-  printf("8*8:     ");
-  printFixed(c, "64");
-  putchar('\n');
-
-  // Very small numbers
-  a = Fixed64_int2(1) / 65536 / 65536;
-  printf("2⁻³²:    ");
-  printFixed(a, "0.00000000023283064365386962890625");
-  putchar('\n');
-  c = Fixed64_mul(a, a);
-  printf("(2⁻³²)²: ");
-  printFixed(c, "0");
-  putchar('\n'); /* underflows */
-
-  // Underflow rounding
-  c = Fixed64_mul(Fixed64_int2(1) / 2, 1);
-  printf("½(2⁻⁵⁶): ");
-  printFixed(c, "0.00000000000000001387778780781445675529539585113525390625");
-  putchar('\n');
+  Fixed64_mul_generic_test();
+  Fixed64_mul_test();
 
   // Division
   c = Fixed64_div(Fixed64_int2(1), Fixed64_int2(16));

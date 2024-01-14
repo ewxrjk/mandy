@@ -24,9 +24,23 @@ extern "C" {
 
 typedef int64_t Fixed64;
 
-Fixed64 Fixed64_mul(Fixed64 a, Fixed64 b);
+Fixed64 Fixed64_mul_generic(Fixed64 a, Fixed64 b);
 Fixed64 Fixed64_div(Fixed64 a, Fixed64 b);
 Fixed64 Fixed64_sqrt(Fixed64 a);
+
+static inline Fixed64 Fixed64_mul(Fixed64 a, Fixed64 b) {
+#if __amd64__
+  __asm__("imul %[b]\n\t"
+          "shrd $56,%%rdx,%%rax\n\t"
+          "adc $0,%%rax"
+          : [a] "+a"(a) // first input, and output, in rax
+          : [b] "r"(b)  // second input anywhere
+          : "rdx");     // clobber rdx
+  return a;
+#else
+  return Fixed64_mul_generic(a, b);
+#endif
+}
 
 static inline Fixed64 Fixed64_int2(int i) {
   return (Fixed64)((uint64_t)i << 56);

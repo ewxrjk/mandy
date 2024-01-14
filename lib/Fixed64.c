@@ -19,11 +19,10 @@
 #include "Fixed128.h"
 #include <errno.h>
 
-uint64_t Fixed64_mul_unsigned(uint64_t a, uint64_t b);
+static uint64_t Fixed64_mul_unsigned(uint64_t a, uint64_t b);
 static uint64_t Fixed64_div_unsigned(uint64_t a, uint64_t b);
 
-#if !HAVE_ASM_64
-Fixed64 Fixed64_mul(Fixed64 a, Fixed64 b) {
+Fixed64 Fixed64_mul_generic(Fixed64 a, Fixed64 b) {
   Fixed64 r;
   int sign = 0;
   if(a < 0) {
@@ -38,36 +37,11 @@ Fixed64 Fixed64_mul(Fixed64 a, Fixed64 b) {
   return sign ? -r : r;
 }
 
-#define MLA(x, y, n)                                                                                                   \
-  do {                                                                                                                 \
-    uint64_t r = (uint64_t)(uint32_t)(x) * (uint32_t)(y);                                                              \
-    int i = (n);                                                                                                       \
-    while(i <= 3) {                                                                                                    \
-      r += result[i];                                                                                                  \
-      result[i] = (uint32_t)r;                                                                                         \
-      r >>= 32;                                                                                                        \
-      ++i;                                                                                                             \
-    }                                                                                                                  \
-  } while(0)
-
-uint64_t Fixed64_mul_unsigned(uint64_t a, uint64_t b) {
-  uint32_t result[4]; /* accumulator for result */
-  memset(result, 0, sizeof result);
-  MLA(a, b, 0);
-  MLA(a >> 32, b, 1);
-  MLA(a, b >> 32, 1);
-  MLA(a >> 32, b >> 32, 2);
-  /*
-   * iIFF FFFF Ffff ffff
-   *
-   * -> IFF.FFFF.F
-   */
-  return (((uint64_t)result[3] << 40) + ((uint64_t)result[2] << 8) + ((uint64_t)result[1] >> 24)
-          + /*rounding*/ !!(result[1] & 0x00800000));
+static uint64_t Fixed64_mul_unsigned(uint64_t a, uint64_t b) {
+  uint128_t r = (uint128_t)a * (uint128_t)b;
+  uint64_t c = (uint64_t)(r >> 55) & 1; // the bit we're going to carry out the bottom
+  return (uint64_t)(r >> 56) + c; // move the point back to the right place and round up
 }
-
-#undef MLA
-#endif
 
 Fixed64 Fixed64_div(Fixed64 a, Fixed64 b) {
   Fixed64 r;
