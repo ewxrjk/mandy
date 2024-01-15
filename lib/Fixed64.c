@@ -72,16 +72,53 @@ static uint64_t Fixed64_div_unsigned(uint64_t a, uint64_t b) {
 
 Fixed64 Fixed64_sqrt(Fixed64 a) {
   assert(a >= 0);
-  uint64_t r = 0, bit = (uint64_t)8 << 56;
-  while(a && bit) {
-    uint64_t rb = r + bit;
-    uint64_t p = Fixed64_mul_unsigned(rb, rb);
-    if(p <= (uint64_t)a)
-      r = rb;
-    bit >>= 1;
+
+  // The general idea is similar to long division.
+  // Starting from the most significant end we see if
+  // each bit belongs in the result by doing a trial
+  // addition to a lower bound and seeing if the
+  // square of that value breaches the target (a).
+  //
+  // We do it in an unsigned 128-bit accumulator with 8 integer bits
+  // and 120 fractional bits, to avoid underflow issues.
+  //
+  // Finally we observe that
+  //
+  //   r^2 + r.2^(n+1) + 2^(2n)
+  //
+  // ...meaning we can avoid a full multiply and operate
+  // with shifts and adds alone.
+
+  uint128_t a128 = ((uint128_t)a) << 64;
+  uint128_t r = 0, r2 = 0;
+  for(int n = 3; n >= -57; n--) {
+    // rshifted = r<<(n+1) = 2.2^(n+1), without shifting by a negative
+    // quantity (which is undefined behavior).
+    int rshift = n + 1;
+    uint128_t rshifted = rshift >= 0 ? r << rshift : r >> -rshift;
+    // r2next = r^2 + r.2^(n+1) + 2^(2n)
+    uint128_t r2next = r2 + rshifted + ((uint128_t)1 << (120 + 2 * n));
+#if 0
+    fprintf(stderr,
+            "n=%3d a=%016lx%016lx r=%016lx%016lx r2=%016lx%016lx r2next=%016lx%016lx %s\n",
+            n,
+            (uint64_t)(a128 >> 64),
+            (uint64_t)a128,
+            (uint64_t)(r >> 64),
+            (uint64_t)r,
+            (uint64_t)(r2 >> 64),
+            (uint64_t)r2,
+            (uint64_t)(r2next >> 64),
+            (uint64_t)r2next,
+            r2next <= a128 ? "✓" : "");
+#endif
+    if(r2next <= a128) {
+      r += (uint128_t)1 << (120 + n);
+      r2 = r2next;
+    }
   }
-  //  TODO rounding
-  return r;
+  uint64_t c = (uint64_t)(r >> 63) & 1; // the bit we're going to carry out the bottom
+  return (uint64_t)(r >> 64) + c;       // move the point back to the right place and round up
 }
 
 int Fixed128_to_Fixed64(Fixed64 *r, const union Fixed128 *a) {

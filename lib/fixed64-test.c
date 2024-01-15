@@ -47,9 +47,9 @@ static const struct {
     {(int64_t)1 << 24, (int64_t)1 << 24, 0},
     // Underflow rounding
     {(int64_t)1 << 55, 1, 1},
-    // Square roots
+    // From the square root tests
     {0x016a09e667f3bcc9, 0x016a09e667f3bcc9, (int64_t)2 << 56},
-    {0x00b504f333f9de64, 0x00b504f333f9de64, 0x007fffffffffffff},
+    {0x00b504f333f9de65, 0x00b504f333f9de65, 0x0080000000000001},
 };
 
 static void Fixed64_mul_test(void) {
@@ -94,13 +94,17 @@ static void Fixed64_div_test(void) {
 static const struct {
   Fixed64 a, expect;
 } Fixed64_sqrt_cases[] = {
-    // √2 = 0x01.6a09e667f3bcc908b2fb1366ea957d3e...
+    // √4 = 2
+    {(int64_t)4 << 56, (int64_t)2 << 56},
+    // √9 = 3
+    {(int64_t)9 << 56, (int64_t)3 << 56},
+    // √16 = 4
+    {(int64_t)16 << 56, (int64_t)4 << 56},
+    // √2 = 0x01.6a09e667f3bcc9(08b2fb1366ea957d3e...)
     //        XX XXXXXXXXXXXXXX
     {(int64_t)2 << 56, 0x016a09e667f3bcc9},
-    // √½ = 0x00.b504f333f9de6484597d89b3754abe9f...
-    //        XX XXXXXXXXXXXXXX
-    {(int64_t)1 << 55, 0x00b504f333f9de64}, // TODO rounding
-
+    // √½ = 0x00.b504f333f9de64(84597d89b3754abe9f...)
+    {(int64_t)1 << 55, 0x00b504f333f9de65}, // rounded up!
 };
 
 static void Fixed64_sqrt_test(void) {
