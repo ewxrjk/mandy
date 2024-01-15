@@ -18,8 +18,8 @@
 #include "Fixed64.h"
 #include "Fixed128.h"
 #include <errno.h>
+#include <assert.h>
 
-static uint64_t Fixed64_mul_unsigned(uint64_t a, uint64_t b);
 static uint64_t Fixed64_div_unsigned(uint64_t a, uint64_t b);
 
 Fixed64 Fixed64_mul_generic(Fixed64 a, Fixed64 b) {
@@ -35,12 +35,6 @@ Fixed64 Fixed64_mul_generic(Fixed64 a, Fixed64 b) {
   }
   r = Fixed64_mul_unsigned(a, b);
   return sign ? -r : r;
-}
-
-static uint64_t Fixed64_mul_unsigned(uint64_t a, uint64_t b) {
-  uint128_t r = (uint128_t)a * (uint128_t)b;
-  uint64_t c = (uint64_t)(r >> 55) & 1; // the bit we're going to carry out the bottom
-  return (uint64_t)(r >> 56) + c; // move the point back to the right place and round up
 }
 
 Fixed64 Fixed64_div(Fixed64 a, Fixed64 b) {
@@ -77,6 +71,7 @@ static uint64_t Fixed64_div_unsigned(uint64_t a, uint64_t b) {
 }
 
 Fixed64 Fixed64_sqrt(Fixed64 a) {
+  assert(a >= 0);
   uint64_t r = 0, bit = (uint64_t)8 << 56;
   while(a && bit) {
     uint64_t rb = r + bit;
@@ -85,7 +80,7 @@ Fixed64 Fixed64_sqrt(Fixed64 a) {
       r = rb;
     bit >>= 1;
   }
-  // TODO rounding
+  //  TODO rounding
   return r;
 }
 

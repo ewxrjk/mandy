@@ -31,7 +31,8 @@ static void printFixed(Fixed64 f, const char *expect) {
     ++errors;
   }
 }
-const struct {
+
+static const struct {
   Fixed64 a, b, expect;
 } Fixed64_mul_cases[] = {
     {(int64_t)5 << 56, (int64_t)7 << 56, (int64_t)35 << 56},
@@ -46,29 +47,71 @@ const struct {
     {(int64_t)1 << 24, (int64_t)1 << 24, 0},
     // Underflow rounding
     {(int64_t)1 << 55, 1, 1},
+    // Square roots
+    {0x016a09e667f3bcc9, 0x016a09e667f3bcc9, (int64_t)2 << 56},
+    {0x00b504f333f9de64, 0x00b504f333f9de64, 0x007fffffffffffff},
 };
-
-static void Fixed64_mul_generic_test(void) {
-  for(size_t i = 0; i < sizeof Fixed64_mul_cases / sizeof *Fixed64_mul_cases; i++) {
-    Fixed64 c = Fixed64_mul_generic(Fixed64_mul_cases[i].a, Fixed64_mul_cases[i].b);
-    printf("Fixed64_mul_generic %#lx * %#lx = %#lx (expected %#lx)%s\n",
-           Fixed64_mul_cases[i].a,
-           Fixed64_mul_cases[i].b,
-           c,
-           Fixed64_mul_cases[i].expect,
-           c == Fixed64_mul_cases[i].expect ? "" : " (MISMATCH)");
-  }
-}
 
 static void Fixed64_mul_test(void) {
   for(size_t i = 0; i < sizeof Fixed64_mul_cases / sizeof *Fixed64_mul_cases; i++) {
     Fixed64 c = Fixed64_mul(Fixed64_mul_cases[i].a, Fixed64_mul_cases[i].b);
-    printf("Fixed64_mul %#lx * %#lx = %#lx (expected %#lx)%s\n",
+    printf("Fixed64_mul 0x%016lx * 0x%016lx = 0x%016lx (expected 0x%016lx)%s\n",
            Fixed64_mul_cases[i].a,
            Fixed64_mul_cases[i].b,
            c,
            Fixed64_mul_cases[i].expect,
            c == Fixed64_mul_cases[i].expect ? "" : " (MISMATCH)");
+    errors += c != Fixed64_mul_cases[i].expect;
+  }
+}
+
+static const struct {
+  Fixed64 a, b, expect;
+} Fixed64_div_cases[] = {
+    {(int64_t)1 << 56, (int64_t)1 << 56, (int64_t)1 << 56},
+    {(int64_t)1 << 56, (int64_t)16 << 56, (int64_t)1 << 52},
+    // Division by 3
+    {(int64_t)1 << 56, (int64_t)3 << 56, 0x0055555555555555},
+    {0x0055555555555555, (int64_t)3 << 56, 0x001c71c71c71c71c},
+    // Signs
+    {-((int64_t)1 << 56), (int64_t)16 << 56, -((int64_t)1 << 52)},
+    {(int64_t)1 << 56, -((int64_t)16 << 56), -((int64_t)1 << 52)},
+};
+
+static void Fixed64_div_test(void) {
+  for(size_t i = 0; i < sizeof Fixed64_div_cases / sizeof *Fixed64_div_cases; i++) {
+    Fixed64 c = Fixed64_div(Fixed64_div_cases[i].a, Fixed64_div_cases[i].b);
+    printf("Fixed64_div 0x%016lx / 0x%016lx = 0x%016lx (expected 0x%016lx)%s\n",
+           Fixed64_div_cases[i].a,
+           Fixed64_div_cases[i].b,
+           c,
+           Fixed64_div_cases[i].expect,
+           c == Fixed64_div_cases[i].expect ? "" : " (MISMATCH)");
+    errors += c != Fixed64_div_cases[i].expect;
+  }
+}
+
+static const struct {
+  Fixed64 a, expect;
+} Fixed64_sqrt_cases[] = {
+    // √2 = 0x01.6a09e667f3bcc908b2fb1366ea957d3e...
+    //        XX XXXXXXXXXXXXXX
+    {(int64_t)2 << 56, 0x016a09e667f3bcc9},
+    // √½ = 0x00.b504f333f9de6484597d89b3754abe9f...
+    //        XX XXXXXXXXXXXXXX
+    {(int64_t)1 << 55, 0x00b504f333f9de64}, // TODO rounding
+
+};
+
+static void Fixed64_sqrt_test(void) {
+  for(size_t i = 0; i < sizeof Fixed64_sqrt_cases / sizeof *Fixed64_sqrt_cases; i++) {
+    Fixed64 c = Fixed64_sqrt(Fixed64_sqrt_cases[i].a);
+    printf("Fixed64_sqrt 0x%016lx = 0x%016lx (expected 0x%016lx)%s\n",
+           Fixed64_sqrt_cases[i].a,
+           c,
+           Fixed64_sqrt_cases[i].expect,
+           c == Fixed64_sqrt_cases[i].expect ? "" : " (MISMATCH)");
+    errors += c != Fixed64_sqrt_cases[i].expect;
   }
 }
 
@@ -136,43 +179,9 @@ int main() {
   printFixed(c, "0.05859375");
   putchar('\n');
 
-  Fixed64_mul_generic_test();
   Fixed64_mul_test();
-
-  // Division
-  c = Fixed64_div(Fixed64_int2(1), Fixed64_int2(16));
-  printf("1/16:    ");
-  printFixed(c, "0.0625");
-  putchar('\n');
-
-  c = Fixed64_div(Fixed64_int2(1), Fixed64_int2(3));
-  printf("1/3:     ");
-  printFixed(c, "0.33333333333333332870740406406184774823486804962158203125");
-  putchar('\n');
-
-  c = Fixed64_div(c, Fixed64_int2(3));
-  printf("1/3/3:   ");
-  printFixed(c, "0.111111111111111104943205418749130330979824066162109375");
-  putchar('\n');
-
-  // Square roots
-  a = Fixed64_sqrt(Fixed64_int2(2));
-  printf("√2:      ");
-  printFixed(a, "1.41421356237309504833010720403763116337358951568603515625");
-  putchar('\n');
-  a = Fixed64_mul(a, a);
-  printf("(√2)²:   ");
-  printFixed(a, "2");
-  putchar('\n');
-
-  a = Fixed64_sqrt(Fixed64_int2(1) / 2);
-  printf("√½:      ");
-  printFixed(a, "0.707106781186547517226159698111587204039096832275390625");
-  putchar('\n');
-  a = Fixed64_mul(a, a);
-  printf("(√½)²:   ");
-  printFixed(a, "0.49999999999999998612221219218554324470460414886474609375");
-  putchar('\n');
+  Fixed64_div_test();
+  Fixed64_sqrt_test();
 
   // Conversion to/from double
   a = Fixed64_double2(1.0);
