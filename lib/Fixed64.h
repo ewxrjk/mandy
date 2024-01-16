@@ -42,22 +42,6 @@ static inline Fixed64 Fixed64_mul(Fixed64 a, Fixed64 b) {
 #endif
 }
 
-static inline Fixed64 Fixed64_mul_unsigned(Fixed64 a, Fixed64 b) {
-#if __amd64__
-  __asm__("imul %[b]\n\t"
-          "shrd $56,%%rdx,%%rax\n\t"
-          "adc $0,%%rax"
-          : [a] "+a"(a) // first input, and output, in rax
-          : [b] "r"(b)  // second input anywhere
-          : "rdx");     // clobber rdx
-  return a;
-#else
-  uint128_t r = (uint128_t)a * (uint128_t)b;
-  uint64_t c = (uint64_t)(r >> 55) & 1; // the bit we're going to carry out the bottom
-  return (uint64_t)(r >> 56) + c;       // move the point back to the right place and round up
-#endif
-}
-
 static inline Fixed64 Fixed64_int2(int i) {
   return (Fixed64)((uint64_t)i << 56);
 }
