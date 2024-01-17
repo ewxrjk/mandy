@@ -68,11 +68,18 @@ static void Fixed64_mul_test(void) {
 static const struct {
   Fixed64 a, b, expect;
 } Fixed64_div_cases[] = {
+    // 1/1 = 1
     {(int64_t)1 << 56, (int64_t)1 << 56, (int64_t)1 << 56},
+    // 1/0.5 = 2
+    {(int64_t)1 << 56, (int64_t)1 << 55, (int64_t)2 << 56},
+    // 1/16 = 0.0625
     {(int64_t)1 << 56, (int64_t)16 << 56, (int64_t)1 << 52},
-    // Division by 3
+    // 1/3 = 0x00.55555555555555(5555555555555555...)
     {(int64_t)1 << 56, (int64_t)3 << 56, 0x0055555555555555},
+    // 1/3/3 = 0x00.1c71c71c71c71c(71c71c71c71c71c7...)
     {0x0055555555555555, (int64_t)3 << 56, 0x001c71c71c71c71c},
+    // 2/3 = 0x00.aaaaaaaaaaaaaa(aaaaaaaaaaaaaaaa...)
+    {(int64_t)2 << 56, (int64_t)3 << 56, 0x00aaaaaaaaaaaaab},
     // Signs
     {-((int64_t)1 << 56), (int64_t)16 << 56, -((int64_t)1 << 52)},
     {(int64_t)1 << 56, -((int64_t)16 << 56), -((int64_t)1 << 52)},
@@ -101,7 +108,6 @@ static const struct {
     // √16 = 4
     {(int64_t)16 << 56, (int64_t)4 << 56},
     // √2 = 0x01.6a09e667f3bcc9(08b2fb1366ea957d3e...)
-    //        XX XXXXXXXXXXXXXX
     {(int64_t)2 << 56, 0x016a09e667f3bcc9},
     // √½ = 0x00.b504f333f9de64(84597d89b3754abe9f...)
     {(int64_t)1 << 55, 0x00b504f333f9de65}, // rounded up!

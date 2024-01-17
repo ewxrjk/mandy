@@ -54,20 +54,27 @@ Fixed64 Fixed64_div(Fixed64 a, Fixed64 b) {
 }
 
 static uint64_t Fixed64_div_unsigned(uint64_t a, uint64_t b) {
-  uint64_t q = 0, bit = (uint64_t)1 << 56;
-  while(b < a) {
+  assert(b > 0);
+  uint128_t a128 = (uint128_t)a << 64, b128 = (uint128_t)b << 64, q128 = 0, bit = (uint128_t)1 << (56 + 64);
+  // Shift b up until b>=a. We adjust initial quotient bit
+  // up to match.
+  while(b128 < a128) {
     bit <<= 1;
-    b <<= 1;
+    b128 <<= 1;
   }
-  while(a && bit) {
-    if(a >= b) {
-      q |= bit;
-      a -= b;
+  // Work out bits from the quotient down far enough to get rounding the right
+  while(a128 && bit >= (uint128_t)1 << 63) {
+    // See if this bit belongs in the result
+    if(a128 >= b128) {
+      q128 |= bit;
+      a128 -= b128;
     }
+    // Move on to the next bit down
     bit >>= 1;
-    b >>= 1;
+    b128 >>= 1;
   }
-  // TODO rounding
+  // Round up
+  uint64_t q = (q128 >> 64) + ((q128 >> 63) & 1);
   return q;
 }
 
