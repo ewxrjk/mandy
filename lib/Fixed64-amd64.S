@@ -54,6 +54,46 @@
 
 	.text
 
+/* uint64_t Fixed64_div_unsigned(uint64_t a[rdi], uint64_t b[rsi]);
+ *
+ * To divide a 128-bit x by a 64-bit y:
+ *
+ *  Let x = xh<<64 + xl
+ *      q = qh<<64 + ql
+ *  We want:
+ *      x = q.y+r
+ *  
+ *  First division is xh/y:
+ *     xh = qh.y + rh
+ *  Second division is (rh<<64+xl)/y:
+ *     rh<<64+xl = ql.y + r
+ *  So
+ *     q.y+r = qh<<64.y + ql.y + r
+ *           = qh<<64.y + rh<<64 + xl
+ *           = (qh.y+rh)<<64 + xl
+ *           = xh<<64 + xl
+ *           = a
+ *
+ * In this case if we directly divided a/b then the fractional
+ * digits would all be lost. So divide (a<<64)/b to put the
+ * point at the bottom of qh, then shift the result and round.
+ */
+	.globl	SYMBOL(Fixed64_div_unsigned)
+SYMBOL(Fixed64_div_unsigned):
+	xor rdx,rdx
+	mov rax,rdi		// rdx:rax = a<<64
+	div rsi				// rax = qh, rdx = rh
+	mov rcx,rax   // rcx = qh
+	xor rax,rax		// rdx:rax = rh<<64 + xl
+	div rsi				// rax = ql, rdx = r
+	// rcx:rax = q = ⌊(a<<64)/b⌋. What we want is
+	// (a close approximation to) (a/b)<<56, so we
+	// need to shift 8 bits right
+	shl rcx,56
+	shr rax,8
+	adc rax,rcx // Rounding
+	ret
+
 /*  int Fixed64_iterate(Fixed64 zx[rdi], Fixed64 zy[rsi],
  *                      Fixed64 cx[rdx], Fixed64 cy[rcx],
  *                      double *r2p[r8],

@@ -25,6 +25,7 @@ extern "C" {
 typedef int64_t Fixed64;
 
 Fixed64 Fixed64_mul_generic(Fixed64 a, Fixed64 b);
+Fixed64 Fixed64_div_unsigned(Fixed64 a, Fixed64 b);
 Fixed64 Fixed64_div(Fixed64 a, Fixed64 b);
 Fixed64 Fixed64_sqrt(Fixed64 a);
 

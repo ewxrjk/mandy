@@ -20,8 +20,6 @@
 #include <errno.h>
 #include <assert.h>
 
-static uint64_t Fixed64_div_unsigned(uint64_t a, uint64_t b);
-
 Fixed64 Fixed64_mul_generic(Fixed64 a, Fixed64 b) {
   int sign = 0;
   if(a < 0) {
@@ -39,6 +37,7 @@ Fixed64 Fixed64_mul_generic(Fixed64 a, Fixed64 b) {
 }
 
 Fixed64 Fixed64_div(Fixed64 a, Fixed64 b) {
+  assert(b != 0);
   Fixed64 r;
   int sign = 0;
   if(a < 0) {
@@ -53,8 +52,8 @@ Fixed64 Fixed64_div(Fixed64 a, Fixed64 b) {
   return sign ? -r : r;
 }
 
-static uint64_t Fixed64_div_unsigned(uint64_t a, uint64_t b) {
-  assert(b > 0);
+#if !__amd64__
+uint64_t Fixed64_div_unsigned(uint64_t a, uint64_t b) {
   uint128_t a128 = (uint128_t)a << 64, b128 = (uint128_t)b << 64, q128 = 0, bit = (uint128_t)1 << (56 + 64);
   // Shift b up until b>=a. We adjust initial quotient bit
   // up to match.
@@ -77,6 +76,7 @@ static uint64_t Fixed64_div_unsigned(uint64_t a, uint64_t b) {
   uint64_t q = (q128 >> 64) + ((q128 >> 63) & 1);
   return q;
 }
+#endif
 
 Fixed64 Fixed64_sqrt(Fixed64 a) {
   assert(a >= 0);
