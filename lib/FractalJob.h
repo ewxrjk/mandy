@@ -98,16 +98,17 @@ public:
                            const double *cyvalues,
                            int maxiters,
                            int *iterations,
-                           double *r2values) {
+                           double *r2values,
+                           int mandelbrot) {
     switch(arith) {
 #if SIMD4
     case arith_simd:
-      simd_iterate4(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values);
+      simd_iterate4(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values, mandelbrot);
       break;
 #elif SIMD2
     case arith_simd:
-      simd_iterate2(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values);
-      simd_iterate2(zxvalues + 2, zyvalues + 2, cxvalues + 2, cyvalues + 2, maxiters, iterations + 2, r2values + 2);
+      simd_iterate2(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values, mandelbrot);
+      simd_iterate2(zxvalues + 2, zyvalues + 2, cxvalues + 2, cyvalues + 2, maxiters, iterations + 2, r2values + 2, mandelbrot);
       break;
 #endif
     default: throw std::logic_error("unhandled arith_type");

@@ -42,7 +42,7 @@ bool JuliaJob::simd_calculate(int px[SIMD_MAX], int py[SIMD_MAX]) {
   }
   double r2values[SIMD_MAX];
   int iterations[SIMD_MAX];
-  simd_iterate(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values);
+  simd_iterate(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values, 0);
   bool escaped = false;
   for(int i = 0; i < SIMD_MAX; i++) {
     dest->pixel(px[i], py[i]) = transform_iterations(iterations[i], r2values[i], maxiters);

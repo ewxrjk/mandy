@@ -39,6 +39,9 @@
     d[0] = s[0];                                                                                                       \
     d[1] = s[1];                                                                                                       \
   } while(0)
+#define vector simd2_vector
+#define ivector simd2_ivector
+#define escape_check simd2_escape_check
 
 #include "simdimpl.h"
 
@@ -49,6 +52,9 @@
 #undef VALUES
 #undef NONZERO
 #undef ASSIGN
+#undef vector
+#undef ivector
+#undef escape_check
 #endif
 
 #if SIMD4
@@ -68,6 +74,9 @@
     d[2] = s[2];                                                                                                       \
     d[3] = s[3];                                                                                                       \
   } while(0)
+#define vector simd4_vector
+#define ivector simd4_ivector
+#define escape_check simd4_escape_check
 
 #include "simdimpl.h"
 
@@ -78,6 +87,9 @@
 #undef VALUES
 #undef NONZERO
 #undef ASSIGN
+#undef vector
+#undef ivector
+#undef escape_check
 #endif
 
 #endif /* SIMDARITH_H */
