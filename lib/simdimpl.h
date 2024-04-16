@@ -21,7 +21,7 @@ static inline bool escape_check(ivector &escaped_already,
                                 ivector &escape_iters,
                                 ivector escaped,
                                 int iterations,
-                                vector &r2,
+                                vector r2,
                                 vector &escape_r2) {
   ivector escaped_this_time = escaped & ~escaped_already;
   ivector iters_vector = {REP(iterations)};
@@ -54,24 +54,24 @@ static inline void NAME(const double *zxvalues,
     const vector cxq = (Cx - 0.25);
     const vector cy2 = Cy * Cy;
     const vector q = cxq * cxq + cy2;
-    ivector escaped = (4.0 * q * (q + cxq) < cy2) || (Cx * Cx + 2.0 * Cx + 1.0 + cy2 < 1.0 / 16.0);
+    const ivector escaped = (4.0 * q * (q + cxq) < cy2) || (Cx * Cx + 2.0 * Cx + 1.0 + cy2 < 1.0 / 16.0);
     escape_check(escaped_already, escape_iters, escaped, maxiters, r2, escape_r2);
   }
 
   while(iterations < maxiters) {
-    vector Zx2 = Zx * Zx;
-    vector Zy2 = Zy * Zy;
+    const vector Zx2 = Zx * Zx;
+    const vector Zy2 = Zy * Zy;
     r2 = Zx2 + Zy2;
-    ivector escaped = r2 >= 64.0; // -1 for points that escaped this time, or in the past; else 0
+    const ivector escaped = r2 >= 64.0; // -1 for points that escaped this time, or in the past; else 0
     if(escape_check(escaped_already, escape_iters, escaped, iterations, r2, escape_r2))
       break;
-    vector Zxnew = Zx2 - Zy2 + Cx;
-    vector Zynew = 2 * Zx * Zy + Cy;
+    const vector Zxnew = Zx2 - Zy2 + Cx;
+    const vector Zynew = 2 * Zx * Zy + Cy;
     Zx = Zxnew;
     Zy = Zynew;
     iterations++;
   }
-  ivector maxiters_vector = {REP(maxiters)};
+  const ivector maxiters_vector = {REP(maxiters)};
   escape_iters |= maxiters_vector & ~escaped_already;
   ASSIGN(r2values, escape_r2);
   ASSIGN(iters, escape_iters);
