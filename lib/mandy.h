@@ -41,10 +41,12 @@
 #define SIMD2 1
 #endif
 
-#if SIMD4
-#define ARITH_DEFAULT arith_simd4
-#elif SIMD2
-#define ARITH_DEFAULT arith_simd2
+#if SIMD2 || SIMD4
+# define SIMD 1
+#endif
+
+#if SIMD
+#define ARITH_DEFAULT arith_simd
 #else
 #define ARITH_DEFAULT arith_double
 #endif

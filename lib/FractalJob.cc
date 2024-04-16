@@ -72,11 +72,8 @@ IterBuffer *FractalJob::recompute(arith_t cx,
 
 void FractalJob::work() {
   switch(arith) {
-#if SIMD2
-  case arith_simd2: simd_work(); break;
-#endif
-#if SIMD4
-  case arith_simd4: simd_work(); break;
+#if SIMD
+  case arith_simd: simd_work(); break;
 #endif
   default: sisd_work(); break;
   }
@@ -105,7 +102,7 @@ void FractalJob::sisd_work() {
   }
 }
 
-#if SIMD2 || SIMD4
+#if SIMD
 void FractalJob::simd_work() {
   int px[4], py[4], d;
   bool escaped = false;

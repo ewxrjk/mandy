@@ -46,7 +46,7 @@ bool MandelbrotJob::sisd_calculate(int px, int py) {
   return iterations != maxiters;
 }
 
-#if SIMD2 || SIMD4
+#if SIMD
 bool MandelbrotJob::simd_calculate(int px[4], int py[4]) {
   const double zxvalues[4] = {0, 0, 0, 0};
   const double zyvalues[4] = {0, 0, 0, 0};

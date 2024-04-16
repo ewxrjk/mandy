@@ -1,0 +1,37 @@
+digraph calltree {
+
+  Job_worker -> FractalJob_work;
+  Job_worker[label="Job::worker\n(Thread queue worker function)"];
+
+  FractalJob_work -> FractalJob_sisd_work;
+  FractalJob_work -> FractalJob_simd_work;
+  FractalJob_work[label="FractalJob::work"];
+
+  FractalJob_sisd_work -> MandelbrotJob_sisd_calculate;
+  FractalJob_sisd_work -> JuliaJob_sisd_calculate;
+  FractalJob_sisd_work[label="FractalJob::sisd_work"];
+
+  FractalJob_simd_work -> MandelbrotJob_simd_calculate;
+  FractalJob_simd_work -> JuliaJob_simd_calculate;
+  FractalJob_simd_work[label="FractalJob::simd_work"];
+
+  MandelbrotJob_sisd_calculate -> iterate;
+  MandelbrotJob_sisd_calculate[label="MandelbrotJob::sisd_calculate"];
+
+  MandelbrotJob_simd_calculate -> simd_iterate;
+  MandelbrotJob_simd_calculate[label="MandelbrotJob::simd_calculate"];
+
+  JuliaJob_sisd_calculate -> iterate;
+  JuliaJob_sisd_calculate[label="JuliaJob::sisd_calculate"];
+
+  JuliaJob_simd_calculate -> simd_iterate;
+  JuliaJob_simd_calculate[label="JuliaJob::simd_calculate"];
+
+  simd_iterate -> simd_iterate2;
+  simd_iterate -> simd_iterate4;
+
+  simd_iterate2 -> simdimpl_h;
+  simd_iterate4 -> simdimpl_h;
+  simdimpl_h[label="inline implementation\nin simdimpl.h"];
+  
+}

@@ -21,7 +21,7 @@
 class MandelbrotJob: public FractalJob {
 public:
   bool sisd_calculate(int px, int py) override;
-#if SIMD2 || SIMD4
+#if SIMD
   bool simd_calculate(int px[4], int py[4]) override;
 #endif
 };

@@ -29,7 +29,7 @@ bool JuliaJob::sisd_calculate(int px, int py) {
   return iterations != maxiters;
 }
 
-#if SIMD2 || SIMD4
+#if SIMD
 bool JuliaJob::simd_calculate(int px[4], int py[4]) {
   const double cxd = (double)cx, cyd = (double)cy;
   double zxvalues[4];

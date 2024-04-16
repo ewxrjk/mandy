@@ -18,11 +18,8 @@
 
 const char *const arith_names[] = {
     "double",
-#if SIMD2
-    "simd2",
-#endif
-#if SIMD4
-    "simd4",
+#if SIMD
+    "simd",
 #endif
     "long double",
     "fixed64",

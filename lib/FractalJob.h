@@ -81,13 +81,13 @@ public:
   // Return true if it escapes
   virtual bool sisd_calculate(int px, int py) = 0;
 
-#if SIMD2 || SIMD4
+#if SIMD
   // Calculate and plot the 4 points px, py
   // Return true if any of them escape
   virtual bool simd_calculate(int px[4], int py[4]) = 0;
 #endif
 
-#if SIMD2 || SIMD4
+#if SIMD
   inline void simd_iterate(const double *zxvalues,
                            const double *zyvalues,
                            const double *cxvalues,
@@ -96,14 +96,15 @@ public:
                            int *iterations,
                            double *r2values) {
     switch(arith) {
-#if SIMD2
-    case arith_simd2:
+#if SIMD4
+    case arith_simd:
+      simd_iterate4(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values);
+      break;
+#elif SIMD2
+    case arith_simd:
       simd_iterate2(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values);
       simd_iterate2(zxvalues + 2, zyvalues + 2, cxvalues + 2, cyvalues + 2, maxiters, iterations + 2, r2values + 2);
       break;
-#endif
-#if SIMD4
-    case arith_simd4: simd_iterate4(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values); break;
 #endif
     default: throw std::logic_error("unhandled arith_type");
     }
@@ -113,7 +114,7 @@ public:
   // Do the computation (called in background thread)
   void work();
   void sisd_work();
-#if SIMD2 || SIMD4
+#if SIMD
   void simd_work();
 #endif
 };
