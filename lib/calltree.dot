@@ -9,17 +9,20 @@ digraph calltree {
 
   FractalJob_sisd_work -> MandelbrotJob_sisd_calculate;
   FractalJob_sisd_work -> JuliaJob_sisd_calculate;
-  FractalJob_sisd_work[label="FractalJob::sisd_work"];
+  FractalJob_sisd_work[label="FractalJob::sisd_work\nEdge optimization here"];
+  # The design is wrong; edge optimization should be in FractalJob::work.
 
   FractalJob_simd_work -> MandelbrotJob_simd_calculate;
   FractalJob_simd_work -> JuliaJob_simd_calculate;
-  FractalJob_simd_work[label="FractalJob::simd_work"];
+  FractalJob_simd_work[label="FractalJob::simd_work\nSecond copy of edge optimization here"];
 
   MandelbrotJob_sisd_calculate -> iterate;
-  MandelbrotJob_sisd_calculate[label="MandelbrotJob::sisd_calculate"];
+  MandelbrotJob_sisd_calculate[label="MandelbrotJob::sisd_calculate\nRegion optimizations are currently here"];
+  # The region optimizations are entirely missing from the SIMD code path.
+  # Again the design is wrong.
 
   MandelbrotJob_simd_calculate -> simd_iterate;
-  MandelbrotJob_simd_calculate[label="MandelbrotJob::simd_calculate"];
+  MandelbrotJob_simd_calculate[label="MandelbrotJob::simd_calculate\nAlways calculates 4 points."];
 
   JuliaJob_sisd_calculate -> iterate;
   JuliaJob_sisd_calculate[label="JuliaJob::sisd_calculate"];
@@ -29,6 +32,7 @@ digraph calltree {
 
   simd_iterate -> simd_iterate2;
   simd_iterate -> simd_iterate4;
+  simd_iterate[label="simd_iterate\nAlways calculates 4 points."];
 
   simd_iterate2 -> simdimpl_h;
   simd_iterate4 -> simdimpl_h;

@@ -19,6 +19,26 @@
 #include <cstring>
 #include "arith.h"
 
+bool MandelbrotJob::fastpath(arith_t cx, arith_t cy, int &iterations, double &r2) {
+  const arith_t cxq = (cx - 0.25);
+  const arith_t cy2 = cy * cy;
+  const arith_t q = cxq * cxq + cy2;
+
+  bool fast = false;
+
+  if(arith_t(4) * q * (q + cxq) < cy2) // Main cardioid
+    fast = true;
+  else if(cx * cx + arith_t(2) * cx + 1 + cy2 < arith_t(1) / arith_t(16)) // Period-2 bulb
+    fast = true;
+
+  if(fast) {
+    iterations = maxiters;
+    r2 = 0.0;
+  }
+
+  return fast;
+  }
+
 bool MandelbrotJob::sisd_calculate(int px, int py) {
   // Complex-plane location of this point
   const arith_t cx = xleft + arith_t(px) * xsize / dest->width();
@@ -28,20 +48,11 @@ bool MandelbrotJob::sisd_calculate(int px, int py) {
   //
   // then z^2 + c = zx^2 - zy^2 + cx + i(2zxzy+cy)
   int iterations = 0;
-  arith_t zx = 0, zy = 0;
-  // Optimizations as described in WP
-  const arith_t cxq = (cx - 0.25);
-  const arith_t cy2 = cy * cy;
-  const arith_t q = cxq * cxq + cy2;
   double r2 = 0.0;
-  // TODO if the whole square is outside both regions, we could
-  // skip these tests.
-  if(arith_t(4) * q * (q + cxq) < cy2) { // Main cardioid
-    iterations = maxiters;
-  } else if(cx * cx + arith_t(2) * cx + 1 + cy2 < arith_t(1) / arith_t(16)) { // Period-2 bulb
-    iterations = maxiters;
-  } else
+  if(!fastpath(cx, cy, iterations, r2)) {
+    arith_t zx = 0, zy = 0;
     iterations = iterate(zx, zy, cx, cy, maxiters, arith, r2);
+  }
   dest->pixel(px, py) = transform_iterations(iterations, r2, maxiters);
   return iterations != maxiters;
 }

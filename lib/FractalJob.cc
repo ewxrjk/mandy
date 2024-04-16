@@ -127,6 +127,10 @@ void FractalJob::simd_work() {
 }
 #endif
 
+bool FractalJob::fastpath(arith_t, arith_t, int &, double &) {
+  return false;
+}
+
 /*
 Local Variables:
 mode:c++

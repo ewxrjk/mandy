@@ -24,6 +24,8 @@ public:
 #if SIMD
   bool simd_calculate(int px[4], int py[4]) override;
 #endif
+
+  bool fastpath(arith_t cx, arith_t cy, int &iterations, double &r2) override;
 };
 
 class MandelbrotJobFactory: public FractalJobFactory {

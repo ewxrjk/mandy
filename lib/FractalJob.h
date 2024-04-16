@@ -77,6 +77,10 @@ public:
                                int ypos,
                                const FractalJobFactory *factory);
 
+  // Attempt to fast-path a point
+  // Return true if it can be optimized
+  virtual bool fastpath(arith_t cx, arith_t cy, int &iterations, double &r2);
+
   // Calculate and plot px, py
   // Return true if it escapes
   virtual bool sisd_calculate(int px, int py) = 0;
