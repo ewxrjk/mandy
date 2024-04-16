@@ -16,6 +16,10 @@
 #ifndef SIMDARITH_H
 #define SIMDARITH_H
 
+#if __amd64__ || __i386__
+# include <x86intrin.h>
+#endif
+
 #if SIMD2
 #define NAME simd_iterate2
 #define BYTES 16
@@ -28,9 +32,12 @@
 //         <=> ~xmm0 = all 0s
 //         <=> xmm0 all 1s
 // so escapes the loop if xmm0 is all 1s, which is what we want
-#define NONZERO(v) __builtin_ia32_ptestc128(v, ivector{REP(-1)})
+#define NONZERO(v) _mm_testc_si128(v, ivector{REP(-1)})
+#define COND_UPDATEV(dest, source, mask) ((dest) = _mm_blendv_pd((dest), (source), (vector)(mask)))
+#define COND_UPDATEI(dest, source, mask) ((dest) = (ivector)_mm_blendv_pd((vector)(dest), (vector)(source), (vector)(mask)))
 #else
 #define NONZERO(v) v[0] & v[1]
+#define COND_UPDATE(dest, source, mask) ((dest) |= ((source) & (mask)))
 #endif
 #define REP(v) v, v
 #define VALUES(v) v[0], v[1]
@@ -51,6 +58,8 @@
 #undef REP
 #undef VALUES
 #undef NONZERO
+#undef COND_UPDATEI
+#undef COND_UPDATEV
 #undef ASSIGN
 #undef vector
 #undef ivector
@@ -61,9 +70,12 @@
 #define NAME simd_iterate4
 #define BYTES 32
 #if __AVX__
-#define NONZERO(v) __builtin_ia32_ptestc256(v, ivector{REP(-1)})
+#define NONZERO(v) _mm256_testc_si256(v, ivector{REP(-1)})
+#define COND_UPDATEV(dest, source, mask) ((dest) = _mm256_blendv_pd((dest), (source), (vector)(mask)))
+#define COND_UPDATEI(dest, source, mask) ((dest) = (ivector)_mm256_blendv_pd((vector)(dest), (vector)(source), (vector)(mask)))
 #else
 #define NONZERO(v) v[0] & v[1] & v[2] & v[3]
+#define COND_UPDATE(dest, source, mask) ((dest) |= ((source) & (mask)))
 #endif
 #define REP(v) v, v, v, v
 #define VALUES(v) v[0], v[1], v[2], v[3]
@@ -86,6 +98,8 @@
 #undef REP
 #undef VALUES
 #undef NONZERO
+#undef COND_UPDATEI
+#undef COND_UPDATEV
 #undef ASSIGN
 #undef vector
 #undef ivector
