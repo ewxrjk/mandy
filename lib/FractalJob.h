@@ -91,31 +91,6 @@ public:
   virtual bool simd_calculate(int px[SIMD_MAX], int py[SIMD_MAX]) = 0;
 #endif
 
-#if SIMD
-  inline void simd_iterate(const double *zxvalues,
-                           const double *zyvalues,
-                           const double *cxvalues,
-                           const double *cyvalues,
-                           int maxiters,
-                           int *iterations,
-                           double *r2values,
-                           int mandelbrot) {
-    switch(arith) {
-#if SIMD4
-    case arith_simd:
-      simd_iterate4(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values, mandelbrot);
-      break;
-#elif SIMD2
-    case arith_simd:
-      simd_iterate2(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values, mandelbrot);
-      simd_iterate2(zxvalues + 2, zyvalues + 2, cxvalues + 2, cyvalues + 2, maxiters, iterations + 2, r2values + 2, mandelbrot);
-      break;
-#endif
-    default: throw std::logic_error("unhandled arith_type");
-    }
-  }
-#endif
-
   // Do the computation (called in background thread)
   void work();
   void sisd_work();

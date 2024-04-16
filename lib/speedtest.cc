@@ -15,6 +15,9 @@
  */
 #include "mandy.h"
 #include "arith.h"
+#if SIMD
+#include "simdarith.h"
+#endif
 #include <ctime>
 
 int main(int argc, char **argv) {
@@ -27,7 +30,7 @@ int main(int argc, char **argv) {
   for(int i = 0; i < 18; i++)
     values[i] = i * 0.125 - 1.0;
   for(int t = 0; t < arith_limit; ++t) {
-#if SIMD
+#if !SIMD
     if(t == arith_simd)
       continue; // not supported by iterate()
 #endif
@@ -49,14 +52,30 @@ int main(int argc, char **argv) {
           }
         }
       }
-      double r2;
-      iterate(zx, zy, cx, cy, maxiter, arith_type(t), r2);
+      if(t == arith_simd) {
+        double zxvalues[SIMD_MAX], zyvalues[SIMD_MAX], cxvalues[SIMD_MAX], cyvalues[SIMD_MAX], r2values[SIMD_MAX];
+        int iterations[SIMD_MAX];
+        for(int j = 0; j < SIMD_MAX; j++) {
+          zxvalues[j] = (double)zx;
+          zyvalues[j] = (double)zy;
+          cxvalues[j] = (double)cx;
+          cyvalues[j] = (double)cy;
+        }
+        simd_iterate(zxvalues, zyvalues, cxvalues, cyvalues, maxiter, iterations, r2values, 0);
+        // Pretend we use the output so it doesn't get compiled away!
+        __asm__ volatile("" : : "m"(iterations[0]), "m"(r2values[0]), "m"(iterations[2]), "m"(r2values[2])); 
+      } else {
+        double r2;
+        iterate(zx, zy, cx, cy, maxiter, arith_type(t), r2);
+      }
     }
     clock_t end = clock();
     double seconds = (end - begin) / (double)CLOCKS_PER_SEC;
     double iterations = (double)repeats * maxiter;
+    if(t==arith_simd)
+      iterations *= SIMD_MAX;
     double ips = iterations / seconds;
-    printf("%12s %6gs; %g iterations; %10g iterations/second\n", arith_names[t], seconds, iterations, ips);
+    printf("%12s %3.2fs; %10.0f iterations; %12.0f iterations/second\n", arith_names[t], seconds, iterations, ips);
   }
   return 0;
 }

@@ -92,4 +92,20 @@
 #undef escape_check
 #endif
 
+static inline void simd_iterate(const double *zxvalues,
+                                const double *zyvalues,
+                                const double *cxvalues,
+                                const double *cyvalues,
+                                int maxiters,
+                                int *iterations,
+                                double *r2values,
+                                int mandelbrot) {
+#if SIMD4
+  simd_iterate4(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values, mandelbrot);
+#elif SIMD2
+  simd_iterate2(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values, mandelbrot);
+  simd_iterate2(zxvalues + 2, zyvalues + 2, cxvalues + 2, cyvalues + 2, maxiters, iterations + 2, r2values + 2, mandelbrot);
+#endif
+}
+
 #endif /* SIMDARITH_H */
