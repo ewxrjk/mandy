@@ -17,7 +17,7 @@
 #define SIMDARITH_H
 
 #if __amd64__ || __i386__
-# include <x86intrin.h>
+#include <x86intrin.h>
 #endif
 
 #if SIMD2
@@ -34,7 +34,8 @@
 // so escapes the loop if xmm0 is all 1s, which is what we want
 #define NONZERO(v) _mm_testc_si128(v, ivector{REP(-1)})
 #define COND_UPDATEV(dest, source, mask) ((dest) = _mm_blendv_pd((dest), (source), (vector)(mask)))
-#define COND_UPDATEI(dest, source, mask) ((dest) = (ivector)_mm_blendv_pd((vector)(dest), (vector)(source), (vector)(mask)))
+#define COND_UPDATEI(dest, source, mask)                                                                               \
+  ((dest) = (ivector)_mm_blendv_pd((vector)(dest), (vector)(source), (vector)(mask)))
 #else
 #define NONZERO(v) v[0] & v[1]
 #define COND_UPDATE(dest, source, mask) ((dest) |= ((source) & (mask)))
@@ -72,7 +73,8 @@
 #if __AVX__
 #define NONZERO(v) _mm256_testc_si256(v, ivector{REP(-1)})
 #define COND_UPDATEV(dest, source, mask) ((dest) = _mm256_blendv_pd((dest), (source), (vector)(mask)))
-#define COND_UPDATEI(dest, source, mask) ((dest) = (ivector)_mm256_blendv_pd((vector)(dest), (vector)(source), (vector)(mask)))
+#define COND_UPDATEI(dest, source, mask)                                                                               \
+  ((dest) = (ivector)_mm256_blendv_pd((vector)(dest), (vector)(source), (vector)(mask)))
 #else
 #define NONZERO(v) v[0] & v[1] & v[2] & v[3]
 #define COND_UPDATE(dest, source, mask) ((dest) |= ((source) & (mask)))
@@ -106,20 +108,13 @@
 #undef escape_check
 #endif
 
-static inline void simd_iterate(const double *zxvalues,
-                                const double *zyvalues,
-                                const double *cxvalues,
-                                const double *cyvalues,
-                                int maxiters,
-                                int *iterations,
-                                double *r2values,
-                                int mandelbrot) {
-#if SIMD4
-  simd_iterate4(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values, mandelbrot);
-#elif SIMD2
-  simd_iterate2(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values, mandelbrot);
-  simd_iterate2(zxvalues + 2, zyvalues + 2, cxvalues + 2, cyvalues + 2, maxiters, iterations + 2, r2values + 2, mandelbrot);
-#endif
-}
+void simd_iterate(const double *zxvalues,
+                  const double *zyvalues,
+                  const double *cxvalues,
+                  const double *cyvalues,
+                  int maxiters,
+                  int *iterations,
+                  double *r2values,
+                  int mandelbrot);
 
 #endif /* SIMDARITH_H */

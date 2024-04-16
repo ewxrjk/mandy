@@ -26,6 +26,7 @@ lib/cgitest
 lib/fixed128-test
 lib/fixed64-test
 lib/speedtest
+lib/cycletest
 Debug
 *.suo
 *.ncb
