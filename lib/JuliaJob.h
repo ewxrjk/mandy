@@ -26,7 +26,7 @@ public:
 
   bool sisd_calculate(int px, int py) override;
 #if SIMD
-  bool simd_calculate(int px[4], int py[4]) override;
+  bool simd_calculate(int px[SIMD_MAX], int py[SIMD_MAX]) override;
 #endif
 };
 

@@ -86,9 +86,9 @@ public:
   virtual bool sisd_calculate(int px, int py) = 0;
 
 #if SIMD
-  // Calculate and plot the 4 points px, py
+  // Calculate and plot the SIMD_MAX points px, py
   // Return true if any of them escape
-  virtual bool simd_calculate(int px[4], int py[4]) = 0;
+  virtual bool simd_calculate(int px[SIMD_MAX], int py[SIMD_MAX]) = 0;
 #endif
 
 #if SIMD

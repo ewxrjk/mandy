@@ -45,6 +45,8 @@
 # define SIMD 1
 #endif
 
+#define SIMD_MAX 4
+
 #if SIMD
 #define ARITH_DEFAULT arith_simd
 #else

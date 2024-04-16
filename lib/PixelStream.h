@@ -16,6 +16,7 @@
 #ifndef PIXELSTREAM_H
 #define PIXELSTREAM_H
 
+// Generate a stream of integer pixel coordinates
 class PixelStream {
 public:
   // Return the next pixel. Return false if there are no more.

@@ -44,7 +44,7 @@ IterBuffer *FractalJob::recompute(arith_t cx,
                                   int ypos,
                                   const FractalJobFactory *factory) {
   IterBuffer *dest = new IterBuffer(w, h);
-  // Set everything to 'unknown'#
+  // Set everything to 'unknown'
   dest->clear();
   // Chunks need to be large enough that the overhead of jobs doesn't
   // add up to much but small enough that stale jobs don't hog the CPU
@@ -97,18 +97,17 @@ void FractalJob::sisd_work() {
       sisd_calculate(px, py);
   } else {
     while(fill_pixels.next(px, py))
-      for(int i = 0; i < 4; i++)
-        dest->pixel(px, py) = transform_iterations(maxiters, 0, maxiters);
+      dest->pixel(px, py) = transform_iterations(maxiters, 0, maxiters);
   }
 }
 
 #if SIMD
 void FractalJob::simd_work() {
-  int px[4], py[4], d;
+  int px[SIMD_MAX], py[SIMD_MAX], d;
   bool escaped = false;
   if(w > 2 && h > 2) {
     PixelStreamEdge edge_pixels(x, y, w, h);
-    while(edge_pixels.morepixels(4, px, py))
+    while(edge_pixels.morepixels(SIMD_MAX, px, py))
       escaped |= simd_calculate(px, py);
     d = 1;
   } else {
@@ -117,11 +116,11 @@ void FractalJob::simd_work() {
   }
   PixelStreamRectangle fill_pixels(x + d, y + d, w - d, h - d);
   if(escaped) {
-    while(fill_pixels.morepixels(4, px, py))
+    while(fill_pixels.morepixels(SIMD_MAX, px, py))
       simd_calculate(px, py);
   } else {
-    while(fill_pixels.morepixels(4, px, py))
-      for(int i = 0; i < 4; i++)
+    while(fill_pixels.morepixels(SIMD_MAX, px, py))
+      for(int i = 0; i < SIMD_MAX; i++)
         dest->pixel(px[i], py[i]) = transform_iterations(maxiters, 0, maxiters);
   }
 }
