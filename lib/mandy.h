@@ -38,7 +38,7 @@
 #endif
 #endif
 
-#if __aarch64__
+#if __ARM_NEON
 #define SIMD2 1
 #endif
 

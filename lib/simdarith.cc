@@ -20,6 +20,23 @@
 #include <x86intrin.h>
 #endif
 
+#if __ARM_NEON
+# include <arm_neon.h>
+#endif
+
+/* Things we need to define:
+ *
+ * ivector                  Vector of 64-bit integers, representing counts or booleans
+ *                          Booleans are all-0 for false and all-1 for true
+ * vector                   Vector of 64-bit floats
+ * NONZERO(ivector v)       Return nonzero if _all_ elements of v are true
+ * COND_UPDATEV(vector d, vector s, ivector m)
+ *                          For any true element of m, copy s to d; leave the rest of d unchanged
+ * REP(int n)               Duplicate n up to an ivector; i.e. "n, n, n, ...""
+ * VALUES(v)                Elements of v; i.e. "v[0], v[1], ..."
+ * ASSIGN(d, s)             Assign array-like things; i.e. "d[0]=s[0]; d[1]=s[1]; ..."
+ */
+
 #if SIMD2
 
 // Byte length of vector
@@ -40,6 +57,10 @@
   ((dest) = (ivector)_mm_blendv_pd((vector)(dest), (vector)(source), (vector)(mask)))
 #endif
 
+#if __ARM_NEON
+#define COND_UPDATEV(dest, source, mask) ((dest) = (vector)vbslq_f16((uint16x8_t)(mask), (float16x8_t)(source), (float16x8_t)(dest))) // Generates BSL or BIT
+#endif
+
 #ifndef NONZERO
 #define NONZERO(v) (v[0] & v[1])
 #endif
@@ -53,7 +74,6 @@
   } while(0)
 
 #endif
-
 
 #if SIMD4
 
@@ -87,7 +107,7 @@
 #endif
 
 #ifndef COND_UPDATEV
-#define COND_UPDATEV(dest, source, mask) ((dest) = (vector)((ivector)(dest) | ((ivector)(source) & (ivector)(mask))))
+#define COND_UPDATEV(dest, source, mask) ((dest) = (vector)((ivector)(dest) | ((ivector)(source) & (mask))))
 #endif
 
 typedef double vector __attribute__((vector_size(BYTES)));
@@ -96,7 +116,7 @@ typedef long long ivector __attribute__((vector_size(BYTES)));
 static inline bool escape_check(ivector &escaped_already,
                                 ivector &escape_iters,
                                 ivector escaped,
-                                int iterations,
+                                int64_t iterations,
                                 vector r2,
                                 vector &escape_r2) {
   ivector escaped_this_time = escaped & ~escaped_already;
@@ -112,7 +132,7 @@ static inline void simd_iterate_core(const double *zxvalues,
                         const double *zyvalues,
                         const double *cxvalues,
                         const double *cyvalues,
-                        int maxiters,
+                        int64_t maxiters,
                         int *iters,
                         double *r2values,
                         int mandelbrot) {
@@ -124,7 +144,7 @@ static inline void simd_iterate_core(const double *zxvalues,
   vector escape_r2 = {0};
   ivector escape_iters = {REP(0)};
   ivector escaped_already = {REP(0)};
-  int iterations = 0;
+  int64_t iterations = 0;
 
   if(mandelbrot) {
     const vector cxq = (Cx - 0.25);
