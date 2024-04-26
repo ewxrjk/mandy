@@ -17,16 +17,16 @@
 #include "arith.h"
 
 #if __amd64__
-# include <x86intrin.h>
-# define CYCLES() __rdtsc()
+#include <x86intrin.h>
+#define CYCLES() __rdtsc()
 #endif
 
 #if __aarch64__ && __clang__
-# include <arm_acle.h>
+#include <arm_acle.h>
 #define CYCLES() __arm_rsr64("CNTVCT_EL0")
 #endif
 
-#if __aarch64__ && ! defined CYCLES
+#if __aarch64__ && !defined CYCLES
 static inline unsigned long long cycles(void) {
   unsigned long long r;
   __asm__ volatile("mrs %0,CNTVCT_EL0" : "=r"(r));
@@ -44,8 +44,7 @@ int main(int argc, char **argv) {
   int maxiter = 20000;
   if(argc > 1)
     maxiter = atoi(argv[1]);
-  double zxvalues[SIMD] = {0}, zyvalues[SIMD] = {0}, cxvalues[SIMD] = {0}, cyvalues[SIMD] = {0},
-         r2values[SIMD] = {0};
+  double zxvalues[SIMD] = {0}, zyvalues[SIMD] = {0}, cxvalues[SIMD] = {0}, cyvalues[SIMD] = {0}, r2values[SIMD] = {0};
   int iterations[SIMD];
   unsigned long long start = CYCLES();
   simd_iterate(zxvalues, zyvalues, cxvalues, cyvalues, maxiter, iterations, r2values, 0);

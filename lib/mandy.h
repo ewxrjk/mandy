@@ -34,7 +34,7 @@
 #if __AVX__
 #define SIMD 4
 #else
-# define SIMD 2
+#define SIMD 2
 #endif
 #endif
 
@@ -42,12 +42,11 @@
 #define SIMD 2
 #endif
 
-
 #if SIMD == 2
-# define SIMD_REP(n) n, n
+#define SIMD_REP(n) n, n
 #endif
 #if SIMD == 4
-# define SIMD_REP(n) n, n, n, n
+#define SIMD_REP(n) n, n, n, n
 #endif
 
 #if SIMD

@@ -21,7 +21,7 @@
 #endif
 
 #if __ARM_NEON
-# include <arm_neon.h>
+#include <arm_neon.h>
 #endif
 
 /* Things we need to define:
@@ -54,7 +54,8 @@
 #endif
 
 #if __ARM_NEON
-#define COND_UPDATEV(dest, source, mask) ((dest) = (vector)vbslq_f16((uint16x8_t)(mask), (float16x8_t)(source), (float16x8_t)(dest))) // Generates BSL or BIT
+#define COND_UPDATEV(dest, source, mask)                                                                               \
+  ((dest) = (vector)vbslq_f16((uint16x8_t)(mask), (float16x8_t)(source), (float16x8_t)(dest))) // Generates BSL or BIT
 #endif
 
 #ifndef NONZERO
@@ -114,20 +115,20 @@ static inline bool escape_check(ivector &escaped_already,
   ivector escaped_this_time = escaped & ~escaped_already;
   ivector iters_vector = {SIMD_REP(iterations)};
   escape_iters |= iters_vector & escaped_this_time;
-  //COND_UPDATEI(escape_iters, iters_vector, escaped_this_time); // no - slightly slower
+  // COND_UPDATEI(escape_iters, iters_vector, escaped_this_time); // no - slightly slower
   escaped_already |= escaped;
   COND_UPDATEV(escape_r2, r2, escaped_this_time);
   return NONZERO(escaped_already);
 }
 
 static inline void simd_iterate_core(const double *zxvalues,
-                        const double *zyvalues,
-                        const double *cxvalues,
-                        const double *cyvalues,
-                        int64_t maxiters,
-                        int *iters,
-                        double *r2values,
-                        int mandelbrot) {
+                                     const double *zyvalues,
+                                     const double *cxvalues,
+                                     const double *cyvalues,
+                                     int64_t maxiters,
+                                     int *iters,
+                                     double *r2values,
+                                     int mandelbrot) {
   const vector Cx = {VALUES(cxvalues)};
   const vector Cy = {VALUES(cyvalues)};
   vector Zx = {VALUES(zxvalues)};

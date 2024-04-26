@@ -37,7 +37,7 @@ bool MandelbrotJob::fastpath(arith_t cx, arith_t cy, int &iterations, double &r2
   }
 
   return fast;
-  }
+}
 
 bool MandelbrotJob::sisd_calculate(int px, int py) {
   // Complex-plane location of this point
