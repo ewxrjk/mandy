@@ -49,18 +49,27 @@
 //         <=> ~xmm0 = all 0s
 //         <=> xmm0 all 1s
 // so escapes the loop if xmm0 is all 1s, which is what we want
-#define NONZERO(v) _mm_testc_si128(v, ivector{REP(-1)})
+
+#define NONZERO(v) _mm_testc_si128(v, ivector{SIMD_REP(-1)})
+
 #define COND_UPDATEV(dest, source, mask) ((dest) = _mm_blendv_pd((dest), (source), (vector)(mask)))
+
+#if 0 // Slower on my computer
 #define COND_UPDATEI(dest, source, mask)                                                                               \
   ((dest) = (ivector)_mm_blendv_pd((vector)(dest), (vector)(source), (vector)(mask)))
 #endif
 
+#endif // __SSE4_1__
+
 #if __ARM_NEON
+
 #define COND_UPDATEV(dest, source, mask)                                                                               \
   ((dest) = (vector)vbslq_f16((uint16x8_t)(mask), (float16x8_t)(source), (float16x8_t)(dest))) // Generates BSL or BIT
+
 #define COND_UPDATEI(dest, source, mask)                                                                               \
   ((dest) = (ivector)vbslq_f16((uint16x8_t)(mask), (float16x8_t)(source), (float16x8_t)(dest))) // Generates BSL or BIT
-#endif
+
+#endif // __ARM_NEON
 
 #ifndef NONZERO
 #define NONZERO(v) (v[0] & v[1])
@@ -73,17 +82,23 @@
     d[1] = s[1];                                                                                                       \
   } while(0)
 
-#endif
+#endif // SIMD == 2
 
 #if SIMD == 4
 
 #if __AVX__
+
 #define NONZERO(v) _mm256_testc_si256(v, ivector{SIMD_REP(-1)})
 //#define NONZERO(v) !_mm256_testz_si256(ivector{REP(0)}, v) // Slower
+
 #define COND_UPDATEV(dest, source, mask) ((dest) = _mm256_blendv_pd((dest), (source), (vector)(mask)))
+
+#if 0 // Slower on my computer
 #define COND_UPDATEI(dest, source, mask)                                                                               \
-  ((dest) = (ivector)_mm256_blendv_pd((vector)(dest), (vector)(source), (vector)(mask))) // TODO slower last time I checked
+  ((dest) = (ivector)_mm256_blendv_pd((vector)(dest), (vector)(source), (vector)(mask)))
 #endif
+
+#endif // __AVX__
 
 #ifndef NONZERO
 #define NONZERO(v) (v[0] & v[1] & v[2] & v[3])
@@ -97,7 +112,8 @@
     d[2] = s[2];                                                                                                       \
     d[3] = s[3];                                                                                                       \
   } while(0)
-#endif
+
+#endif // SIMD == 4
 
 #ifndef COND_UPDATEI
 #define COND_UPDATEI(dest, source, mask) ((dest) |= ((source) & (mask)))
