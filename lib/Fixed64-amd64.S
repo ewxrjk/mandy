@@ -16,7 +16,7 @@
 #include <config.h>
 
 #if HAVE_ASM_AMD64
-	.intel_syntax noprefix
+        .intel_syntax noprefix
 
 #if __linux__
 # define SYMBOL(s) s
@@ -35,7 +35,7 @@
  * - when you run out the stack is used in reverse order
  *
  * Register usage table:
- *   %rax	Smash, 1st return value
+ *   %rax       Smash, 1st return value
  *   %rbx       preserve
  *   %rcx       4th arg, smash
  *   %rdx       3rd arg, 2nd return value, smash
@@ -52,7 +52,7 @@
  * See: http://www.x86-64.org/documentation/abi.pdf
  */
 
-	.text
+        .text
 
 /* uint64_t Fixed64_div_unsigned(uint64_t a[rdi], uint64_t b[rsi]);
  *
@@ -78,21 +78,21 @@
  * digits would all be lost. So divide (a<<64)/b to put the
  * point at the bottom of qh, then shift the result and round.
  */
-	.globl	SYMBOL(Fixed64_div_unsigned)
+        .globl  SYMBOL(Fixed64_div_unsigned)
 SYMBOL(Fixed64_div_unsigned):
-	xor rdx,rdx
-	mov rax,rdi		// rdx:rax = a<<64
-	div rsi				// rax = qh, rdx = rh
-	mov rcx,rax   // rcx = qh
-	xor rax,rax		// rdx:rax = rh<<64 + xl
-	div rsi				// rax = ql, rdx = r
-	// rcx:rax = q = ⌊(a<<64)/b⌋. What we want is
-	// (a close approximation to) (a/b)<<56, so we
-	// need to shift 8 bits right
-	shl rcx,56
-	shr rax,8
-	adc rax,rcx // Rounding
-	ret
+        xor rdx,rdx
+        mov rax,rdi             // rdx:rax = a<<64
+        div rsi                         // rax = qh, rdx = rh
+        mov rcx,rax   // rcx = qh
+        xor rax,rax             // rdx:rax = rh<<64 + xl
+        div rsi                         // rax = ql, rdx = r
+        // rcx:rax = q = ⌊(a<<64)/b⌋. What we want is
+        // (a close approximation to) (a/b)<<56, so we
+        // need to shift 8 bits right
+        shl rcx,56
+        shr rax,8
+        adc rax,rcx // Rounding
+        ret
 
 /*  int Fixed64_iterate(Fixed64 zx[rdi], Fixed64 zy[rsi],
  *                      Fixed64 cx[rdx], Fixed64 cy[rcx],
@@ -100,82 +100,85 @@ SYMBOL(Fixed64_div_unsigned):
  *                      int maxiters[r9);
  *
  * Register allocation:
- * rax,rdx	Accumulator for multiplications
- * rbx		iterations
- * rcx		cy
- * rdi		zx
- * rsi		zy
- * r8		r2p
- * r9		maxiters
- * r10,r11	zx^2
- * r12,r13	zy^2
- * r14		cx
- * r15		constants
+ * rax,rdx      Accumulator for multiplications
+ * rbx          iterations
+ * rcx          cy
+ * rdi          zx
+ * rsi          zy
+ * r8           r2p
+ * r9           maxiters
+ * r10,r11      zx^2
+ * r12,r13      zy^2
+ * r14          cx
+ * r15          constants
  *
+ * Although the inputs are in 8.56 format, some of the intermediates
+ * are in 16.112 format (i.e. what you get if you multiply two 8.56
+ * values together).
  */
 
-	.globl	SYMBOL(Fixed64_iterate)
+        .globl  SYMBOL(Fixed64_iterate)
 SYMBOL(Fixed64_iterate):
-	push	rbx
-	push	r12
-	push	r13
-	push	r14
-	push	r15
-	mov	r14,rdx
-	mov	rbx,0
-	movabs	r15,0x0040000000000000
-	.align	4
+        push    rbx
+        push    r12
+        push    r13
+        push    r14
+        push    r15
+        mov     r14,rdx
+        mov     rbx,0                          // iterations = 0
+        movabs  r15,0x0040000000000000         // r15 = 64, in 16.112 format
+        .align  4
 iter1:
-	// We keep z^2 in 16.112 format, since it may overflow 8.56
-	mov	rax,rdi
-	imul	rdi		// rdx:rax = zx^2
-	mov	r11,rax
-	mov	r10,rdx		// r10:r11 = zx^2
-	mov	rax,rsi
-	imul	rsi		// rdx:rax = zy^2
-	mov	r13,rax
-	mov	r12,rdx		// r12:r13 = zy^2
-	add	rax,r11
-	adc	rdx,r10		// rdx:rax = zx^2+zy^2
-	cmp	rdx,r15
-	jge	2f
-	shrd	r11,r10,56	// r11 = zx^2
-	mov	rax,rdi
-	imul	rsi		// rdx:rax = zx * zy
-	shrd	r13,r12,56	// r13 = zy^2
-	shrd	rax,rdx,56	// rax = zx * zy
-	lea	rsi,[rcx+rax*2]	// zy = 2 * zx * zy + cy
-	sub	r11,r13		// r11 = zx^2 - zy^2
-	lea	rdi,[r11+r14]	// zx = zx^2 - zy^2 + cx
-	inc	rbx
-	cmp	rbx,r9
-	jb	iter1
-	// Breached iteration limit
-	jmp	6f
+        // We keep z^2 in 16.112 format, since it may overflow 8.56
+        mov     rax,rdi
+        imul    rdi                            // rdx:rax = zx^2
+        mov     r11,rax
+        mov     r10,rdx                        // r10:r11 = zx^2
+        mov     rax,rsi
+        imul    rsi                            // rdx:rax = zy^2
+        mov     r13,rax
+        mov     r12,rdx                        // r12:r13 = zy^2
+        add     rax,r11
+        adc     rdx,r10                        // rdx:rax = zx^2+zy^2
+        cmp     rdx,r15
+        jge     2f                             // escape if zx^2+zy^2 > 64
+        shrd    r11,r10,56                     // r11 = zx^2
+        mov     rax,rdi
+        imul    rsi                            // rdx:rax = zx * zy
+        shrd    r13,r12,56                     // r13 = zy^2
+        shrd    rax,rdx,56                     // rax = zx * zy
+        lea     rsi,[rcx+rax*2]                // zy = 2 * zx * zy + cy
+        sub     r11,r13                        // r11 = zx^2 - zy^2
+        lea     rdi,[r11+r14]                  // zx = zx^2 - zy^2 + cx
+        inc     rbx                            // iterations += 1
+        cmp     rbx,r9
+        jb      iter1                          // repeat if iterations < maxiters
+        // Breached iteration limit
+        jmp     6f
 2:
-	// Escaped.  We can't return r^2 in an 8.56 since it may have
-	// overflowed.  We can return it in a double however (and in fact
-	// that's more useful to the caller).
-	cvtsi2sd	xmm0,rdx
-	cvtsi2sd	xmm1,rax
-	// rdx had units at bit 2*56-64=48, so it needs to be
-	// "shifted right" by 48 bits.
-	movabs	r15,0x3CF0000000000000
-	movq	xmm2,r15
-	mulsd	xmm0,xmm2
-	// rax is a further 64 bits down
-	movabs	r15,0x38F0000000000000
-	movq	xmm2,r15
-	mulsd	xmm1,xmm2
-	addsd	xmm0,xmm1
-	movq	qword ptr [r8],xmm0
+        // Escaped.  We can't return r^2 in an 8.56 since it may have
+        // overflowed.  We can return it in a double however (and in fact
+        // that's more useful to the caller).
+        cvtsi2sd xmm0,rdx
+        cvtsi2sd xmm1,rax
+        // rdx had units at bit 2*56-64=48, so it needs to be
+        // "shifted right" by 48 bits.
+        movabs  r15,0x3CF0000000000000        // =(double)2^-48
+        movq    xmm2,r15
+        mulsd   xmm0,xmm2
+        // rax is a further 64 bits down
+        movabs  r15,0x38F0000000000000        // =(double)2^-112
+        movq    xmm2,r15
+        mulsd   xmm1,xmm2
+        addsd   xmm0,xmm1
+        movq    qword ptr [r8],xmm0
 6:
-	mov	rax,rbx		// Return iteration count
-	pop	r15
-	pop	r14
-	pop	r13
-	pop	r12
-	pop	rbx
-	ret
+        mov     rax,rbx                       // Return iteration count
+        pop     r15
+        pop     r14
+        pop     r13
+        pop     r12
+        pop     rbx
+        ret
 #endif
 
