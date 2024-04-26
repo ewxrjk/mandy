@@ -32,6 +32,8 @@
  * NONZERO(ivector v)       Return nonzero if _all_ elements of v are true
  * COND_UPDATEV(vector d, vector s, ivector m)
  *                          For any true element of m, copy s to d; leave the rest of d unchanged
+ * COND_UPDATEV(ivector d, ivector s, ivector m)
+ *                          For any true element of m, copy s to d; leave the rest of d unchanged
  * VALUES(v)                Elements of v; i.e. "v[0], v[1], ..."
  * ASSIGN(d, s)             Assign array-like things; i.e. "d[0]=s[0]; d[1]=s[1]; ..."
  */
@@ -56,6 +58,8 @@
 #if __ARM_NEON
 #define COND_UPDATEV(dest, source, mask)                                                                               \
   ((dest) = (vector)vbslq_f16((uint16x8_t)(mask), (float16x8_t)(source), (float16x8_t)(dest))) // Generates BSL or BIT
+#define COND_UPDATEI(dest, source, mask)                                                                               \
+  ((dest) = (ivector)vbslq_f16((uint16x8_t)(mask), (float16x8_t)(source), (float16x8_t)(dest))) // Generates BSL or BIT
 #endif
 
 #ifndef NONZERO
@@ -78,7 +82,7 @@
 //#define NONZERO(v) !_mm256_testz_si256(ivector{REP(0)}, v) // Slower
 #define COND_UPDATEV(dest, source, mask) ((dest) = _mm256_blendv_pd((dest), (source), (vector)(mask)))
 #define COND_UPDATEI(dest, source, mask)                                                                               \
-  ((dest) = (ivector)_mm256_blendv_pd((vector)(dest), (vector)(source), (vector)(mask)))
+  ((dest) = (ivector)_mm256_blendv_pd((vector)(dest), (vector)(source), (vector)(mask))) // TODO slower last time I checked
 #endif
 
 #ifndef NONZERO
@@ -106,21 +110,27 @@
 typedef double vector __attribute__((vector_size(8 * SIMD)));
 typedef long long ivector __attribute__((vector_size(8 * SIMD)));
 
-static inline void escape_check(ivector &escaped_already,
-                                ivector &escape_iters,
-                                ivector escaped,
-                                int64_t iterations,
-                                vector r2,
-                                vector &escape_r2) {
+static void escape_check(ivector &escaped_already,
+                         ivector &escape_iters,
+                         ivector escaped,
+                         int64_t iterations,
+                         vector r2,
+                         vector &escape_r2) {
   ivector escaped_this_time = escaped & ~escaped_already;
   ivector iters_vector = {SIMD_REP(iterations)};
-  escape_iters |= iters_vector & escaped_this_time;
-  // COND_UPDATEI(escape_iters, iters_vector, escaped_this_time); // no - slightly slower
+  COND_UPDATEI(escape_iters, iters_vector, escaped_this_time);
   escaped_already |= escaped;
   COND_UPDATEV(escape_r2, r2, escaped_this_time);
 }
 
-static inline void simd_iterate_once(vector &Zx, vector &Zy, vector &escape_r2, ivector &escaped_already, ivector &escape_iters, int64_t &iterations, vector Cx, vector Cy) {
+static inline void simd_iterate_once(vector &Zx,
+                                     vector &Zy,
+                                     vector &escape_r2,
+                                     ivector &escaped_already,
+                                     ivector &escape_iters,
+                                     int64_t &iterations,
+                                     vector Cx,
+                                     vector Cy) {
   const vector Zx2 = Zx * Zx;
   const vector Zy2 = Zy * Zy;
   const vector r2 = Zx2 + Zy2;
