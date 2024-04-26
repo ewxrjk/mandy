@@ -159,7 +159,7 @@ static inline void simd_iterate_core(const double *zxvalues,
     escape_check(escaped_already, escape_iters, escaped, maxiters, r2, escape_r2);
   }
 
-  while(iterations < maxiters) {
+  while(iterations < maxiters && !NONZERO(escaped_already)) {
     simd_iterate_once(Zx, Zy, escape_r2, escaped_already, escape_iters, iterations, Cx, Cy);
     simd_iterate_once(Zx, Zy, escape_r2, escaped_already, escape_iters, iterations, Cx, Cy);
     simd_iterate_once(Zx, Zy, escape_r2, escaped_already, escape_iters, iterations, Cx, Cy);
@@ -168,8 +168,6 @@ static inline void simd_iterate_core(const double *zxvalues,
     simd_iterate_once(Zx, Zy, escape_r2, escaped_already, escape_iters, iterations, Cx, Cy);
     simd_iterate_once(Zx, Zy, escape_r2, escaped_already, escape_iters, iterations, Cx, Cy);
     simd_iterate_once(Zx, Zy, escape_r2, escaped_already, escape_iters, iterations, Cx, Cy);
-    if(NONZERO(escaped_already))
-      break;
   }
   const ivector maxiters_vector = {SIMD_REP(maxiters)};
   escape_iters |= maxiters_vector & ~escaped_already;
