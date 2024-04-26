@@ -16,6 +16,143 @@
 #include "mandy.h"
 #include "simdarith.h"
 
+#if __amd64__ || __i386__
+#include <x86intrin.h>
+#endif
+
+#if SIMD2
+
+// Byte length of vector
+#define BYTES 16
+
+#if __SSE4_1__
+// xmm0=escaped
+// xmm7=(all 1s)
+//   vptest xmm0,xmm7
+//   jnc (continue loop)
+// sets CF <=> ~xmm0 & xmm7 = all 0s
+//         <=> ~xmm0 = all 0s
+//         <=> xmm0 all 1s
+// so escapes the loop if xmm0 is all 1s, which is what we want
+#define NONZERO(v) _mm_testc_si128(v, ivector{REP(-1)})
+#define COND_UPDATEV(dest, source, mask) ((dest) = _mm_blendv_pd((dest), (source), (vector)(mask)))
+#define COND_UPDATEI(dest, source, mask)                                                                               \
+  ((dest) = (ivector)_mm_blendv_pd((vector)(dest), (vector)(source), (vector)(mask)))
+#endif
+
+#ifndef NONZERO
+#define NONZERO(v) (v[0] & v[1])
+#endif
+
+#define REP(v) v, v
+#define VALUES(v) v[0], v[1]
+#define ASSIGN(d, s)                                                                                                   \
+  do {                                                                                                                 \
+    d[0] = s[0];                                                                                                       \
+    d[1] = s[1];                                                                                                       \
+  } while(0)
+
+#endif
+
+
+#if SIMD4
+
+#define BYTES 32
+
+#if __AVX__
+#define NONZERO(v) _mm256_testc_si256(v, ivector{REP(-1)})
+//#define NONZERO(v) !_mm256_testz_si256(ivector{REP(0)}, v) // Slower
+#define COND_UPDATEV(dest, source, mask) ((dest) = _mm256_blendv_pd((dest), (source), (vector)(mask)))
+#define COND_UPDATEI(dest, source, mask)                                                                               \
+  ((dest) = (ivector)_mm256_blendv_pd((vector)(dest), (vector)(source), (vector)(mask)))
+#endif
+
+#ifndef NONZERO
+#define NONZERO(v) (v[0] & v[1] & v[2] & v[3])
+#endif
+
+#define REP(v) v, v, v, v
+#define VALUES(v) v[0], v[1], v[2], v[3]
+#define ASSIGN(d, s)                                                                                                   \
+  do {                                                                                                                 \
+    d[0] = s[0];                                                                                                       \
+    d[1] = s[1];                                                                                                       \
+    d[2] = s[2];                                                                                                       \
+    d[3] = s[3];                                                                                                       \
+  } while(0)
+#endif
+
+#ifndef COND_UPDATEI
+#define COND_UPDATEI(dest, source, mask) ((dest) |= ((source) & (mask)))
+#endif
+
+#ifndef COND_UPDATEV
+#define COND_UPDATEV(dest, source, mask) ((dest) = (vector)((ivector)(dest) | ((ivector)(source) & (ivector)(mask))))
+#endif
+
+typedef double vector __attribute__((vector_size(BYTES)));
+typedef long long ivector __attribute__((vector_size(BYTES)));
+
+static inline bool escape_check(ivector &escaped_already,
+                                ivector &escape_iters,
+                                ivector escaped,
+                                int iterations,
+                                vector r2,
+                                vector &escape_r2) {
+  ivector escaped_this_time = escaped & ~escaped_already;
+  ivector iters_vector = {REP(iterations)};
+  escape_iters |= iters_vector & escaped_this_time;
+  //COND_UPDATEI(escape_iters, iters_vector, escaped_this_time); // no - slightly slower
+  escaped_already |= escaped;
+  COND_UPDATEV(escape_r2, r2, escaped_this_time);
+  return NONZERO(escaped_already);
+}
+
+static inline void simd_iterate_core(const double *zxvalues,
+                        const double *zyvalues,
+                        const double *cxvalues,
+                        const double *cyvalues,
+                        int maxiters,
+                        int *iters,
+                        double *r2values,
+                        int mandelbrot) {
+  const vector Cx = {VALUES(cxvalues)};
+  const vector Cy = {VALUES(cyvalues)};
+  vector Zx = {VALUES(zxvalues)};
+  vector Zy = {VALUES(zyvalues)};
+  vector r2 = {REP(0)};
+  vector escape_r2 = {0};
+  ivector escape_iters = {REP(0)};
+  ivector escaped_already = {REP(0)};
+  int iterations = 0;
+
+  if(mandelbrot) {
+    const vector cxq = (Cx - 0.25);
+    const vector cy2 = Cy * Cy;
+    const vector q = cxq * cxq + cy2;
+    const ivector escaped = (4.0 * q * (q + cxq) < cy2) || (Cx * Cx + 2.0 * Cx + 1.0 + cy2 < 1.0 / 16.0);
+    escape_check(escaped_already, escape_iters, escaped, maxiters, r2, escape_r2);
+  }
+
+  while(iterations < maxiters) {
+    const vector Zx2 = Zx * Zx;
+    const vector Zy2 = Zy * Zy;
+    r2 = Zx2 + Zy2;
+    const ivector escaped = r2 >= 64.0; // -1 for points that escaped this time, or in the past; else 0
+    if(escape_check(escaped_already, escape_iters, escaped, iterations, r2, escape_r2))
+      break;
+    const vector Zxnew = Zx2 - Zy2 + Cx;
+    const vector Zynew = 2 * Zx * Zy + Cy;
+    Zx = Zxnew;
+    Zy = Zynew;
+    iterations++;
+  }
+  const ivector maxiters_vector = {REP(maxiters)};
+  escape_iters |= maxiters_vector & ~escaped_already;
+  ASSIGN(r2values, escape_r2);
+  ASSIGN(iters, escape_iters);
+}
+
 void simd_iterate(const double *zxvalues,
                   const double *zyvalues,
                   const double *cxvalues,
@@ -25,10 +162,10 @@ void simd_iterate(const double *zxvalues,
                   double *r2values,
                   int mandelbrot) {
 #if SIMD4
-  simd_iterate4(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values, mandelbrot);
+  simd_iterate_core(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values, mandelbrot);
 #elif SIMD2
-  simd_iterate2(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values, mandelbrot);
-  simd_iterate2(
+  simd_iterate_core(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values, mandelbrot);
+  simd_iterate_core(
       zxvalues + 2, zyvalues + 2, cxvalues + 2, cyvalues + 2, maxiters, iterations + 2, r2values + 2, mandelbrot);
 #endif
 }

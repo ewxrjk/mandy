@@ -28,12 +28,9 @@ digraph calltree {
   JuliaJob_simd_calculate -> simd_iterate;
   JuliaJob_simd_calculate[label="JuliaJob::simd_calculate\nAlways calculates 4 points."];
 
-  simd_iterate -> simd_iterate2;
-  simd_iterate -> simd_iterate4;
+  simd_iterate -> simd_iterate_core;
   simd_iterate[label="simd_iterate\nAlways calculates 4 points."];
 
-  simd_iterate2 -> simdimpl_h;
-  simd_iterate4 -> simdimpl_h;
-  simdimpl_h[label="inline implementation\nin simdimpl.h\nSecond copy of region optimizations here"];
+  simd_iterate_core[label="simd_iterate_core\nSecond copy of region optimizations here"];
   
 }

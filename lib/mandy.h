@@ -31,9 +31,10 @@
 
 // Select SIMD implementations
 #if __amd64__
-#define SIMD2 1
 #if __AVX__
 #define SIMD4 1
+#else
+# define SIMD2 2
 #endif
 #endif
 

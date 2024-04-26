@@ -15,6 +15,9 @@
  */
 #include "mandy.h"
 #include "arith.h"
+#if __amd64__
+# include <x86intrin.h>
+#endif
 #if SIMD
 #include "simdarith.h"
 #endif
