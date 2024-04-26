@@ -106,7 +106,7 @@
 typedef double vector __attribute__((vector_size(8 * SIMD)));
 typedef long long ivector __attribute__((vector_size(8 * SIMD)));
 
-static inline bool escape_check(ivector &escaped_already,
+static inline void escape_check(ivector &escaped_already,
                                 ivector &escape_iters,
                                 ivector escaped,
                                 int64_t iterations,
@@ -118,7 +118,19 @@ static inline bool escape_check(ivector &escaped_already,
   // COND_UPDATEI(escape_iters, iters_vector, escaped_this_time); // no - slightly slower
   escaped_already |= escaped;
   COND_UPDATEV(escape_r2, r2, escaped_this_time);
-  return NONZERO(escaped_already);
+}
+
+static inline void simd_iterate_once(vector &Zx, vector &Zy, vector &escape_r2, ivector &escaped_already, ivector &escape_iters, int64_t &iterations, vector Cx, vector Cy) {
+  const vector Zx2 = Zx * Zx;
+  const vector Zy2 = Zy * Zy;
+  const vector r2 = Zx2 + Zy2;
+  const ivector escaped = r2 >= 64.0; // -1 for points that escaped this time, or in the past; else 0
+  escape_check(escaped_already, escape_iters, escaped, iterations, r2, escape_r2);
+  const vector Zxnew = Zx2 - Zy2 + Cx;
+  const vector Zynew = 2 * Zx * Zy + Cy;
+  Zx = Zxnew;
+  Zy = Zynew;
+  iterations++;
 }
 
 static inline void simd_iterate_core(const double *zxvalues,
@@ -133,7 +145,6 @@ static inline void simd_iterate_core(const double *zxvalues,
   const vector Cy = {VALUES(cyvalues)};
   vector Zx = {VALUES(zxvalues)};
   vector Zy = {VALUES(zyvalues)};
-  vector r2 = {SIMD_REP(0)};
   vector escape_r2 = {0};
   ivector escape_iters = {SIMD_REP(0)};
   ivector escaped_already = {SIMD_REP(0)};
@@ -144,21 +155,21 @@ static inline void simd_iterate_core(const double *zxvalues,
     const vector cy2 = Cy * Cy;
     const vector q = cxq * cxq + cy2;
     const ivector escaped = (4.0 * q * (q + cxq) < cy2) || (Cx * Cx + 2.0 * Cx + 1.0 + cy2 < 1.0 / 16.0);
+    vector r2 = {SIMD_REP(0)};
     escape_check(escaped_already, escape_iters, escaped, maxiters, r2, escape_r2);
   }
 
   while(iterations < maxiters) {
-    const vector Zx2 = Zx * Zx;
-    const vector Zy2 = Zy * Zy;
-    r2 = Zx2 + Zy2;
-    const ivector escaped = r2 >= 64.0; // -1 for points that escaped this time, or in the past; else 0
-    if(escape_check(escaped_already, escape_iters, escaped, iterations, r2, escape_r2))
+    simd_iterate_once(Zx, Zy, escape_r2, escaped_already, escape_iters, iterations, Cx, Cy);
+    simd_iterate_once(Zx, Zy, escape_r2, escaped_already, escape_iters, iterations, Cx, Cy);
+    simd_iterate_once(Zx, Zy, escape_r2, escaped_already, escape_iters, iterations, Cx, Cy);
+    simd_iterate_once(Zx, Zy, escape_r2, escaped_already, escape_iters, iterations, Cx, Cy);
+    simd_iterate_once(Zx, Zy, escape_r2, escaped_already, escape_iters, iterations, Cx, Cy);
+    simd_iterate_once(Zx, Zy, escape_r2, escaped_already, escape_iters, iterations, Cx, Cy);
+    simd_iterate_once(Zx, Zy, escape_r2, escaped_already, escape_iters, iterations, Cx, Cy);
+    simd_iterate_once(Zx, Zy, escape_r2, escaped_already, escape_iters, iterations, Cx, Cy);
+    if(NONZERO(escaped_already))
       break;
-    const vector Zxnew = Zx2 - Zy2 + Cx;
-    const vector Zynew = 2 * Zx * Zy + Cy;
-    Zx = Zxnew;
-    Zy = Zynew;
-    iterations++;
   }
   const ivector maxiters_vector = {SIMD_REP(maxiters)};
   escape_iters |= maxiters_vector & ~escaped_already;
