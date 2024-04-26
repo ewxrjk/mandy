@@ -32,21 +32,23 @@
 // Select SIMD implementations
 #if __amd64__
 #if __AVX__
-#define SIMD4 1
+#define SIMD 4
 #else
-# define SIMD2 2
+# define SIMD 2
 #endif
 #endif
 
 #if __ARM_NEON
-#define SIMD2 1
+#define SIMD 2
 #endif
 
-#if SIMD2 || SIMD4
-# define SIMD 1
-#endif
 
-#define SIMD_MAX 4
+#if SIMD == 2
+# define SIMD_REP(n) n, n
+#endif
+#if SIMD == 4
+# define SIMD_REP(n) n, n, n, n
+#endif
 
 #if SIMD
 #define ARITH_DEFAULT arith_simd

@@ -103,11 +103,11 @@ void FractalJob::sisd_work() {
 
 #if SIMD
 void FractalJob::simd_work() {
-  int px[SIMD_MAX], py[SIMD_MAX], d;
+  int px[SIMD], py[SIMD], d;
   bool escaped = false;
   if(w > 2 && h > 2) {
     PixelStreamEdge edge_pixels(x, y, w, h);
-    while(edge_pixels.morepixels(SIMD_MAX, px, py))
+    while(edge_pixels.morepixels(SIMD, px, py))
       escaped |= simd_calculate(px, py);
     d = 1;
   } else {
@@ -116,11 +116,11 @@ void FractalJob::simd_work() {
   }
   PixelStreamRectangle fill_pixels(x + d, y + d, w - d, h - d);
   if(escaped) {
-    while(fill_pixels.morepixels(SIMD_MAX, px, py))
+    while(fill_pixels.morepixels(SIMD, px, py))
       simd_calculate(px, py);
   } else {
-    while(fill_pixels.morepixels(SIMD_MAX, px, py))
-      for(int i = 0; i < SIMD_MAX; i++)
+    while(fill_pixels.morepixels(SIMD, px, py))
+      for(int i = 0; i < SIMD; i++)
         dest->pixel(px[i], py[i]) = transform_iterations(maxiters, 0, maxiters);
   }
 }

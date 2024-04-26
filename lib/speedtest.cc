@@ -53,17 +53,15 @@
           }
         }
         if(t == arith_simd) {
-          double zxvalues[SIMD_MAX], zyvalues[SIMD_MAX], cxvalues[SIMD_MAX], cyvalues[SIMD_MAX], r2values[SIMD_MAX];
-          int iterations[SIMD_MAX];
-          for(int j = 0; j < SIMD_MAX; j++) {
+          double zxvalues[SIMD], zyvalues[SIMD], cxvalues[SIMD], cyvalues[SIMD], r2values[SIMD];
+          int iterations[SIMD];
+          for(int j = 0; j < SIMD; j++) {
             zxvalues[j] = (double)zx;
             zyvalues[j] = (double)zy;
             cxvalues[j] = (double)cx;
             cyvalues[j] = (double)cy;
           }
           simd_iterate(zxvalues, zyvalues, cxvalues, cyvalues, maxiter, iterations, r2values, 0);
-          // Pretend we use the output so it doesn't get compiled away!
-          __asm__ volatile("" : : "m"(iterations[0]), "m"(r2values[0]), "m"(iterations[2]), "m"(r2values[2])); 
         } else {
           double r2;
           iterate(zx, zy, cx, cy, maxiter, arith_type(t), r2);
@@ -73,7 +71,7 @@
       double seconds = (end - begin) / (double)CLOCKS_PER_SEC;
       double iterations = (double)repeats * maxiter;
       if(t==arith_simd)
-        iterations *= SIMD_MAX;
+        iterations *= SIMD;
       double ips = iterations / seconds;
       printf("%12s %3.2fs; %10.0f iterations; %12.0f iterations/second\n", arith_names[t], seconds, iterations, ips);
     }

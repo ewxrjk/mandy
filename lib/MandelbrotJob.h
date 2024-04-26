@@ -22,7 +22,7 @@ class MandelbrotJob: public FractalJob {
 public:
   bool sisd_calculate(int px, int py) override;
 #if SIMD
-  bool simd_calculate(int px[SIMD_MAX], int py[SIMD_MAX]) override;
+  bool simd_calculate(int px[SIMD], int py[SIMD]) override;
 #endif
 
   bool fastpath(arith_t cx, arith_t cy, int &iterations, double &r2) override;

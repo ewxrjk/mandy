@@ -32,15 +32,11 @@
  * NONZERO(ivector v)       Return nonzero if _all_ elements of v are true
  * COND_UPDATEV(vector d, vector s, ivector m)
  *                          For any true element of m, copy s to d; leave the rest of d unchanged
- * REP(int n)               Duplicate n up to an ivector; i.e. "n, n, n, ...""
  * VALUES(v)                Elements of v; i.e. "v[0], v[1], ..."
  * ASSIGN(d, s)             Assign array-like things; i.e. "d[0]=s[0]; d[1]=s[1]; ..."
  */
 
-#if SIMD2
-
-// Byte length of vector
-#define BYTES 16
+#if SIMD == 2
 
 #if __SSE4_1__
 // xmm0=escaped
@@ -65,7 +61,6 @@
 #define NONZERO(v) (v[0] & v[1])
 #endif
 
-#define REP(v) v, v
 #define VALUES(v) v[0], v[1]
 #define ASSIGN(d, s)                                                                                                   \
   do {                                                                                                                 \
@@ -75,12 +70,10 @@
 
 #endif
 
-#if SIMD4
-
-#define BYTES 32
+#if SIMD == 4
 
 #if __AVX__
-#define NONZERO(v) _mm256_testc_si256(v, ivector{REP(-1)})
+#define NONZERO(v) _mm256_testc_si256(v, ivector{SIMD_REP(-1)})
 //#define NONZERO(v) !_mm256_testz_si256(ivector{REP(0)}, v) // Slower
 #define COND_UPDATEV(dest, source, mask) ((dest) = _mm256_blendv_pd((dest), (source), (vector)(mask)))
 #define COND_UPDATEI(dest, source, mask)                                                                               \
@@ -91,7 +84,6 @@
 #define NONZERO(v) (v[0] & v[1] & v[2] & v[3])
 #endif
 
-#define REP(v) v, v, v, v
 #define VALUES(v) v[0], v[1], v[2], v[3]
 #define ASSIGN(d, s)                                                                                                   \
   do {                                                                                                                 \
@@ -110,8 +102,8 @@
 #define COND_UPDATEV(dest, source, mask) ((dest) = (vector)((ivector)(dest) | ((ivector)(source) & (mask))))
 #endif
 
-typedef double vector __attribute__((vector_size(BYTES)));
-typedef long long ivector __attribute__((vector_size(BYTES)));
+typedef double vector __attribute__((vector_size(8 * SIMD)));
+typedef long long ivector __attribute__((vector_size(8 * SIMD)));
 
 static inline bool escape_check(ivector &escaped_already,
                                 ivector &escape_iters,
@@ -120,7 +112,7 @@ static inline bool escape_check(ivector &escaped_already,
                                 vector r2,
                                 vector &escape_r2) {
   ivector escaped_this_time = escaped & ~escaped_already;
-  ivector iters_vector = {REP(iterations)};
+  ivector iters_vector = {SIMD_REP(iterations)};
   escape_iters |= iters_vector & escaped_this_time;
   //COND_UPDATEI(escape_iters, iters_vector, escaped_this_time); // no - slightly slower
   escaped_already |= escaped;
@@ -140,10 +132,10 @@ static inline void simd_iterate_core(const double *zxvalues,
   const vector Cy = {VALUES(cyvalues)};
   vector Zx = {VALUES(zxvalues)};
   vector Zy = {VALUES(zyvalues)};
-  vector r2 = {REP(0)};
+  vector r2 = {SIMD_REP(0)};
   vector escape_r2 = {0};
-  ivector escape_iters = {REP(0)};
-  ivector escaped_already = {REP(0)};
+  ivector escape_iters = {SIMD_REP(0)};
+  ivector escaped_already = {SIMD_REP(0)};
   int64_t iterations = 0;
 
   if(mandelbrot) {
@@ -167,7 +159,7 @@ static inline void simd_iterate_core(const double *zxvalues,
     Zy = Zynew;
     iterations++;
   }
-  const ivector maxiters_vector = {REP(maxiters)};
+  const ivector maxiters_vector = {SIMD_REP(maxiters)};
   escape_iters |= maxiters_vector & ~escaped_already;
   ASSIGN(r2values, escape_r2);
   ASSIGN(iters, escape_iters);
@@ -181,11 +173,5 @@ void simd_iterate(const double *zxvalues,
                   int *iterations,
                   double *r2values,
                   int mandelbrot) {
-#if SIMD4
   simd_iterate_core(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values, mandelbrot);
-#elif SIMD2
-  simd_iterate_core(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values, mandelbrot);
-  simd_iterate_core(
-      zxvalues + 2, zyvalues + 2, cxvalues + 2, cyvalues + 2, maxiters, iterations + 2, r2values + 2, mandelbrot);
-#endif
 }

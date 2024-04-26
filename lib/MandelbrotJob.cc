@@ -58,20 +58,20 @@ bool MandelbrotJob::sisd_calculate(int px, int py) {
 }
 
 #if SIMD
-bool MandelbrotJob::simd_calculate(int px[SIMD_MAX], int py[SIMD_MAX]) {
-  const double zxvalues[SIMD_MAX] = {0, 0, 0, 0};
-  const double zyvalues[SIMD_MAX] = {0, 0, 0, 0};
-  double cxvalues[SIMD_MAX];
-  double cyvalues[SIMD_MAX];
-  for(int i = 0; i < SIMD_MAX; i++) {
+bool MandelbrotJob::simd_calculate(int px[SIMD], int py[SIMD]) {
+  const double zxvalues[SIMD] = {SIMD_REP(0)};
+  const double zyvalues[SIMD] = {SIMD_REP(0)};
+  double cxvalues[SIMD];
+  double cyvalues[SIMD];
+  for(int i = 0; i < SIMD; i++) {
     cxvalues[i] = (double)(xleft + arith_t(px[i]) * xsize / dest->width());
     cyvalues[i] = (double)(ybottom + arith_t(dest->height() - 1 - py[i]) * xsize / dest->width());
   }
-  double r2values[SIMD_MAX];
-  int iterations[SIMD_MAX];
+  double r2values[SIMD];
+  int iterations[SIMD];
   simd_iterate(zxvalues, zyvalues, cxvalues, cyvalues, maxiters, iterations, r2values, 1);
   bool escaped = false;
-  for(int i = 0; i < SIMD_MAX; i++) {
+  for(int i = 0; i < SIMD; i++) {
     dest->pixel(px[i], py[i]) = transform_iterations(iterations[i], r2values[i], maxiters);
     escaped |= (iterations[i] != maxiters);
   }

@@ -44,12 +44,11 @@ int main(int argc, char **argv) {
   int maxiter = 20000;
   if(argc > 1)
     maxiter = atoi(argv[1]);
-  double zxvalues[SIMD_MAX] = {0}, zyvalues[SIMD_MAX] = {0}, cxvalues[SIMD_MAX] = {0}, cyvalues[SIMD_MAX] = {0},
-         r2values[SIMD_MAX] = {0};
-  int iterations[SIMD_MAX];
+  double zxvalues[SIMD] = {0}, zyvalues[SIMD] = {0}, cxvalues[SIMD] = {0}, cyvalues[SIMD] = {0},
+         r2values[SIMD] = {0};
+  int iterations[SIMD];
   unsigned long long start = CYCLES();
   simd_iterate(zxvalues, zyvalues, cxvalues, cyvalues, maxiter, iterations, r2values, 0);
-  __asm__ volatile("" : : "m"(iterations[0]), "m"(r2values[0]), "m"(iterations[2]), "m"(r2values[2]));
   unsigned long long finish = CYCLES();
   unsigned long long cycles = finish - start;
   printf("iterations %d/%d cycles %llu cycles/iteration %f\n",
