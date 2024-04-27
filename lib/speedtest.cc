@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
     if(t == arith_simd)
       iterations *= SIMD;
     double ips = iterations / seconds;
-    printf("%12s %3.2fs; %10.0f iterations; %12.0f iterations/second\n", arith_names[t], seconds, iterations, ips);
+    printf("%12s %10.0f iterations; %12.0f iterations/second (elapsed %3.2fs)\n", arith_names[t], iterations, ips, seconds);
   }
   return 0;
 }
