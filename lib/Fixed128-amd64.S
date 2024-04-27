@@ -274,6 +274,7 @@ iterloop:
 #endif
 
         // rbx,rcx,rdi are used as the accumulator
+#if 1
         mov     rax,r8
         mul     r10                     // rdx,rax = zx.h * zy.h
         mov     rcx,rax
@@ -296,6 +297,26 @@ iterloop:
         add     rdi,rdx
         adc     rcx,0
         adc     rbx,0                   // rbx,rcx,rdi = (zx.h * zy.h)<<64 + zx.h * zy.l + zx.l * zy.h + (zx.l * zy.l) >> 64
+#else // A bit slower on my computer
+        mov     rdx,r8
+        mulx    rbx,rcx,r10             // rbx,rcx = zx.h * zy.h
+        
+        mulx    rdx,rdi,r11             // rdx,rdi = zx.h * zy.l
+        add     rcx,rdx
+        adc     rbx,0                   // rbx,rcx,rdi = (zx.h * zy.h)<<64 + zx.h * zy.l
+
+        mov     rdx,r9
+        mulx    rdx,rax,r10             // rdx,rax = zx.l * zy.h
+        add     rdi,rax
+        adc     rcx,rdx
+        adc     rbx,0                   // rbx,rcx,rdi = (zx.h * zy.h)<<64 + zx.h * zy.l + zx.l * zy.h
+
+        mov     rdx,r9
+        mulx    rdx,rax,r11             // rdx,rax = zx.l * zy.l
+        add     rdi,rdx
+        adc     rcx,0
+        adc     rbx,0                   // rbx,rcx,rdi = (zx.h * zy.h)<<64 + zx.h * zy.l + zx.l * zy.h + (zx.l * zy.l) >> 64
+#endif
         // Rearrange top 128 bits into two registers
         //
         // The units bit (bits 32 of zx.h, zy.h) has ended up in bit 0 of rbx,
