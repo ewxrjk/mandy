@@ -232,6 +232,7 @@ iterloop:
         // Work out the sign of the result, and make the inputs positive.
         // We don't need the (correct-sign) versions any more so we
         // negate in place.
+#if 1
         cmp     r8,0
         setl    bpl                     // bpl = zx < 0 ? 1 : 0
         jge     1f
@@ -248,6 +249,30 @@ iterloop:
         adc     r10,0                   // Now zy >= 0
         dec     bpl                     // bpl = (zx * zy) < 0 ? ±1 : 0
 2:
+#else
+        // Branch-free version. In fact this (including its elaboration to
+        // the final sign fixup and the square subroutine) is substantially
+        // slower.
+        xor     rbp,rbp
+        cmp     r8,rbp
+        setl    bpl                     // bpl = zx < 0 ? 1 : 0
+        neg     rbp                     // rbp = zx < 0 ? -1 : 0
+        xor     r9,rbp
+        xor     r8,rbp
+        sub     r9,rbp
+        sbb     r8,rbp                  // r8,r9 = |zx|
+
+        xor     rax,rax
+        cmp     r10,rax
+        setl    al                      // al = zy < 0 ? 1 : 0
+        neg     rax                     // rax = zy < 0 ? -1 : 0
+        xor     r11,rax
+        xor     r10,rax
+        sub     r11,rax
+        sbb     r10,rax                 // r10,r11 = |zy|
+        xor     rbp,rax                 // rbp = (zx * zy) < 0 ? -1 : 0
+#endif
+
         // rbx,rcx,rdi are used as the accumulator
         mov     rax,r8
         mul     r10                     // rdx,rax = zx.h * zy.h
