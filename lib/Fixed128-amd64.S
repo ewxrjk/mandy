@@ -166,6 +166,8 @@ SYMBOL(Fixed128_mul):
  *  rsi            - iterations
  *  [rsp+32]       - maxiters
  *  rbp            - sign of zx*zy
+ *
+ * Registers are written in high,low order (even though memory is low-first)
  */
         .align  4
         .globl SYMBOL(Fixed128_iterate)
@@ -181,94 +183,104 @@ SYMBOL(Fixed128_iterate):
         push    rdi
         sub             rsp,48
         // Store maxiters in the red zone
-        mov     [rsp+32],r8
+        mov     [rsp+32],r8             // [rsp+32] = maxiters
         // Ditto cx/cy
-
         mov     rax,[rdx]
-        mov     [rsp+0],rax
-        mov     rax,[rdx+8]
-        mov     [rsp+8],rax             // [rsp+0] = cx
+        mov     rbx,[rdx+8]
+        mov     [rsp+0],rax             
+        mov     [rsp+8],rbx             // [rsp+0] = cx
         mov     rax,[rcx]
+        mov     rbx,[rcx+8]
         mov     [rsp+16],rax
-        mov     rax,[rcx+8]
-        mov     [rsp+24],rax    // [rsp+16] = cy
+        mov     [rsp+24],rbx            // [rsp+16] = cy
         // Load initial zx/zy
         mov     r9,[rdi]
         mov     r8,[rdi+8]              // r8,r9 = zx
         mov     r11,[rsi]
         mov     r10,[rsi+8]             // r10,r11 = zy
         // Iteration count
-        xor     rsi,rsi                 // iterations = 0
+        xor     rsi,rsi                 // rsi = iterations = 0
         // Main loop
 iterloop:
         // Compute zx^2
         mov     r14,r8
         mov     r15,r9                  // r14,r15 = zx
-        movabs  rbp,0x4000000000 // rbp,<missing> = 64.0
-        call    square          // rbx,rcx = zx^2
+        movabs  rbp,0x4000000000        // rbp,<missing> = 64.0
+        call    square                  // rbx,rcx = zx^2
+        mov     r12,rbx
+        mov     r13,rcx                 // r12,r13 = zx^2
+        
         // Compute zy^2
         mov     r14,r10
         mov     r15,r11                 // r14,r15 = zy
-        mov     r12,rbx
-        mov     r13,rcx                 // r12,r13 = zx^2
         .att_syntax // hack to work around bizarre bug in apple assembler
-        call    square          // rbx,rcx = zy^2
+        call    square                  // rbx,rcx = zy^2
         .intel_syntax noprefix
         mov     r14,rbx
         mov     r15,rcx                 // r14,r15 = zy^2
-        // Add them up and compare against the limit
+        
+        // Compute zx^2 + zy^2
         add     rcx,r13
         adc     rbx,r12                 // rbx,rcx = zx^2 + zy^2
+        
+        // Check for escape
         cmp     rbx,rbp
         jge     escaped                 // if zx^2 + zy^2 >= 64, escaped
+
         // Compute zx*zy
-        // First figure out what the sign will be
+
+        // Work out the sign of the result, and make the inputs positive.
+        // We don't need the (correct-sign) versions any more so we
+        // negate in place.
         cmp     r8,0
-        setl    bpl
+        setl    bpl                     // bpl = zx < 0 ? 1 : 0
         jge     1f
         not     r9
         add     r9,1
         not     r8
-        adc     r8,0
+        adc     r8,0                    // Now zx >= 0
 1:
         cmp     r10,0
         jge     2f
         not     r11
         add     r11,1
         not     r10
-        adc     r10,0
-        dec     bpl
+        adc     r10,0                   // Now zy >= 0
+        dec     bpl                     // bpl = (zx * zy) < 0 ? ±1 : 0
 2:
         // rbx,rcx,rdi are used as the accumulator
         mov     rax,r8
-        mul     r10
+        mul     r10                     // rdx,rax = zx.h * zy.h
         mov     rcx,rax
-        mov     rbx,rdx
+        mov     rbx,rdx                 // rbx,rcx = zx.h * zy.h
         //
         mov     rax,r8
-        mul     r11
+        mul     r11                     // rdx,rax = zx.h * zy.l
         mov     rdi,rax
         add     rcx,rdx
-        adc     rbx,0
+        adc     rbx,0                   // rbx,rcx,rdi = (zx.h * zy.h)<<64 + zx.h * zy.l
         //
         mov     rax,r9
-        mul     r10
+        mul     r10                     // rdx,rax = zx.l * zy.h
         add     rdi,rax
         adc     rcx,rdx
-        adc     rbx,0
+        adc     rbx,0                   // rbx,rcx,rdi = (zx.h * zy.h)<<64 + zx.h * zy.l + zx.l * zy.h
         //
         mov     rax,r9
-        mul     r11
+        mul     r11                     // rdx,rax = zx.l * zy.l
         add     rdi,rdx
         adc     rcx,0
-        adc     rbx,0
+        adc     rbx,0                   // rbx,rcx,rdi = (zx.h * zy.h)<<64 + zx.h * zy.l + zx.l * zy.h + (zx.l * zy.l) >> 64
         // Rearrange top 128 bits into two registers
+        //
+        // The units bit (bits 32 of zx.h, zy.h) has ended up in bit 0 of rbx,
+        // so we need to shift everything 32 bits left.
         shld    rbx,rcx,32
-        shld    rcx,rdi,32
+        shld    rcx,rdi,32              // rbx,rcx = (top 128 bits of) zx * zy
         // Double and maybe round up
         bt      rdi,31
         adc     rcx,rcx
-        adc     rbx,rbx
+        adc     rbx,rbx                 // rbx,rcx = 2 * zx * zy
         // Set sign
         shr     bpl,1
         jnc     3f
@@ -277,28 +289,34 @@ iterloop:
         not     rbx
         adc     rbx,0
 3:
-        // Now we have rbx,rcx = 2.zx.zy
-        // Let zy=r10,r11=2.zx.zy+cy
+        // Now we have:
+        //                                 r12,r13 = zx^2
+        //                                 r14,r15 = zy^2
+        //                                 rbx,rcx = 2.zx.zy
+
+        // Compute zx_next = 2.zx.zy+cy
         mov     r11,[rsp+16]
-        mov     r10,[rsp+24]    // r10,r11 = cy
+        mov     r10,[rsp+24]            // r10,r11 = cy
         add     r11,rcx
-        adc     r10,rbx                 // r10,r11 = 2.zx.zy+cy
-        // Let zy=r8,r9=zx^2-zy^2+cx
-    mov r9,[rsp+0]
-    mov r8,[rsp+8]              // r8,r9 = cx
+        adc     r10,rbx                 // r10,r11 = 2.zx.zy + cy = zx_next
+
+        // Compute zy_next = zx^2-zy^2+cx
+        mov r9,[rsp+0]
+        mov r8,[rsp+8]                  // r8,r9 = cx
         add     r9,r13
         adc     r8,r12                  // r8,r9 = zx^2 + cx
         sub     r9,r15
-        sbb     r8,r14                  // r8,r9 = zx^2 - zy^2 + cx
+        sbb     r8,r14                  // r8,r9 = zx^2 - zy^2 + cx = zy_next
+
         // Increment iteration count
-        inc     rsi
+        inc     rsi                     // iterations += 1
         // Only go back round the loop if not too big
         cmp     rsi,[rsp+32]
         .att_syntax // hack to work around bizarre bug in apple assembler
         jb      iterloop
         .intel_syntax noprefix
 escaped:
-    // Retrieve iteration count
+        // Retrieve iteration count
         mov     rax,rsi
         // Return r^2 in the first argument (rather idiosyncratic)
         add rsp,48
@@ -333,32 +351,32 @@ square:
         // As with Fixed128_mul we start at the most significant end and
         // work our way down
         mov     rax,r14
-        mul     r14
+        mul     r14                     // rdx,rax = h * h
         mov     rcx,rax
-        mov     rbx,rdx
+        mov     rbx,rdx                 // rbx,rcx = h * h
         //
         mov     rax,r14
-        mul     r15
+        mul     r15                     // rdx,rax = h * l
         mov     rdi,rax
         add     rcx,rdx
-        adc     rbx,0
-        //
+        adc     rbx,0                   // rbx,rcx,rdi = (h * h) << 64 + h * l
+
         // We take advantage of (x+y)^2=(x^2+2xy+y^2) to skip a multiply
         add     rdi,rax
         adc     rcx,rdx
-        adc     rbx,0
-        //
+        adc     rbx,0                   // rbx,rcx,rdi = (h * h) << 64 + 2 * h * l
+
         mov     rax,r15
-        mul     r15
+        mul     r15                     // rdx,rax = l * l
         add     rdi,rdx
         adc     rcx,0
-        adc     rbx,0
+        adc     rbx,0                   // rbx,rcx,rdi = (h * h) << 64 + 2 * h * l + (l * l) >> 64
         // Rearrange top 128 bits into two registers
         shld    rbx,rcx,32
-        shld    rcx,rdi,32
+        shld    rcx,rdi,32              // rbx,rcx = (top 128 bits of) (hl * hl)
         // Maybe round up
         bt      rdi,31
         adc     rcx,0
-        adc     rbx,0
+        adc     rbx,0                   // rbx,rcx = hl * hl
         ret
 #endif
