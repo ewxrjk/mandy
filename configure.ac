@@ -48,7 +48,7 @@ fi
 CXXFLAGS="${CXXFLAGS} ${CXXFLAGS_EXTRA}"
 AC_PROG_CC
 AC_LANG([C])
-AX_CHECK_COMPILE_FLAG([-march=native],[CFLAGS="-march=native $FLAGS"])
+AX_CHECK_COMPILE_FLAG([-march=native],[CFLAGS="-march=native $CFLAGS"])
 if test "x$GCC" = xyes; then
   CFLAGS="-Wall -W -Werror -Wpointer-arith -Wwrite-strings $CFLAGS"
 fi
