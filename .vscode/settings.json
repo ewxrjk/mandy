@@ -1,0 +1,17 @@
+{
+    "files.associations": {
+        "sstream": "cpp",
+        "iostream": "cpp",
+        "vector": "cpp",
+        "numbers": "c",
+        "*.inc": "c",
+        "fixed128.h": "c",
+        "stdexcept": "cpp",
+        "fixed256.h": "c",
+        "chrono": "cpp",
+        "random": "cpp",
+        "limits": "cpp",
+        "semaphore": "cpp",
+        "valarray": "cpp"
+    }
+}

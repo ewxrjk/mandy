@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "mandy.h"
-#include "Fixed128.h"
+#include "Fixed256.h"
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
@@ -23,25 +23,25 @@
  * the end.
  *
  * How much space do we need?  The smallest possible number we can represent
- * is 2^-FRACBITS.  In decimal this has NFRACBITS digits after the point
+ * is 2^-FRACBITS.  In decimal this has NFRACBITS256 digits after the point
  * (each time you multiply by 10 to read off another digit the rightmost bit
  * moves one place left, because 10 is even).  For the smallest number
  * there's a lot of initial 0s but you don't get that in the general case.
  *
  * Add to that the integer part, since we only ever use a single 32-bit word
  * for that we have at most 10 digits.  So the biggest integer we need to
- * represent is 10^(10+NFRACBITS).
+ * represent is 10^(10+NFRACBITS256).
  *
- * In hex the computation is simpler: 16^(8+NFRACBITS/4).  Simple experiment
+ * In hex the computation is simpler: 16^(8+NFRACBITS256/4).  Simple experiment
  * reveals that this is much smaller (at least for realistic values of
- * NFRACBITS).\
+ * NFRACBITS256).\
  *
  * So our integer needs at least
- *            lg(10^(10+NFRACBITS))
- *          = log10(10^(10+NFRACBITS))/log10(2)
- *          = (10+NFRACBITS)/log10(2)
- *          ~ 3 * (10+NFRACBITS)
- * bits or about (3 * (10+NFRACBITS) + 31)/32 words.
+ *            lg(10^(10+NFRACBITS256))
+ *          = log10(10^(10+NFRACBITS256))/log10(2)
+ *          = (10+NFRACBITS256)/log10(2)
+ *          ~ 3 * (10+NFRACBITS256)
+ * bits or about (3 * (10+NFRACBITS256) + 31)/32 words.
  *
  * We are conservative in teh arithmetic, (+32 instead of +31) and add
  * a guard word to detect overflow.
@@ -49,7 +49,7 @@
  * As with the main fixed-point representation the word order is
  * little-endian, the first words is units, the second is 2^32s, etc.
  */
-#define NINTWORDS ((3 * (10 + NFRACBITS) + 32) / 32 + 1)
+#define NINTWORDS ((3 * (10 + NFRACBITS256) + 32) / 32 + 1)
 
 static const char digits[] = "0123456789abcdefghijklmnopqrstuvwxyz";
 
@@ -134,11 +134,11 @@ static void print(const uint32_t value[NINTWORDS]) {
 }
 #endif
 
-int Fixed128_str2(union Fixed128 *r, const char *start, char **endptr) {
+int Fixed256_str2(union Fixed256 *r, const char *start, char **endptr) {
   int base, error = 0, sign = 0, digit, scale = 0;
   uint32_t value[NINTWORDS];
   const char *s = start;
-  Fixed128_int2(r, 0);
+  Fixed256_int2(r, 0);
   // Consume leading whitespace
   while(isspace((unsigned char)*s))
     ++s;
@@ -212,7 +212,7 @@ int Fixed128_str2(union Fixed128 *r, const char *start, char **endptr) {
     // TODO missing some overflow detection in here
     /* We need to divide down by base^-scale.  First compute the divisor. */
     uint32_t divisor[NINTWORDS];
-    int bit = NFRACBITS;
+    int bit = NFRACBITS256;
     memset(divisor, 0, sizeof divisor);
     divisor[0] = 1;
     while(scale < 0) {
@@ -227,7 +227,7 @@ int Fixed128_str2(union Fixed128 *r, const char *start, char **endptr) {
         goto done;
       }
       ++bit;
-      if(bit > NFIXED128 * 32)
+      if(bit > 256)
         return -1;
     }
     /* Now we can start extracting bits.  The dividend will be the
@@ -235,7 +235,7 @@ int Fixed128_str2(union Fixed128 *r, const char *start, char **endptr) {
     while(bit >= 0 && !isZero(value)) {
       if(le(divisor, value)) {
         sub(value, value, divisor);
-        r->word[bit / 32] |= ((uint32_t)1 << (bit & 31));
+        r->u32[bit / 32] |= ((uint32_t)1 << (bit & 31));
       }
       /* Halve the divisor (by doubling the remainder if the divisor
        * is now odd) */
@@ -247,10 +247,10 @@ int Fixed128_str2(union Fixed128 *r, const char *start, char **endptr) {
     }
     if(bit == -1 && le(divisor, value)) {
       // Round up
-      union Fixed128 round;
+      union Fixed256 round;
       memset(&round, 0, sizeof round);
-      round.word[0] = 1;
-      Fixed128_add(r, r, &round);
+      round.u32[0] = 1;
+      Fixed256_add(r, r, &round);
     }
   } else if(scale >= 0) {
     /* The result will just be an integer.  It had better fit (with
@@ -276,38 +276,26 @@ int Fixed128_str2(union Fixed128 *r, const char *start, char **endptr) {
       }
       --scale;
     }
-    Fixed128_int2(r, (int)n);
+    Fixed256_int2(r, (int)n);
   }
 done:
   if(error == ERANGE) {
     // Set the maximum value of the given sign
     if(sign) {
-      memset(r->word, 0x00, sizeof r->word);
-      r->word[NFIXED128 - 1] = 0x80000000;
+      memset(r->u32, 0x00, sizeof r->u32);
+      r->u32[7] = 0x80000000;
     } else {
-      memset(r->word, 0xFF, sizeof r->word);
-      r->word[NFIXED128 - 1] = 0x7FFFFFFF;
+      memset(r->u32, 0xFF, sizeof r->u32);
+      r->u32[7] = 0x7FFFFFFF;
     }
   } else {
     /* Set the sign of the result */
     if(sign)
-      Fixed128_neg(r, r);
+      Fixed256_neg(r, r);
   }
   if(endptr)
     *endptr = (char *)s;
   return error;
-}
-
-int Fixed128_str2_cs(union Fixed128 *r, const char *s) {
-  char *endptr;
-  int rc = Fixed128_str2(r, s, &endptr);
-  if(rc == 0) {
-    if(endptr == s || *endptr)
-      return FIXED128_STR_FORMAT;
-    else
-      return FIXED128_STR_OK;
-  } else
-    return FIXED128_STR_RANGE;
 }
 
 /*

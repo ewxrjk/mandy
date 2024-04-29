@@ -1,0 +1,44 @@
+{
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "Build fixed256-test",
+            "command": "make",
+            "args": [
+                "-j$(nproc)",
+                "-Clib",
+                "fixed256-test"
+            ],
+            "options": {
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Build fixed256-test."
+        },
+        {
+            "type": "cppbuild",
+            "label": "Build all",
+            "command": "make",
+            "args": [
+                "-j$(nproc)",
+                "check"
+            ],
+            "options": {
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Build fixed256-test."
+        }
+    ],
+    "version": "2.0.0"
+}

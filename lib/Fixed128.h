@@ -17,13 +17,14 @@
 #define FIXED128_H
 
 #include <string.h>
+#include "Fixed256.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #define NFIXED128 4 /* == 128 bits */
-#define NFRACBITS 32 * (NFIXED128 - 1)
+#define NFRACBITS128 32 * (NFIXED128 - 1)
 
 typedef unsigned __int128 uint128_t;
 typedef __int128 int128_t;
@@ -36,6 +37,7 @@ union Fixed128 {
   // So you get 1 sign bit, 31 integer bits, and 32 * (NFIXED128-1) fractional
   // bits.
   uint32_t word[NFIXED128];
+  int32_t s32[NFIXED128];
   // Interpreted as two 64-bit integers, little-endian order
   // i.e. qword[0] * 2^-96 * qword[1] ^ 2^-32
   uint64_t u64[2];
@@ -92,23 +94,23 @@ static inline void Fixed128_setbit(union Fixed128 *a, int bit) {
   a->u128 |= (uint128_t)1 << (bit + 96);
 }
 
-static inline int Fixed128_lt0(const union Fixed128 *a) {
+static inline bool Fixed128_lt0(const union Fixed128 *a) {
   return a->s128 < 0;
 }
 
-static inline int Fixed128_ge0(const union Fixed128 *a) {
+static inline bool Fixed128_ge0(const union Fixed128 *a) {
   return a->s128 >= 0;
 }
 
-static inline int Fixed128_eq(const union Fixed128 *a, const union Fixed128 *b) {
+static inline bool Fixed128_eq(const union Fixed128 *a, const union Fixed128 *b) {
   return a->u128 == b->u128;
 }
 
-static inline int Fixed128_ne(const union Fixed128 *a, const union Fixed128 *b) {
+static inline bool Fixed128_ne(const union Fixed128 *a, const union Fixed128 *b) {
   return a->u128 != b->u128;
 }
 
-static inline int Fixed128_lt(const union Fixed128 *a, const union Fixed128 *b) {
+static inline bool Fixed128_lt(const union Fixed128 *a, const union Fixed128 *b) {
   return a->s128 < b->s128;
 }
 
@@ -116,19 +118,19 @@ static inline int Fixed128_lt_unsigned(const union Fixed128 *a, const union Fixe
   return a->u128 < b->u128;
 }
 
-static inline int Fixed128_gt(const union Fixed128 *a, const union Fixed128 *b) {
+static inline bool Fixed128_gt(const union Fixed128 *a, const union Fixed128 *b) {
   return a->s128 > b->s128;
 }
 
-static inline int Fixed128_le(const union Fixed128 *a, const union Fixed128 *b) {
+static inline bool Fixed128_le(const union Fixed128 *a, const union Fixed128 *b) {
   return a->s128 <= b->s128;
 }
 
-static inline int Fixed128_ge(const union Fixed128 *a, const union Fixed128 *b) {
+static inline bool Fixed128_ge(const union Fixed128 *a, const union Fixed128 *b) {
   return a->s128 >= b->s128;
 }
 
-static inline int Fixed128_gt_unsigned(const union Fixed128 *a, const union Fixed128 *b) {
+static inline bool Fixed128_gt_unsigned(const union Fixed128 *a, const union Fixed128 *b) {
   return a->u128 > b->u128;
 }
 
@@ -151,6 +153,9 @@ int Fixed128_str2_cs(union Fixed128 *r, const char *s);
 void Fixed128_double2(union Fixed128 *r, double n);
 double Fixed128_2double(const union Fixed128 *a);
 long double Fixed128_2longdouble(const union Fixed128 *a);
+
+void Fixed256_to_Fixed128(union Fixed128 *r, union Fixed256 *a);
+void Fixed128_to_Fixed256(union Fixed256 *r, union Fixed128 *a);
 
 int Fixed128_iterate(
     union Fixed128 *zx, union Fixed128 *zy, const union Fixed128 *cx, const union Fixed128 *cy, int64_t maxiters);
@@ -182,6 +187,10 @@ public:
   }
 
   fixed128(const Fixed128 &raw): f(raw) {}
+  
+  fixed128(fixed256 ff) {
+    Fixed256_to_Fixed128(&f, &ff.f);
+  }
 
   // Assignment
 
@@ -256,27 +265,27 @@ public:
   // Comparison
 
   bool operator<(const fixed128 &that) const {
-    return !!Fixed128_lt(&f, &that.f);
+    return Fixed128_lt(&f, &that.f);
   }
 
   bool operator>(const fixed128 &that) const {
-    return !!Fixed128_lt(&that.f, &f);
+    return Fixed128_gt(&f, &that.f);
   }
 
   bool operator>=(const fixed128 &that) const {
-    return !Fixed128_lt(&f, &that.f);
+    return Fixed128_ge(&f, &that.f);
   }
 
   bool operator<=(const fixed128 &that) const {
-    return !Fixed128_lt(&that.f, &f);
+    return Fixed128_le(&f, &that.f);
   }
 
   bool operator==(const fixed128 &that) const {
-    return !!Fixed128_eq(&that.f, &f);
+    return Fixed128_eq(&f, &that.f);
   }
 
   bool operator!=(const fixed128 &that) const {
-    return !Fixed128_eq(&that.f, &f);
+    return Fixed128_eq(&f, &that.f);
   }
 
   // Conversions

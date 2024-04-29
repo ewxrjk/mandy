@@ -15,6 +15,7 @@
  */
 #include "mandy.h"
 #include "Fixed128.h"
+#include "Fixed256.h"
 #include <stdio.h>
 #include <math.h>
 
@@ -154,7 +155,7 @@ static void Fixed128_div_unsigned(union Fixed128 *r, const union Fixed128 *a, co
     ++bit;
   }
   Fixed128_int2(&quot, 0);
-  while(bit >= -NFRACBITS) {
+  while(bit >= -NFRACBITS128) {
     union Fixed128 diff;
     Fixed128_sub(&diff, &rem, &sub);
     if(Fixed128_ge0(&diff)) {
@@ -261,6 +262,25 @@ long double Fixed128_2longdouble(const union Fixed128 *a) {
   }
   return (a->word[NFIXED128 - 4] / 79228162514264337593543950336.0L + a->word[NFIXED128 - 3] / 18446744073709551616.0L
           + a->word[NFIXED128 - 2] / 4294967296.0L + a->word[NFIXED128 - 1]);
+}
+
+int Fixed128_str2(union Fixed128 *r, const char *start, char **endptr) {
+  union Fixed256 r256 = { .u32 = { 0 }};
+  int rc = Fixed256_str2(&r256, start, endptr);
+  Fixed256_to_Fixed128(r, &r256);
+  return rc;
+}
+
+int Fixed128_str2_cs(union Fixed128 *r, const char *s) {
+  char *endptr;
+  int rc = Fixed128_str2(r, s, &endptr);
+  if(rc == 0) {
+    if(endptr == s || *endptr)
+      return FIXED128_STR_FORMAT;
+    else
+      return FIXED128_STR_OK;
+  } else
+    return FIXED128_STR_RANGE;
 }
 
 /*

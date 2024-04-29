@@ -26,10 +26,11 @@
 #include <iostream>
 #include <sstream>
 
+#include "Fixed256.h"
 #include "Fixed128.h"
 #include "Fixed64.h"
 
-typedef fixed128 arith_t;
+typedef fixed256 arith_t;
 
 enum arith_type {
   arith_double,
@@ -39,6 +40,7 @@ enum arith_type {
   arith_long_double,
   arith_fixed64,
   arith_fixed128,
+  arith_fixed256,
 
   arith_limit
 };
@@ -122,6 +124,26 @@ public:
 
   static int iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy, int maxiters, double &r2) {
     return defaultIterate((long double)zx, (long double)zy, (long double)cx, (long double)cy, maxiters, r2);
+  }
+};
+
+template <> class arith_traits<fixed256> {
+public:
+  static inline fixed256 maximum() {
+    Fixed256 f = { .u64 = { 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff, 0x7fffffffffffffff }};
+    return fixed256(f);
+  }
+
+  static std::string toString(const fixed256 &n) {
+    return n.toString();
+  }
+
+  static int fromString(fixed256 &n, const char *s, char **endptr) {
+    return n.fromString(s, endptr);
+  }
+
+  static int iterate(fixed256 zx, fixed256 zy, fixed256 cx, fixed256 cy, int maxiters, double &r2) {
+    return defaultIterate(zx, zy, cx, cy, maxiters, r2);
   }
 };
 

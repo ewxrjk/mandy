@@ -24,6 +24,7 @@ const char *const arith_names[] = {
     "long double",
     "fixed64",
     "fixed128",
+    "fixed256",
 };
 
 arith_type string_to_arith(const std::string &s) {
@@ -39,6 +40,7 @@ int iterate(arith_t zx, arith_t zy, arith_t cx, arith_t cy, int maxiters, arith_
   case arith_long_double: return arith_traits<long double>::iterate(zx, zy, cx, cy, maxiters, r2); break;
   case arith_fixed64: return arith_traits<fixed64>::iterate(zx, zy, cx, cy, maxiters, r2); break;
   case arith_fixed128: return arith_traits<fixed128>::iterate(zx, zy, cx, cy, maxiters, r2); break;
+  case arith_fixed256: return arith_traits<fixed256>::iterate(zx, zy, cx, cy, maxiters, r2); break;
   default: throw std::logic_error("iterate unrecognized/unsuitable arith_t");
   }
 }

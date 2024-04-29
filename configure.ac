@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-AC_INIT([mandy], [0.0.WIP], [rjk@greenend.org.uk])
+AC_INIT([mandy],[0.0.WIP],[rjk@greenend.org.uk])
 AC_CONFIG_AUX_DIR([config.aux])
 AM_INIT_AUTOMAKE([foreign])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
@@ -24,7 +24,7 @@ AC_PROG_CXX
 AM_PROG_AS
 AC_PROG_RANLIB
 AM_PROG_AR
-AC_SET_MAKE
+AC_PROG_MAKE_SET
 PKG_CHECK_MODULES([gtkmm], [gtkmm-2.4])
 PKG_CHECK_MODULES([gdkpixbuf], [gdk-pixbuf-2.0])
 AC_CHECK_LIB([fcgi],[FCGX_Init],
