@@ -67,8 +67,8 @@ static inline void Fixed256_add(union Fixed256 *r, const union Fixed256 *a, cons
   uint64_t c = 0;
 
   for(int i = 0; i < 8; i++) {
-    c = c + a->u32[N] + b->u32[N];
-    r->u32[N] = (uint32_t)c; 
+    c = c + a->u32[i] + b->u32[i];
+    r->u32[i] = (uint32_t)c; 
     c >>= 32;
   }
 #endif
@@ -97,8 +97,8 @@ static inline void Fixed256_sub(union Fixed256 *r, const union Fixed256 *a, cons
   uint64_t c = 1;
 
   for(int i = 0; i < 8; i++) {
-    c = c + a->u32[N] + ~b->u32[N];
-    r->u32[N] = (uint32_t)c; 
+    c = c + a->u32[i] + ~b->u32[i];
+    r->u32[i] = (uint32_t)c; 
     c >>= 32;
   }
   #endif
