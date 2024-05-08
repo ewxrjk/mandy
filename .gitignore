@@ -24,6 +24,7 @@ debian/substvars.*
 debian/files
 lib/cgitest
 lib/fixed128-test
+lib/fixed256-test
 lib/fixed64-test
 lib/speedtest
 lib/cycletest

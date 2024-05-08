@@ -186,9 +186,9 @@ bool RealControl::DisplayIsValid(const char *s) const {
   errno = 0;
   arith_t n;
   int error = arith_traits<arith_t>::fromString(n, s, &end);
-  if(error || n < min || n > max || *end)
+  if(error || n < min || n > max || *end) {
     return false;
-  else
+  } else
     return true;
 }
 

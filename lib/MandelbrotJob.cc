@@ -31,6 +31,38 @@ bool MandelbrotJob::fastpath(arith_t cx, arith_t cy, int &iterations, double &r2
   else if(cx * cx + arith_t(2) * cx + 1 + cy2 < arith_t(1) / arith_t(16)) // Period-2 bulb
     fast = true;
 
+#if 0
+  {
+    bool fast_d = false;
+    double cx_d = (double)cx, cy_d = (double)cy;
+    double cxq_d = cx_d - 0.25;
+    double cy2_d = cy_d * cy_d;
+    double q_d = cxq_d * cxq_d + cy2_d;
+    if(4.0 * q_d * (q_d + cxq_d) < cy2_d)
+      fast_d = true;
+    else if(cx_d * cx_d + 2 * cx_d + 1 + cy2_d < 1.0 / 16.0) // Period-2 bulb
+      fast_d = true;
+    if(fast != fast_d) {
+      fprintf(stderr, "cx= %12g / %12g\n", (double)cx, cx_d);
+      fprintf(stderr, "cy= %12g / %12g\n", (double)cy, cy_d);
+      fprintf(stderr, "cxq=%12g / %12g\n", (double)cxq, cxq_d);
+      fprintf(stderr, "cy2=%12g / %12g\n", (double)cy2, cy2_d);
+      fprintf(stderr, "   =%16lx.%016lx%016lx%016lx\n", cy2.f.u64[3], cy2.f.u64[2], cy2.f.u64[1], cy2.f.u64[0]);
+      arith_t l1 = arith_t(4) * q * (q + cxq);
+      double l1_d =  4.0 * q_d * (q_d + cxq_d);
+      fprintf(stderr, " l1=%12g / %12g\n", (double)l1, l1_d);
+      fprintf(stderr, "   =%16lx.%016lx%016lx%016lx\n", l1.f.u64[3], l1.f.u64[2], l1.f.u64[1], l1.f.u64[0]);
+      bool b1 = l1 < cy2;
+      bool b1_d = l1_d < cy2_d;
+      fprintf(stderr, " b1=%12d / %12d\n", b1, b1_d);
+      fprintf(stderr, " l2=%12g / %12g\n", (double)(cx * cx + arith_t(2) * cx + 1 + cy2), cx_d * cx_d + 2 * cx_d + 1 + cy2_d);
+      fprintf(stderr, " r2=%12g / %12g\n", (double)(arith_t(1) / arith_t(16)), 1.0 / 16.0);
+      fprintf(stderr, " b2=%12d / %12d\n", cx * cx + arith_t(2) * cx + 1 + cy2 < arith_t(1) / arith_t(16), cx_d * cx_d + 2 * cx_d + 1 + cy2_d < 1.0 / 16.0);
+      assert(fast == fast_d);
+    }
+  }
+#endif
+
   if(fast) {
     iterations = maxiters;
     r2 = 0.0;

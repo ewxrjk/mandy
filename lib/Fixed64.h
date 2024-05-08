@@ -17,6 +17,7 @@
 #define FIXED64_H
 
 #include "Fixed128.h"
+#include "Fixed256.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,7 +60,9 @@ static inline double Fixed64_2double(Fixed64 a) {
 }
 
 int Fixed128_to_Fixed64(Fixed64 *r, const union Fixed128 *a);
-void Fixed64_to_Fixed(union Fixed128 *r, Fixed64 a);
+void Fixed64_to_Fixed128(union Fixed128 *r, Fixed64 a);
+
+void Fixed256_to_Fixed64(Fixed64 *r, union Fixed256 *a);
 
 int Fixed64_iterate(Fixed64 zx, Fixed64 zy, Fixed64 cx, Fixed64 cy, double *r2p, int maxiters);
 
@@ -86,8 +89,11 @@ public:
   fixed64(fixed128 ff) {
     int err = Fixed128_to_Fixed64(&f, &ff.f);
     if(err)
-      throw std::runtime_error("fixed128 to fixed128 conversion failed");
+      throw std::runtime_error("fixed128 to fixed64 conversion failed");
   }
+fixed64(fixed256 ff) {
+  Fixed256_to_Fixed64(&f, &ff.f);
+}
 
   // Assignment
 
