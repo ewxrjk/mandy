@@ -15,14 +15,14 @@
  */
 #include <config.h>
 
-#if HAVE_ASM_AMD64
-        .intel_syntax noprefix
-
 #if __linux__
 # define SYMBOL(s) s
 #else
 # define SYMBOL(s) _##s
 #endif
+
+#if __amd64__
+        .intel_syntax noprefix
 
 /*
  * Some possibly-relevant rules:

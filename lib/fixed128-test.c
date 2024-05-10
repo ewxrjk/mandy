@@ -39,7 +39,7 @@ static void printFixed128(const union Fixed128 *f, const char *expect) {
 int main() {
   union Fixed128 a, b, c, d;
   double x;
-#if HAVE_ASM_128
+#if HAVE_ASM_FIXED128_ITERATE
   int count;
 #endif
 
@@ -364,7 +364,7 @@ int main() {
   printFixed128(&a, "0.5");
   putchar('\n');
 
-#if HAVE_ASM_128
+#if HAVE_ASM_FIXED128_ITERATE
   // Mandelbrot computation
   Fixed128_int2(&a, 0);
   Fixed128_int2(&b, 0);

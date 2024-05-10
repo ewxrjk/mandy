@@ -54,28 +54,6 @@ if test "x$GCC" = xyes; then
 fi
 CFLAGS="${CFLAGS} ${CFLAGS_EXTRA}"
 
-#
-# Assembler support
-#
-AC_ARG_WITH([assembler],
-            [AS_HELP_STRING([--without-assembler],
-			    [suppress assembler implementations])],
-            [],
-            [with_assembler=yes])
-if test "x$with_assembler" != xno; then
-  AC_MSG_CHECKING([for assembler support])
-  case $host_cpu in
-  x86_64 )
-    AC_DEFINE([HAVE_ASM], [1], [use assembly fixed point support])
-    AC_DEFINE([HAVE_ASM_AMD64], [1], [use amd64 assembler])
-    AC_MSG_RESULT([x86-64])
-    ;;
-  * )
-    AC_MSG_RESULT([none])
-    ;;
-  esac
-fi
-
 # sigc++ is broken, but the compiler can be persuaded to ignore it.
 # https://bugzilla.redhat.com/show_bug.cgi?id=1576299
 # Annoyingly, Clang and GCC use different options for this.
@@ -98,6 +76,18 @@ AH_BOTTOM([#ifdef __GNUC__
 # define attribute(x) __attribute__(x)
 #else
 # define attribute(x)
+#endif
+
+// Select assembler implementation
+#if __amd64__
+# define HAVE_ASM_FIXED128_ITERATE 1
+# define HAVE_ASM_FIXED256_MUL 1
+# define HAVE_ASM_FIXED64_DIV 1
+# define HAVE_ASM_FIXED64_ITERATE 1
+#endif
+
+#if __aarch64__
+# define HAVE_ASM_FIXED256_MUL 1
 #endif])
 
 AC_CONFIG_FILES([Makefile lib/Makefile images/Makefile web/Makefile gtkui/Makefile])

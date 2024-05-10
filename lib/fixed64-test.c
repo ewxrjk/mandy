@@ -128,7 +128,7 @@ static void Fixed64_sqrt_test(void) {
 int main() {
   Fixed64 a, b, c;
   double x;
-#if HAVE_ASM_64
+#if HAVE_ASM_FIXED64_ITERATE
   double r2;
   int count;
   Fixed64 cx, cy;
@@ -251,7 +251,7 @@ int main() {
   printFixed(a, "-127.00000000000000001387778780781445675529539585113525390625");
   putchar('\n');
 
-#if HAVE_ASM_64
+#if HAVE_ASM_FIXED64_ITERATE
   // Mandelbrot computation
   cx = 0x00a6aaaaaaaaaaab;
   cy = (Fixed64)0xfffd555555555555;

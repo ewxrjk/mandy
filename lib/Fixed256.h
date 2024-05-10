@@ -51,18 +51,46 @@ static inline void Fixed256_add(union Fixed256 *r, const union Fixed256 *a, cons
   __asm__ volatile("mov (%[a]),%[t]\n\t"
                    "add (%[b]),%[t]\n\t"
                    "mov %[t],(%[r])\n\t"
+
                    "mov 8(%[a]),%[t]\n\t"
                    "adc 8(%[b]),%[t]\n\t"
                    "mov %[t],8(%[r])\n\t"
+
                    "mov 16(%[a]),%[t]\n\t"
                    "adc 16(%[b]),%[t]\n\t"
                    "mov %[t],16(%[r])\n\t"
+
                    "mov 24(%[a]),%[t]\n\t"
                    "adc 24(%[b]),%[t]\n\t"
                    "mov %[t],24(%[r])\n\t"
   : [t]"=&r"(t)
   : [a]"r"(a), [b]"r"(b), [r]"r"(r)
   : "cc", "memory");
+#elif __aarch64__
+  uint64_t av, bv;
+
+  __asm__ volatile("ldr %[av],[%[a]]\n\t"
+                   "ldr %[bv],[%[b]]\n\t"
+                   "adds %[av],%[av],%[bv]\n\t"
+                   "str %[av],[%[r]]\n\t"
+                   
+                   "ldr %[av],[%[a],8]\n\t"
+                   "ldr %[bv],[%[b],8]\n\t"
+                   "adcs %[av],%[av],%[bv]\n\t"
+                   "str %[av],[%[r],8]\n\t"
+                   
+                   "ldr %[av],[%[a],16]\n\t"
+                   "ldr %[bv],[%[b],16]\n\t"
+                   "adcs %[av],%[av],%[bv]\n\t"
+                   "str %[av],[%[r],16]\n\t"
+                   
+                   "ldr %[av],[%[a],24]\n\t"
+                   "ldr %[bv],[%[b],24]\n\t"
+                   "adc %[av],%[av],%[bv]\n\t"
+                   "str %[av],[%[r],24]"
+                   : [av]"=&r"(av), [bv]"=&r"(bv)
+                   : [a]"r"(a), [b]"r"(b), [r]"r"(r)
+                   : "cc", "memory");
 #else
   uint64_t c = 0;
 
@@ -81,18 +109,46 @@ static inline void Fixed256_sub(union Fixed256 *r, const union Fixed256 *a, cons
   __asm__ volatile("mov (%[a]),%[t]\n\t"
                    "sub (%[b]),%[t]\n\t"
                    "mov %[t],(%[r])\n\t"
+
                    "mov 8(%[a]),%[t]\n\t"
                    "sbb 8(%[b]),%[t]\n\t"
                    "mov %[t],8(%[r])\n\t"
+                   
                    "mov 16(%[a]),%[t]\n\t"
                    "sbb 16(%[b]),%[t]\n\t"
                    "mov %[t],16(%[r])\n\t"
+                   
                    "mov 24(%[a]),%[t]\n\t"
                    "sbb 24(%[b]),%[t]\n\t"
                    "mov %[t],24(%[r])\n\t"
   : [t]"=&r"(t)
   : [a]"r"(a), [b]"r"(b), [r]"r"(r)
   : "cc", "memory");
+#elif __aarch64__
+  uint64_t av, bv;
+
+  __asm__ volatile("ldr %[av],[%[a]]\n\t"
+                   "ldr %[bv],[%[b]]\n\t"
+                   "subs %[av],%[av],%[bv]\n\t"
+                   "str %[av],[%[r]]\n\t"
+                   
+                   "ldr %[av],[%[a],8]\n\t"
+                   "ldr %[bv],[%[b],8]\n\t"
+                   "sbcs %[av],%[av],%[bv]\n\t"
+                   "str %[av],[%[r],8]\n\t"
+                   
+                   "ldr %[av],[%[a],16]\n\t"
+                   "ldr %[bv],[%[b],16]\n\t"
+                   "sbcs %[av],%[av],%[bv]\n\t"
+                   "str %[av],[%[r],16]\n\t"
+                   
+                   "ldr %[av],[%[a],24]\n\t"
+                   "ldr %[bv],[%[b],24]\n\t"
+                   "sbc %[av],%[av],%[bv]\n\t"
+                   "str %[av],[%[r],24]"
+                   : [av]"=&r"(av), [bv]"=&r"(bv)
+                   : [a]"r"(a), [b]"r"(b), [r]"r"(r)
+                   : "cc", "memory");
 #else
   uint64_t c = 1;
 
@@ -112,14 +168,17 @@ static inline void Fixed256_neg(union Fixed256 *r, const union Fixed256 *a) {
                    "not %[t]\n\t"
                    "add $1,%[t]\n\t"
                    "mov %[t],(%[r])\n\t"
+
                    "mov 8(%[a]),%[t]\n\t"
                    "not %[t]\n\t"
                    "adc $0,%[t]\n\t"
                    "mov %[t],8(%[r])\n\t"
+                   
                    "mov 16(%[a]),%[t]\n\t"
                    "not %[t]\n\t"
                    "adc $0,%[t]\n\t"
                    "mov %[t],16(%[r])\n\t"
+                   
                    "mov 24(%[a]),%[t]\n\t"
                    "not %[t]\n\t"
                    "adc $0,%[t]\n\t"
@@ -127,6 +186,27 @@ static inline void Fixed256_neg(union Fixed256 *r, const union Fixed256 *a) {
   : [t]"=&r"(t)
   : [a]"r"(a), [r]"r"(r)
   : "cc", "memory");
+#elif __aarch64__
+  uint64_t av;
+
+  __asm__ volatile("ldr %[av],[%[a]]\n\t"
+                   "negs %[av],%[av]\n\t"
+                   "str %[av],[%[r]]\n\t"
+                   
+                   "ldr %[av],[%[a],8]\n\t"
+                   "ngcs %[av],%[av]\n\t"
+                   "str %[av],[%[r],8]\n\t"
+                   
+                   "ldr %[av],[%[a],16]\n\t"
+                   "ngcs %[av],%[av]\n\t"
+                   "str %[av],[%[r],16]\n\t"
+                   
+                   "ldr %[av],[%[a],24]\n\t"
+                   "ngc %[av],%[av]\n\t"
+                   "str %[av],[%[r],24]"
+                   : [av]"=&r"(av)
+                   : [a]"r"(a), [r]"r"(r)
+                   : "cc", "memory");
 #else
   const union Fixed256 zero = { .u64 = { 0 }};
   Fixed256_sub(r, &zero, a);

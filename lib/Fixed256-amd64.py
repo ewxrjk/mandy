@@ -49,7 +49,7 @@ def amd64_neg(r):
     print(f"  adc {r[3]},0")
 
 def amd64_header():
-    print("""#if HAVE_ASM_AMD64
+    print("""#if __amd64__
 .intel_syntax noprefix
 
 #if __linux__
@@ -136,6 +136,23 @@ def amd64_op(op):
         print(f"  xor rdi,1")
         print(f"2:")
 
+    # We will calculate the full product so we can round correctly
+    #
+    # We will do 64x64->128 multiplies and use three 64-bit registers
+    # to accumulate the sum for each column, including the carry
+    # up from previous columns. 
+    #
+    # We will 'rotate' the accumulator through different registers
+    # to achieve this.
+
+    MAXDEPTH=-3
+    DEPTH=-3
+
+    assert DEPTH >= MAXDEPTH
+
+    # Moving accumulator
+    c = r[-3:] + r + [None, None]
+
     def row(n, c, add=True):
         cname = ":".join([r for r in reversed(c[:3]) if r != None])
         print(f"// Compute r[{n}] using {cname}")
@@ -177,14 +194,6 @@ def amd64_op(op):
                     print(f"  adc {c[2]},{c[2]}")
                 add = True
 
-    MAXDEPTH=-3
-    DEPTH=-3
-
-    assert DEPTH >= MAXDEPTH
-
-    # Moving accumulator
-    c = r[-3:] + r + [None, None]
-
     for i in range(MAXDEPTH, 0):
         if i >= DEPTH:
             row(i, c[:3], i != DEPTH)
@@ -198,7 +207,6 @@ def amd64_op(op):
 
     for n in range(0, 4):
         row(n, c[:3])
-        no = 8 * n
         # Move the accumulator
         c = c[1:]
 

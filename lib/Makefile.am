@@ -22,7 +22,7 @@ Shell.cc Shell.h 						\
 Threading.cc Threading.h arith.cc arith.h fatal.cc mandy.h	\
 cgi.cc cgi.h \
 simdarith.h simdarith.cc PixelStream.h \
-Fixed256.h Fixed256.cc Fixed256CC.cc Fixed256-amd64.S
+Fixed256.h Fixed256.cc Fixed256CC.cc Fixed256-amd64.S Fixed256-aarch64.S
 
 fixed128_test_SOURCES=fixed128-test.c
 fixed128_test_LDADD=libmandy.a -lm

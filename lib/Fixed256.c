@@ -134,7 +134,7 @@ static __always_inline void Fixed256_mul_unsigned(union Fixed256 *r, const union
 
 }
 
-#if !HAVE_ASM_AMD64
+#if !HAVE_ASM_FIXED256_MUL
 void Fixed256_mul(union Fixed256 *r, const union Fixed256 *a, const union Fixed256 *b) {
   int sign = 0;
   union Fixed256 ap, bp;

@@ -17,7 +17,7 @@
 */
 #include <config.h>
 
-#if HAVE_ASM_AMD64
+#if __amd64__
 .intel_syntax noprefix
 
 #if __linux__

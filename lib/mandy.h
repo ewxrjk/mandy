@@ -19,12 +19,6 @@
 #include <config.h>
 #include <inttypes.h>
 
-// Use assembler if requested to by configure script
-#if HAVE_ASM
-#define HAVE_ASM_64 1
-#define HAVE_ASM_128 1
-#endif
-
 #ifndef ATOMIC_TYPE
 #define ATOMIC_TYPE int
 #endif

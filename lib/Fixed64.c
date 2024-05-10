@@ -52,7 +52,7 @@ Fixed64 Fixed64_div(Fixed64 a, Fixed64 b) {
   return sign ? -r : r;
 }
 
-#if !__amd64__
+#if !HAVE_ASM_FIXED64_DIV
 uint64_t Fixed64_div_unsigned(uint64_t a, uint64_t b) {
   uint128_t a128 = (uint128_t)a << 64, b128 = (uint128_t)b << 64, q128 = 0, bit = (uint128_t)1 << (56 + 64);
   // Shift b up until b>=a. We adjust initial quotient bit
