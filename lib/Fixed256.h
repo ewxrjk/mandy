@@ -46,26 +46,18 @@ static inline void Fixed256_int2(union Fixed256 *r, int i) {
 
 static inline void Fixed256_add(union Fixed256 *r, const union Fixed256 *a, const union Fixed256 *b) {
 #if __amd64__
-  uint64_t t;
-
-  __asm__ volatile("mov (%[a]),%[t]\n\t"
-                   "add (%[b]),%[t]\n\t"
-                   "mov %[t],(%[r])\n\t"
-
-                   "mov 8(%[a]),%[t]\n\t"
-                   "adc 8(%[b]),%[t]\n\t"
-                   "mov %[t],8(%[r])\n\t"
-
-                   "mov 16(%[a]),%[t]\n\t"
-                   "adc 16(%[b]),%[t]\n\t"
-                   "mov %[t],16(%[r])\n\t"
-
-                   "mov 24(%[a]),%[t]\n\t"
-                   "adc 24(%[b]),%[t]\n\t"
-                   "mov %[t],24(%[r])\n\t"
-  : [t]"=&r"(t)
-  : [a]"r"(a), [b]"r"(b), [r]"r"(r)
-  : "cc", "memory");
+  uint64_t r0 = a->u64[0], r1 = a->u64[1], r2 = a->u64[2], r3 = a->u64[3];
+  __asm__ volatile("add %[b0],%[r0]\n\t"
+                   "adc %[b1],%[r1]\n\t"
+                   "adc %[b2],%[r2]\n\t"
+                   "adc %[b3],%[r3]\n\t"
+                   : [r0]"+r"(r0), [r1]"+r"(r1), [r2]"+r"(r2), [r3]"+r"(r3)
+                   : [b0]"rme"(b->u64[0]), [b1]"rme"(b->u64[1]), [b2]"rme"(b->u64[2]), [b3]"rme"(b->u64[3])
+                   : "cc");
+  r->u64[0] = r0;
+  r->u64[1] = r1;
+  r->u64[2] = r2;
+  r->u64[3] = r3;
 #elif __aarch64__
 #if 1
   uint64_t r0, r1, r2, r3;
@@ -120,26 +112,18 @@ static inline void Fixed256_add(union Fixed256 *r, const union Fixed256 *a, cons
 
 static inline void Fixed256_sub(union Fixed256 *r, const union Fixed256 *a, const union Fixed256 *b) {
 #if __amd64__
-  uint64_t t;
-
-  __asm__ volatile("mov (%[a]),%[t]\n\t"
-                   "sub (%[b]),%[t]\n\t"
-                   "mov %[t],(%[r])\n\t"
-
-                   "mov 8(%[a]),%[t]\n\t"
-                   "sbb 8(%[b]),%[t]\n\t"
-                   "mov %[t],8(%[r])\n\t"
-                   
-                   "mov 16(%[a]),%[t]\n\t"
-                   "sbb 16(%[b]),%[t]\n\t"
-                   "mov %[t],16(%[r])\n\t"
-                   
-                   "mov 24(%[a]),%[t]\n\t"
-                   "sbb 24(%[b]),%[t]\n\t"
-                   "mov %[t],24(%[r])\n\t"
-  : [t]"=&r"(t)
-  : [a]"r"(a), [b]"r"(b), [r]"r"(r)
-  : "cc", "memory");
+  uint64_t r0 = a->u64[0], r1 = a->u64[1], r2 = a->u64[2], r3 = a->u64[3];
+  __asm__ volatile("sub %[b0],%[r0]\n\t"
+                   "sbb %[b1],%[r1]\n\t"
+                   "sbb %[b2],%[r2]\n\t"
+                   "sbb %[b3],%[r3]\n\t"
+                   : [r0]"+r"(r0), [r1]"+r"(r1), [r2]"+r"(r2), [r3]"+r"(r3)
+                   : [b0]"rme"(b->u64[0]), [b1]"rme"(b->u64[1]), [b2]"rme"(b->u64[2]), [b3]"rme"(b->u64[3])
+                   : "cc");
+  r->u64[0] = r0;
+  r->u64[1] = r1;
+  r->u64[2] = r2;
+  r->u64[3] = r3;
 #elif __aarch64__
 #if 1
   uint64_t r0, r1, r2, r3;
@@ -194,30 +178,19 @@ static inline void Fixed256_sub(union Fixed256 *r, const union Fixed256 *a, cons
 
 static inline void Fixed256_neg(union Fixed256 *r, const union Fixed256 *a) {
 #if __amd64__
-  uint64_t t;
+  uint64_t r0 = ~a->u64[0], r1 = ~a->u64[1], r2 = ~a->u64[2], r3 = ~a->u64[3];
 
-  __asm__ volatile("mov (%[a]),%[t]\n\t"
-                   "not %[t]\n\t"
-                   "add $1,%[t]\n\t"
-                   "mov %[t],(%[r])\n\t"
-
-                   "mov 8(%[a]),%[t]\n\t"
-                   "not %[t]\n\t"
-                   "adc $0,%[t]\n\t"
-                   "mov %[t],8(%[r])\n\t"
-                   
-                   "mov 16(%[a]),%[t]\n\t"
-                   "not %[t]\n\t"
-                   "adc $0,%[t]\n\t"
-                   "mov %[t],16(%[r])\n\t"
-                   
-                   "mov 24(%[a]),%[t]\n\t"
-                   "not %[t]\n\t"
-                   "adc $0,%[t]\n\t"
-                   "mov %[t],24(%[r])\n\t"
-  : [t]"=&r"(t)
-  : [a]"r"(a), [r]"r"(r)
-  : "cc", "memory");
+  __asm__ volatile("add $1,%[r0]\n\t"
+                   "adc $0,%[r1]\n\t"
+                   "adc $0,%[r2]\n\t"
+                   "adc $0,%[r3]"
+  : [r0]"+r"(r0), [r1]"+r"(r1), [r2]"+r"(r2), [r3]"+r"(r3) 
+  : 
+  : "cc");
+  r->u64[0] = r0;
+  r->u64[1] = r1;
+  r->u64[2] = r2;
+  r->u64[3] = r3;
 #elif __aarch64__
 #if 1
   uint64_t r0, r1, r2, r3;
