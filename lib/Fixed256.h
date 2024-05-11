@@ -67,6 +67,21 @@ static inline void Fixed256_add(union Fixed256 *r, const union Fixed256 *a, cons
   : [a]"r"(a), [b]"r"(b), [r]"r"(r)
   : "cc", "memory");
 #elif __aarch64__
+#if 1
+  uint64_t r0, r1, r2, r3;
+  __asm__ volatile("adds %[r0],%[a0],%[b0]\n\t"
+                   "adcs %[r1],%[a1],%[b1]\n\t"
+                   "adcs %[r2],%[a2],%[b2]\n\t"
+                   "adc %[r3],%[a3],%[b3]"
+                   : [r0]"=&r"(r0), [r1]"=&r"(r1), [r2]"=&r"(r2), [r3]"=&r"(r3)
+                   : [a0]"r"(a->u64[0]), [a1]"r"(a->u64[1]), [a2]"r"(a->u64[2]), [a3]"r"(a->u64[3]),
+                     [b0]"r"(b->u64[0]), [b1]"r"(b->u64[1]), [b2]"r"(b->u64[2]), [b3]"r"(b->u64[3])
+                   : "cc", "memory");
+  r->u64[0] = r0;
+  r->u64[1] = r1;
+  r->u64[2] = r2;
+  r->u64[3] = r3;
+#else
   uint64_t av, bv;
 
   __asm__ volatile("ldr %[av],[%[a]]\n\t"
@@ -91,6 +106,7 @@ static inline void Fixed256_add(union Fixed256 *r, const union Fixed256 *a, cons
                    : [av]"=&r"(av), [bv]"=&r"(bv)
                    : [a]"r"(a), [b]"r"(b), [r]"r"(r)
                    : "cc", "memory");
+#endif
 #else
   uint64_t c = 0;
 
@@ -125,6 +141,21 @@ static inline void Fixed256_sub(union Fixed256 *r, const union Fixed256 *a, cons
   : [a]"r"(a), [b]"r"(b), [r]"r"(r)
   : "cc", "memory");
 #elif __aarch64__
+#if 1
+  uint64_t r0, r1, r2, r3;
+  __asm__ volatile("subs %[r0],%[a0],%[b0]\n\t"
+                   "sbcs %[r1],%[a1],%[b1]\n\t"
+                   "sbcs %[r2],%[a2],%[b2]\n\t"
+                   "sbc %[r3],%[a3],%[b3]"
+                   : [r0]"=&r"(r0), [r1]"=&r"(r1), [r2]"=&r"(r2), [r3]"=&r"(r3)
+                   : [a0]"r"(a->u64[0]), [a1]"r"(a->u64[1]), [a2]"r"(a->u64[2]), [a3]"r"(a->u64[3]),
+                     [b0]"r"(b->u64[0]), [b1]"r"(b->u64[1]), [b2]"r"(b->u64[2]), [b3]"r"(b->u64[3])
+                   : "cc", "memory");
+  r->u64[0] = r0;
+  r->u64[1] = r1;
+  r->u64[2] = r2;
+  r->u64[3] = r3;
+#else
   uint64_t av, bv;
 
   __asm__ volatile("ldr %[av],[%[a]]\n\t"
@@ -149,6 +180,7 @@ static inline void Fixed256_sub(union Fixed256 *r, const union Fixed256 *a, cons
                    : [av]"=&r"(av), [bv]"=&r"(bv)
                    : [a]"r"(a), [b]"r"(b), [r]"r"(r)
                    : "cc", "memory");
+#endif
 #else
   uint64_t c = 1;
 
@@ -187,6 +219,20 @@ static inline void Fixed256_neg(union Fixed256 *r, const union Fixed256 *a) {
   : [a]"r"(a), [r]"r"(r)
   : "cc", "memory");
 #elif __aarch64__
+#if 1
+  uint64_t r0, r1, r2, r3;
+  __asm__ volatile("negs %[r0],%[a0]\n\t"
+                   "ngcs %[r1],%[a1]\n\t"
+                   "ngcs %[r2],%[a2]\n\t"
+                   "ngc %[r3],%[a3]"
+                   : [r0]"=&r"(r0), [r1]"=&r"(r1), [r2]"=&r"(r2), [r3]"=&r"(r3)
+                   : [a0]"r"(a->u64[0]), [a1]"r"(a->u64[1]), [a2]"r"(a->u64[2]), [a3]"r"(a->u64[3])
+                   : "cc", "memory");
+  r->u64[0] = r0;
+  r->u64[1] = r1;
+  r->u64[2] = r2;
+  r->u64[3] = r3;
+#else
   uint64_t av;
 
   __asm__ volatile("ldr %[av],[%[a]]\n\t"
@@ -207,6 +253,7 @@ static inline void Fixed256_neg(union Fixed256 *r, const union Fixed256 *a) {
                    : [av]"=&r"(av)
                    : [a]"r"(a), [r]"r"(r)
                    : "cc", "memory");
+#endif
 #else
   const union Fixed256 zero = { .u64 = { 0 }};
   Fixed256_sub(r, &zero, a);
