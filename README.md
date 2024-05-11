@@ -27,20 +27,22 @@ See `man mandy` for documentation.
 
 You can select at runtime the arithmetic type used to compute the images.
 
-`double` gives you about 53 bits of precision.  `long double` gives
-you 64 bits of precision.  Both are floating point types and are
-(probably) directly supported by your hardware, so should be fast.
+`double` gives you about 53 bits of precision.
+It is usually directly supported by CPU hardware, so very fast.
 
-`fixed64` gives you 56 bits of precision after the point.  It has had
-some optimization effort but is nevertheless a bit slower than using
-'double' on an x86-64 CPU.
+`simd` is the same data type as `double` but uses vector instructions
+if available, giving a 2x or 4x acceleration depending on platform.
 
-`fixed128` gives you 96 bits of precision after the point.  It's
-relatively slow.
+`long double` is very platform dependent. On x86 it gives you 64 bits of precision. On Arm it is more precise but also quite slow, due to lack of hardware support.
 
-On x86-64 CPUs the fixed point types are implemented in hand-written
-assembly language.  On other CPUs they are implemented in C and are
-likely to be very slow.
+`fixed64` gives you 56 bits of precision after the point.  The x86 implementation
+is well optimized.
+
+`fixed128` gives you 96 bits of precision after the point.  The x86 implementation
+is well optimized.
+
+`fixed256` gives you 192 bits of precision after the point.  The x86 and Arm
+implementations are somewhat optimized.
 
 ## Copyright
 
