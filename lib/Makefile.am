@@ -38,6 +38,9 @@ fixed256-test.inc: Fixed-test.py
 
 fixed64_test_SOURCES=fixed64-test.c
 fixed64_test_LDADD=libmandy.a -lm
+fixed64-test.o: fixed64-test.inc
+fixed64-test.inc: Fixed-test.py
+	python3 Fixed-test.py Fixed64 > fixed64-test.inc
 
 speedtest_SOURCES=speedtest.cc
 speedtest_LDADD=libmandy.a -lm

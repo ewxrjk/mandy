@@ -19,6 +19,50 @@
 #include <math.h>
 #include <string.h>
 #include <assert.h>
+#include <stdlib.h>
+#include <inttypes.h>
+
+static void fixed64_print(Fixed64 f) {
+  printf("%02"PRIx64".%014"PRIx64, f >> 56, f & 0x00FFFFFFFFFFFFFF);
+}
+
+static void
+fixed64_check(const char *file, int line, const char *func, Fixed64 got, Fixed64 expect) {
+  if(expect != got) {
+    printf("%s:%d: %s:\n", file, line, func);
+    printf("expect: ");
+    fixed64_print(expect);
+    printf("\n");
+    printf("   got: ");
+    fixed64_print(got);
+    printf("\n");
+    exit(1);
+  }
+}
+
+static void
+fixed64_check_str(const char *file, int line, const char *func, const char *got, const char *expect) {
+  if(strcmp(expect, got)) {
+    printf("%s:%d: %s:\n", file, line, func);
+    printf("expect: %s\n", expect);
+    printf("   got: %s\n", got);
+    exit(1);
+  }
+}
+
+static void
+fixed64_check_double(const char *file, int line, const char *func, double got, double expect) {
+  if(expect != got) {
+    printf("%s:%d: %s: expected %a got %a\n", file, line, func, expect, got);
+    exit(1);
+  }
+}
+
+#define CHECK(GOT, EXPECT) fixed64_check(__FILE__, __LINE__, __func__, GOT, EXPECT)
+#define CHECK_STR(GOT, EXPECT) fixed64_check_str(__FILE__, __LINE__, __func__, GOT, EXPECT)
+#define CHECK_DOUBLE(GOT, EXPECT) fixed64_check_double(__FILE__, __LINE__, __func__, GOT, EXPECT)
+
+#include "fixed64-test.inc"
 
 static int errors;
 
@@ -126,6 +170,21 @@ static void Fixed64_sqrt_test(void) {
 }
 
 int main() {
+
+  // Generated tests
+
+  fixed64_test_mul();
+  fixed64_test_div();
+
+  fixed64_test_sqrt();
+
+  fixed64_test_2str();
+  fixed64_test_str2();
+
+  fixed64_test_double2();
+  fixed64_test_2double();
+
+  // Legacy manual tests
   Fixed64 a, b, c;
   double x;
 #if HAVE_ASM_FIXED64_ITERATE

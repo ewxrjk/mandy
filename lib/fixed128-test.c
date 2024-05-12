@@ -64,7 +64,7 @@ fixed128_check_bool(const char *file, int line, const char *func, bool got, bool
 static void
 fixed128_check_double(const char *file, int line, const char *func, double got, double expect) {
   if(expect != got) {
-    printf("%s:%d: %s: expected %g got %g\n", file, line, func, expect, got);
+    printf("%s:%d: %s: expected %a got %a\n", file, line, func, expect, got);
     exit(1);
   }
 }

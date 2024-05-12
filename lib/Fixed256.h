@@ -29,12 +29,12 @@ extern "C" {
 // The first 64 bits are the integer part; the remaining
 // 192 bits, the fractional part. The least signficant word
 // is first (so big-endian platforms won't work).
-union Fixed256 {
+typedef union Fixed256 {
   uint16_t u16[16];
   uint32_t u32[8];
   uint64_t u64[4];
   int64_t s64[4];
-};
+} Fixed256;
 
 #define FIXED256_REP(F) F(0) F(1) F(2) F(3) F(4) F(5) F(6) F(7)
 #define FIXED256_REP_COMMAS(F) F(0), F(1), F(2), F(3), F(4), F(5), F(6), F(7),

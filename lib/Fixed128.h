@@ -29,7 +29,7 @@ extern "C" {
 typedef unsigned __int128 uint128_t;
 typedef __int128 int128_t;
 
-union Fixed128 {
+typedef union Fixed128 {
   // In a word-based interpreation:
   //
   // Least significant word is first
@@ -46,7 +46,7 @@ union Fixed128 {
   int128_t s128;
   // The combination of these representations mean we only work on
   // little-endian platforms.
-};
+} Fixed128;
 
 static inline void Fixed128_add(union Fixed128 *r, const union Fixed128 *a, const union Fixed128 *b) {
   r->s128 = a->s128 + b->s128;
