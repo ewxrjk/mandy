@@ -126,7 +126,7 @@ SYMBOL(Fixed64_iterate):
         push    r15
         mov     r14,rdx
         mov     rbx,0                          // iterations = 0
-        movabs  r15,0x0040000000000000         // r15 = 64, in 16.112 format
+        movabs  r15,R2LIMIT << 48              // r15 = R2LIMIT, in 16.112 format
         .align  4
 iter1:
         // We keep z^2 in 16.112 format, since it may overflow 8.56

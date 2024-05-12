@@ -205,7 +205,7 @@ iterloop:
         // Compute zx^2
         mov     r14,r8
         mov     r15,r9                  // r14,r15 = zx
-        movabs  rbp,0x4000000000        // rbp,<missing> = 64.0
+        movabs  rbp,R2LIMIT<<32         // rbp,<missing> = R2LIMIT
         call    square                  // rbx,rcx = zx^2
         mov     r12,rbx
         mov     r13,rcx                 // r12,r13 = zx^2

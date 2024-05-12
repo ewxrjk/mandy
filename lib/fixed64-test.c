@@ -323,8 +323,8 @@ int main() {
   putchar('\n');
   count = Fixed64_iterate(0, 0, cx, cy, &r2, 255);
   printf("iterate: %d   r2: %.32g\n", count, r2);
-  assert(count == 5);
-  assert(r2 == 255.08471462316811);
+  assert(count == 4);
+  assert(r2 ==  15.323603744876644228156692406628);
 
   cx = Fixed64_int2(-1);
   cy = Fixed64_int2(-1);
@@ -336,12 +336,12 @@ int main() {
   putchar('\n');
   count = Fixed64_iterate(0, 0, cx, cy, &r2, 255);
   printf("iterate: %d   r2: %.32g\n", count, r2);
-  if(count != 4) {
-    printf("-- EXPECTED iterate 4\n");
+  if(count != 3) {
+    printf("-- EXPECTED iterate 3\n");
     ++errors;
   }
-  if(r2 != 106) {
-    printf("-- EXPECTED r2 106\n");
+  if(r2 != 10) {
+    printf("-- EXPECTED r2 10\n");
     ++errors;
   }
   /*

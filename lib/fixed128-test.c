@@ -472,12 +472,10 @@ int main() {
   putchar('\n');
   count = Fixed128_iterate(&a, &b, &c, &d, 255);
   printf("iterate: %d\n", count);
-  assert(count == 5);
+  assert(count == 4);
   printf("r2:      ");
   printFixed128(&a,
-                "255."
-                "0847146231680921822490979294883733796937062914865973007119"
-                "69271702628248021937906742095947265625");
+                "15.32360374487664264857127912540696759670677650117087795385295567740513433818705379962921142578125");
   putchar('\n');
 
   Fixed128_int2(&a, 0);
@@ -491,13 +489,12 @@ int main() {
   printFixed128(&d, "-1");
   putchar('\n');
   count = Fixed128_iterate(&a, &b, &c, &d, 255);
-  printf("iterate: %d\n", count);
-  if(count != 4) {
-    printf("-- EXPECTED 4\n");
+  if(count != 3) {
+    printf("-- EXPECTED 3\n");
     ++errors;
   }
   printf("r2:      ");
-  printFixed128(&a, "106");
+  printFixed128(&a, "10");
   putchar('\n');
 #endif
 

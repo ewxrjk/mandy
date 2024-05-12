@@ -88,7 +88,10 @@ AH_BOTTOM([#ifdef __GNUC__
 
 #if __aarch64__
 # define HAVE_ASM_FIXED256_MUL 1
-#endif])
+#endif
+
+#define R2LIMIT 4 // Escape value
+])
 
 AC_CONFIG_FILES([Makefile lib/Makefile images/Makefile web/Makefile gtkui/Makefile])
 AC_OUTPUT

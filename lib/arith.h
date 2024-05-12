@@ -67,12 +67,13 @@ static inline count_t transform_iterations(int iterations, double r2, int maxite
 template <typename T> int defaultIterate(T zx, T zy, T cx, T cy, int maxiters, double &r2_out) {
   T r2, zx2, zy2;
   int iterations = 0;
-  while(((r2 = (zx2 = zx * zx) + (zy2 = zy * zy)) < T(64)) && iterations < maxiters) {
+  while(((r2 = (zx2 = zx * zx) + (zy2 = zy * zy)) < T(R2LIMIT)) && iterations < maxiters) {
     zy = T(2) * zx * zy + cy;
     zx = zx2 - zy2 + cx;
     ++iterations;
   }
   r2_out = (double)r2;
+  assert(r2_out >= 0.0);
   return iterations;
 }
 
@@ -146,7 +147,7 @@ public:
     Fixed256 r2, zx2, zy2;
     int iterations = 0;
     Fixed256 limit;
-    Fixed256_int2(&limit, 64);
+    Fixed256_int2(&limit, R2LIMIT);
     for(;;) {
       Fixed256_square(&zx2, &zx.f);
       Fixed256_square(&zy2, &zy.f);
@@ -192,7 +193,7 @@ public:
     Fixed128 r2, zx2, zy2;
     int iterations = 0;
     Fixed128 limit;
-    Fixed128_int2(&limit, 64);
+    Fixed128_int2(&limit, R2LIMIT);
     for(;;) {
       Fixed128_square(&zx2, &zx.f);
       Fixed128_square(&zy2, &zy.f);
@@ -230,7 +231,7 @@ public:
 
   static int iterate(arith_t zxa, arith_t zya, arith_t cxa, arith_t cya, int maxiters, double &r2_out) {
     fixed64 zx = zxa, zy = zya, cx = cxa, cy = cya;
-#if HAVE_ASM_FIXED64_ITERATE
+#if HAVE_ASM_FIXED64_ITERATE || 0
     return Fixed64_iterate(zx.f, zy.f, cx.f, cy.f, &r2_out, maxiters);
 #else
     return defaultIterate(zx, zy, cx, cy, maxiters, r2_out);

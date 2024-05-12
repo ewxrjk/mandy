@@ -150,7 +150,7 @@ static inline void simd_iterate_once(vector &Zx,
   const vector Zx2 = Zx * Zx;
   const vector Zy2 = Zy * Zy;
   const vector r2 = Zx2 + Zy2;
-  const ivector escaped = r2 >= 64.0; // -1 for points that escaped this time, or in the past; else 0
+  const ivector escaped = r2 >= (double)R2LIMIT; // -1 for points that escaped this time, or in the past; else 0
   escape_check(escaped_already, escape_iters, escaped, iterations, r2, escape_r2);
   const vector Zxnew = Zx2 - Zy2 + Cx;
   const vector Zynew = 2 * Zx * Zy + Cy;
