@@ -19,6 +19,63 @@
 #include <math.h>
 #include <string.h>
 #include <assert.h>
+#include <stdlib.h>
+
+static void fixed128_print(const union Fixed128 *f) {
+  printf("%08x %08x.%08x %08x",
+         f->word[3],
+         f->word[2],
+         f->word[1],
+         f->word[0]);
+}
+
+static void
+fixed128_check(const char *file, int line, const char *func, const union Fixed128 *got, const union Fixed128 *expect) {
+  if(Fixed128_ne(expect, got)) {
+    printf("%s:%d: %s:\n", file, line, func);
+    printf("expect: ");
+    fixed128_print(expect);
+    printf("\n");
+    printf("   got: ");
+    fixed128_print(got);
+    printf("\n");
+    exit(1);
+  }
+}
+
+static void
+fixed128_check_str(const char *file, int line, const char *func, const char *got, const char *expect) {
+  if(strcmp(expect, got)) {
+    printf("%s:%d: %s:\n", file, line, func);
+    printf("expect: %s\n", expect);
+    printf("   got: %s\n", got);
+    exit(1);
+  }
+}
+
+static void
+fixed128_check_bool(const char *file, int line, const char *func, bool got, bool expect) {
+  if(expect != got) {
+    printf("%s:%d: %s: expected %d got %d\n", file, line, func, expect, got);
+    exit(1);
+  }
+}
+
+static void
+fixed128_check_double(const char *file, int line, const char *func, double got, double expect) {
+  if(expect != got) {
+    printf("%s:%d: %s: expected %g got %g\n", file, line, func, expect, got);
+    exit(1);
+  }
+}
+
+#define CHECK(GOT, EXPECT) fixed128_check(__FILE__, __LINE__, __func__, &GOT, &EXPECT)
+#define CHECK_BOOL(GOT, EXPECT) fixed128_check_bool(__FILE__, __LINE__, __func__, GOT, EXPECT)
+#define CHECK_STR(GOT, EXPECT) fixed128_check_str(__FILE__, __LINE__, __func__, GOT, EXPECT)
+#define CHECK_DOUBLE(GOT, EXPECT) fixed128_check_double(__FILE__, __LINE__, __func__, GOT, EXPECT)
+
+#include "fixed128-test.inc"
+
 
 static int errors;
 
@@ -37,6 +94,29 @@ static void printFixed128(const union Fixed128 *f, const char *expect) {
 }
 
 int main() {
+
+  // Generated tests
+
+  fixed128_test_neg();
+  fixed128_test_square();
+
+  fixed128_test_compare();
+  fixed128_test_compare_unsigned();
+
+  fixed128_test_add();
+  fixed128_test_sub();
+  fixed128_test_mul();
+  fixed128_test_div();
+  fixed128_test_sqrt();
+
+  fixed128_test_2str();
+  fixed128_test_str2();
+
+  fixed128_test_double2();
+  fixed128_test_2double();
+
+  // Legacy manual tests
+
   union Fixed128 a, b, c, d;
   double x;
 #if HAVE_ASM_FIXED128_ITERATE

@@ -1728,286 +1728,286 @@ static void fixed256_test_double2(void) {
   union Fixed256 got;
   {
     const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000 } };
-    Fixed256_double2(&got, 1.1184163064561854e-58);
+    Fixed256_double2(&got, -1.164982730250667e-58);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0xffffffffffffffdf, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff } };
-    Fixed256_double2(&got, -5.403666097050183e-57);
+    const union Fixed256 expect = { .u64= { 0x00000000000000b1, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000 } };
+    Fixed256_double2(&got, 2.8338886449624355e-56);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0xffffffffffff3286, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff } };
-    Fixed256_double2(&got, -8.380081602493441e-54);
+    const union Fixed256 expect = { .u64= { 0x000000000000870d, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000 } };
+    Fixed256_double2(&got, 5.507871039208665e-54);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0xffffffffff24e1c2, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff } };
-    Fixed256_double2(&got, -2.2877001840791212e-51);
+    const union Fixed256 expect = { .u64= { 0xffffffffff829869, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff } };
+    Fixed256_double2(&got, -1.3092857288243472e-51);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0xffffffff12fee0cf, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff } };
-    Fixed256_double2(&got, -6.334569488835662e-49);
+    const union Fixed256 expect = { .u64= { 0xfffffffffda9aaf1, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff } };
+    Fixed256_double2(&got, -6.246880320155938e-51);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0xffffffae19b07350, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff } };
-    Fixed256_double2(&got, -5.603801544803075e-47);
+    const union Fixed256 expect = { .u64= { 0xffffffe623b15e3a, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff } };
+    Fixed256_double2(&got, -1.7694523336555736e-47);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0xffff8a077dc9da8d, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff } };
-    Fixed256_double2(&got, -2.0664026551390738e-44);
+    const union Fixed256 expect = { .u64= { 0x00004d9d98184b9d, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000 } };
+    Fixed256_double2(&got, 1.3595327992245863e-44);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0x009e6c318da21d20, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000 } };
-    Fixed256_double2(&got, 7.103916470607554e-42);
+    const union Fixed256 expect = { .u64= { 0x0093d38c0d6fe640, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000 } };
+    Fixed256_double2(&got, 6.628763050981942e-42);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0x5bb543edd1604000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000 } };
-    Fixed256_double2(&got, 1.0527569880987513e-39);
+    const union Fixed256 expect = { .u64= { 0x300e5d1f390b2000, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff } };
+    Fixed256_double2(&got, -2.3870788069375817e-39);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0x0d4843fb45400000, 0x00000000000000bb, 0x0000000000000000, 0x0000000000000000 } };
-    Fixed256_double2(&got, 5.4969608219013885e-37);
+    const union Fixed256 expect = { .u64= { 0x838f792c1b300000, 0xffffffffffffff0e, 0xffffffffffffffff, 0xffffffffffffffff } };
+    Fixed256_double2(&got, -7.096638424313061e-37);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0x1b45376e60000000, 0x00000000000019ee, 0x0000000000000000, 0x0000000000000000 } };
-    Fixed256_double2(&got, 1.9507641800471852e-35);
+    const union Fixed256 expect = { .u64= { 0x6758f2a0a0000000, 0x000000000000abe9, 0x0000000000000000, 0x0000000000000000 } };
+    Fixed256_double2(&got, 1.2933201358391382e-34);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0x493829a000000000, 0xffffffffff377d33, 0xffffffffffffffff, 0xffffffffffffffff } };
-    Fixed256_double2(&got, -3.861700161807061e-32);
+    const union Fixed256 expect = { .u64= { 0x26e0439000000000, 0xffffffffffdd93a5, 0xffffffffffffffff, 0xffffffffffffffff } };
+    Fixed256_double2(&got, -6.629678959135302e-33);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0x6080800000000000, 0xffffffffc738e74c, 0xffffffffffffffff, 0xffffffffffffffff } };
-    Fixed256_double2(&got, -2.7993577576247457e-30);
+    const union Fixed256 expect = { .u64= { 0x191c500000000000, 0x0000000086499331, 0x0000000000000000, 0x0000000000000000 } };
+    Fixed256_double2(&got, 6.62088010461484e-30);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0xd500000000000000, 0xffffffc757c3ee7f, 0xffffffffffffffff, 0xffffffffffffffff } };
-    Fixed256_double2(&got, -7.151139793285439e-28);
+    const union Fixed256 expect = { .u64= { 0x8690000000000000, 0xffffff01140b6c88, 0xffffffffffffffff, 0xffffffffffffffff } };
+    Fixed256_double2(&got, -3.2175642169958808e-27);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0xf000000000000000, 0x00001b7a22346b7e, 0x0000000000000000, 0x0000000000000000 } };
-    Fixed256_double2(&got, 8.878324814232375e-26);
+    const union Fixed256 expect = { .u64= { 0x5000000000000000, 0xffffe409ca510b8f, 0xffffffffffffffff, 0xffffffffffffffff } };
+    Fixed256_double2(&got, -9.034930854997797e-26);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x00912b217f27b0a0, 0x0000000000000000, 0x0000000000000000 } };
-    Fixed256_double2(&got, 1.2008055210148918e-22);
+    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x00716db1f3511f80, 0x0000000000000000, 0x0000000000000000 } };
+    Fixed256_double2(&got, 9.382585326421304e-23);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x6cd44336870a4000, 0xffffffffffffffff, 0xffffffffffffffff } };
-    Fixed256_double2(&got, -3.116463958163812e-20);
+    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x75205265d5753000, 0xffffffffffffffff, 0xffffffffffffffff } };
+    Fixed256_double2(&got, -2.940765889587178e-20);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x9cbd0b7281e00000, 0x0000000000000057, 0x0000000000000000 } };
-    Fixed256_double2(&got, 4.749470109378837e-18);
+    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0xfa85468ae3c00000, 0x00000000000000e3, 0x0000000000000000 } };
+    Fixed256_double2(&got, 1.2358744459870571e-17);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x7a425e7790000000, 0xffffffffffffe9b9, 0xffffffffffffffff } };
-    Fixed256_double2(&got, -3.0913436008019043e-16);
+    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0xe65450c460000000, 0x000000000000cd87, 0x0000000000000000 } };
+    Fixed256_double2(&got, 2.852313639404852e-15);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x6cf248f000000000, 0x0000000000c31ad6, 0x0000000000000000 } };
-    Fixed256_double2(&got, 6.931516138826494e-13);
+    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x816db9b000000000, 0xffffffffff0fa97d, 0xffffffffffffffff } };
+    Fixed256_double2(&got, -8.538518467802468e-13);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x3514e00000000000, 0xffffffffbbb1ee09, 0xffffffffffffffff } };
-    Fixed256_double2(&got, -6.212300068855467e-11);
+    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x9229f00000000000, 0xffffffff0d073d69, 0xffffffffffffffff } };
+    Fixed256_double2(&got, -2.2098149126700088e-10);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x4700000000000000, 0xfffffff0e3c32af4, 0xffffffffffffffff } };
-    Fixed256_double2(&got, -3.518141625882704e-09);
+    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0xd040000000000000, 0x0000001534040096, 0x0000000000000000 } };
+    Fixed256_double2(&got, 4.936751460253785e-09);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x4000000000000000, 0x0000b234d2b8e62e, 0x0000000000000000 } };
-    Fixed256_double2(&got, 1.062192561427062e-05);
+    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0xb000000000000000, 0x0000e0d828b86622, 0x0000000000000000 } };
+    Fixed256_double2(&got, 1.3401768883621538e-05);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x0000000000000000, 0x0099328fdd2ff2d0, 0x0000000000000000 } };
-    Fixed256_double2(&got, 0.0023376084547519884);
+    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x0000000000000000, 0xffc32d33abef59f0, 0xffffffffffffffff } };
+    Fixed256_double2(&got, -0.0009280918930608404);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x0000000000000000, 0xdd4db58795ce9800, 0xffffffffffffffff } };
-    Fixed256_double2(&got, -0.13553300323309758);
+    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x0000000000000000, 0x37730edf02618800, 0xffffffffffffffff } };
+    Fixed256_double2(&got, -0.7834006028693866);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x0000000000000000, 0xa7edb0ac33c00000, 0xffffffffffffff38 } };
-    Fixed256_double2(&got, -199.34402938648077);
+    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x0000000000000000, 0xb39a197d24400000, 0xffffffffffffffd7 } };
+    Fixed256_double2(&got, -40.298429877231456);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x0000000000000000, 0x586bf2c208000000, 0xffffffffffff3478 } };
-    Fixed256_double2(&got, -52103.65460284007);
+    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x0000000000000000, 0x67b28d1d40000000, 0xffffffffffff0ede } };
+    Fixed256_double2(&got, -61729.59493177448);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x0000000000000000, 0xab6d5fa000000000, 0x00000000002562d6 } };
-    Fixed256_double2(&got, 2450134.6696376577);
+    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x0000000000000000, 0xb81fb12800000000, 0xffffffffff718191 } };
+    Fixed256_double2(&got, -9338478.280766418);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x0000000000000000, 0x6fb1900000000000, 0x00000000f005bf2f } };
-    Fixed256_double2(&got, 4026908463.436303);
+    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x0000000000000000, 0xab36880000000000, 0xffffffffe032cd7b } };
+    Fixed256_double2(&got, -533541508.33119917);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x0000000000000000, 0xcd70000000000000, 0x000000d0bfc2c050 } };
-    Fixed256_double2(&got, 896570409040.8025);
+    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x0000000000000000, 0x8e30000000000000, 0xfffffffddb1a2361 } };
+    Fixed256_double2(&got, -9208978590.44458);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x0000000000000000, 0x4000000000000000, 0x00000c99804a7d95 } };
-    Fixed256_double2(&got, 13853421895061.25);
+    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x0000000000000000, 0x6000000000000000, 0xffff7756d8561ff4 } };
+    Fixed256_double2(&got, -150260096294923.62);
     CHECK(got, expect);
   }
   {
-    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x004980bdd6242190 } };
-    Fixed256_double2(&got, 2.068922612974427e+16);
+    const union Fixed256 expect = { .u64= { 0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0xff763423ab517c80 } };
+    Fixed256_double2(&got, -3.878621898332659e+16);
     CHECK(got, expect);
   }
 }
 
 static void fixed256_test_2double(void) {
   {
-    const union Fixed256 a = { .u64= { 0x389647bfe845d000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000 } };
+    const union Fixed256 a = { .u64= { 0x44cb63e46dd61000, 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff } };
     double got = Fixed256_2double(&a);
-    CHECK_DOUBLE(got, 6.49587273566882e-40);
+    CHECK_DOUBLE(got, -2.1490138275225466e-39);
   }
   {
-    const union Fixed256 a = { .u64= { 0x2619ba80f6300000, 0xffffffffffffffeb, 0xffffffffffffffff, 0xffffffffffffffff } };
+    const union Fixed256 a = { .u64= { 0xe2d5b3584f800000, 0x00000000000000b1, 0x0000000000000000, 0x0000000000000000 } };
     double got = Fixed256_2double(&a);
-    CHECK_DOUBLE(got, -6.127608110421973e-38);
+    CHECK_DOUBLE(got, 5.22760185670136e-37);
   }
   {
-    const union Fixed256 a = { .u64= { 0xa5c7ee02f0000000, 0x0000000000006175, 0x0000000000000000, 0x0000000000000000 } };
+    const union Fixed256 a = { .u64= { 0x778409f130000000, 0x000000000000870d, 0x0000000000000000, 0x0000000000000000 } };
     double got = Fixed256_2double(&a);
-    CHECK_DOUBLE(got, 7.332042446893065e-35);
+    CHECK_DOUBLE(got, 1.0160228745127892e-34);
   }
   {
-    const union Fixed256 a = { .u64= { 0x075404c000000000, 0x0000000000d4f9c1, 0x0000000000000000, 0x0000000000000000 } };
+    const union Fixed256 a = { .u64= { 0x478bfae000000000, 0xffffffffff829868, 0xffffffffffffffff, 0xffffffffffffffff } };
     double got = Fixed256_2double(&a);
-    CHECK_DOUBLE(got, 4.1017608860904293e-32);
+    CHECK_DOUBLE(got, -2.4152058758983018e-32);
   }
   {
-    const union Fixed256 a = { .u64= { 0xf7bc700000000000, 0x00000000b6d81ef2, 0x0000000000000000, 0x0000000000000000 } };
+    const union Fixed256 a = { .u64= { 0xb39bd00000000000, 0xfffffffffda9aaf0, 0xffffffffffffffff, 0xffffffffffffffff } };
     double got = Fixed256_2double(&a);
-    CHECK_DOUBLE(got, 9.014916167197262e-30);
+    CHECK_DOUBLE(got, -1.1523460252500937e-31);
   }
   {
-    const union Fixed256 a = { .u64= { 0xd480000000000000, 0x000000fd4d97ee85, 0x0000000000000000, 0x0000000000000000 } };
+    const union Fixed256 a = { .u64= { 0x4410000000000000, 0xffffffe623b15e39, 0xffffffffffffffff, 0xffffffffffffffff } };
     double got = Fixed256_2double(&a);
-    CHECK_DOUBLE(got, 3.197134598427783e-27);
+    CHECK_DOUBLE(got, -3.264063434957249e-28);
   }
   {
-    const union Fixed256 a = { .u64= { 0x8000000000000000, 0x00004e621fd8bf0a, 0x0000000000000000, 0x0000000000000000 } };
+    const union Fixed256 a = { .u64= { 0xa000000000000000, 0x00004d9d98184b9d, 0x0000000000000000, 0x0000000000000000 } };
     double got = Fixed256_2double(&a);
-    CHECK_DOUBLE(got, 2.532700969484511e-25);
+    CHECK_DOUBLE(got, 2.5078953607109895e-25);
   }
   {
-    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x00b8f9ce465c0af0, 0x0000000000000000, 0x0000000000000000 } };
+    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x0093d38c0d6fe640, 0x0000000000000000, 0x0000000000000000 } };
     double got = Fixed256_2double(&a);
-    CHECK_DOUBLE(got, 1.5300839865697248e-22);
+    CHECK_DOUBLE(got, 1.2227909552672598e-22);
   }
   {
-    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x2c019ce65de5e000, 0x0000000000000000, 0x0000000000000000 } };
+    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x300e5d1f390b2000, 0xffffffffffffffff, 0xffffffffffffffff } };
     double got = Fixed256_2double(&a);
-    CHECK_DOUBLE(got, 9.318696571233289e-21);
+    CHECK_DOUBLE(got, -4.40338318353535e-20);
   }
   {
-    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x3eeff2bd1d500000, 0x00000000000000aa, 0x0000000000000000 } };
+    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x838f792c1b300000, 0xffffffffffffff0e, 0xffffffffffffffff } };
     double got = Fixed256_2double(&a);
-    CHECK_DOUBLE(got, 9.229045957306763e-18);
+    CHECK_DOUBLE(got, -1.3090987279695645e-17);
   }
   {
-    const union Fixed256 a = { .u64= { 0x0000000000000000, 0xe5270732f0000000, 0x0000000000008139, 0x0000000000000000 } };
+    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x6758f2a0a0000000, 0x000000000000abe9, 0x0000000000000000 } };
     double got = Fixed256_2double(&a);
-    CHECK_DOUBLE(got, 1.793373128319184e-15);
+    CHECK_DOUBLE(got, 2.3857545551199855e-15);
   }
   {
-    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x404c840000000000, 0xffffffffff3ad219, 0xffffffffffffffff } };
+    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x26e0439000000000, 0xffffffffffdd93a5, 0xffffffffffffffff } };
     double got = Fixed256_2double(&a);
-    CHECK_DOUBLE(got, -7.005216040943231e-13);
+    CHECK_DOUBLE(got, -1.2229599105002604e-13);
   }
   {
-    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x3347200000000000, 0xffffffff9696c250, 0xffffffffffffffff } };
+    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x191c500000000000, 0x0000000086499331, 0x0000000000000000 } };
     double got = Fixed256_2double(&a);
-    CHECK_DOUBLE(got, -9.587083469760841e-11);
+    CHECK_DOUBLE(got, 1.2213368083254527e-10);
   }
   {
-    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x0d60000000000000, 0xffffff5da349299c, 0xffffffffffffffff } };
+    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x8690000000000000, 0xffffff01140b6c88, 0xffffffffffffffff } };
     double got = Fixed256_2double(&a);
-    CHECK_DOUBLE(got, -3.78028873536443e-08);
+    CHECK_DOUBLE(got, -5.935358365164868e-08);
   }
   {
-    const union Fixed256 a = { .u64= { 0x0000000000000000, 0xe000000000000000, 0x000075b81c293d86, 0x0000000000000000 } };
+    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x5000000000000000, 0xffffe409ca510b8f, 0xffffffffffffffff } };
     double got = Fixed256_2double(&a);
-    CHECK_DOUBLE(got, 7.016609889519782e-06);
+    CHECK_DOUBLE(got, -1.666650572058062e-06);
   }
   {
-    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x0000000000000000, 0xffb9173203a50380, 0xffffffffffffffff } };
+    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x0000000000000000, 0x00716db1f3511f80, 0x0000000000000000 } };
     double got = Fixed256_2double(&a);
-    CHECK_DOUBLE(got, -0.0010819914717607529);
+    CHECK_DOUBLE(got, 0.0017307815026623638);
   }
   {
-    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x0000000000000000, 0x284940d78d61a800, 0xffffffffffffffff } };
+    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x0000000000000000, 0x3a902932eaba9800, 0xffffffffffffffff } };
     double got = Fixed256_2double(&a);
-    CHECK_DOUBLE(got, -0.8426322435139978);
+    CHECK_DOUBLE(got, -0.7712377787295474);
   }
   {
-    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x0000000000000000, 0xf643f76d6e200000, 0x00000000000000c6 } };
+    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x0000000000000000, 0x088803e79e500000, 0x00000000000000e3 } };
     double got = Fixed256_2double(&a);
-    CHECK_DOUBLE(got, 198.96197458669315);
+    CHECK_DOUBLE(got, 227.0333254280543);
   }
   {
-    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x0000000000000000, 0x9fea169580000000, 0x0000000000008a27 } };
+    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x0000000000000000, 0xff905d9a30000000, 0x000000000000cd86 } };
     double got = Fixed256_2double(&a);
-    CHECK_DOUBLE(got, 35367.62466565275);
+    CHECK_DOUBLE(got, 52614.99829659476);
   }
   {
-    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x0000000000000000, 0x960bfea000000000, 0xffffffffffce5e50 } };
+    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x0000000000000000, 0x7998faf000000000, 0xffffffffff0fa97d } };
     double got = Fixed256_2double(&a);
-    CHECK_DOUBLE(got, -3252655.4138794765);
+    CHECK_DOUBLE(got, -15750786.525009457);
   }
   {
-    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x0000000000000000, 0x460c400000000000, 0xffffffff25ddbe70 } };
+    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x0000000000000000, 0x8ba6500000000000, 0xffffffff0d073d69 } };
     double got = Fixed256_2double(&a);
-    CHECK_DOUBLE(got, -3659678095.7263756);
+    CHECK_DOUBLE(got, -4076389014.4544935);
   }
   {
-    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x0000000000000000, 0xe270000000000000, 0xffffffa8db63a8e4 } };
+    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x0000000000000000, 0x45a0000000000000, 0x0000001534040096 } };
     double got = Fixed256_2double(&a);
-    CHECK_DOUBLE(got, -374276380443.1155);
+    CHECK_DOUBLE(got, 91066990742.27197);
   }
   {
-    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x0000000000000000, 0x2800000000000000, 0xffffd4cdb937461d } };
+    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x0000000000000000, 0xc000000000000000, 0x0000e0d828b86621 } };
     double got = Fixed256_2double(&a);
-    CHECK_DOUBLE(got, -47494935919074.84);
+    CHECK_DOUBLE(got, 247219000731169.75);
   }
   {
-    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0xff9937dbf9f21930 } };
+    const union Fixed256 a = { .u64= { 0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0xffc32d33abef59f0 } };
     double got = Fixed256_2double(&a);
-    CHECK_DOUBLE(got, -2.893050467043912e+16);
+    CHECK_DOUBLE(got, -1.7120273628177936e+16);
   }
 }
 

@@ -26,12 +26,15 @@ Fixed256.h Fixed256.cc Fixed256CC.cc Fixed256-amd64.S Fixed256-aarch64.S
 
 fixed128_test_SOURCES=fixed128-test.c
 fixed128_test_LDADD=libmandy.a -lm
+fixed128-test.o: fixed128-test.inc
+fixed128-test.inc: Fixed-test.py
+	python3 Fixed-test.py Fixed128 > fixed128-test.inc
 
 fixed256_test_SOURCES=fixed256-test.c
 fixed256_test_LDADD=libmandy.a -lm
 fixed256-test.o: fixed256-test.inc
-fixed256-test.inc: Fixed256-test.py
-	python3 Fixed256-test.py > fixed256-test.inc
+fixed256-test.inc: Fixed-test.py
+	python3 Fixed-test.py Fixed256 > fixed256-test.inc
 
 fixed64_test_SOURCES=fixed64-test.c
 fixed64_test_LDADD=libmandy.a -lm

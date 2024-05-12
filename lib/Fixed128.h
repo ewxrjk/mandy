@@ -115,10 +115,6 @@ static inline bool Fixed128_lt(const union Fixed128 *a, const union Fixed128 *b)
   return a->s128 < b->s128;
 }
 
-static inline int Fixed128_lt_unsigned(const union Fixed128 *a, const union Fixed128 *b) {
-  return a->u128 < b->u128;
-}
-
 static inline bool Fixed128_gt(const union Fixed128 *a, const union Fixed128 *b) {
   return a->s128 > b->s128;
 }
@@ -131,12 +127,20 @@ static inline bool Fixed128_ge(const union Fixed128 *a, const union Fixed128 *b)
   return a->s128 >= b->s128;
 }
 
+static inline int Fixed128_lt_unsigned(const union Fixed128 *a, const union Fixed128 *b) {
+  return a->u128 < b->u128;
+}
+
 static inline bool Fixed128_gt_unsigned(const union Fixed128 *a, const union Fixed128 *b) {
   return a->u128 > b->u128;
 }
 
 static inline int Fixed128_le_unsigned(const union Fixed128 *a, const union Fixed128 *b) {
   return a->u128 <= b->u128;
+}
+
+static inline int Fixed128_ge_unsigned(const union Fixed128 *a, const union Fixed128 *b) {
+  return a->u128 >= b->u128;
 }
 
 static inline int Fixed128_eq0(const union Fixed128 *a) {
