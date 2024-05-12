@@ -143,15 +143,11 @@ public:
   }
 
   static int iterate(fixed256 zx, fixed256 zy, fixed256 cx, fixed256 cy, int maxiters, double &r2_out) {
-    // TODO a more asm-friendly implemenattion, e.g. using Fixed256_square
     Fixed256 r2, zx2, zy2;
     int iterations = 0;
     Fixed256 limit;
     Fixed256_int2(&limit, 64);
     for(;;) {
-      // TODO as currently implemented this generates a lot of pointless
-      // loads and stores. We may need to go to a top-to-bottom asm implmentation
-      // to avoid this.
       Fixed256_square(&zx2, &zx.f);
       Fixed256_square(&zy2, &zy.f);
       Fixed256_add(&r2, &zx2, &zy2);
@@ -186,14 +182,32 @@ public:
     return n.fromString(s, endptr);
   }
 
-  static int iterate(fixed128 zx, fixed128 zy, fixed128 cx, fixed128 cy, int maxiters, double &r2) {
+  static int iterate(fixed128 zx, fixed128 zy, fixed128 cx, fixed128 cy, int maxiters, double &r2_out) {
 #if HAVE_ASM_FIXED128_ITERATE
     int rawCount = Fixed128_iterate(&zx.f, &zy.f, &cx.f, &cy.f, maxiters);
     // r2 is returned in zx (rather oddly)
-    r2 = (double)zx;
+    r2_out = (double)zx;
     return rawCount;
 #else
-    return defaultIterate(zx, zy, cx, cy, maxiters, r2);
+    Fixed128 r2, zx2, zy2;
+    int iterations = 0;
+    Fixed128 limit;
+    Fixed128_int2(&limit, 64);
+    for(;;) {
+      Fixed128_square(&zx2, &zx.f);
+      Fixed128_square(&zy2, &zy.f);
+      Fixed128_add(&r2, &zx2, &zy2);
+      if(Fixed128_ge(&r2, &limit) || iterations >= maxiters)
+        break;
+      Fixed128_mul(&zy.f, &zx.f, &zy.f);
+      Fixed128_add(&zy.f, &zy.f, &zy.f);
+      Fixed128_add(&zy.f, &zy.f, &cy.f);
+      Fixed128_sub(&zx.f, &zx2, &zy2);
+      Fixed128_add(&zx.f, &zx.f, &cx.f);
+      ++iterations;
+    }
+    r2_out = Fixed128_2double(&r2);
+    return iterations;
 #endif
   }
 };
@@ -214,12 +228,12 @@ public:
     return n.fromString(s, endptr);
   }
 
-  static int iterate(arith_t zxa, arith_t zya, arith_t cxa, arith_t cya, int maxiters, double &r2) {
+  static int iterate(arith_t zxa, arith_t zya, arith_t cxa, arith_t cya, int maxiters, double &r2_out) {
     fixed64 zx = zxa, zy = zya, cx = cxa, cy = cya;
 #if HAVE_ASM_FIXED64_ITERATE
-    return Fixed64_iterate(zx.f, zy.f, cx.f, cy.f, &r2, maxiters);
+    return Fixed64_iterate(zx.f, zy.f, cx.f, cy.f, &r2_out, maxiters);
 #else
-    return defaultIterate(zx, zy, cx, cy, maxiters, r2);
+    return defaultIterate(zx, zy, cx, cy, maxiters, r2_out);
 #endif
   }
 };

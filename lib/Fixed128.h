@@ -66,6 +66,7 @@ static inline int Fixed128_neg(union Fixed128 *r, const union Fixed128 *a) {
 }
 
 int Fixed128_mul(union Fixed128 *r, const union Fixed128 *a, const union Fixed128 *b);
+int Fixed128_square(union Fixed128 *r, const union Fixed128 *a);
 
 void Fixed128_divu(union Fixed128 *r, const union Fixed128 *a, unsigned u);
 

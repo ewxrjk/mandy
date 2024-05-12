@@ -29,7 +29,7 @@ static inline void add_with_overflow(int *overflow, uint128_t *r, uint128_t b) {
   *r += b;
 }
 
-static int Fixed128_mul_unsigned(union Fixed128 *r, const union Fixed128 *a, const union Fixed128 *b) {
+static inline int Fixed128_mul_unsigned(union Fixed128 *r, const union Fixed128 *a, const union Fixed128 *b) {
   // Compute the four partial products. Recall representation is
   // little-endian.
   uint128_t hh = (uint128_t)a->u64[1] * (uint128_t)b->u64[1];
@@ -76,6 +76,17 @@ int Fixed128_mul(union Fixed128 *r, const union Fixed128 *a, const union Fixed12
   if(sign)
     overflow |= Fixed128_neg(r, r);
   return overflow;
+}
+
+int Fixed128_square(union Fixed128 *r, const union Fixed128 *a) {
+  union Fixed128 aa = {0};
+  int overflow = 0;
+  /* Sort out sign */
+  if(Fixed128_lt0(a)) {
+    overflow |= Fixed128_neg(&aa, a);
+    a = &aa;
+  }
+  return Fixed128_mul_unsigned(r, a, a);
 }
 
 void Fixed128_divu(union Fixed128 *r, const union Fixed128 *a, unsigned u) {
