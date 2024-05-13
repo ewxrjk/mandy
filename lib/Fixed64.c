@@ -20,22 +20,6 @@
 #include <errno.h>
 #include <assert.h>
 
-Fixed64 Fixed64_mul_generic(Fixed64 a, Fixed64 b) {
-  int sign = 0;
-  if(a < 0) {
-    a = -a;
-    sign = !sign;
-  }
-  if(b < 0) {
-    b = -b;
-    sign = !sign;
-  }
-  uint128_t r128 = (uint128_t)a * (uint128_t)b;
-  uint64_t c = (uint64_t)(r128 >> 55) & 1; // the bit we're going to carry out the bottom
-  Fixed64 r = (uint64_t)(r128 >> 56) + c;  // move the point back to the right place and round up
-  return sign ? -r : r;
-}
-
 Fixed64 Fixed64_div(Fixed64 a, Fixed64 b) {
   assert(b != 0);
   Fixed64 r;

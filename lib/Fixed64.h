@@ -25,7 +25,6 @@ extern "C" {
 
 typedef int64_t Fixed64;
 
-Fixed64 Fixed64_mul_generic(Fixed64 a, Fixed64 b);
 uint64_t Fixed64_div_unsigned(uint64_t a, uint64_t b);
 Fixed64 Fixed64_div(Fixed64 a, Fixed64 b);
 Fixed64 Fixed64_sqrt(Fixed64 a);
@@ -40,7 +39,19 @@ static inline Fixed64 Fixed64_mul(Fixed64 a, Fixed64 b) {
           : "rdx");     // clobber rdx
   return a;
 #else
-  return Fixed64_mul_generic(a, b);
+  int sign = 0;
+  if(a < 0) {
+    a = -a;
+    sign = !sign;
+  }
+  if(b < 0) {
+    b = -b;
+    sign = !sign;
+  }
+  uint128_t r128 = (uint128_t)a * (uint128_t)b;
+  uint64_t c = (uint64_t)(r128 >> 55) & 1; // the bit we're going to carry out the bottom
+  Fixed64 r = (uint64_t)(r128 >> 56) + c;  // move the point back to the right place and round up
+  return sign ? -r : r;
 #endif
 }
 
