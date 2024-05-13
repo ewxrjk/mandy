@@ -68,9 +68,8 @@ uint64_t Fixed64_div_unsigned(uint64_t a, uint64_t b) {
           "mov %%rax,%[t]\n\t"   // t = qh
           "xor %%rax,%%rax\n\t"  // rdx:rax = rh<<64 + xl
           "div %[b]\n\t"         // rax = ql, rdx = r
-          "shl $56,%[t]\n\t"
-          "shr $8,%%rax\n\t"
-          "adc %[t],%%rax"
+          "shrd $8,%[t],%%rax\n\t"
+          "adc $0,%%rax"
   : "+a"(a),                     // Quotient in rax
     "+&d"(d),                    // rdx is a temporary (and initially 0)
     [t]"=&r"(t)                  // temporary register
