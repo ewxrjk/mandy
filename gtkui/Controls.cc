@@ -147,6 +147,8 @@ Gtk::Widget *TextEntryControl::widget() {
 }
 
 bool TextEntryControl::DisplayIsValid() const {
+  if(!get_editable())
+    return true;
   return DisplayIsValid(get_text().c_str());
 }
 
