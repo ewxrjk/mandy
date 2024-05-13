@@ -82,7 +82,6 @@ AH_BOTTOM([#ifdef __GNUC__
 #if __amd64__
 # define HAVE_ASM_FIXED128_ITERATE 1
 # define HAVE_ASM_FIXED256_MUL 1
-# define HAVE_ASM_FIXED64_DIV 1
 # define HAVE_ASM_FIXED64_ITERATE 1
 #endif
 

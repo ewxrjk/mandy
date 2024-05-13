@@ -36,8 +36,48 @@ Fixed64 Fixed64_div(Fixed64 a, Fixed64 b) {
   return sign ? -r : r;
 }
 
-#if !HAVE_ASM_FIXED64_DIV
 uint64_t Fixed64_div_unsigned(uint64_t a, uint64_t b) {
+#if __amd64__
+/* To divide a 128-bit x by a 64-bit y:
+ *
+ *  Let x = xh<<64 + xl
+ *      q = qh<<64 + ql
+ *  We want:
+ *      x = q.y+r
+ *  
+ *  First division is qh = xh/y:
+ *     xh = qh.y + rh
+ *  Second division is ql = (rh<<64+xl)/y:
+ *     rh<<64+xl = ql.y + r
+ *  So
+ *     q.y+r = qh<<64.y + ql.y + r
+ *           = qh<<64.y + rh<<64 + xl
+ *           = (qh.y+rh)<<64 + xl
+ *           = xh<<64 + xl
+ *           = a
+ *
+ * In this case if we directly divided a/b then the fractional
+ * digits would all be lost. So divide (a<<64)/b to put the
+ * point at the bottom of qh, then shift the result and round.
+ * 
+ * In the above terms this means x=a<<64, xh=a, xl=0, y=b.
+ */
+  uint64_t d = 0, t;
+  // On entry: rdx:rax = a (i.e. xh)
+  __asm__("div %[b]\n\t"         // rdx = rh, rax = qh
+          "mov %%rax,%[t]\n\t"   // t = qh
+          "xor %%rax,%%rax\n\t"  // rdx:rax = rh<<64 + xl
+          "div %[b]\n\t"         // rax = ql, rdx = r
+          "shl $56,%[t]\n\t"
+          "shr $8,%%rax\n\t"
+          "adc %[t],%%rax"
+  : "+a"(a),                     // Quotient in rax
+    "+&d"(d),                    // rdx is a temporary (and initially 0)
+    [t]"=&r"(t)                  // temporary register
+  : [b]"r"(b)                    // divisor
+  : "cc");
+  return a;
+#else
   uint128_t a128 = (uint128_t)a << 64, b128 = (uint128_t)b << 64, q128 = 0, bit = (uint128_t)1 << (56 + 64);
   // Shift b up until b>=a. We adjust initial quotient bit
   // up to match.
@@ -59,8 +99,8 @@ uint64_t Fixed64_div_unsigned(uint64_t a, uint64_t b) {
   // Round up
   uint64_t q = (q128 >> 64) + ((q128 >> 63) & 1);
   return q;
+  #endif
 }
-#endif
 
 Fixed64 Fixed64_sqrt(Fixed64 a) {
   assert(a >= 0);
