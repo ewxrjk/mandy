@@ -92,5 +92,5 @@ AH_BOTTOM([#ifdef __GNUC__
 #define R2LIMIT 4 // Escape value
 ])
 
-AC_CONFIG_FILES([Makefile lib/Makefile images/Makefile web/Makefile gtkui/Makefile])
+AC_CONFIG_FILES([Makefile lib/Makefile images/Makefile gtkui/Makefile])
 AC_OUTPUT
