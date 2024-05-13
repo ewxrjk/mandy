@@ -67,7 +67,7 @@ static inline count_t transform_iterations(int iterations, double r2, int maxite
 template <typename T> int defaultIterate(T zx, T zy, T cx, T cy, int maxiters, double &r2_out) {
   T r2, zx2, zy2;
   int iterations = 0;
-  while(((r2 = (zx2 = zx * zx) + (zy2 = zy * zy)) < T(R2LIMIT)) && iterations < maxiters) {
+  while(((r2 = (zx2 = arith_traits<T>::square(zx)) + (zy2 = arith_traits<T>::square(zy))) < T(R2LIMIT)) && iterations < maxiters) {
     zy = T(2) * zx * zy + cy;
     zx = zx2 - zy2 + cx;
     ++iterations;
@@ -81,6 +81,10 @@ template <> class arith_traits<double> {
 public:
   static inline double maximum() {
     return HUGE_VAL;
+  }
+
+  static inline double square(double x) {
+    return x * x;
   }
 
   static std::string toString(const double &n) {
@@ -110,6 +114,10 @@ public:
 #endif
   }
 
+  static inline long double square(long double x) {
+    return x * x;
+  }
+
   static std::string toString(const long double &n) {
     std::stringstream s;
 
@@ -133,6 +141,10 @@ public:
   static inline fixed256 maximum() {
     Fixed256 f = { .u64 = { 0xffffffffffffffff, 0xffffffffffffffff, 0xffffffffffffffff, 0x7fffffffffffffff }};
     return fixed256(f);
+  }
+
+  static fixed256 inline square(const fixed256 &a) {
+    return a.square();
   }
 
   static std::string toString(const fixed256 &n) {
@@ -173,6 +185,10 @@ public:
     memset(f.word, 0xFF, sizeof f.word);
     f.word[NFIXED128 - 1] = 0x7FFFFFFF;
     return fixed128(f);
+  }
+
+  static fixed128 inline square(const fixed128 &a) {
+    return a.square();
   }
 
   static std::string toString(const fixed128 &n) {
@@ -219,6 +235,10 @@ public:
     fixed64 n;
     n.f = 0x7fffffffffffffffLL;
     return n;
+  }
+
+  static fixed64 inline square(const fixed64 &a) {
+    return a.square();
   }
 
   static std::string toString(const fixed64 &n) {

@@ -368,6 +368,12 @@ public:
   }
 #endif
 
+  fixed256 square() const {
+    fixed256 r;
+    Fixed256_square(&r.f, &f);
+    return r;
+  }
+
   // Comparison
 
   bool operator<(const fixed256 &that) const {

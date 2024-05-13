@@ -267,6 +267,12 @@ public:
     return r;
   }
 
+  fixed128 square() const {
+    fixed128 r;
+    Fixed128_square(&r.f, &f);
+    return r;
+  }
+
   // Comparison
 
   bool operator<(const fixed128 &that) const {

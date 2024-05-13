@@ -55,6 +55,21 @@ static inline Fixed64 Fixed64_mul(Fixed64 a, Fixed64 b) {
 #endif
 }
 
+static inline Fixed64 Fixed64_square(Fixed64 a) {
+#if __amd64__
+  return Fixed64_mul(a, a);
+#else
+  int sign = 0;
+  if(a < 0) {
+    a = -a;
+  }
+  uint128_t r128 = (uint128_t)a * (uint128_t)a;
+  uint64_t c = (uint64_t)(r128 >> 55) & 1; // the bit we're going to carry out the bottom
+  Fixed64 r = (uint64_t)(r128 >> 56) + c;  // move the point back to the right place and round up
+  return sign ? -r : r;
+#endif
+}
+
 static inline Fixed64 Fixed64_int2(int i) {
   return (Fixed64)((uint64_t)i << 56);
 }
@@ -102,9 +117,10 @@ public:
     if(err)
       throw std::runtime_error("fixed128 to fixed64 conversion failed");
   }
-fixed64(fixed256 ff) {
-  Fixed256_to_Fixed64(&f, &ff.f);
-}
+
+  fixed64(fixed256 ff) {
+    Fixed256_to_Fixed64(&f, &ff.f);
+  }
 
   // Assignment
 
@@ -176,6 +192,11 @@ fixed64(fixed256 ff) {
     return r;
   }
 
+  fixed64 square() const {
+    fixed64 r;
+    r.f = Fixed64_square(f);
+    return r;
+  }
   // Comparison
 
   bool operator<(const fixed64 &that) const {
