@@ -58,7 +58,9 @@
  *                      Fixed64 cx[rdx], Fixed64 cy[rcx],
  *                      double *r2p[r8],
  *                      int maxiters[r9);
- *
+ */
+#if R2LIMIT > 4
+/*
  * Register allocation:
  * rax,rdx      Accumulator for multiplications
  * rbx          iterations
@@ -101,7 +103,7 @@ iter1:
         add     rax,r11
         adc     rdx,r10                        // rdx:rax = zx^2+zy^2
         cmp     rdx,r15
-        jge     2f                             // escape if zx^2+zy^2 > 64
+        jge     2f                             // escape if zx^2+zy^2 > R2LIMIT
         shrd    r11,r10,56                     // r11 = zx^2
         mov     rax,rdi
         imul    rsi                            // rdx:rax = zx * zy
@@ -140,5 +142,70 @@ iter1:
         pop     r12
         pop     rbx
         ret
+#else
+        /* For smaller R2LIMIT we try to get away with overflow
+         *
+         * Register allocation:
+         * rax,rdx      Accumulator for multiplications
+         * rbx          iterations
+         * rcx          cy
+         * rdi          zx
+         * rsi          zy
+         * r8           r2p
+         * r9           maxiters
+         * r10          zx^2
+         * r11          zy^2
+         * r12          cx
+         * r13          escape limit
+          */
+        .globl  SYMBOL(Fixed64_iterate)
+SYMBOL(Fixed64_iterate):
+        push    rbx
+        push    r13
+        push    r12
+        push    r13
+        mov     r12,rdx                         // r12 <- cx
+        mov     rbx,0                           // iterations = 0
+        movabs  r13,R2LIMIT << 56               // r13 = R2LIMIT
+        .align  4
+iter2:
+        mov     rax,rdi                         // rax <- zx
+        imul    rdi                             // rdx:rax < zx^2 (16.112)
+        shrd    rax,rdx,56                      // rax <- zx^2
+        mov     r10,rax                         // r10 <- zx^2
+        mov     rax,rsi                         // rax <- zy^2
+        imul    rsi                             // rdx::rax <- zy^2 (16.112)
+        shrd    rax,rdx,56                      // rax <- zy^2
+        mov     r11,rax                         // r11 <- zy^2
+        add     rax,r10                         // rax <- zx^2 + zy^2 = r^2
+        cmp     rax,r13
+        jge     2f                              // escape if zx^2+zy^2 > R2LIMIT
+        mov     rax,rdi                         // rax <- zx
+        imul    rsi                             // rdx:rax <- zx * zy (16.112)
+        shrd    rax,rdx,55                      // rax <- 2 * zx * zy
+        lea     rsi,[rax+rcx]                   // rdi <- 2 * zx * zy + cy (new zy)
+        sub     r10,r11                         // r10 <- zx^2 - zy^2
+        lea     rdi,[r10+r12]                   // rdi <- zx^2 - zy^2 + cx (new zx)
+        inc     rbx                             // iterations += 1
+        cmp     rbx,r9
+        jb      iter2                           // repeat if iterations < maxiters
+        // Breached iteration limit
+        jmp     3f
+2:
+        // Escaped. Return r^2 in a double.
+        cvtsi2sd xmm0,rax
+        movabs  rdx,0x3c70000000000000          // =(double)2^-56
+        movq    xmm1,rdx
+        mulsd   xmm0,xmm1
+        movq    qword ptr [r8],xmm0
+3:
+        mov     rax,rbx                         // Return iteration count
+        pop     r13
+        pop     r12
+        pop     r13
+        pop     rbx
+        ret        
+      
+#endif
 #endif
 
