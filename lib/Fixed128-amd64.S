@@ -169,7 +169,7 @@ SYMBOL(Fixed128_mul):
  *
  * Registers are written in high,low order (even though memory is low-first)
  */
-        .align  4
+        .align  16
         .globl SYMBOL(Fixed128_iterate)
 SYMBOL(Fixed128_iterate):
         // Registers we must preserve
@@ -384,7 +384,7 @@ escaped:
         // rbx,rcx,rdi are used as accumulator
         //
         // In the language of Fixed128_mul, we have r14=Ab=Ef, r15=cd=gh
-        .align  4
+        .align  16
 square:
         // We can throw away sign information as the answer is never -ve
         cmp     r14,0

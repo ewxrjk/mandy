@@ -65,7 +65,7 @@ def amd64_footer():
 
 def amd64_op(op):
     print(f".text")
-    print(f".align 4")
+    print(f".align 16")
     print(f".globl SYMBOL(Fixed256_{op})")
     print(f"SYMBOL(Fixed256_{op}):")
     # rdi = r, rsi = a, rdx = b

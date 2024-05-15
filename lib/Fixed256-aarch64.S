@@ -21,7 +21,7 @@
 #define SYMBOL(s) s
 
 .text
-.align 4
+.align 16
 .globl SYMBOL(Fixed256_mul)
 SYMBOL(Fixed256_mul):
 // Load operands
@@ -175,7 +175,7 @@ SYMBOL(Fixed256_mul):
   stp x9,x10,[x0,16]
   ret
 .text
-.align 4
+.align 16
 .globl SYMBOL(Fixed256_square)
 SYMBOL(Fixed256_square):
 // Load operands

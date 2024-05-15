@@ -89,7 +89,7 @@ SYMBOL(Fixed64_iterate):
         mov     r14,rdx
         mov     rbx,0                          // iterations = 0
         movabs  r15,R2LIMIT << 48              // r15 = R2LIMIT, in 16.112 format
-        .align  4
+        .align  16
 iter1:
         // We keep z^2 in 16.112 format, since it may overflow 8.56
         mov     rax,rdi
@@ -167,7 +167,7 @@ SYMBOL(Fixed64_iterate):
         mov     r12,rdx                         // r12 <- cx
         mov     rbx,0                           // iterations = 0
         movabs  r13,R2LIMIT << 56               // r13 = R2LIMIT
-        .align  4
+        .align  16
 iter2:
         mov     rax,rdi                         // rax <- zx
         imul    rdi                             // rdx:rax < zx^2 (16.112)

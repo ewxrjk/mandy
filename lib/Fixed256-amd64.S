@@ -27,7 +27,7 @@
 #endif
 
 .text
-.align 4
+.align 16
 .globl SYMBOL(Fixed256_mul)
 SYMBOL(Fixed256_mul):
   push rbx
@@ -239,7 +239,7 @@ SYMBOL(Fixed256_mul):
   ret
 
 .text
-.align 4
+.align 16
 .globl SYMBOL(Fixed256_square)
 SYMBOL(Fixed256_square):
   push rbx

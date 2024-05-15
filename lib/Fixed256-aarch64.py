@@ -55,7 +55,7 @@ def a64_footer():
 
 def a64_op(op):
     print(f".text")
-    print(f".align 4")
+    print(f".align 16")
     print(f".globl SYMBOL(Fixed256_{op})")
     print(f"SYMBOL(Fixed256_{op}):")
     # x0 = r, x1 = a, x2 = b
