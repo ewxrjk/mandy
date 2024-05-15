@@ -187,6 +187,31 @@ iter2:
         sub     r10,r11                         // r10 <- zx^2 - zy^2
         lea     rdi,[r10+r12]                   // rdi <- zx^2 - zy^2 + cx (new zx)
         inc     rbx                             // iterations += 1
+
+#if 1 // 1 level of unrolling seems to be a marginal performance improvement
+        cmp     rbx,r9
+        jae     3f
+
+        mov     rax,rdi                         // rax <- zx
+        imul    rdi                             // rdx:rax < zx^2 (16.112)
+        shrd    rax,rdx,56                      // rax <- zx^2
+        mov     r10,rax                         // r10 <- zx^2
+        mov     rax,rsi                         // rax <- zy^2
+        imul    rsi                             // rdx::rax <- zy^2 (16.112)
+        shrd    rax,rdx,56                      // rax <- zy^2
+        mov     r11,rax                         // r11 <- zy^2
+        add     rax,r10                         // rax <- zx^2 + zy^2 = r^2
+        cmp     rax,r13
+        jge     2f                              // escape if zx^2+zy^2 > R2LIMIT
+        mov     rax,rdi                         // rax <- zx
+        imul    rsi                             // rdx:rax <- zx * zy (16.112)
+        shrd    rax,rdx,55                      // rax <- 2 * zx * zy
+        lea     rsi,[rax+rcx]                   // rdi <- 2 * zx * zy + cy (new zy)
+        sub     r10,r11                         // r10 <- zx^2 - zy^2
+        lea     rdi,[r10+r12]                   // rdi <- zx^2 - zy^2 + cx (new zx)
+        inc     rbx                             // iterations += 1
+#endif
+        
         cmp     rbx,r9
         jb      iter2                           // repeat if iterations < maxiters
         // Breached iteration limit
