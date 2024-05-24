@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <math.h>
 
+#if !HAVE_ASM_FIXED256_MUL
 // Force-inline so that Fixed256_square doesn't have to do so much work
 static __always_inline void Fixed256_mul_unsigned(union Fixed256 *r, const union Fixed256 *a, const union Fixed256 *b) {
   uint64_t c = 0;
@@ -134,7 +135,6 @@ static __always_inline void Fixed256_mul_unsigned(union Fixed256 *r, const union
 
 }
 
-#if !HAVE_ASM_FIXED256_MUL
 void Fixed256_mul(union Fixed256 *r, const union Fixed256 *a, const union Fixed256 *b) {
   int sign = 0;
   union Fixed256 ap, bp;

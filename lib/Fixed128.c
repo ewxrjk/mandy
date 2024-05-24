@@ -86,7 +86,8 @@ int Fixed128_square(union Fixed128 *r, const union Fixed128 *a) {
     overflow |= Fixed128_neg(&aa, a);
     a = &aa;
   }
-  return Fixed128_mul_unsigned(r, a, a);
+  overflow |= Fixed128_mul_unsigned(r, a, a);
+  return overflow;
 }
 
 void Fixed128_divu(union Fixed128 *r, const union Fixed128 *a, unsigned u) {
