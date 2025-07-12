@@ -44,6 +44,13 @@ if test "x$GXX" = xyes; then
     CXXFLAGS="-Wno-deprecated-copy $CXXFLAGS"
     ;;
   esac
+  # G++ 16 hates GTKMM, earlier G++'s won't let you disable a
+  # warning they don't have 🤡
+  case $(${CXX} --version) in
+  *"(GCC) 16."* )
+    CXXFLAGS="${CXXFLAGS} -Wno-error=sfinae-incomplete"
+    ;;
+  esac
 fi
 CXXFLAGS="${CXXFLAGS} ${CXXFLAGS_EXTRA}"
 AC_PROG_CC
