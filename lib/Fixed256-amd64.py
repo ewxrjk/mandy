@@ -57,6 +57,10 @@ def amd64_header():
 #else
 # define SYMBOL(s) _##s
 #endif
+
+#if __linux__
+.section .note.GNU-stack,"",@progbits
+#endif
 """)
 
 def amd64_footer():

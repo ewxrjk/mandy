@@ -26,6 +26,10 @@
 # define SYMBOL(s) _##s
 #endif
 
+#if __linux__
+.section .note.GNU-stack,"",@progbits
+#endif
+
 .text
 .align 16
 .globl SYMBOL(Fixed256_mul)

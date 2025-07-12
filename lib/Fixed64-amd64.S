@@ -22,6 +22,11 @@
 #endif
 
 #if __amd64__
+
+#if __linux__
+.section .note.GNU-stack,"",@progbits
+#endif
+
         .intel_syntax noprefix
 
 /*

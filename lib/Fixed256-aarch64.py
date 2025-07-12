@@ -47,6 +47,10 @@ def a64_neg(r):
 def a64_header():
     print("""#if __aarch64__
 #define SYMBOL(s) s
+
+#if __linux__
+.section .note.GNU-stack,"",@progbits
+#endif
 """)
 
 def a64_footer():
