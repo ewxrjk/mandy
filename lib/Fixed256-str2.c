@@ -77,9 +77,10 @@ static void mla(uint32_t value[NINTWORDS], int base, int digit) {
 static int sl(uint32_t value[NINTWORDS]) {
   int overflow = !!(value[NINTWORDS - 1] & 0x80000000);
   int n;
+  // The mask placates a sanitizer, and is compiled away
   for(n = NINTWORDS - 1; n > 0; --n)
-    value[n] = (value[n] << 1) + !!(value[n - 1] & 0x80000000);
-  value[0] <<= 1;
+    value[n] = ((value[n] & 0x7fffffff) << 1) + !!(value[n - 1] & 0x80000000);
+  value[0] = (value[0] & 0x7fffffff) << 1;
   return overflow;
 }
 

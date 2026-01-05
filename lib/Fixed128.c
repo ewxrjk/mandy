@@ -43,11 +43,14 @@ static inline int Fixed128_mul_unsigned(union Fixed128 *r, const union Fixed128 
   //
   // The bottom 96 bits will accumulate in u.
   int overflow = hh > ((uint128_t)1 << 96) - 1;
-  uint128_t result = hh << 32;
+  const uint128_t mask = ((uint128_t)0xFFFFFFFFFFFFFFFF + ((uint128_t)0xFFFFFFFF << 64));
+  uint128_t result = (hh & mask) << 32;
   add_with_overflow(&overflow, &result, hl >> 32);
-  uint128_t u = (hl << 64) & UNDERFLOW_MASK;
+  uint128_t u = ((hl & 0xffffffffffffffff) << 64) & UNDERFLOW_MASK;
   add_with_overflow(&overflow, &result, lh >> 32);
-  u += (lh << 64) & UNDERFLOW_MASK;
+  // The masking of the top bits placates a sanitizer; the compiler
+  // optimizes it out.
+  u += ((lh & 0xffffffffffffffff) << 64) & UNDERFLOW_MASK;
   add_with_overflow(&overflow, &result, ll >> 96);
   u += ll & UNDERFLOW_MASK;
   // If the top bit of the underflow is nonzero, round up.

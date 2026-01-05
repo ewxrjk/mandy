@@ -71,7 +71,7 @@ static inline Fixed64 Fixed64_square(Fixed64 a) {
 }
 
 static inline Fixed64 Fixed64_int2(int i) {
-  return (Fixed64)((uint64_t)i << 56);
+  return (Fixed64)(((uint64_t)i & 0xFF) << 56);
 }
 
 char *Fixed64_2str(char buffer[], unsigned bufsize, Fixed64 a, int base);

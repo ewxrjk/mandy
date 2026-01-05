@@ -73,7 +73,12 @@ def Fixed(INTBITS:int, FRACBITS: int):
 
         def C(self) -> str:
             if BITS == 64:
-                return f"0x{self.n:016x}" 
+                if self.n < (1<<63):
+                    return f"0x{self.n:016x}" 
+                elif self.n == 1<<63:
+                    return "INT64_MIN" # remarkably hard to get past both Clang and sanitizers
+                else:
+                    return f"-0x{(1<<64)-self.n:016x}" 
             else:
                 words = ", ".join([f"0x{self.u64(i):016x}" for i in range(0, BITS//64)])
                 return f"{{ .u64= {{ {words} }} }}"

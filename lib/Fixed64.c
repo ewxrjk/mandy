@@ -157,7 +157,7 @@ int Fixed128_to_Fixed64(Fixed64 *r, const union Fixed128 *a) {
   uint64_t result;
   if(intpart > 127 || intpart < -128)
     return ERANGE;
-  result = (uint64_t)a->word[NFIXED128 - 1] << 56;
+  result = ((uint64_t)a->word[NFIXED128 - 1] & 0xff) << 56;
   result += (uint64_t)a->word[NFIXED128 - 2] << 24;
   result += a->word[NFIXED128 - 3] >> 8;
   if(a->word[NFIXED128 - 3] & 128) {
@@ -174,6 +174,7 @@ void Fixed64_to_Fixed128(union Fixed128 *r, Fixed64 a) {
   memset(r, 0, sizeof *r);
   r->word[NFIXED128 - 1] = (uint32_t)(a >> 56);
   r->word[NFIXED128 - 2] = (uint32_t)(a >> 24);
+  a &= 0x00ffffffffffffff; // placate sanitizer; the optimizer removes it
   r->word[NFIXED128 - 3] = (uint32_t)((uint64_t)a << 8);
 }
 

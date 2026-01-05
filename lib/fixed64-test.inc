@@ -110,7 +110,7 @@ static void fixed64_test_mul(void) {
   {
     const Fixed64 a = 0x0f1ca20c7311d8a3;
     const Fixed64 b = 0x0c25ced2a6cecc1b;
-    const Fixed64 expect = 0xb792f17aed30b596;
+    const Fixed64 expect = -0x486d0e8512cf4a6a;
     got = Fixed64_mul(a, b);
     CHECK(got, expect);
   }
@@ -145,7 +145,7 @@ static void fixed64_test_mul(void) {
   {
     const Fixed64 a = 0x0b0ffa503bab6c39;
     const Fixed64 b = 0x0d51589705805975;
-    const Fixed64 expect = 0x9353984b1fab5098;
+    const Fixed64 expect = -0x6cac67b4e054af68;
     got = Fixed64_mul(a, b);
     CHECK(got, expect);
   }
@@ -166,14 +166,14 @@ static void fixed64_test_mul(void) {
   {
     const Fixed64 a = 0x0ffac622e1ea24c4;
     const Fixed64 b = 0x0c965a57815a47c5;
-    const Fixed64 expect = 0xc923dd5afbf2ade7;
+    const Fixed64 expect = -0x36dc22a5040d5219;
     got = Fixed64_mul(a, b);
     CHECK(got, expect);
   }
   {
     const Fixed64 a = 0x0f5e04f708d6af57;
     const Fixed64 b = 0x0cefed97cc22af58;
-    const Fixed64 expect = 0xc6cf455e59f282cf;
+    const Fixed64 expect = -0x3930baa1a60d7d31;
     got = Fixed64_mul(a, b);
     CHECK(got, expect);
   }
@@ -194,7 +194,7 @@ static void fixed64_test_mul(void) {
   {
     const Fixed64 a = 0x0bdb525b64ac5db9;
     const Fixed64 b = 0x0f04abad07923986;
-    const Fixed64 expect = 0xb2113427e72530fb;
+    const Fixed64 expect = -0x4deecbd818dacf05;
     got = Fixed64_mul(a, b);
     CHECK(got, expect);
   }
@@ -347,7 +347,7 @@ static void fixed64_test_2str(void) {
     CHECK_STR(buffer, "1");
   }
   {
-    const Fixed64 a = 0xff00000000000000;
+    const Fixed64 a = -0x0100000000000000;
     Fixed64_2str(buffer, sizeof buffer, a, 10);
     CHECK_STR(buffer, "-1");
     Fixed64_2str(buffer, sizeof buffer, a, 16);
@@ -361,7 +361,7 @@ static void fixed64_test_2str(void) {
     CHECK_STR(buffer, "7f.ffffffffffffff");
   }
   {
-    const Fixed64 a = 0x8000000000000000;
+    const Fixed64 a = INT64_MIN;
     Fixed64_2str(buffer, sizeof buffer, a, 10);
     CHECK_STR(buffer, "-128");
     Fixed64_2str(buffer, sizeof buffer, a, 16);
@@ -598,17 +598,17 @@ static void fixed64_test_double2(void) {
     CHECK(got, expect);
   }
   {
-    const Fixed64 expect = 0xffffffffff829869;
+    const Fixed64 expect = -0x00000000007d6797;
     got = Fixed64_double2(-1.1405487277571964e-10);
     CHECK(got, expect);
   }
   {
-    const Fixed64 expect = 0xfffffffffda9aaf1;
+    const Fixed64 expect = -0x000000000256550f;
     got = Fixed64_double2(-5.4418002463091e-10);
     CHECK(got, expect);
   }
   {
-    const Fixed64 expect = 0xffffffe623b15e3a;
+    const Fixed64 expect = -0x00000019dc4ea1c6;
     got = Fixed64_double2(-1.5414103763202476e-06);
     CHECK(got, expect);
   }
@@ -618,7 +618,7 @@ static void fixed64_test_double2(void) {
     CHECK(got, expect);
   }
   {
-    const Fixed64 expect = 0xffc9e9c606b7f320;
+    const Fixed64 expect = -0x00361639f9480ce0;
     got = Fixed64_double2(-0.21127664886448683);
     CHECK(got, expect);
   }

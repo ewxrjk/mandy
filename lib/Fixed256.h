@@ -160,16 +160,16 @@ void Fixed256_mul(union Fixed256 *r, const union Fixed256 *a, const union Fixed2
 void Fixed256_square(union Fixed256 *r, const union Fixed256 *a);
 
 static inline void Fixed256_shl_unsigned(union Fixed256 *a) {
-  a->u64[3] = (a->u64[3] << 1) | (a->u64[2] >> 63);
-  a->u64[2] = (a->u64[2] << 1) | (a->u64[1] >> 63);
-  a->u64[1] = (a->u64[1] << 1) | (a->u64[0] >> 63);
-  a->u64[0] = a->u64[0] << 1;
+  a->u64[3] = ((a->u64[3] & 0x7fffffffffffffff) << 1) | (a->u64[2] >> 63);
+  a->u64[2] = ((a->u64[2] & 0x7fffffffffffffff) << 1) | (a->u64[1] >> 63);
+  a->u64[1] = ((a->u64[1] & 0x7fffffffffffffff) << 1) | (a->u64[0] >> 63);
+  a->u64[0] = (a->u64[0] & 0x7fffffffffffffff) << 1;
 }
 
 static inline void Fixed256_shr_unsigned(union Fixed256 *a) {
-  a->u64[0] = (a->u64[0] >> 1) | (a->u64[1] << 63);
-  a->u64[1] = (a->u64[1] >> 1) | (a->u64[2] << 63);
-  a->u64[2] = (a->u64[2] >> 1) | (a->u64[3] << 63);
+  a->u64[0] = (a->u64[0] >> 1) | ((a->u64[1] & 1) << 63);
+  a->u64[1] = (a->u64[1] >> 1) | ((a->u64[2] & 1) << 63);
+  a->u64[2] = (a->u64[2] >> 1) | ((a->u64[3] & 1) << 63);
   a->u64[3] = a->u64[3] >> 1;
 }
 

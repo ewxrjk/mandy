@@ -58,7 +58,7 @@ static inline void Fixed128_sub(union Fixed128 *r, const union Fixed128 *a, cons
 
 static inline int Fixed128_neg(union Fixed128 *r, const union Fixed128 *a) {
   uint32_t sign = a->word[NFIXED128 - 1] & 0x80000000;
-  r->u128 = -a->u128;
+  r->u128 = ~a->u128 + 1;  
   if(sign && (r->word[NFIXED128 - 1] & 0x80000000))
     return 1;
   else
