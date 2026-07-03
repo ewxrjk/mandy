@@ -17,11 +17,9 @@
 #ifndef VIEW_H
 #define VIEW_H
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wparentheses"
-#include <gtkmm/drawingarea.h>
-#pragma GCC diagnostic pop
 #include "arith.h"
+#include <cairomm/context.h>
+#include <gtkmm/drawingarea.h>
 
 class IterBuffer;
 class FractalJobFactory;
@@ -37,7 +35,7 @@ public:
   virtual bool on_button_press_event(GdkEventButton *);
   virtual bool on_button_release_event(GdkEventButton *);
   virtual bool on_motion_notify_event(GdkEventMotion *);
-  virtual bool on_expose_event(GdkEventExpose *);
+  virtual bool on_draw(const ::Cairo::RefPtr< ::Cairo::Context>& );
 
   void NewPointer(int xpos, int ypos);
   void NewLocation(int xpos = -1, int ypos = -1);
@@ -70,7 +68,6 @@ private:
   IterBuffer *dest = nullptr;
   Glib::RefPtr<Gdk::Pixbuf> pixbuf;
 
-  void Redraw(int x, int y, int w, int h);
   void NewPixels(int x, int y, int w, int h);
   void NewPixels();
   static void Completed(Job *generic_job, void *completion_data);

@@ -42,13 +42,13 @@ void GenericWindow::Initialize(View *view_) {
 bool GenericWindow::on_key_release_event(GdkEventKey *event) {
   if((event->state & (Gdk::SHIFT_MASK | Gdk::CONTROL_MASK)) == Gdk::CONTROL_MASK) {
     switch(event->keyval) {
-    case GDK_equal:
-    case GDK_minus:
-    case GDK_KP_Add:
-    case GDK_KP_Subtract: {
-      int w, h;
-      view->get_window()->get_size(w, h);
-      if(event->keyval == GDK_equal || event->keyval == GDK_KP_Add)
+    case GDK_KEY_equal:
+    case GDK_KEY_minus:
+    case GDK_KEY_KP_Add:
+    case GDK_KEY_KP_Subtract: {
+      auto window = view->get_window();
+      int w = window->get_width(), h = window->get_height();
+      if(event->keyval == GDK_KEY_equal || event->keyval == GDK_KEY_KP_Add)
         view->Zoom(w / 2.0, h / 2.0, M_SQRT1_2);
       else
         view->Zoom(w / 2.0, h / 2.0, M_SQRT2);

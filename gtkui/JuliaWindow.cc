@@ -16,9 +16,9 @@
 #include "mmui.h"
 #include "MainMenu.h"
 #include "JuliaWindow.h"
+#include "arith.h"
 #include <gtkmm/frame.h>
 #include <gtkmm/box.h>
-#include "arith.h"
 
 namespace mmui {
 

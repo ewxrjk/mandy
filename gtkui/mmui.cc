@@ -17,8 +17,9 @@
 #include "JuliaWindow.h"
 #include "MandelbrotWindow.h"
 #include "Draw.h"
-#include <gtkmm/main.h>
 #include <getopt.h>
+#include <gtkmm/main.h>
+#include <glibmm/main.h>
 
 mmui::MandelbrotWindow *mmui::mandelbrot;
 mmui::JuliaWindow *mmui::julia;
@@ -33,7 +34,7 @@ static bool pollAgainHandler() {
 static bool periodic() {
   bool more = Job::poll(1);
   if(more && !pollAgainConnection.connected())
-    pollAgainConnection = Glib::signal_idle().connect(sigc::ptr_fun(pollAgainHandler));
+    pollAgainConnection = Glib::MainContext::get_default()->signal_idle().connect(sigc::ptr_fun(pollAgainHandler));
   return true;
 }
 
@@ -105,7 +106,7 @@ int main(int argc, char **argv) {
   if(optind != argc)
     fatal(0, "invalid argument '%s'", argv[optind]);
 
-  Glib::signal_timeout().connect(sigc::ptr_fun(periodic), 10);
+  Glib::MainContext::get_default()->signal_timeout().connect(sigc::ptr_fun(periodic), 10);
 
   mmui::mandelbrot = new mmui::MandelbrotWindow();
   mmui::julia = new mmui::JuliaWindow();

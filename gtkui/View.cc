@@ -18,12 +18,14 @@
 #include "ControlPanel.h"
 #include "FractalJob.h"
 #include "Color.h"
+#include "arith.h"
+#include <algorithm>
+#include <cstring>
+#include <glibmm/main.h>
+#include <gdkmm/general.h>
 #include <gtkmm/filechooserdialog.h>
 #include <gtkmm/stock.h>
 #include <gtkmm/image.h>
-#include <algorithm>
-#include <cstring>
-#include "arith.h"
 
 namespace mmui {
 View::View() {
@@ -96,13 +98,13 @@ bool View::on_motion_notify_event(GdkEventMotion *event) {
   dragToX = event->x;
   dragToY = event->y;
   if(!dragIdleConnection.connected())
-    dragIdleConnection = Glib::signal_idle().connect(sigc::mem_fun(*this, &View::DragIdle));
+    Glib::MainContext::get_default()->signal_idle().connect(sigc::mem_fun(*this, &View::DragIdle));
   return true;
 }
 
 void View::GetCoordinates(arith_t &x, arith_t &y, int xpos, int ypos) {
-  int w, h;
-  get_window()->get_size(w, h);
+  auto window = get_window();
+  int w = window->get_width(), h = window->get_height();
   if(w > h) {
     x = xcenter + radius * (xpos * 2.0 - w) / h;
     y = ycenter - radius * (ypos * 2.0 / h - 1);
@@ -133,30 +135,23 @@ void View::DragComplete() {
 
 // Redrawing ----------------------------------------------------------------
 
-bool View::on_expose_event(GdkEventExpose *) {
-  int w, h;
-  get_window()->get_size(w, h);
-  if(!pixbuf || w != pixbuf->get_width() || h != pixbuf->get_height()) {
-    // The pixbuf is the wrong size (i.e. the window has been
-    // resized).  Attempt a recompute.
+bool View::on_draw(const ::Cairo::RefPtr< ::Cairo::Context>& cairocontext) {
+  auto window = get_window();
+  if(window->get_width() != pixbuf->get_width() || window->get_height() != pixbuf->get_height())
     NewSize();
-  } else {
-    // Just draw what we've got
-    // TODO only redraw the bit that was exposed
-    Redraw(0, 0, w, h);
-  }
+  
+  // TODO can we limit to just drawing the area we need?
+  //auto window = get_window();
+  //int w = window->get_width(), h = window->get_height();
+  Gdk::Cairo::set_source_pixbuf(cairocontext, pixbuf, 0, 0);
+  cairocontext->paint();
   return true;
-}
-
-void View::Redraw(int x, int y, int w, int h) {
-  get_window()->draw_pixbuf(
-      get_style()->get_fg_gc(Gtk::STATE_NORMAL), pixbuf, x, y, x, y, w, h, Gdk::RGB_DITHER_NONE, 0, 0);
 }
 
 // Recolor the entire view
 void View::NewPixels() {
-  int w, h;
-  get_window()->get_size(w, h);
+  auto window = get_window();
+  int w = window->get_width(), h = window->get_height();
   NewPixels(0, 0, w, h);
 }
 
@@ -182,6 +177,7 @@ void View::NewPixels(int px, int py, int pw, int ph) {
       }
     }
   }
+  queue_draw_area(px, py, pw, ph);
 }
 
 // Job completion callback
@@ -194,7 +190,6 @@ void View::Completed(Job *generic_job, void *data) {
   if(j->dest != v->dest)
     return;
   v->NewPixels(j->x, j->y, j->w, j->h);
-  v->Redraw(j->x, j->y, j->w, j->h);
   double elapsed_time = finished.tv_sec - v->started.tv_sec + (finished.tv_nsec - v->started.tv_nsec) / 1000000000.0;
   char buffer[64];
   snprintf(buffer, sizeof buffer, "%gs", elapsed_time);
@@ -211,10 +206,10 @@ void View::NewLocation(int xpos, int ypos) {
     dest->release();
     dest = NULL;
   }
-  int w, h;
-  get_window()->get_size(w, h);
+  auto window = get_window();
+  int w = window->get_width(), h = window->get_height();
   if(!pixbuf)
-    pixbuf = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, false, 8, w, h);
+    pixbuf = Gdk::Pixbuf::create(Gdk::Colorspace::COLORSPACE_RGB, false, 8, w, h);
   // TODO if there's a pixbuf available then ideally we would move or scale it
   // to provide continuity.
   if(xpos == -1 || ypos == -1)
@@ -229,8 +224,8 @@ void View::NewLocation(int xpos, int ypos) {
 void View::NewSize() {
   if(!property_visible())
     return;
-  int wNew, hNew;
-  get_window()->get_size(wNew, hNew);
+  auto window = get_window();
+  int wNew = window->get_width(), hNew = window->get_height();
   // If there's a pixbuf it'll be the wrong size, so delete it.  We draw it
   // first to provide visual continuity.
   if(pixbuf) {
@@ -256,7 +251,7 @@ void View::NewSize() {
     arith_t offset_x = (wNew - wScaled) / 2;
     arith_t offset_y = (hNew - hScaled) / 2;
     // Create the new pixbuf
-    Glib::RefPtr<Gdk::Pixbuf> newPixbuf = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, false, 8, wNew, hNew);
+    Glib::RefPtr<Gdk::Pixbuf> newPixbuf = Gdk::Pixbuf::create(Gdk::Colorspace::COLORSPACE_RGB, false, 8, wNew, hNew);
     // Areas outside the rescaled image will be mid-grey
     memset(newPixbuf->get_pixels(), 0x80, newPixbuf->get_rowstride() * hNew);
     // Do the scale
@@ -269,10 +264,9 @@ void View::NewSize() {
                   (double)(offset_y),
                   (double)(scale),
                   (double)(scale),
-                  Gdk::INTERP_NEAREST);
+                  Gdk::InterpType::INTERP_NEAREST);
     // Use the new pixbuf henceforth
     pixbuf = newPixbuf;
-    Redraw(0, 0, pixbuf->get_width(), pixbuf->get_height());
   }
   NewLocation(wNew / 2, hNew / 2);
 }
@@ -280,8 +274,8 @@ void View::NewSize() {
 // Motion -------------------------------------------------------------------
 
 void View::Drag(int deltax, int deltay) {
-  int w, h;
-  get_window()->get_size(w, h);
+  auto window = get_window();
+  int w = window->get_width(), h = window->get_height();
   if(w > h) {
     xcenter -= arith_t(deltax) * radius * 2 / h;
     ycenter += arith_t(deltay) * radius * 2 / h;
@@ -292,8 +286,8 @@ void View::Drag(int deltax, int deltay) {
 }
 
 void View::Zoom(arith_t x, arith_t y, arith_t scale) {
-  int w, h;
-  get_window()->get_size(w, h);
+  auto window = get_window();
+  int w = window->get_width(), h = window->get_height();
   /* The idea is that when you click on a point, it should zoom
    * *around that point*.  Formally we require that:
    *

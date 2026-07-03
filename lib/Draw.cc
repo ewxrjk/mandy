@@ -129,7 +129,7 @@ int draw(int width,
   } else {
     // Convert to a pixbuf
     // TODO de-dupe with View::Completed
-    Glib::RefPtr<Gdk::Pixbuf> pixbuf = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, false, 8, width, height);
+    Glib::RefPtr<Gdk::Pixbuf> pixbuf = Gdk::Pixbuf::create(Gdk::Colorspace::COLORSPACE_RGB, false, 8, width, height);
     const int rowstride = pixbuf->get_rowstride();
     guint8 *pixels = pixbuf->get_pixels();
     for(int py = 0; py < height; ++py) {

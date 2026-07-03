@@ -8,7 +8,7 @@ set.
 You will need [gtkmm](https://www.gtkmm.org) and either GNU C++ or Clang.
 
 ```
-apt install libgtkmm-2.4-dev autoconf-archive
+apt install libgtkmm-3.0-dev autoconf-archive
 ./autogen.sh
 ./configure 
 make check

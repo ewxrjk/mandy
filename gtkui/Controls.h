@@ -16,14 +16,11 @@
 #ifndef CONTROLS_H
 #define CONTROLS_H
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wparentheses"
 #include <gtkmm/label.h>
 #include <gtkmm/entry.h>
-#include <gtkmm/table.h>
-#include <gtkmm/filechooserbutton.h>
 #include <gtkmm/comboboxtext.h>
-#pragma GCC diagnostic pop
+#include <gtkmm/filechooserbutton.h>
+#include <gtkmm/table.h>
 
 namespace mmui {
 
@@ -81,7 +78,7 @@ public:
   template <typename T>
   DropDownControl(ControlContainer *p, std::string *value, const T &s, const T &e): Control(p), m_value(value) {
     for(T it = s; it != e; ++it)
-      append_text(*it);
+      append(*it);
     set_active_text(*value);
   }
 

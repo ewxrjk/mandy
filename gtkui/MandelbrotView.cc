@@ -65,9 +65,9 @@ void MandelbrotView::Movie() {
 
 void MandelbrotView::NewJulia(arith_t xpos, arith_t ypos) {
   if(juliaView) {
-    int w, h;
     arith_t x, y;
-    get_window()->get_size(w, h);
+    auto window = get_window();
+    int w = window->get_width(), h = window->get_height();
     if(w > h) {
       x = xcenter + radius * (xpos * 2.0 - w) / h;
       y = ycenter - radius * (ypos * 2.0 / h - 1);

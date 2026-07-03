@@ -15,3 +15,8 @@
 SUBDIRS=lib images gtkui
 EXTRA_DIST=debian/rules debian/control debian/changelog		\
 	debian/copyright README.md
+
+all: .vscode/c_cpp_properties.json
+
+.vscode/c_cpp_properties.json: config.log scripts/vscode.py
+	scripts/vscode.py > .vscode/c_cpp_properties.json

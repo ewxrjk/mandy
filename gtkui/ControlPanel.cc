@@ -49,8 +49,8 @@ ControlPanel::ControlPanel(View *v):
 }
 
 void ControlPanel::Activated() {
-  int w, h;
-  view->get_window()->get_size(w, h);
+  auto window = view->get_window();
+  int w = window->get_width(), h = window->get_height();
   view->NewLocation(w / 2, h / 2);
 }
 

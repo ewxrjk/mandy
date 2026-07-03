@@ -14,15 +14,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "mmui.h"
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wparentheses"
-#include <gtkmm/dialog.h>
-#include <gtkmm/stock.h>
-#include <gtkmm/menu.h>
-#pragma GCC diagnostic pop
 #include "MainMenu.h"
 #include "JuliaWindow.h"
 #include "MandelbrotWindow.h"
+#include <gtkmm/dialog.h>
+#include <gtkmm/stock.h>
+#include <gtkmm/menu.h>
+#include <gtkmm/imagemenuitem.h>
+#include <gtkmm/checkmenuitem.h>
 
 #include "logo.h"
 
@@ -133,7 +132,7 @@ public:
   Gtk::ImageMenuItem aboutItem;
 
   void AboutActivated() {
-    Gtk::Dialog about("About Mandy", FindParent(this), true /*modal*/);
+    Gtk::Dialog about("About Mandy", *FindParent(this), true /*modal*/);
     Gtk::Label name;
     name.set_markup("<span font_desc=\"Sans 36\">Mandy</span>");
     Gtk::Label description("Mandelbrot/Julia Set Generator");

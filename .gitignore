@@ -44,3 +44,4 @@ ipch
 TestResults
 *.log
 *.trs
+.vscode/c_cpp_properties.json
