@@ -20,7 +20,7 @@
 #include <gtkmm/entry.h>
 #include <gtkmm/comboboxtext.h>
 #include <gtkmm/filechooserbutton.h>
-#include <gtkmm/table.h>
+#include <gtkmm/grid.h>
 
 namespace mmui {
 
@@ -40,7 +40,7 @@ class Control {
   Gtk::Label label;
 
 public:
-  inline Control(ControlContainer *p): parent(p) {}
+  inline Control(ControlContainer *p): parent(p) { }
 
   // Attach to parent container, with a caption
   void Attach(int x, int y, const char *caption, int width = 1);
@@ -203,7 +203,7 @@ public:
 };
 
 // Container of controls
-class ControlContainer: public Gtk::Table {
+class ControlContainer: public Gtk::Grid {
 public:
   // Collection of child controls
   std::vector<Control *> controls;

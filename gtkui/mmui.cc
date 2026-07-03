@@ -38,6 +38,21 @@ static bool periodic() {
   return true;
 }
 
+class MandyApplication: public Gtk::Application {
+public:
+  void on_activate() override {
+    Glib::MainContext::get_default()->signal_timeout().connect(sigc::ptr_fun(periodic), 10);
+
+    mmui::mandelbrot = new mmui::MandelbrotWindow();
+    mmui::julia = new mmui::JuliaWindow();
+    mmui::mandelbrot->view.NewSize();
+    mmui::mandelbrot->view.SetJulia(&mmui::julia->view, mmui::julia);
+    mmui::julia->view.NewSize();
+
+  add_window(*mmui::mandelbrot);
+  }
+};
+
 static const struct option options[] = {{"help", no_argument, NULL, 'h'},
                                         {"threads", required_argument, NULL, 't'},
                                         {"draw", no_argument, NULL, 'd'},
@@ -45,7 +60,6 @@ static const struct option options[] = {{"help", no_argument, NULL, 'h'},
                                         {NULL, 0, NULL, 0}};
 
 int main(int argc, char **argv) {
-  Gtk::Main kit(argc, argv);
   int nthreads = -1, mode = 0;
 
   int n;
@@ -106,15 +120,8 @@ int main(int argc, char **argv) {
   if(optind != argc)
     fatal(0, "invalid argument '%s'", argv[optind]);
 
-  Glib::MainContext::get_default()->signal_timeout().connect(sigc::ptr_fun(periodic), 10);
-
-  mmui::mandelbrot = new mmui::MandelbrotWindow();
-  mmui::julia = new mmui::JuliaWindow();
-  mmui::mandelbrot->view.NewSize();
-  mmui::mandelbrot->view.SetJulia(&mmui::julia->view, mmui::julia);
-  mmui::julia->view.NewSize();
-
-  Gtk::Main::run(*mmui::mandelbrot);
+  MandyApplication app;
+  app.run();
   return 0;
 }
 

@@ -63,9 +63,14 @@ void ControlContainer::SetSensitivity(bool sensitivity) {
 
 void Control::Attach(int x, int y, const char *caption, int width) {
   label.set_text(caption);
-  label.set_alignment(1.0, 0.0);
-  parent->attach(label, 2 * x, 2 * x + 1, y, y + 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
-  parent->attach(*widget(), 2 * x + 1, 2 * (x + width), y, y + 1, Gtk::FILL, Gtk::SHRINK, 1, 1);
+  label.set_xalign(1.0);
+  label.set_yalign(0.5);
+  label.set_margin_end(4);
+  label.set_margin_start(4);
+  label.set_margin_bottom(1);
+  label.set_margin_top(1);
+  parent->attach(label, 2 * x, y, 1, 1);
+  parent->attach(*widget(), 2 * x + 1, y, width, 1);
 }
 
 bool Control::DisplayIsValid() const {

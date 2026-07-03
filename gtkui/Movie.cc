@@ -224,8 +224,8 @@ MovieControls::MovieControls(MovieWindow *window):
   m_height_control.Attach(1, 4, "Height");
   m_arith_control.Attach(1, 5, "Precision");
 
-  m_ffmpeg_control.Attach(0, 6, "Encoder", 2);
-  m_path_control.Attach(0, 7, "Filename", 2);
+  m_ffmpeg_control.Attach(0, 6, "Encoder", 3);
+  m_path_control.Attach(0, 7, "Filename", 3);
 }
 
 void MovieControls::controlChanged(Control *c) {
